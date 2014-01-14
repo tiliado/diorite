@@ -1,0 +1,4 @@
+build
+playground/_build
+.waf*
+.lock*
