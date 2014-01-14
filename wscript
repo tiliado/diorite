@@ -33,6 +33,7 @@ APPNAME = "diorite"
 VERSION = "0.1.0"
 API_VERSION = "0.1"
 
+import sys
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from waflib.Context import WAFVERSION
@@ -41,7 +42,17 @@ WAF_VERSION = map(int, WAFVERSION.split("."))
 REQUIRED_VERSION = [1, 7, 14] 
 if WAF_VERSION < REQUIRED_VERSION:
 	print("Too old waflib %s < %s. Use waf binary distributed with the source code!" % (WAF_VERSION, REQUIRED_VERSION))
-	import sys; sys.exit(1)
+	sys.exit(1)
+
+LINUX = "linux"
+WIN = "win"
+
+if sys.platform.startswith("linux"):
+	_PLATFORM = LINUX
+elif sys.platform.startswith("win"):
+	_PLATFORM = WIN
+else:
+	_PLATFORM = sys.platform
 
 @conf
 def vala_def(ctx, vala_definition):
@@ -81,11 +92,20 @@ def options(ctx):
 	ctx.add_option('--debug', action='store_true', default=True, dest='debug', help="Turn on debugging symbols")
 	ctx.add_option('--no-debug', action='store_false', dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--no-ldconfig', action='store_false', default=True, dest='ldconfig', help="Don't run ldconfig after installation")
+	ctx.add_option('--platform', default=_PLATFORM, help="Target platform")
 
 # Configure build process
 def configure(ctx):
+	
+	ctx.env.PLATFORM = PLATFORM = ctx.options.platform
+	if PLATFORM not in (WIN, LINUX):
+		print("Unsupported platform %s. Please try to talk to devs to consider support of your platform." % sys.platform)
+		sys.exit(1)
+	
 	ctx.env.VALA_DEFINES = []
+	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
+	
 	ctx.load('compiler_c vala')
 	ctx.check_vala(min_version=(0,16,1))
 	
@@ -130,9 +150,15 @@ def build(ctx):
 		packages = packages,
 		uselib = uselib,
 		vala_defines = vala_defines,
-		#~ install_path = '${LIBDIR}/%s' % (DIORITE_GLIB),
 		vapi_dirs = ['vapi']
 	)
+	
+	if ctx.env.PLATFORM == WIN:
+		LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
+		CFLAGS="-mms-bitfields"
+	else:
+		LIBNAME = "dioriteglib"
+		CFLAGS=""
 	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
@@ -143,12 +169,14 @@ def build(ctx):
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
-		API_VERSION=API_VERSION
+		API_VERSION=API_VERSION,
+		CFLAGS=CFLAGS,
+		LIBNAME=LIBNAME
 		)
 	
 	ctx.add_post_fun(post)
 
 def post(ctx):
 	if ctx.cmd in ('install', 'uninstall'):
-		if ctx.options.ldconfig:
+		if ctx.env.PLATFORM == LINUX and ctx.options.ldconfig:
 			ctx.exec_command('/sbin/ldconfig') 
