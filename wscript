@@ -35,6 +35,13 @@ API_VERSION = "0.1"
 
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
+from waflib.Context import WAFVERSION
+
+WAF_VERSION = map(int, WAFVERSION.split("."))
+REQUIRED_VERSION = [1, 7, 14] 
+if WAF_VERSION < REQUIRED_VERSION:
+	print("Too old waflib %s < %s. Use waf binary distributed with the source code!" % (WAF_VERSION, REQUIRED_VERSION))
+	import sys; sys.exit(1)
 
 @conf
 def vala_def(ctx, vala_definition):
