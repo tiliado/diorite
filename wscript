@@ -150,7 +150,8 @@ def build(ctx):
 		packages = packages,
 		uselib = uselib,
 		vala_defines = vala_defines,
-		vapi_dirs = ['vapi']
+		vapi_dirs = ['vapi'],
+		vala_target_glib = "2.32",
 	)
 	
 	if ctx.env.PLATFORM == WIN:
