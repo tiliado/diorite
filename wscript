@@ -44,15 +44,15 @@ if WAF_VERSION < REQUIRED_VERSION:
 	print("Too old waflib %s < %s. Use waf binary distributed with the source code!" % (WAF_VERSION, REQUIRED_VERSION))
 	sys.exit(1)
 
-LINUX = "linux"
-WIN = "win"
+LINUX = "LINUX"
+WIN = "WIN"
 
 if sys.platform.startswith("linux"):
 	_PLATFORM = LINUX
 elif sys.platform.startswith("win"):
 	_PLATFORM = WIN
 else:
-	_PLATFORM = sys.platform
+	_PLATFORM = sys.platform.upper()
 
 @conf
 def vala_def(ctx, vala_definition):
@@ -97,12 +97,12 @@ def options(ctx):
 # Configure build process
 def configure(ctx):
 	
-	ctx.env.PLATFORM = PLATFORM = ctx.options.platform
+	ctx.env.PLATFORM = PLATFORM = ctx.options.platform.upper()
 	if PLATFORM not in (WIN, LINUX):
 		print("Unsupported platform %s. Please try to talk to devs to consider support of your platform." % sys.platform)
 		sys.exit(1)
 	
-	ctx.env.VALA_DEFINES = []
+	ctx.env.VALA_DEFINES = [PLATFORM]
 	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
@@ -134,13 +134,30 @@ def configure(ctx):
 	
 	# Check dependencies
 	ctx.check_dep('glib-2.0', 'GLIB', '2.32')
+	ctx.check_dep('gio-2.0', 'GIO', '2.32')
+	if PLATFORM == LINUX:
+		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
+	elif PLATFORM == WIN:
+		ctx.check_dep('gio-windows-2.0', 'WINGIO', '2.32')
 
 def build(ctx):
 	#~ print ctx.env
+	PLATFORM = ctx.env.PLATFORM
 	DIORITE_GLIB = "dioriteglib"
-	packages = 'posix glib-2.0'
+	packages = 'posix glib-2.0 gio-2.0'
 	uselib = 'GLIB'
 	vala_defines = ctx.env.VALA_DEFINES
+	
+	if PLATFORM == WIN:
+		LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
+		CFLAGS="-mms-bitfields"
+		uselib += " WINGIO"
+		packages += " gio-windows-2.0 win32"
+	else:
+		LIBNAME = "dioriteglib"
+		CFLAGS=""
+		uselib += " UNIXGIO"
+		packages += " gio-unix-2.0"
 	
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
@@ -153,13 +170,6 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = "2.32",
 	)
-	
-	if ctx.env.PLATFORM == WIN:
-		LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
-		CFLAGS="-mms-bitfields"
-	else:
-		LIBNAME = "dioriteglib"
-		CFLAGS=""
 	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
