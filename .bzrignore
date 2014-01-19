@@ -2,3 +2,4 @@ build
 playground/_build
 .waf*
 .lock*
+examples/_build

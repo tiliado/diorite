@@ -1,5 +1,15 @@
 #!/usr/bin/make -f
 
+# Author: Jiří Janoušek <janousek.jiri@gmail.com>
+#
+# To the extent possible under law, author has waived all
+# copyright and related or neighboring rights to this file.
+# http://creativecommons.org/publicdomain/zero/1.0/
+#
+# This file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 OUT=./_build
 BASE=.
 BINARY=subprocess
@@ -33,8 +43,8 @@ dist-win: build
 	cp ${MINGW_BIN}/zlib1.dll ${OUT}/zlib1.dll
 	cp ${MINGW_BIN}/gspawn-win32-helper.exe ${OUT}/gspawn-win32-helper.exe
 	cp ${MINGW_BIN}/gspawn-win32-helper-console.exe ${OUT}/gspawn-win32-helper-console.exe
+	
 	cp ${MINGW_LIB}/dioriteglib-0.dll ${OUT}/dioriteglib-0.dll
-	@echo "Run wine ${OUT}/${BINARY}.exe"
 
 clean:
 	rm -rf ${OUT}
