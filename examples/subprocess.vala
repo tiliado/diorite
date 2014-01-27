@@ -25,55 +25,58 @@ int main(string[] args)
 	}
 	else
 	{
-		string[] argv = {args[0], "Hello", "the", "best", "world", "ever!"};
-		message("New subprocess: %s", args[0]);
+		string[] argv = {"notepad", "Hello", "the", "best", "world", "ever!"};
+		message("New subprocess: %s",argv[0]);
 		try
 		{
 			var process = new Diorite.Subprocess(argv, Diorite.SubprocessFlags.NONE);
-			message("Waiting 0.5 s");
-			message("Result: %s", process.wait(500).to_string());
-			message("Kill!");
-			process.force_exit();
+			message("Waiting 1 s");
+			message("Result: %s", process.wait(1000).to_string());
+			message("Try to exit.");
+			process.exit();
+			message("Waiting 5 s");
+			message("Result: %s", process.wait(5000).to_string());
+			
+			if(process.running)
+			{
+				message("Kill!");
+				process.force_exit();
+			}
 			message("Waiting forever");
 			message("Result: %s", process.wait().to_string());
 			message("Status: %d", process.status);
+			
 		}
 		catch (GLib.Error e)
 		{
 			critical("Error: %s", e.message);
 			return 1;
 		}
-		
+		argv[0] = args[0];
 		try
 		{
 			var process = new Diorite.Subprocess(argv, Diorite.SubprocessFlags.NONE);
-			message("Waiting 0.5 s");
-			message("Result: %s", process.wait(500).to_string());
+			message("Waiting 2 s");
+			message("Result: %s", process.wait(2000).to_string());
+			message("Try to exitcleanly");
+			process.exit();
+			message("Waiting 2 s");
+			message("Result: %s", process.wait(2000).to_string());
+			if(process.running)
+			{
+				message("Kill!");
+				process.force_exit();
+			}
 			message("Waiting forever");
 			message("Result: %s", process.wait().to_string());
 			message("Status: %d", process.status);
+			return 0;
 		}
 		catch (GLib.Error e)
 		{
 			critical("Error: %s", e.message);
 			return 1;
 		}
-		
-		try
-		{
-			var process = new Diorite.Subprocess(argv, Diorite.SubprocessFlags.NONE);
-			message("Waiting 0.5 s");
-			message("Result: %s", process.wait(500).to_string());
-			message("Waiting forever");
-			message("Result: %s", process.wait().to_string());
-			message("Status: %d", process.status);
-		}
-		catch (GLib.Error e)
-		{
-			critical("Error: %s", e.message);
-			return 1;
-		}
-		
 	}
 	return 0;
 }

@@ -25,8 +25,10 @@ run-linux: build
 build:
 	@mkdir -p ${OUT}
 	valac -d ${OUT} -b ${BASE} --thread --save-temps -v \
+	--vapidir ../vapi --vapidir ../build --pkg glib-2.0 --target-glib=2.32 \
 	--pkg=dioriteglib --pkg=posix \
 	-X '-DG_LOG_DOMAIN="Diorite"' \
+	-D WIN --pkg win32  \
 	subprocess.vala
 
 dist-win: build
@@ -44,6 +46,7 @@ dist-win: build
 	cp ${MINGW_BIN}/gspawn-win32-helper.exe ${OUT}/gspawn-win32-helper.exe
 	cp ${MINGW_BIN}/gspawn-win32-helper-console.exe ${OUT}/gspawn-win32-helper-console.exe
 	
+	cp ${MINGW_BIN}/dioriteinterrupthelper.exe ${OUT}/dioriteinterrupthelper.exe
 	cp ${MINGW_LIB}/dioriteglib-0.dll ${OUT}/dioriteglib-0.dll
 
 clean:

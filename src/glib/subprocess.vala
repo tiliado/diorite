@@ -41,7 +41,7 @@ public enum SubprocessFlags
  */
 public class Subprocess: GLib.Object
 {
-	public int pid {get; private set; default = -1;}
+	public Pid pid {get; private set; default = -1;}
 	public int status {get; set; default = -1;}
 	public GLib.InputStream? stdin_pipe {get; private set;}
 	public GLib.OutputStream? stdout_pipe {get; private set;}
@@ -151,6 +151,71 @@ public class Subprocess: GLib.Object
 			}
 		}
 		return loop_result;
+	}
+	
+	/**
+	 * Ask the subprocess to exit cleanly.
+	 * 
+	 * On Unix, it sends signal SIGTERM. On Windows, it tries to send message WM_CLOSE to the
+	 * associated window and then Ctrl-C control message.
+	 */
+	public void exit()
+	{
+		#if LINUX
+		send_signal(Posix.SIGTERM);
+		#elif WIN
+		var pid = ((Win32.Process) this.pid).get_id();
+		var wm_close_sent = false;
+		if (!Win32.enum_windows((window) =>
+		{
+			ulong win_pid;
+			if (!window.get_process_id(out win_pid))
+			{
+				warning("Failed to get window process id. %s", Win32.get_last_error_msg());
+				return false;
+			}
+			
+			debug("Found window with pid %lu (wanted %lu)", win_pid, pid);
+			if (win_pid != pid)
+					return true;
+			
+			if (!window.send_message(Win32.Message.WM_CLOSE) && Win32.get_last_error() != 0)
+			{
+				warning("Failed to send WM_CLOSE message. %s", Win32.get_last_error_msg());
+				return false;
+			}
+			
+			debug("WM_CLOSE sent to %lu", win_pid);
+			wm_close_sent = true;
+			return true;
+		}) && Win32.get_last_error() != 0)
+			warning("Failed to enum windows. %s", Win32.get_last_error_msg());
+			
+		if (!wm_close_sent)
+		{
+			const string HELPER = "dioriteinterrupthelper.exe";
+			string[] argv = {HELPER, pid.to_string()};
+			Pid? child_pid = null;
+			Win32.set_console_ctrl_handler(null, true);
+			try
+			{
+				int status;
+				Process.spawn_sync(null, argv, null, SpawnFlags.SEARCH_PATH, null, null, null, out status);
+				if (status != 0)
+					warning("Helper exited with status %d", status);
+			}
+			catch (SpawnError e)
+			{
+				critical("Failed to spawn helper: %s", e.message);
+			}
+			Win32.set_console_ctrl_handler(null, false);
+			if (child_pid != null)
+				Process.close_pid(child_pid);
+		}
+		#else
+		UNSUPPORTED PLATFORM!
+		#endif
+		
 	}
 	
 	/**

@@ -185,6 +185,16 @@ def build(ctx):
 		LIBNAME=LIBNAME
 		)
 	
+	if PLATFORM == WIN :
+		ctx.program(
+		target = "dioriteinterrupthelper",
+		source = ['src/helpers/interrupthelper.vala'],
+		use = [DIORITE_GLIB],
+		packages = 'glib-2.0 win32',
+		uselib = 'GLIB',
+		vapi_dirs = ['vapi'],
+		vala_target_glib = "2.32",
+		)
 	ctx.add_post_fun(post)
 
 def post(ctx):
