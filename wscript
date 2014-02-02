@@ -135,6 +135,8 @@ def configure(ctx):
 	# Check dependencies
 	ctx.check_dep('glib-2.0', 'GLIB', '2.32')
 	ctx.check_dep('gio-2.0', 'GIO', '2.32')
+	# FUTURE: make optional, maybe separate diorite test to a separate library?
+	ctx.check_dep('libvala-0.16', 'LIBVALA', '0.16')
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
 	elif PLATFORM == WIN:
@@ -183,6 +185,17 @@ def build(ctx):
 		API_VERSION=API_VERSION,
 		CFLAGS=CFLAGS,
 		LIBNAME=LIBNAME
+		)
+	
+	testgen = "dioritetestgen"
+	ctx.program(
+		target = testgen,
+		source = ctx.path.ant_glob('src/testgen/*.vala'),
+		use = [DIORITE_GLIB],
+		packages = 'glib-2.0 libvala-0.16',
+		uselib = 'GLIB LIBVALA',
+		vapi_dirs = ['vapi'],
+		vala_target_glib = "2.32",
 		)
 	
 	if PLATFORM == WIN :
