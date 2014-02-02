@@ -25,9 +25,12 @@ run-linux: build
 build:
 	@mkdir -p ${OUT}/testgen
 	dioritetestgen -d ${OUT}/testgen testcase.vala
+	
 	valac -d ${OUT} -b ${BASE} --thread --save-temps -v \
+	--library=${BINARY} -o lib${BINARY}.so \
 	--vapidir ../vapi --vapidir ../build --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib --pkg=posix \
+	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
+	-X -fPIC -X -shared \
 	-X '-DG_LOG_DOMAIN="Diorite"' \
 	-D WIN --pkg win32  \
 	${OUT}/testgen/testcase.vala

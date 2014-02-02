@@ -25,14 +25,70 @@
 namespace Diorite
 {
 
-public errordomain Error
+public class TestSpec
 {
-	INVALID_ARGUMENT,
-	UNEXPECTED_RESULT,
-	NOT_SUPPORTED,
-	NOT_IMPLEMENTED,
-	IOERROR,
-	NOT_FOUND;
+	public string name {get; private set;}
+	public bool @async {get; private set;}
+	
+	public TestSpec(string name, bool @async)
+	{
+		this.name = name;
+		this.@async = @async;
+	}
 }
+
+public class TestSpecReader
+{
+	private const string ASYNC = "async";
+	private string path;
+	
+	public TestSpecReader(string path)
+	{
+		this.path = path;
+	}
+	
+	public TestSpec get_spec(string name) throws Error
+	{
+		var stream = FileStream.open(path, "r");
+		if (stream == null)
+			throw new Error.IOERROR("Cannot open '%s' for reading.", path);
+		
+		string line;
+		while((line = stream.read_line()) != null)
+		{
+			var fields = line.strip().split(" ");
+			if (fields.length != 2 || fields[0] != name)
+				continue;
+			return new TestSpec(name, fields[1] == ASYNC);
+		}
+		throw new Error.NOT_FOUND("Test '%s' not found in '%s'.", name, path);
+	}
+	
+	public TestSpecIter iterator()
+	{
+		return new TestSpecIter(FileStream.open(path, "r"));
+	}
+}
+
+public class TestSpecIter
+{
+	private FileStream? stream;
+	
+	public TestSpecIter(owned FileStream? stream)
+	{
+		this.stream = (owned) stream;
+	}
+	
+	public string? next_value()
+	{
+		if (stream == null)
+			return null;
+		var line = stream.read_line();
+		if (line != null)
+			return line.strip().split(" ")[0];
+		return null;
+	}
+}
+
 
 } // namespace Diorite

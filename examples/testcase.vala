@@ -15,13 +15,6 @@ namespace My
 
 class TestCase: Diorite.TestCase
 {
-	construct
-	{
-		add_test("one", test_one);
-		add_test("two", test_two);
-		add_test("three", test_three);
-		add_test("four", test_four);
-	}
 	
 	public void test_one()
 	{
@@ -56,14 +49,20 @@ class TestCase: Diorite.TestCase
 		assert("foo" == "goo");
 		message("four success");
 	}
-}
-
-int main(string[] args)
-{
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
-	var runner = new Diorite.TestRunner(args);
-	runner.add_test_case("MyTestCase", typeof(TestCase));
-	return runner.run(args);
+	
+	public async void test_five()
+	{
+		message("five starts");
+		Idle.add(test_five.callback);
+		yield;
+		assert(5 == 4 + 1);
+		message("five ends");
+	}
 }
 
 } // namespace Diorite
+
+[ModuleInit]
+public void module_init(GLib.TypeModule type_module)
+{
+}

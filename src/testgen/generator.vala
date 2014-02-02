@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Check
+namespace Diorite
 {
 
 class Generator
@@ -95,8 +95,11 @@ class Generator
 		if (context.report.get_errors() > 0)
 			return 1;
 		
-		var preprocessor = new Preprocessor(context, directory);
+		var dir = directory ?? "dioritetestgen";
+		var spec = new TestSpec(dir);
+		var preprocessor = new Preprocessor(context, dir, spec);
 		preprocessor.run();
+		spec.finish();
 		if (context.report.get_errors() > 0)
 			return 1;
 		

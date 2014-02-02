@@ -45,10 +45,63 @@ public enum CheckType
 	}
 }
 
+public class TestSpec
+{
+	private string directory;
+	private string[] tests;
+	private string[] adaptors;
+	private uint[] hashes;
+	private StringBuilder definitions;
+	private FileStream? stream = null;
+	
+	public TestSpec(string directory)
+	{
+		this.directory = directory;
+		tests = {};
+		adaptors = {};
+		hashes = {};
+		definitions = new StringBuilder();
+		var filename = "tests.spec";
+		var stream_path = Path.build_filename(directory, Path.get_basename(filename));
+		stdout.printf(" (generated) -> %s\n", stream_path);
+		stream = FileStream.open(stream_path, "w");
+		if (stream == null)
+			Vala.Report.error(null, "Cannot open file '%s' for writing".printf(stream_path));
+	}
+	
+	public void visit(Vala.Method node)
+	{
+		if( stream == null)
+			return;
+		
+		if (node.binding == Vala.MemberBinding.INSTANCE
+		&& !node.has_result
+		&& node.name.has_prefix("test_"))
+		{
+			var full_name = node.get_full_name();
+			foreach (unowned string test in tests)
+			{
+				if (test == full_name)
+					return;
+			}
+			
+			stream.printf("%s %s\n", full_name, node.coroutine ? "async" : "sync");
+			tests += full_name;
+		}
+	}
+	
+	public void finish()
+	{
+		stream.flush();
+		stream = null;
+	}
+}
+
 public class Preprocessor: Vala.CodeVisitor
 {
 	private Vala.CodeContext context;
 	private string directory;
+	private TestSpec spec;
 	private FileStream? stream = null;
 	private Vala.SourceFile? source_file = null;
 	private string? file_name = null;
@@ -58,10 +111,11 @@ public class Preprocessor: Vala.CodeVisitor
 	private int last_line;
 	private uint tmp_id;
 	
-	public Preprocessor(Vala.CodeContext context, string? directory)
+	public Preprocessor(Vala.CodeContext context, string directory, TestSpec spec)
 	{
 		this.context = context;
-		this.directory = directory ?? "dioritetestgen";
+		this.directory = directory;
+		this.spec = spec;
 	}
 	
 	public void run()
@@ -141,7 +195,7 @@ public class Preprocessor: Vala.CodeVisitor
 				var id3 = ID.printf(++this.tmp_id);
 				var type_left = binary.left.value_type.to_string();
 				var type_right = binary.right.value_type.to_string();
-				stream.puts("do{");
+				stream.puts("{");
 				stream.printf(" %s %s = %s;", type_left, id1, binary.left.to_string());
 				stream.printf(" %s %s = %s;", type_right.to_string(), id2, binary.right.to_string());
 				stream.printf(" bool %s = %s %s %s;", id3, id1, operator_str, id2);
@@ -162,9 +216,9 @@ public class Preprocessor: Vala.CodeVisitor
 					stream.printf(", null, (Diorite.Stringify) %s.to_string", id2);
 				stream.printf(", \"%s\", %d)", file_name.replace("\"","\\\""), r.first_line);
 				if (check_type == CheckType.EXPECT)
-					stream.puts("; }while(false)");
+					stream.puts("; }");
 				else
-					stream.puts(") return; }while(false)");
+					stream.puts(") return; }");
 			}
 			else if (check_type == CheckType.EXPECT)
 			{
@@ -173,7 +227,7 @@ public class Preprocessor: Vala.CodeVisitor
 			}
 			else
 			{
-				stream.printf("do{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}while(false)",
+				stream.printf("{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}",
 					expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
 			}
 			skip(r.last_line, r.last_column + 1);
@@ -396,6 +450,7 @@ public class Preprocessor: Vala.CodeVisitor
 	
 	public override void visit_method(Vala.Method node)
 	{
+		spec.visit(node);
 		node.accept_children(this);
 	}
 	

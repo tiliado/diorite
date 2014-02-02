@@ -25,6 +25,8 @@
 namespace Diorite
 {
 
+public delegate void TestLog(string message);
+
 /**
  * Delegate to return a string.
  * 
@@ -42,33 +44,8 @@ private static string strquote(string str)
  */
 public abstract class TestCase: GLib.Object
 {
-	internal List<TestAdapter> adapters = null;
-	internal weak TestRunner? runner = null;
-	
-	/**
-	 * Adds synchronous test.
-	 * 
-	 * @param name    test name
-	 * @param test    test body
-	 */
-	public void add_test(string name, owned TestFunc test)
-	{
-		var adapter = new Adapter(this, name, (owned) test);
-		adapters.append(adapter);
-	}
-	
-	/**
-	 * Adds asynchronous test.
-	 * 
-	 * @param name          test name
-	 * @param test_begin    begin callback of test body
-	 * @param test_end      finish callback of test body
-	 */
-	public void add_async_test(string name, owned TestFuncBegin test_begin, owned TestFuncEnd test_end)
-	{
-		var adapter = new AsyncAdapter(this, name, (owned) test_begin, (owned) test_end);
-		adapters.append(adapter);
-	}
+	public unowned TestLog assertion_failed = null;
+	public unowned TestLog expectation_failed = null;
 	
 	/**
 	 * Set up environment before each test of this test case.
@@ -113,9 +90,8 @@ public abstract class TestCase: GLib.Object
 	 */
 	public bool real_assert1(bool result, string expr, string file, int line)
 	{
-		GLib.assert(runner != null);
 		if (!result)
-			runner.assertion_failed("%s:%d Assertion %s failed .".printf(
+			assertion_failed("%s:%d Assertion %s failed .".printf(
 			file, line, expr));
 		return result;
 	}
@@ -125,9 +101,8 @@ public abstract class TestCase: GLib.Object
 	 */
 	public bool real_expect1(bool result, string expr, string file, int line)
 	{
-		GLib.assert(runner != null);
 		if (!result)
-			runner.expectation_failed("%s:%d Expectation %s failed.".printf(
+			expectation_failed("%s:%d Expectation %s failed.".printf(
 			file, line, expr));
 		return result;
 	}
@@ -139,9 +114,8 @@ public abstract class TestCase: GLib.Object
 	string? str_left, Stringify? val_left, string? str_right, Stringify? val_right,
 	string file, int line)
 	{
-		GLib.assert(runner != null);
 		if (!result)
-			runner.assertion_failed("%s:%d Assertion %s %s %s failed: %s %s %s.".printf(
+			assertion_failed("%s:%d Assertion %s %s %s failed: %s %s %s.".printf(
 			file, line, expr_left, op, expr_right,
 			str_left != null ? strquote(str_left) : val_left(),
 			op,
@@ -156,9 +130,8 @@ public abstract class TestCase: GLib.Object
 	string? str_left, Stringify? val_left, string? str_right, Stringify? val_right,
 	string file, int line)
 	{
-		GLib.assert(runner != null);
 		if (!result)
-			runner.expectation_failed("%s:%d Expectation %s %s %s failed: %s %s %s.".printf(
+			expectation_failed("%s:%d Expectation %s %s %s failed: %s %s %s.".printf(
 			file, line, expr_left, op, expr_right,
 			str_left != null ? strquote(str_left) : val_left(),
 			op,

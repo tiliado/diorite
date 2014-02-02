@@ -25,12 +25,13 @@
 namespace Diorite
 {
 
+static TestModule module = null;
+
 /**
  * Runs tests.
  */
 public class TestRunner
 {
-	private HashTable<string, Type?> test_cases;
 	private string? path;
 	private TestAdapter? adapter;
 	private TestCase test_case;
@@ -47,34 +48,7 @@ public class TestRunner
 	 */
 	public TestRunner(string[] args)
 	{
-		test_cases = new HashTable<string, Type>(str_hash, str_equal);
 		output = stderr;
-	}
-	
-	/**
-	 * Adds test case
-	 * 
-	 * @param name    test case name
-	 * @param type    class of the test case
-	 */
-	public void add_test_case(string name, Type type)
-	{
-		test_cases.insert(name, type);
-	}
-	
-	/**
-	 * Creates new test case object for given name.
-	 * 
-	 * @param name    a test case name
-	 * @return newly initialized test case
-	 */
-	public TestCase? get_test_case(string name)
-	{
-		var type = test_cases.lookup(name);
-		if (type == null)
-			return null;
-		
-		return Object.new(type) as TestCase;
 	}
 	
 	/**
@@ -84,20 +58,22 @@ public class TestRunner
 	 */
 	public int run(string[] args)
 	{
-		if (args.length >= 2)
-			return run_test(args[1]);
-		
-		foreach(var key in test_cases.get_keys())
+		if (args.length < 3)
 		{
-			var t_case = get_test_case(key);
-			foreach (var adapter in t_case.adapters)
-			{
-				var result = run_subprocess(args[0], key + "/" + adapter.test_name);
-				if (result != 0)
-					tests_failed++;
-				else
-					tests_passed++;
-			}
+			return 1;
+		}
+		
+		if (args.length >= 4)
+			return run_test(args[1], args[2], args[3]);
+		
+		var spec_reader = new TestSpecReader(args[2]);
+		foreach (string test in spec_reader)
+		{
+			var result = run_subprocess(args[0], args[1], args[2], test);
+			if (result != 0)
+				tests_failed++;
+			else
+				tests_passed++;
 		}
 		
 		log("*** SUMMARY:\n");
@@ -108,27 +84,42 @@ public class TestRunner
 		return tests_failed == 0 ? 0 : 1;
 	}
 	
-	private int run_test(string path)
+	private int run_test(string module_name, string specfile, string path)
 	{
 		this.path = path;
-		test_case = get_test_case(Path.get_dirname(path));
-		return_val_if_fail(test_case != null, 1);
-		var name = Path.get_basename(path);
-		foreach(var a in test_case.adapters)
+		module = new TestModule(module_name);
+		if (!module.load())
 		{
-			if (a.test_name == name)
-			{
-				adapter = a;
-				break;
-			}
+			logf("*** ERROR: %s\n", module.error);
+			return 1;
 		}
 		
-		return_val_if_fail(adapter != null, 1);
+		var spec_reader = new TestSpecReader(specfile);
+		try
+		{
+			var spec = spec_reader.get_spec(path);
+			adapter = module.load_test(spec);
+		}
+		catch (Error e)
+		{
+			logf("*** ERROR: %s\n", e.message);
+			return 1;
+		}
+		
+		if (adapter == null)
+		{
+			logf("*** ERROR: %s\n", module.error);
+			return 1;
+		}
+		
+		test_case = adapter.test_case;
+		test_case.assertion_failed = this.assertion_failed;
+		test_case.expectation_failed = this.expectation_failed;
 		started();
-		test_case.runner = this;
 		test_case.set_up();
 		adapter.run();
 		test_case.tear_down();
+		module.unload();
 		return finished(path, adapter.success);
 	}
 	
@@ -142,14 +133,14 @@ public class TestRunner
 		checks_passed++;  // TODO: pass to parent runner
 	}
 	
-	public void expectation_failed(string? message=null)
+	private void expectation_failed(string? message=null)
 	{
 		checks_failed++; // TODO: pass to parent runner
 		adapter.success = false;
 		logf("*** FAIL  %s: %s\n", path, message ?? "(no message)");
 	}
 	
-	public void assertion_failed(string? message=null)
+	private void assertion_failed(string? message=null)
 	{
 		checks_failed++; // TODO: pass to parent runner
 		adapter.success = false;
@@ -189,9 +180,9 @@ public class TestRunner
 		return success ? 0 : 2;
 	}
 	
-	private int run_subprocess(string binary, string path)
+	private int run_subprocess(string binary, string module_name, string specfile, string path)
 	{
-		string[] argv = {binary, path};
+		string[] argv = {binary, module_name, specfile, path};
 		try
 		{
 			var process = new Diorite.Subprocess(argv, Diorite.SubprocessFlags.NONE);
