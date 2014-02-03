@@ -58,6 +58,13 @@ class TestCase: Diorite.TestCase
 		assert(5 == 4 + 1);
 		message("five ends");
 	}
+	
+	public void test_array()
+	{
+		string[] arr1 = {"hello", "world1"};
+		string[] arr2 = {"hello", "world", "2"};
+		expect_array<string>(arr1, arr2, str_equal, string.dup);
+	}
 }
 
 } // namespace Diorite

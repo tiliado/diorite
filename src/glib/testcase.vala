@@ -34,6 +34,9 @@ public delegate void TestLog(string message);
  */
 public delegate string Stringify();
 
+[CCode(has_target=false)]
+public delegate string StringifyData<T>(T data);
+
 private static string strquote(string str)
 {
 	return "\"" + str.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
@@ -137,6 +140,50 @@ public abstract class TestCase: GLib.Object
 			op,
 			str_right != null ? strquote(str_right) : val_right()));
 		return result;
+	}
+	
+	public void expect_array<T>(T[] expected, T[] found,
+	EqualFunc<T> equal_func, StringifyData<T> stringify_func)
+	{
+		GLib.assert_not_reached();
+	}
+	
+	public void assert_array<T>(T[] expected, T[] found,
+	EqualFunc<T> equal_func, StringifyData<T> stringify_func)
+	{
+		GLib.assert_not_reached();
+	}
+	
+	public bool _expect_array<T>(bool assertion, string expr_left, string expr_right,
+	T[] expected, T[] found, EqualFunc<T> eq, StringifyData<T> str,
+	string file, int line)
+	{
+		var buffer = new StringBuilder();
+		var limit = int.max(expected.length, found.length);
+		if (expected.length != found.length)
+			buffer.append_printf("Length mismatch: %d != %d\n", expected.length, found.length);
+		
+		for (var i = 0; i < limit; i++)
+		{
+			if (i >= expected.length)
+				buffer.append_printf("Extra element (%d): %s\n", i, str(found[i]));
+			else if (i >= found.length)
+				buffer.append_printf("Missing element (%d): %s\n", i, str(expected[i]));
+			else if (!eq(expected[i], found[i]))
+				buffer.append_printf("Element mismatch (%d): %s != %s\n", i, str(expected[i]), str(found[i]));
+		}
+		
+		if (buffer.len > 0)
+		{
+			var check_type = assertion ? "Assertion" : "Expectation";
+			buffer.prepend("%s:%d %s %s == %s failed:\n".printf(file, line, check_type, expr_left, expr_right));
+			if (assertion)
+				assertion_failed(buffer.str);
+			else
+				expectation_failed(buffer.str);
+			return false;
+		}
+		return true;
 	}
 }
 

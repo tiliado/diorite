@@ -29,12 +29,18 @@ public enum CheckType
 {
 	NONE,
 	EXPECT,
-	ASSERT;
+	ASSERT,
+	EXPECT_ARRAY,
+	ASSERT_ARRAY;
 	
 	public static CheckType parse(string name)
 	{
 		switch (name)
 		{
+		case "Diorite.TestCase.assert_array":
+			return ASSERT_ARRAY;
+		case "Diorite.TestCase.expect_array":
+			return EXPECT_ARRAY;
 		case "Diorite.TestCase.assert":
 			return ASSERT;
 		case "Diorite.TestCase.expect":
@@ -144,93 +150,124 @@ public class Preprocessor: Vala.CodeVisitor
 	{
 		if (lines.length == 0)
 			return;
+		var r = node.source_reference;
 		var full_name = node._call.symbol_reference.get_full_name();
 		var check_type = CheckType.parse(full_name);
-		if (check_type != CheckType.ASSERT && check_type != CheckType.EXPECT)
-			return;
-		
-		var r = node.source_reference;
-		if (write_forward(r.first_line, r.first_column))
+		if (check_type == CheckType.ASSERT || check_type == CheckType.EXPECT)
 		{
-			
-			var args = node.get_argument_list();
-			var arg1 = args.get(0);
-			string expr = arg1.to_string();
-			var binary = arg1 as Vala.BinaryExpression;
-			string? operator_str = null;
-			if (binary != null)
+			if (write_forward(r.first_line, r.first_column))
 			{
-				switch (binary.operator)
+				var args = node.get_argument_list();
+				var arg1 = args.get(0);
+				string expr = arg1.to_string();
+				var binary = arg1 as Vala.BinaryExpression;
+				string? operator_str = null;
+				
+				if (binary != null)
 				{
-				case Vala.BinaryOperator.LESS_THAN:
-					operator_str = "<";
-					break;
-				case Vala.BinaryOperator.GREATER_THAN:
-					operator_str = ">";
-					break;
-				case Vala.BinaryOperator.LESS_THAN_OR_EQUAL:
-					operator_str = "<=";
-					break;
-				case Vala.BinaryOperator.GREATER_THAN_OR_EQUAL:
-					operator_str = ">=";
-					break;
-				case Vala.BinaryOperator.EQUALITY:
-					operator_str = "==";
-					break;
-				case Vala.BinaryOperator.INEQUALITY:
-					operator_str = "!=";
-					break;
-				default:
-					// Not a comparation
-					binary = null;
-					break;
+					switch (binary.operator)
+					{
+					case Vala.BinaryOperator.LESS_THAN:
+						operator_str = "<";
+						break;
+					case Vala.BinaryOperator.GREATER_THAN:
+						operator_str = ">";
+						break;
+					case Vala.BinaryOperator.LESS_THAN_OR_EQUAL:
+						operator_str = "<=";
+						break;
+					case Vala.BinaryOperator.GREATER_THAN_OR_EQUAL:
+						operator_str = ">=";
+						break;
+					case Vala.BinaryOperator.EQUALITY:
+						operator_str = "==";
+						break;
+					case Vala.BinaryOperator.INEQUALITY:
+						operator_str = "!=";
+						break;
+					default:
+						// Not a comparation
+						binary = null;
+						break;
+					}
 				}
+				
+				if (binary != null)
+				{
+					const string ID = "__test_tmp%u__";
+					var type_left = binary.left.value_type.to_string();
+					var type_right = binary.right.value_type.to_string();
+					var id1 = ID.printf(++this.tmp_id);
+					var id2 = ID.printf(++this.tmp_id);
+					stream.puts("{");
+					stream.printf(" %s %s = %s;", type_left, id1, binary.left.to_string());
+					stream.printf(" %s %s = %s;", type_right, id2, binary.right.to_string());
+					var id3 = ID.printf(++this.tmp_id);
+					stream.printf(" bool %s = %s %s %s;", id3, id1, operator_str, id2);
+					if (check_type == CheckType.EXPECT)
+						stream.printf("this.real_expect2(%s", id3);
+					else
+						stream.printf(" if (!this.real_assert2(%s", id3);
+					stream.printf(",\"%s\"", binary.left.to_string().replace("\"","\\\""));
+					stream.printf(",\"%s\"", operator_str);
+					stream.printf(",\"%s\"", binary.right.to_string().replace("\"","\\\""));
+					if (type_left == "string")
+						stream.printf(", %s, null", id1);
+					else
+						stream.printf(", null, (Diorite.Stringify) %s.to_string", id1);
+					if (type_right == "string")
+						stream.printf(", %s, null", id2);
+					else
+						stream.printf(", null, (Diorite.Stringify) %s.to_string", id2);
+					stream.printf(", \"%s\", %d)", file_name.replace("\"","\\\""), r.first_line);
+					if (check_type == CheckType.EXPECT)
+						stream.puts("; }");
+					else
+						stream.puts(") return; }");
+				}
+				else if (check_type == CheckType.EXPECT)
+				{
+					stream.printf("this.real_expect1(%s, \"%s\", \"%s\", %d)",
+						expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
+				}
+				else
+				{
+					stream.printf("{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}",
+						expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
+				}
+				skip(r.last_line, r.last_column + 1);
 			}
-			
-			if (binary != null)
+		}
+		else if(check_type == CheckType.ASSERT_ARRAY || check_type == CheckType.EXPECT_ARRAY)
+		{
+			if (write_forward(r.first_line, r.first_column))
 			{
-				const string ID = "__test_tmp%u__";
-				var id1 = ID.printf(++this.tmp_id);
-				var id2 = ID.printf(++this.tmp_id);
-				var id3 = ID.printf(++this.tmp_id);
-				var type_left = binary.left.value_type.to_string();
-				var type_right = binary.right.value_type.to_string();
+				var args = node.get_argument_list();
+				var a_expected = args.get(0).to_string();
+				var a_found = args.get(1).to_string();
+				var a_cmp = args.get(2).to_string();
+				var a_str = args.get(3).to_string();
+				
+//~ 				var base_type = node._call.formal_target_type.to_string();
+				var base_type = args.get(0).value_type.to_string();
+				base_type = base_type.substring(0, base_type.length - (base_type.has_suffix("?") ? 3 : 3));
+				
 				stream.puts("{");
-				stream.printf(" %s %s = %s;", type_left, id1, binary.left.to_string());
-				stream.printf(" %s %s = %s;", type_right.to_string(), id2, binary.right.to_string());
-				stream.printf(" bool %s = %s %s %s;", id3, id1, operator_str, id2);
-				if (check_type == CheckType.EXPECT)
-					stream.printf("this.real_expect2(%s", id3);
+//~ 					var base_type = type_left.substring(0, type_left.length - 3);
+				if (check_type == CheckType.EXPECT_ARRAY)
+					stream.printf("this._expect_array<%s>(false", base_type);
 				else
-					stream.printf(" if (!this.real_assert2(%s", id3);
-				stream.printf(",\"%s\"", binary.left.to_string().replace("\"","\\\""));
-				stream.printf(",\"%s\"", operator_str);
-				stream.printf(",\"%s\"", binary.right.to_string().replace("\"","\\\""));
-				if (type_left == "string")
-					stream.printf(", %s, null", id1);
-				else
-					stream.printf(", null, (Diorite.Stringify) %s.to_string", id1);
-				if (type_right == "string")
-					stream.printf(", %s, null", id2);
-				else
-					stream.printf(", null, (Diorite.Stringify) %s.to_string", id2);
+					stream.printf(" if (!this._expect_array<%s>(true", base_type);
+				stream.printf(",\"%s\"", a_expected.replace("\"","\\\""));
+				stream.printf(",\"%s\"", a_found.replace("\"","\\\""));
+				stream.printf(", %s, %s, %s, %s", a_expected, a_found, a_cmp, a_str);
 				stream.printf(", \"%s\", %d)", file_name.replace("\"","\\\""), r.first_line);
-				if (check_type == CheckType.EXPECT)
+				if (check_type == CheckType.EXPECT_ARRAY)
 					stream.puts("; }");
 				else
 					stream.puts(") return; }");
+				skip(r.last_line, r.last_column + 1);
 			}
-			else if (check_type == CheckType.EXPECT)
-			{
-				stream.printf("this.real_expect1(%s, \"%s\", \"%s\", %d)",
-					expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
-			}
-			else
-			{
-				stream.printf("{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}",
-					expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
-			}
-			skip(r.last_line, r.last_column + 1);
 		}
 	}
 	
