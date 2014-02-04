@@ -28,13 +28,18 @@ mingw*)
 	PLATFORM="WIN"
 	LIBPREFIX="lib"
 	LIBSUFFIX=".dll"
-	TESTER="wine ${OUT}/dioritetester.exe"
-	TESTGEN="wine ${OUT}/dioritetestgen.exe"
+	EXECSUFFIX=".exe"
+	LAUNCHER="wine"
+	TESTER="${LAUNCHER} ${OUT}/dioritetester.exe"
+	TESTGEN="${LAUNCHER} ${OUT}/dioritetestgen.exe"
+	
 ;;
 lin*)
 	PLATFORM="LINUX"
 	LIBPREFIX="lib"
 	LIBSUFFIX=".so"
+	EXECSUFFIX=""
+	LAUNCHER=""
 	TESTER="dioritetester"
 	TESTGEN="dioritetestgen"
 ;;
