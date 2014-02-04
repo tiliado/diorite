@@ -35,7 +35,38 @@ public delegate void TestLog(string message);
 public delegate string Stringify();
 
 [CCode(has_target=false)]
-public delegate string StringifyData<T>(T data);
+public delegate bool EqualData(void* data1, void* data2);
+
+[CCode(has_target=false)]
+public delegate string StringifyData(void* data);
+
+
+public bool str_eq(void* data1, void* data2)
+{
+	uint8* p1 = *((uint8**) data1);
+	uint8* p2 = *((uint8**) data2);
+	unowned string str1 = (string) p1;
+	unowned string str2 = (string) p2;
+	return str_equal(str1, str2);
+}
+
+public bool int_eq(void* data1, void* data2)
+{
+	return *((int*)data1) == *((int*)data2);
+}
+
+public static string str_int(void* data)//, string? def=null)
+{
+	int i = *((int*)data);
+	return i.to_string();
+}
+
+public static string str_str(void* data)//, string? def=null)
+{
+	uint8* p = *((uint8**) data);
+	unowned string str = (string) p;
+	return str.dup();
+}
 
 private static string strquote(string str)
 {
@@ -142,35 +173,39 @@ public abstract class TestCase: GLib.Object
 		return result;
 	}
 	
-	public void expect_array<T>(T[] expected, T[] found,
-	EqualFunc<T> equal_func, StringifyData<T> stringify_func)
+	public void expect_array(ulong type_size, void* expected, void* found,
+	EqualData equal_func, StringifyData stringify_func)
 	{
 		GLib.assert_not_reached();
 	}
 	
-	public void assert_array<T>(T[] expected, T[] found,
-	EqualFunc<T> equal_func, StringifyData<T> stringify_func)
+	public void assert_array(ulong type_size, void* expected, void* found,
+	EqualData equal_func, StringifyData stringify_func)
 	{
 		GLib.assert_not_reached();
 	}
 	
-	public bool _expect_array<T>(bool assertion, string expr_left, string expr_right,
-	T[] expected, T[] found, EqualFunc<T> eq, StringifyData<T> str,
-	string file, int line)
+	public bool _expect_array(bool assertion, string expr_left, string expr_right,
+	ulong type_size, void* expected, int expected_length, void* found, int found_length,
+	EqualData eq, StringifyData str, string file, int line)
 	{
 		var buffer = new StringBuilder();
-		var limit = int.max(expected.length, found.length);
-		if (expected.length != found.length)
-			buffer.append_printf("Length mismatch: %d != %d\n", expected.length, found.length);
+		var limit = int.max(expected_length, found_length);
+		if (expected_length != found_length)
+			buffer.append_printf("Length mismatch: %d != %d\n", expected_length, found_length);
+		
+		// Pointer arithmetics. Big thanks to Understanding and Using C Pointers by Richard Reese
+		uint8* exp = expected;
+		uint8* fnd = found;
 		
 		for (var i = 0; i < limit; i++)
 		{
-			if (i >= expected.length)
-				buffer.append_printf("Extra element (%d): %s\n", i, str(found[i]));
-			else if (i >= found.length)
-				buffer.append_printf("Missing element (%d): %s\n", i, str(expected[i]));
-			else if (!eq(expected[i], found[i]))
-				buffer.append_printf("Element mismatch (%d): %s != %s\n", i, str(expected[i]), str(found[i]));
+			if (i >= expected_length)
+				buffer.append_printf("Extra element (%d): %s\n", i, str(fnd + i * type_size));
+			else if (i >= found_length)
+				buffer.append_printf("Missing element (%d): %s\n", i, str(exp + i * type_size));
+			else if (!eq(exp + i * type_size, fnd + i * type_size))
+				buffer.append_printf("Element mismatch (%d): %s != %s\n", i, str(exp + i * type_size), str(fnd + i * type_size));
 		}
 		
 		if (buffer.len > 0)

@@ -17,11 +17,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-OUT=./build
-BUILD=../build
+OUT=${OUT:-./build}
+BUILD=${BUILD:-../build}
 # On Fedora 20
-MINGW_BIN=/usr/i686-w64-mingw32/sys-root/mingw/bin
-MINGW_LIB=/usr/i686-w64-mingw32/sys-root/mingw/lib
+MINGW_BIN=${MINGW_BIN:-/usr/i686-w64-mingw32/sys-root/mingw/bin}
+MINGW_LIB=${MINGW_LIB:-/usr/i686-w64-mingw32/sys-root/mingw/lib}
 
 case $PLATFORM in
 mingw*)

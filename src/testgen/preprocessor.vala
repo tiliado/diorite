@@ -243,24 +243,23 @@ public class Preprocessor: Vala.CodeVisitor
 			if (write_forward(r.first_line, r.first_column))
 			{
 				var args = node.get_argument_list();
-				var a_expected = args.get(0).to_string();
-				var a_found = args.get(1).to_string();
-				var a_cmp = args.get(2).to_string();
-				var a_str = args.get(3).to_string();
-				
-//~ 				var base_type = node._call.formal_target_type.to_string();
-				var base_type = args.get(0).value_type.to_string();
-				base_type = base_type.substring(0, base_type.length - (base_type.has_suffix("?") ? 3 : 3));
+				var a_type = args.get(0);
+				var a_expected = args.get(1).to_string();
+				var a_found = args.get(2).to_string();
+				var a_cmp = args.get(3).to_string();
+				var a_str = args.get(4);
 				
 				stream.puts("{");
-//~ 					var base_type = type_left.substring(0, type_left.length - 3);
 				if (check_type == CheckType.EXPECT_ARRAY)
-					stream.printf("this._expect_array<%s>(false", base_type);
+					stream.puts("this._expect_array(false");
 				else
-					stream.printf(" if (!this._expect_array<%s>(true", base_type);
+					stream.puts(" if (!this._expect_array(true");
 				stream.printf(",\"%s\"", a_expected.replace("\"","\\\""));
-				stream.printf(",\"%s\"", a_found.replace("\"","\\\""));
-				stream.printf(", %s, %s, %s, %s", a_expected, a_found, a_cmp, a_str);
+				stream.printf(",\"%s\", ", a_found.replace("\"","\\\""));
+				write_node(a_type);
+				stream.printf(", %s, %s.length, %s, %s.length, %s, ",
+				a_expected, a_expected, a_found, a_found, a_cmp);
+				write_node(a_str);
 				stream.printf(", \"%s\", %d)", file_name.replace("\"","\\\""), r.first_line);
 				if (check_type == CheckType.EXPECT_ARRAY)
 					stream.puts("; }");
@@ -643,6 +642,13 @@ public class Preprocessor: Vala.CodeVisitor
 		line = 1;
 		column = 1;
 		return true;
+	}
+	
+	private bool write_node(Vala.CodeNode node)
+	{
+		var r = node.source_reference;
+		var result = skip(r.first_line, r.first_column);
+		return result ? write_forward(r.last_line, r.last_column + 1) : result;
 	}
 	
 	private bool write_forward(int line, int column)

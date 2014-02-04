@@ -68,9 +68,15 @@ class TestCase: Diorite.TestCase
 	
 	public void test_array()
 	{
+		int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8};
+		int[] arr3 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+		message("Expect second");
+		expect_array(sizeof(int), arr2, arr3, Diorite.int_eq, Diorite.str_int);
+		message("Expect second done");
+		
 		string[] arr1 = {"hello", "world1"};
-		string[] arr2 = {"hello", "world", "2"};
-		expect_array<string>(arr1, arr2, str_equal, string.dup);
+		string[] arr1b = {"hello", "world2", "yes"};
+		expect_array(sizeof(string), arr1, arr1b, Diorite.str_eq, Diorite.str_str);
 	}
 }
 
