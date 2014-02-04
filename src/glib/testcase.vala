@@ -82,6 +82,7 @@ public abstract class TestCase: GLib.Object
 {
 	public unowned TestLog assertion_failed = null;
 	public unowned TestLog expectation_failed = null;
+	public string? mark = null;
 	
 	/**
 	 * Set up environment before each test of this test case.
@@ -127,8 +128,11 @@ public abstract class TestCase: GLib.Object
 	public bool real_assert1(bool result, string expr, string file, int line)
 	{
 		if (!result)
-			assertion_failed("%s:%d Assertion %s failed .".printf(
-			file, line, expr));
+		{
+			var mrk = mark != null ? ":" + mark : "";
+			assertion_failed("%s:%d%s Assertion %s failed .".printf(
+			file, line, mrk, expr));
+		}
 		return result;
 	}
 	
@@ -138,40 +142,31 @@ public abstract class TestCase: GLib.Object
 	public bool real_expect1(bool result, string expr, string file, int line)
 	{
 		if (!result)
-			expectation_failed("%s:%d Expectation %s failed.".printf(
-			file, line, expr));
+		{
+			var mrk = mark != null ? ":" + mark : "";
+			expectation_failed("%s:%d%s Expectation %s failed.".printf(
+			file, line, mrk, expr));
+		}
 		return result;
 	}
 	
 	/**
 	 * For internal usage of dioritetestgen.
 	 */
-	public bool real_assert2(bool result, string expr_left, string op, string expr_right,
-	string? str_left, Stringify? val_left, string? str_right, Stringify? val_right,
+	public bool real_expect2(bool assertion, bool result, string expr_left, string op, string expr_right,
+	string? str_left, string? str_right,
 	string file, int line)
 	{
 		if (!result)
-			assertion_failed("%s:%d Assertion %s %s %s failed: %s %s %s.".printf(
-			file, line, expr_left, op, expr_right,
-			str_left != null ? strquote(str_left) : val_left(),
+		{
+			var check_type = assertion ? "Assertion" : "Expectation";
+			var mrk = mark != null ? ":" + mark : "";
+			expectation_failed("%s:%d%s %s %s %s %s failed: %s %s %s.".printf(
+			file, line, mrk, check_type, expr_left, op, expr_right,
+			str_left != null ? str_left : "???",
 			op,
-			str_right != null ? strquote(str_right) : val_right()));
-		return result;
-	}
-	
-	/**
-	 * For internal usage of dioritetestgen.
-	 */
-	public bool real_expect2(bool result, string expr_left, string op, string expr_right,
-	string? str_left, Stringify? val_left, string? str_right, Stringify? val_right,
-	string file, int line)
-	{
-		if (!result)
-			expectation_failed("%s:%d Expectation %s %s %s failed: %s %s %s.".printf(
-			file, line, expr_left, op, expr_right,
-			str_left != null ? strquote(str_left) : val_left(),
-			op,
-			str_right != null ? strquote(str_right) : val_right()));
+			str_right != null ? str_right : "???"));
+		}
 		return result;
 	}
 	
@@ -212,8 +207,9 @@ public abstract class TestCase: GLib.Object
 		
 		if (buffer.len > 0)
 		{
+			var mrk = mark != null ? ":" + mark : "";
 			var check_type = assertion ? "Assertion" : "Expectation";
-			buffer.prepend("%s:%d %s %s == %s failed:\n".printf(file, line, check_type, expr_left, expr_right));
+			buffer.prepend("%s:%d%s %s %s == %s failed:\n".printf(file, line, mrk, check_type, expr_left, expr_right));
 			if (assertion)
 				assertion_failed(buffer.str);
 			else

@@ -42,7 +42,7 @@ build()
 	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
 	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
-	-X -fPIC -X -shared \
+	-X -fPIC -X -shared -g -X -g3 \
 	-X '-DG_LOG_DOMAIN="Diorite"' \
 	${OUT}/testgen/*.vala
 }

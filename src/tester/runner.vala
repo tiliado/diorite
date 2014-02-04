@@ -69,11 +69,10 @@ public class TestRunner
 		var spec_reader = new TestSpecReader(args[2]);
 		foreach (string test in spec_reader)
 		{
-			var result = run_subprocess(args[0], args[1], args[2], test);
-			if (result != 0)
-				tests_failed++;
-			else
+			if (run_subprocess(args[0], args[1], args[2], test))
 				tests_passed++;
+			else
+				tests_failed++;
 		}
 		
 		log("*** SUMMARY:\n");
@@ -177,12 +176,14 @@ public class TestRunner
 	private int finished(string path, bool success)
 	{
 		logf("*** DONE  %s %s\n", path, success.to_string());
+		Process.exit(success ? 0 : 2);
 		return success ? 0 : 2;
 	}
 	
-	private int run_subprocess(string binary, string module_name, string specfile, string path)
+	private bool run_subprocess(string binary, string module_name, string specfile, string path)
 	{
 		string[] argv = {binary, module_name, specfile, path};
+		logf("+ %s %s %s %s\n", binary, module_name, specfile, path);
 		try
 		{
 			var process = new Diorite.Subprocess(argv, Diorite.SubprocessFlags.NONE);
@@ -194,12 +195,44 @@ public class TestRunner
 					process.force_exit();
 			}
 			
-			return process.status; // TODO: parse status
+			var status = process.status;
+			#if WIN
+				if (status == 0)
+					return true;
+				
+				logf("*** EXIT with status %d", status);
+				return false;
+			#else
+			
+			if (Process.if_exited(status))
+			{
+				status = Process.exit_status(status);
+				if (status == 0)
+					return true;
+				logf("*** EXIT with status %d\n", status);
+				return false;
+			}
+			
+			if(Process.if_signaled(status))
+			{
+				logf("*** SIGNAL %s\n", (Process.term_sig(status)).to_string());
+				return false;
+			}
+			
+			if (Process.core_dump(status))
+			{
+				logf("*** SIGNAL %s\n", (Process.term_sig(status)).to_string());
+				return false;
+			}
+			
+			logf("*** UNKNOWN EXIT %s\n", (Process.term_sig(status)).to_string());
+			return false;
+			#endif
 		}
 		catch (GLib.Error e)
 		{
 			critical("Error: %s", e.message);
-			return 1;
+			return false;
 		}
 	}
 }

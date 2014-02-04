@@ -53,6 +53,10 @@ public enum CheckType
 
 public class TestSpec
 {
+	private static const string LOOP_START = "start";
+	private static const string LOOP_END = "end";
+	private static const string LOOP_STEP = "step";
+	private static const string TIMEOUT = "timeout";
 	private string directory;
 	private string[] tests;
 	private string[] adaptors;
@@ -91,7 +95,37 @@ public class TestSpec
 					return;
 			}
 			
-			stream.printf("%s %s\n", full_name, node.coroutine ? "async" : "sync");
+			int loop_start = 0;
+			int loop_end = 0;
+			int loop_step = 1;
+			int timeout = 0;
+			var attr = node.get_attribute("DTest");
+			if (attr != null)
+			{
+				loop_start = attr.has_argument(LOOP_START) ? attr.get_integer(LOOP_START, loop_start) : loop_start;
+				loop_end = attr.has_argument(LOOP_END) ? attr.get_integer(LOOP_END, loop_end) : loop_end;
+				loop_step = attr.has_argument(LOOP_STEP) ? attr.get_integer(LOOP_STEP, loop_step) : loop_step;
+				timeout = attr.has_argument(TIMEOUT) ? attr.get_integer(TIMEOUT, timeout) : timeout;
+			}
+			
+			var parameters = node.get_parameters();
+			if (parameters.size == 0)
+			{
+				loop_start = loop_end = 0;
+			}
+			else if (parameters.size == 1)
+			{
+				if (loop_start == loop_end)
+					loop_end = loop_start + 1;
+			}
+			else
+			{
+				return;
+			}
+			
+			stream.printf("%s %s %d %d %d %d\n",
+			full_name, node.coroutine ? "async" : "sync",
+			loop_start, loop_end, loop_step, timeout);
 			tests += full_name;
 		}
 	}
@@ -159,11 +193,14 @@ public class Preprocessor: Vala.CodeVisitor
 			{
 				var args = node.get_argument_list();
 				var arg1 = args.get(0);
-				string expr = arg1.to_string();
 				var binary = arg1 as Vala.BinaryExpression;
 				string? operator_str = null;
+				if (binary != null && (
+				binary.left.value_type.to_string() == "null"
+				|| binary.right.value_type.to_string() == "null"))
+					binary = null;
 				
-				if (binary != null)
+				if (binary != null && binary.right.value_type.to_string() != "null")
 				{
 					switch (binary.operator)
 					{
@@ -190,6 +227,7 @@ public class Preprocessor: Vala.CodeVisitor
 						binary = null;
 						break;
 					}
+					
 				}
 				
 				if (binary != null)
@@ -199,41 +237,47 @@ public class Preprocessor: Vala.CodeVisitor
 					var type_right = binary.right.value_type.to_string();
 					var id1 = ID.printf(++this.tmp_id);
 					var id2 = ID.printf(++this.tmp_id);
+					var left_expr = read_node(binary.left);
+					var right_expr = read_node(binary.right);
 					stream.puts("{");
-					stream.printf(" %s %s = %s;", type_left, id1, binary.left.to_string());
-					stream.printf(" %s %s = %s;", type_right, id2, binary.right.to_string());
+					stream.printf(" %s %s = %s;", type_left, id1, left_expr);
+					stream.printf(" %s %s = %s;", type_right, id2, right_expr);
 					var id3 = ID.printf(++this.tmp_id);
 					stream.printf(" bool %s = %s %s %s;", id3, id1, operator_str, id2);
 					if (check_type == CheckType.EXPECT)
-						stream.printf("this.real_expect2(%s", id3);
+						stream.printf("this.real_expect2(false, %s", id3);
 					else
-						stream.printf(" if (!this.real_assert2(%s", id3);
-					stream.printf(",\"%s\"", binary.left.to_string().replace("\"","\\\""));
+						stream.printf(" if (!this.real_expect2(true, %s", id3);
+					stream.printf(",\"%s\"", left_expr.replace("\"","\\\""));
 					stream.printf(",\"%s\"", operator_str);
-					stream.printf(",\"%s\"", binary.right.to_string().replace("\"","\\\""));
+					stream.printf(",\"%s\"", right_expr.replace("\"","\\\""));
 					if (type_left == "string")
-						stream.printf(", %s, null", id1);
+						stream.printf(", %s", id1);
 					else
-						stream.printf(", null, (Diorite.Stringify) %s.to_string", id1);
+						stream.printf(", %s.to_string()", id1);
 					if (type_right == "string")
-						stream.printf(", %s, null", id2);
+						stream.printf(", %s", id2);
 					else
-						stream.printf(", null, (Diorite.Stringify) %s.to_string", id2);
+						stream.printf(", %s.to_string()", id2);
 					stream.printf(", \"%s\", %d)", file_name.replace("\"","\\\""), r.first_line);
 					if (check_type == CheckType.EXPECT)
 						stream.puts("; }");
 					else
 						stream.puts(") return; }");
 				}
-				else if (check_type == CheckType.EXPECT)
-				{
-					stream.printf("this.real_expect1(%s, \"%s\", \"%s\", %d)",
-						expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
-				}
 				else
 				{
-					stream.printf("{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}",
-						expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
+					string expr = read_node(arg1);
+					if (check_type == CheckType.EXPECT)
+					{
+						stream.printf("this.real_expect1(%s, \"%s\", \"%s\", %d)",
+							expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
+					}
+					else
+					{
+						stream.printf("{ if(!this.real_assert1(%s, \"%s\", \"%s\", %d)) return;}",
+							expr, expr.replace("\"","\\\""), file_name.replace("\"","\\\""), r.first_line);
+					}
 				}
 				skip(r.last_line, r.last_column + 1);
 			}
@@ -646,36 +690,49 @@ public class Preprocessor: Vala.CodeVisitor
 	
 	private bool write_node(Vala.CodeNode node)
 	{
-		var r = node.source_reference;
-		var result = skip(r.first_line, r.first_column);
-		return result ? write_forward(r.last_line, r.last_column + 1) : result;
+		var data = read_node(node);
+		if (data != null)
+		{
+			stream.puts(data);
+			return true;
+		}
+		return false;
 	}
 	
-	private bool write_forward(int line, int column)
+	private string? read_node(Vala.CodeNode node)
+	{
+		var r = node.source_reference;
+		var result = skip(r.first_line, r.first_column);
+		if (!result)
+			return null;
+		return read_forward(r.last_line, r.last_column + 1);
+	}
+	
+	private string? read_forward(int line, int column)
 	{
 		if (line < this.line || line == this.line && column <= this.column)
-			return false;
-			
+			return null;
+		
+		var buffer = new StringBuilder();
 		unowned string data;
 		if (this.line == line)
 		{
 			data = lines[line -1];
-			stream.puts(data.slice(this.column - 1, column - 1));
+			buffer.append(data.slice(this.column - 1, column - 1));
 			this.column = column;
-			return true;
+			return buffer.str;
 		}
 		
-		
 		data = lines[this.line - 1];
-		stream.puts(this.column > 1 ? data.substring(this.column - 1) : data);
-		stream.putc('\n');
+		buffer.append(this.column > 1 ? data.substring(this.column - 1) : data);
+		buffer.append_c('\n');
 		lines[this.line - 1] = null;
 		this.column = 1;
 		
 		for (var i = this.line; i < line - 1; i++)
 		{
-			stream.puts(lines[i]);
-			stream.putc('\n');
+			buffer.append(lines[i]);
+			buffer.append_c('\n');
 			lines[i] = null;
 		}
 		
@@ -684,10 +741,25 @@ public class Preprocessor: Vala.CodeVisitor
 		if (column > this.column)
 		{
 			data = lines[line - 1];
-			stream.puts(data.slice(0, column -1));
+			buffer.append(data.slice(0, column -1));
 			this.column = column;
 		}
-		return true;
+		
+		return buffer.str;
+	}
+	
+	private bool write_forward(int line, int column)
+	{
+		if (line < this.line || line == this.line && column <= this.column)
+			return false;
+			
+		var data = read_forward(line, column);
+		if (data != null)
+		{
+			stream.puts(data);
+			return true;
+		}
+		return false;
 	}
 	
 	private bool skip(int line, int column)

@@ -87,8 +87,10 @@ public class TestModule: GLib.TypeModule
 			return null;
 		}
 		
-		var symbol = get_c_func(type_name, test_name);
 		var test_case = Object.new(type) as TestCase;
+		string symbol;
+		
+		symbol = get_c_func(type_name, test_name);
 		void* func = null;
 		if (!module.symbol(symbol, out func))
 		{
@@ -97,7 +99,12 @@ public class TestModule: GLib.TypeModule
 		}
 		
 		if (!spec.async)
-			return new Adapter(test_case, name, (TestFunc) func);
+		{
+			if (!spec.loop)
+				return new Adapter(test_case, name, (TestFunc) func);
+			
+			return new LoopAdapter(test_case, name, (TestLoop) func, spec.loop_start, spec.loop_end, spec.loop_step);
+		}
 		
 		symbol += "_finish";
 		void* func2 = null;
@@ -106,7 +113,11 @@ public class TestModule: GLib.TypeModule
 			error = "Module symbol %s not found. %s\n".printf(symbol, Module.error() ?? "");
 			return null;
 		}
-		return new AsyncAdapter(test_case, name, (TestFuncBegin) func, (TestFuncEnd) func2);
+		
+		if (!spec.loop)
+			return new AsyncAdapter(test_case, name, (TestFuncBegin) func, (TestFuncEnd) func2);
+		
+		return new AsyncLoopAdapter(test_case, name, (TestLoopBegin) func, (TestLoopEnd) func2, spec.loop_start, spec.loop_end, spec.loop_step);
 	}
 	
 	private string get_c_func(string klass, string method)
