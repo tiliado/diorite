@@ -40,32 +40,34 @@ public delegate bool EqualData(void* data1, void* data2);
 [CCode(has_target=false)]
 public delegate string StringifyData(void* data);
 
-
-public bool str_eq(void* data1, void* data2)
+namespace Test
 {
-	uint8* p1 = *((uint8**) data1);
-	uint8* p2 = *((uint8**) data2);
-	unowned string str1 = (string) p1;
-	unowned string str2 = (string) p2;
-	return str_equal(str1, str2);
-}
-
-public bool int_eq(void* data1, void* data2)
-{
-	return *((int*)data1) == *((int*)data2);
-}
-
-public static string str_int(void* data)//, string? def=null)
-{
-	int i = *((int*)data);
-	return i.to_string();
-}
-
-public static string str_str(void* data)//, string? def=null)
-{
-	uint8* p = *((uint8**) data);
-	unowned string str = (string) p;
-	return str.dup();
+	public bool str_eq(void* data1, void* data2)
+	{
+		uint8* p1 = *((uint8**) data1);
+		uint8* p2 = *((uint8**) data2);
+		unowned string str1 = (string) p1;
+		unowned string str2 = (string) p2;
+		return str_equal(str1, str2);
+	}
+	
+	public bool int_eq(void* data1, void* data2)
+	{
+		return *((int*)data1) == *((int*)data2);
+	}
+	
+	public static string str_int(void* data)//, string? def=null)
+	{
+		int i = *((int*)data);
+		return i.to_string();
+	}
+	
+	public static string str_str(void* data)//, string? def=null)
+	{
+		uint8* p = *((uint8**) data);
+		unowned string str = (string) p;
+		return str.dup();
+	}
 }
 
 private static string strquote(string str)

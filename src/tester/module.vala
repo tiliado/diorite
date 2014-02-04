@@ -88,7 +88,6 @@ public class TestModule: GLib.TypeModule
 		}
 		
 		var symbol = get_c_func(type_name, test_name);
-		message("%s %s %s %s", type_name, test_name, type.name(), symbol);
 		var test_case = Object.new(type) as TestCase;
 		void* func = null;
 		if (!module.symbol(symbol, out func))

@@ -15,76 +15,27 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * Tests are under public domain because they might contain useful sample code.
  */
 
 using Diorite.Test;
-
-namespace My
-{
 
 class TestCase: Diorite.TestCase
 {
 	
 	public void test_one()
 	{
-		message("One");
 		assert("foo" == "foo");
 		expect("foo" == "foo");
-		expect("foo" == "goo");
-		assert("foo" == "goo");
-	}
-	
-	public void test_two()
-	{
-		message("Two");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
-	}
-	
-	public void test_three()
-	{
-		message("Three");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
-	}
-	
-	public void test_four()
-	{
-		message("four");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
-		message("four success");
-	}
-	
-	public async void test_five()
-	{
-		message("five starts");
-		Idle.add(test_five.callback);
-		yield;
-		assert(5 == 4 + 1);
-		message("five ends");
 	}
 	
 	public void test_array()
 	{
-		int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8};
-		int[] arr3 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-		message("Expect second");
-		expect_array(sizeof(int), arr2, arr3, int_eq, str_int);
-		message("Expect second done");
-		
 		string[] arr1 = {"hello", "world1"};
-		string[] arr1b = {"hello", "world2", "yes"};
-		expect_array(sizeof(string), arr1, arr1b, str_eq, str_str);
+		expect_array(sizeof(string), arr1, arr1, str_eq, str_str);
+		
+		int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8};
+		expect_array(sizeof(int), arr2, arr2, int_eq, str_int);
 	}
-}
-
-} // namespace Diorite
-
-[ModuleInit]
-public void module_init(GLib.TypeModule type_module)
-{
 }
