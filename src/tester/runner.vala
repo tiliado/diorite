@@ -195,15 +195,8 @@ public class TestRunner
 					process.force_exit();
 			}
 			
+			#if LINUX
 			var status = process.status;
-			#if WIN
-				if (status == 0)
-					return true;
-				
-				logf("*** EXIT with status %d", status);
-				return false;
-			#else
-			
 			if (Process.if_exited(status))
 			{
 				status = Process.exit_status(status);
@@ -226,6 +219,12 @@ public class TestRunner
 			}
 			
 			logf("*** UNKNOWN EXIT %s\n", (Process.term_sig(status)).to_string());
+			return false;
+			#else
+			if (process.status == 0)
+				return true;
+			
+			logf("*** EXIT with status %d", process.status);
 			return false;
 			#endif
 		}
