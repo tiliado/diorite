@@ -38,28 +38,6 @@ build()
 	${OUT}/testgen/testcase.vala
 }
 
-dist()
-{
-	echo "*** $0 dist ***"
-	mkdir -p ${OUT}
-	if [ "$PLATFORM" == "WIN" ]; then
-		for file in  \
-		libglib-2.0-0.dll libgobject-2.0-0.dll libgthread-2.0-0.dll \
-		libgcc_s_sjlj-1.dll libintl-8.dll libffi-6.dll iconv.dll \
-		libgio-2.0-0.dll libgmodule-2.0-0.dll zlib1.dll libvala-0.16-0.dll \
-		gspawn-win32-helper.exe gspawn-win32-helper-console.exe
-		do
-			cp -spuvf ${MINGW_BIN}/$file ${OUT}
-		done
-		
-		for file in \
-		dioriteglib-0.dll dioriteinterrupthelper.exe dioritetestgen.exe dioritetester.exe
-		do
-			cp -lpuvf ${BUILD}/$file ${OUT}
-		done
-	fi
-}
-
 run()
 {
 	build
