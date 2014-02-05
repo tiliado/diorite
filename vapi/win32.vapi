@@ -190,4 +190,118 @@ public struct Window: Handle
 	public bool destroy();
 }
 
+[CCode (cname="HANDLE")]
+public struct FileHandle: Handle
+{
+	[CCode (cname = "INVALID_HANDLE_VALUE")]
+	public static const Handle INVALID;
+	
+	[CCode (cname = "CreateFile", cheader_filename = "windows.h")]
+	public static FileHandle create(String filename, long access, long share_mode,
+	LPSECURITY_ATTRIBUTES? security_attrs, long creation_disposition,
+	long flag, FileHandle? template_file=null);
+	
+	// http://msdn.microsoft.com/en-us/library/aa365467.aspx
+	[CCode (cname = "ReadFile", cheader_filename = "windows.h")]
+	public bool read(uint8[] buffer, out long bytes_read, out LPOVERLAPPED? overlapped=null);
+	
+	[CCode (cname = "WriteFile", cheader_filename = "windows.h")]
+	public bool write(uint8[] buffer, out long bytes_written, out LPOVERLAPPED? lpOverlapped=null);
+	
+	[CCode (cname = "FlushFileBuffers", cheader_filename = "windows.h")]
+	public bool flush();
+	
+	
+}
+
+[CCode (cname="HANDLE")]
+public struct NamedPipe: FileHandle
+{
+	[CCode (cname = "INVALID_HANDLE_VALUE")]
+	public static const Handle INVALID;
+	
+	[CCode (cname = "CreateNamedPipe", cheader_filename = "windows.h")]
+	public static NamedPipe create(String name, long dwOpenMode, long dwPipeMode,
+	long nMaxInstances, long nOutBufferSize, long nInBufferSize, long nDefaultTimeOut,
+	LPSECURITY_ATTRIBUTES? lpSecurityAttributes);
+	
+	[CCode (cname = "CreateFile", cheader_filename = "windows.h")]
+	public static FileHandle open(String name, long access, long share_mode,
+	LPSECURITY_ATTRIBUTES? security_attrs, long creation_disposition,
+	long flag, FileHandle? template_file=null);
+	
+	[CCode (cname = "ConnectNamedPipe", cheader_filename = "windows.h")]
+	public bool connect(out LPOVERLAPPED? overlapped=null);
+	
+	[CCode (cname = "DisconnectNamedPipe", cheader_filename = "windows.h")]
+	public bool disconnect();
+	
+	// http://msdn.microsoft.com/en-us/library/aa365787%28v=vs.85%29.aspx
+	[CCode (cname="SetNamedPipeHandleState", cheader_filename = "windows.h")]
+	public bool set_state(ref ulong? mode, ulong? max_collection, ulong? timeout);
+	
+	// http://msdn.microsoft.com/en-us/library/aa365800%28v=vs.85%29.aspx
+	[CCode (cname="WaitNamedPipe", cheader_filename = "windows.h")]
+	public static bool wait(String name, ulong timeout);
+}
+
+[SimpleType]
+[CCode (cname = "LPOVERLAPPED", cheader_filename = "windows.h")]
+public struct LPOVERLAPPED{}
+	
+[SimpleType]
+[CCode (cname = "LPSECURITY_ATTRIBUTES", cheader_filename = "windows.h")]
+public struct LPSECURITY_ATTRIBUTES{}
+
+
+[CCode (cname="PIPE_ACCESS_DUPLEX", cheader_filename="windows.h")]
+public long PIPE_ACCESS_DUPLEX;
+
+[CCode (cname="PIPE_TYPE_BYTE", cheader_filename="windows.h")]
+public long PIPE_TYPE_BYTE;
+
+[CCode (cname="PIPE_TYPE_MESSAGE", cheader_filename="windows.h")]
+public long PIPE_TYPE_MESSAGE;
+
+[CCode (cname="PIPE_READMODE_BYTE", cheader_filename="windows.h")]
+public long PIPE_READMODE_BYTE;
+
+[CCode (cname="PIPE_READMODE_MESSAGE", cheader_filename="windows.h")]
+public long PIPE_READMODE_MESSAGE;
+
+[CCode (cname="PIPE_WAIT", cheader_filename="windows.h")]
+public long PIPE_WAIT;
+
+[CCode (cname="PIPE_UNLIMITED_INSTANCES", cheader_filename="windows.h")]
+public long PIPE_UNLIMITED_INSTANCES;
+
+[CCode (cname="GENERIC_READ", cheader_filename="windows.h")]
+public long GENERIC_READ;
+
+[CCode (cname="GENERIC_WRITE", cheader_filename="windows.h")]
+public long GENERIC_WRITE;
+
+[CCode (cname="FILE_WRITE_ATTRIBUTES", cheader_filename="windows.h")]
+public long FILE_WRITE_ATTRIBUTES;
+
+[CCode (cname="FILE_SHARE_READ", cheader_filename="windows.h")]
+public long FILE_SHARE_READ;
+
+[CCode (cname="FILE_SHARE_WRITE", cheader_filename="windows.h")]
+public long  FILE_SHARE_WRITE;
+
+[CCode (cname="OPEN_EXISTING", cheader_filename="windows.h")]
+public long OPEN_EXISTING;
+
+[CCode (cname="FILE_ATTRIBUTE_NORMAL", cheader_filename="windows.h")]
+public long FILE_ATTRIBUTE_NORMAL;
+
+[CCode (cname="ERROR_MORE_DATA", cheader_filename="windows.h")]
+public ulong ERROR_MORE_DATA;
+
+[CCode (cname="ERROR_PIPE_BUSY", cheader_filename="windows.h")]
+public ulong ERROR_PIPE_BUSY;
+
+[CCode (cname="ERROR_PIPE_CONNECTED", cheader_filename="windows.h")]
+public ulong ERROR_PIPE_CONNECTED;
 } // namespace Win32

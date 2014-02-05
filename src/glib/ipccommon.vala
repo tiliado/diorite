@@ -22,26 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Diorite.Ipc
 {
+#if WIN
+public const uint PIPE_BUFSIZE = 4096;
+public const uint MESSAGE_BUFSIZE = 512;
+private const string PIPE_FORMAT = "\\\\.\\pipe\\libdiorite.%s(%s)";
+#endif
 
-public errordomain Error
-{
-	INVALID_ARGUMENT,
-	UNEXPECTED_RESULT,
-	NOT_SUPPORTED,
-	NOT_IMPLEMENTED,
-	IOERROR,
-	NOT_FOUND;
-}
-
-public errordomain IOError
-{
-	CONN_FAILED,
-	TIMEOUT,
-	RW_FAILED,
-	READ,
-	WRITE;
-}
-
-} // namespace Diorite
+} // namespace Diorote
