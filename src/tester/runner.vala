@@ -224,7 +224,7 @@ public class TestRunner
 			if (process.status == 0)
 				return true;
 			
-			logf("*** EXIT with status %d", process.status);
+			logf("*** EXIT with status %d\n", process.status);
 			return false;
 			#endif
 		}

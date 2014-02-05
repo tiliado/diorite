@@ -59,7 +59,7 @@ class Generator
 		context.add_define("GOBJECT");
 	
 		int glib_major = 2;
-		int glib_minor = 22;
+		int glib_minor = 32;
 		context.target_glib_major = glib_major;
 		context.target_glib_minor = glib_minor;
 		
