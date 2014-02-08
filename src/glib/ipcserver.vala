@@ -32,7 +32,7 @@ public class Server
 	#if WIN
 	private Win32.NamedPipe pipe = Win32.NamedPipe.INVALID;
 	#else
-	UNSUPPORTED PLATFORM!
+	// TODO
 	#endif
 	
 	public Server(string name)
@@ -42,7 +42,7 @@ public class Server
 		var user = Environment.get_user_name().replace("\\", ".");
 		this.path = PIPE_FORMAT.printf(name, user);
 		#else
-		UNSUPPORTED PLATFORM!
+		assert_not_reached(); // TODO
 		#endif
 	}
 	
@@ -136,7 +136,7 @@ public class Server
 			}
 		}
 		#else
-		UNSUPPORTED PLATFORM!
+		assert_not_reached(); // TODO
 		#endif
 	}
 	
