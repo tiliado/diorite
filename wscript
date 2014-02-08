@@ -102,6 +102,7 @@ def configure(ctx):
 		print("Unsupported platform %s. Please try to talk to devs to consider support of your platform." % sys.platform)
 		sys.exit(1)
 	
+	ctx.define(PLATFORM, 1)
 	ctx.env.VALA_DEFINES = [PLATFORM]
 	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
@@ -167,9 +168,10 @@ def build(ctx):
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
 		vnum = "0.1.0",
-		source = ctx.path.ant_glob('src/glib/*.vala'),
+		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.c'),
 		packages = packages,
 		uselib = uselib,
+		includes = ["src/glib"],
 		vala_defines = vala_defines,
 		vapi_dirs = ['vapi'],
 		vala_target_glib = "2.32",

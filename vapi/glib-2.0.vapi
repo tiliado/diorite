@@ -1698,7 +1698,7 @@ namespace GLib {
 #endif
 	public class Thread<T> {
 #if GLIB_2_32
-		public Thread (string? name, owned ThreadFunc<T> func);
+		public Thread (string? name, ThreadFunc<T> func);
 		[CCode (cname = "g_thread_try_new")]
 		public Thread.try (string? name, owned ThreadFunc<T> func) throws GLib.Error;
 #endif

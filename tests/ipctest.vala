@@ -24,23 +24,25 @@ using Diorite.Test;
 class IpcTest: Diorite.TestCase
 {
 	private bool listening;
+	private Diorite.Ipc.Server? bytes_server;
 	
 	[DTest(start=8, end=1000, step=8)]
 	public void test_communication_bytes(int repeat)
 	{
-		listening = false;
+		bytes_server = new Diorite.Ipc.Server("test");
 		var thread = new Thread<void*>("server", run_bytes_server);
 		bool listening = false;
 		while (!listening)
 		{
 			Thread.yield();
-			lock(this.listening)
+			lock(bytes_server)
 			{
-				listening = this.listening;
+				assert(bytes_server != null);
+				listening = bytes_server.listening;
 			}
 			Thread.yield();
 		}
-		
+
 		var client = new Diorite.Ipc.Client("test", 5000);
 		var request = new ByteArray.sized(repeat);
 		for (var i = 0; i < repeat; i++)
@@ -65,19 +67,19 @@ class IpcTest: Diorite.TestCase
 	}
 	
 	private void* run_bytes_server()
-	{
-		var server = new Diorite.Ipc.Server("test");
+	{ 
 		try
 		{
-			lock(listening)
-			{
-				listening = true;
-			}
-			server.listen();
+			bytes_server.listen();
 		}
 		catch (Diorite.IOError e)
 		{
-			expectation_failed("%s:%d:%s Server error: %s".printf(Log.FILE, Log.LINE, mark, e.message));
+			lock(bytes_server)
+			{
+				expectation_failed("%s:%d:%s Server error: %s".printf(Log.FILE, Log.LINE, mark, e.message));
+				bytes_server = null;
+			}
+			
 		}
 		return null;
 	}

@@ -22,49 +22,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Ipc
-{
+#ifdef LINUX
+#include <glib.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include "ipcsocket.h"
 
-public class Server
+gint diorite_ipc_socket_connect(gint fd, gchar* path)
 {
-	private Channel channel;
-	public bool listening
-	{
-		get {return channel.listening;}
-	}
-	
-	public Server(string name)
-	{
-		channel = new Channel(name);
-	}
-	
-	public void listen() throws IOError
-	{
-		while (true)
-		{
-			channel.create();
-			while (true)
-			{
-				channel.listen();
-				ByteArray request;
-				ByteArray response;
-				
-				channel.read_bytes(out request);
-				
-				if (!handle((owned) request, out response))
-					response = new ByteArray();
-				
-				channel.write_bytes(response);
-				channel.disconnect();
-			}
-		}
-	}
-	
-	protected virtual bool handle(owned ByteArray request, out ByteArray? response)
-	{
-		response = (owned) request;
-		return true;
-	}
+	struct sockaddr_un address;
+	size_t size = sizeof(struct sockaddr_un);
+	memset(&address, 0, size);
+	address.sun_family = AF_UNIX;
+	strcpy(address.sun_path, path);
+	return connect(fd, (struct sockaddr *) &address, size);
 }
 
-} // namespace Diorote
+gint diorite_ipc_socket_bind(gint fd, gchar* path)
+{
+	struct sockaddr_un address;
+	size_t size = sizeof(struct sockaddr_un);
+	memset(&address, 0, size);
+	address.sun_family = AF_UNIX;
+	strcpy(address.sun_path, path);
+	return bind(fd, (struct sockaddr *) &address, size);
+}
+
+gint diorite_ipc_socket_accept(gint fd)
+{
+	struct sockaddr_un address;
+	size_t size = sizeof(struct sockaddr_un);
+	memset(&address, 0, size);
+	// remember: third argument is a pointer
+	return accept(fd, (struct sockaddr *) &address, &size);
+}
+
+#endif

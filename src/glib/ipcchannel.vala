@@ -40,16 +40,27 @@ public void uint32_from_bytes(ref uint8[] buffer, out uint32 data, uint offset=0
 	data = 0;
 	for(var i = 0; i < size; i ++)
 		data += buffer[offset + i] * (1 << (3 - i) * 8);
-} 
+}
+
+#if LINUX
+[CCode(cheader_filename="socket.h")]
+private extern int socket_connect(int fd, string path);
+[CCode(cheader_filename="socket.h")]
+private extern int socket_bind(int fd, string path);
+[CCode(cheader_filename="socket.h")]
+private extern int socket_accept(int fd);
+#endif
 
 public class Channel
 {
 	private string name;
 	private string path;
+	private bool _listening = false; 
 	#if WIN
 	private Win32.NamedPipe pipe = Win32.NamedPipe.INVALID;
 	#else
-	// TODO
+	private int local_socket = -1;
+	private int remote_socket = -1;
 	#endif
 	private bool connected
 	{
@@ -58,8 +69,21 @@ public class Channel
 			#if WIN
 			return pipe != Win32.Handle.INVALID;
 			#else
-			return false;
+			return local_socket > -1;
 			#endif
+		}
+	}
+	
+	public bool listening
+	{
+		get
+		{
+			bool result;
+			lock (_listening)
+			{
+				result = _listening;
+			}
+			return result;
 		}
 	}
 	
@@ -79,7 +103,16 @@ public class Channel
 		if (pipe == Win32.Handle.INVALID)
 			throw new IOError.CONN_FAILED("Failed to create pipe '%s'. %s", path, Win32.get_last_error_msg());
 		#else
-		assert_not_reached();
+		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
+		if (local_socket < 0)
+			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, Posix.get_last_error_msg());
+		Posix.unlink(path);
+		var result = socket_bind(local_socket, path);
+		if (result < 0)
+		{
+			close();
+			throw new IOError.CONN_FAILED("Failed to bind socket '%s'. %s", path, Posix.get_last_error_msg());
+		}
 		#endif
 	}
 	
@@ -87,13 +120,33 @@ public class Channel
 	{
 		check_connected();
 		#if WIN
+		lock (_listening)
+		{
+			_listening = true;
+		}
 		if (!pipe.connect() && Win32.get_last_error() != Win32.ERROR_PIPE_CONNECTED)
 		{
 			close();
 			throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
 		}
 		#else
-		assert_not_reached();
+		var result = Posix.listen(local_socket, 5);
+		if (result < 0)
+		{
+			close();
+			throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, Posix.get_last_error_msg());
+		}
+		lock (_listening)
+		{
+			_listening = true;
+		}
+		
+		remote_socket = socket_accept(local_socket);
+		if (remote_socket < 0)
+		{
+			close();
+			throw new IOError.CONN_FAILED("Failed to accept on socket '%s'. %s", path, Posix.get_last_error_msg());
+		}
 		#endif
 	}
 	
@@ -103,7 +156,8 @@ public class Channel
 		#if WIN
 		pipe.disconnect();
 		#else
-		assert_not_reached();
+		Posix.close(remote_socket);
+		remote_socket = -1;
 		#endif
 	}
 	
@@ -133,7 +187,15 @@ public class Channel
 			throw new IOError.CONN_FAILED("Failed to set up pipe '%s'. %s", path, Win32.get_last_error_msg()); 
 		}
 		#else
-		assert_not_reached();
+		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
+		if (local_socket < 0)
+			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, Posix.get_last_error_msg());
+		var result = socket_connect(local_socket, path);
+		if (result < 0)
+		{
+			close();
+			throw new IOError.CONN_FAILED("Failed to connect to '%s'. %s", path, Posix.get_last_error_msg());
+		}
 		#endif
 	}
 	
@@ -145,15 +207,29 @@ public class Channel
 	
 	public void close()
 	{
+		lock (_listening)
+		{
+			_listening = false;
+		}
+		
+		#if WIN
 		if (connected)
 		{
-			#if WIN
 			pipe.close();
 			pipe = Win32.NamedPipe.INVALID;
-			#else
-			assert_not_reached();
-			#endif
 		}
+		#else
+		if (local_socket >= 0)
+		{
+			Posix.close(local_socket);
+			local_socket = -1;
+		}
+		if (remote_socket >= 0)
+		{
+			Posix.close(remote_socket);
+			remote_socket = -1;
+		}
+		#endif
 	}
 	
 	public void flush() throws IOError
@@ -161,8 +237,6 @@ public class Channel
 		check_connected();
 		#if WIN
 		pipe.flush();
-		#else
-		assert_not_reached();
 		#endif
 	}
 	
@@ -175,10 +249,17 @@ public class Channel
 		if (!pipe.write(data, out bytes_written))
 		{
 			close();
-			throw new IOError.WRITE("Failed send request to pipe '%s': %s", path, Win32.get_last_error_msg());
+			throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
 		}
 		#else
-		assert_not_reached();
+		var fd = remote_socket >= 0 ? remote_socket : local_socket;
+		var result = Posix.write(fd, (void*) buffer, len);
+		if (result < 0)
+		{
+			close();
+			throw new IOError.WRITE("Failed write to socket '%s': %s", path, Posix.get_last_error_msg());
+		}
+		bytes_written = (ulong) result;
 		#endif
 		flush();
 	}
@@ -194,20 +275,16 @@ public class Channel
 		uint32_to_bytes(ref size_buffer, size);
 		bytes.prepend(size_buffer);
 		
-		#if WIN
-			uint8* data = bytes.data;
-			var total_size = bytes.len;
-			ulong bytes_written_total = 0;
-			ulong bytes_written;
-			do
-			{
-				write(data + bytes_written_total, int.min(MESSAGE_BUFSIZE, (int)(total_size - bytes_written_total)), out bytes_written);
-				bytes_written_total += bytes_written;
-			}
-			while (bytes_written_total < total_size);
-		#else
-		assert_not_reached();
-		#endif
+		uint8* data = bytes.data;
+		var total_size = bytes.len;
+		ulong bytes_written_total = 0;
+		ulong bytes_written;
+		do
+		{
+			write(data + bytes_written_total, int.min(MESSAGE_BUFSIZE, (int)(total_size - bytes_written_total)), out bytes_written);
+			bytes_written_total += bytes_written;
+		}
+		while (bytes_written_total < total_size);
 	}
 	
 	public void read_data(out uint8[] data) throws IOError
@@ -221,14 +298,13 @@ public class Channel
 	{
 		check_connected();
 		bytes = new ByteArray();
-		#if WIN
 		uint8[MESSAGE_BUFSIZE] buffer = new uint8[MESSAGE_BUFSIZE];
 		ulong bytes_read;
 		uint64 bytes_read_total = 0;
 		uint64 message_size = 0;
 		do
 		{
-			pipe.read(buffer, out bytes_read);
+			read(buffer, out bytes_read);
 			if (bytes_read_total == 0)
 			{
 				uint32_from_bytes(ref buffer, out message_size);
@@ -248,12 +324,9 @@ public class Channel
 				bytes.remove_range(bytes.len - extra, extra);
 		}
 		while (bytes_read_total < message_size);
-		#else
-		assert_not_reached();
-		#endif
 	}
 	
-	protected void read(uint8[] buffer, out long bytes_read) throws IOError
+	protected void read(uint8[] buffer, out ulong bytes_read) throws IOError
 	{
 		bytes_read = 0;
 		#if WIN
@@ -264,7 +337,14 @@ public class Channel
 			throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
 		}
 		#else
-		assert_not_reached();
+		var fd = remote_socket >= 0 ? remote_socket : local_socket;
+		var result = Posix.read(fd, (void*) buffer, buffer.length);
+		if (result < 0)
+		{
+			close();
+			throw new IOError.READ("Failed to read from socket. %s", Posix.get_last_error_msg());
+		}
+		bytes_read = (ulong) result;
 		#endif
 	}
 	
@@ -281,3 +361,16 @@ public class Channel
 }
 
 } // namespace Diorote
+
+#if LINUX
+namespace Posix
+{
+	
+private string get_last_error_msg()
+{
+	var last_error = Posix.errno;
+	return "Error %d: %s".printf(last_error, Posix.strerror(last_error));
+}
+
+} // namespace Posix
+#endif

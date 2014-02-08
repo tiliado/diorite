@@ -22,49 +22,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Ipc
-{
+#ifdef LINUX
+#ifndef __DIORITE_IPC_SOCKET_H
+#define __DIORITE_IPC_SOCKET_H
 
-public class Server
-{
-	private Channel channel;
-	public bool listening
-	{
-		get {return channel.listening;}
-	}
-	
-	public Server(string name)
-	{
-		channel = new Channel(name);
-	}
-	
-	public void listen() throws IOError
-	{
-		while (true)
-		{
-			channel.create();
-			while (true)
-			{
-				channel.listen();
-				ByteArray request;
-				ByteArray response;
-				
-				channel.read_bytes(out request);
-				
-				if (!handle((owned) request, out response))
-					response = new ByteArray();
-				
-				channel.write_bytes(response);
-				channel.disconnect();
-			}
-		}
-	}
-	
-	protected virtual bool handle(owned ByteArray request, out ByteArray? response)
-	{
-		response = (owned) request;
-		return true;
-	}
-}
+#include <glib.h>
 
-} // namespace Diorote
+gint diorite_ipc_socket_connect(gint fd, gchar* path);
+gint diorite_ipc_socket_bind(gint fd, gchar* path);
+gint diorite_ipc_socket_accept(gint fd);
+
+#endif
+#endif

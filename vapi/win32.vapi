@@ -203,10 +203,10 @@ public struct FileHandle: Handle
 	
 	// http://msdn.microsoft.com/en-us/library/aa365467.aspx
 	[CCode (cname = "ReadFile", cheader_filename = "windows.h")]
-	public bool read(uint8[] buffer, out long bytes_read, out LPOVERLAPPED? overlapped=null);
+	public bool read(uint8[] buffer, out ulong bytes_read, out LPOVERLAPPED? overlapped=null);
 	
 	[CCode (cname = "WriteFile", cheader_filename = "windows.h")]
-	public bool write(uint8[] buffer, out long bytes_written, out LPOVERLAPPED? lpOverlapped=null);
+	public bool write(uint8[] buffer, out ulong bytes_written, out LPOVERLAPPED? lpOverlapped=null);
 	
 	[CCode (cname = "FlushFileBuffers", cheader_filename = "windows.h")]
 	public bool flush();
