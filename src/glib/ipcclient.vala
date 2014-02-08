@@ -57,12 +57,7 @@ public class Client
 	{
 		this.name = name;
 		this.timeout = timeout;
-		#if WIN
-		var user = Environment.get_user_name().replace("\\", ".");
-		this.path = PIPE_FORMAT.printf(name, user);
-		#else
-		assert_not_reached(); // TODO
-		#endif
+		this.path = create_path(name);
 	}
 	
 	public bool send(ByteArray request, out ByteArray? response) throws IOError

@@ -28,6 +28,17 @@ namespace Diorite.Ipc
 public const uint PIPE_BUFSIZE = 4096;
 public const uint MESSAGE_BUFSIZE = 512;
 private const string PIPE_FORMAT = "\\\\.\\pipe\\libdiorite.%s(%s)";
+#else
+private const string SOCKET_FORMAT = "libdiorite.%s(%s)";
 #endif
 
+private string create_path(string name)
+{
+	var user = Environment.get_user_name().replace("\\", ".");
+	#if WIN
+	return PIPE_FORMAT.printf(name, user);
+	#else
+	return Path.build_filename(Environment.get_tmp_dir(), SOCKET_FORMAT.printf(name, user));
+	#endif
+}
 } // namespace Diorote

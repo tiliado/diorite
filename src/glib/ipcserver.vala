@@ -38,12 +38,7 @@ public class Server
 	public Server(string name)
 	{
 		this.name = name;
-		#if WIN
-		var user = Environment.get_user_name().replace("\\", ".");
-		this.path = PIPE_FORMAT.printf(name, user);
-		#else
-		assert_not_reached(); // TODO
-		#endif
+		this.path = create_path(name);
 	}
 	
 	public void listen() throws IOError
