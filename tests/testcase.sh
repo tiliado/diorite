@@ -26,8 +26,8 @@ set -eu
 NAME="testcase"
 CMD="$1"
 PLATFORM="$2"
-OUT=${OUT:-../build}
-BUILD=${BUILD:-../build}
+OUT=${OUT:-`dirname $PWD`/build}
+BUILD=${BUILD:-`dirname $PWD`/build}
 . ../examples/conf.inc.sh 
 
 build()
@@ -39,7 +39,7 @@ build()
 	
 	valac -d ${OUT} -b . --thread --save-temps -v \
 	--library=${NAME} -o ${LIBPREFIX}${NAME}${LIBSUFFIX} \
-	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
+	--vapidir $BUILD -X -I$BUILD -X -L$BUILD -X -ldioriteglib \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
 	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
 	-X -fPIC -X -shared -g -X -g3 \

@@ -41,7 +41,9 @@ public errordomain IOError
 	TIMEOUT,
 	RW_FAILED,
 	READ,
-	WRITE;
+	WRITE,
+	TOO_MANY_DATA,
+	NOT_CONNECTED;
 }
 
 } // namespace Diorite

@@ -29,7 +29,7 @@ class IpcTest: Diorite.TestCase
 	public void test_communication_bytes(int repeat)
 	{
 		listening = false;
-		var thread = new Thread<void*>("server", run_string_server);
+		var thread = new Thread<void*>("server", run_bytes_server);
 		bool listening = false;
 		while (!listening)
 		{
@@ -48,7 +48,7 @@ class IpcTest: Diorite.TestCase
 		ByteArray? response;
 		try
 		{
-			assert(client.send(request, out response));
+			client.send(request, out response);
 			assert(repeat == response.len);
 			var orig_mark = mark;
 			for (var i = 0; i < repeat; i++)
@@ -64,7 +64,7 @@ class IpcTest: Diorite.TestCase
 		}
 	}
 	
-	private void* run_string_server()
+	private void* run_bytes_server()
 	{
 		var server = new Diorite.Ipc.Server("test");
 		try
