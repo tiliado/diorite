@@ -139,6 +139,7 @@ def configure(ctx):
 	# FUTURE: make optional, maybe separate diorite test to a separate library?
 	ctx.check_dep('libvala-0.16', 'LIBVALA', '0.16')
 	ctx.check_dep('gmodule-2.0', 'GMODULE', '2.32')
+	ctx.check_dep('gthread-2.0', 'GTHREAD', '2.32')
 	
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
@@ -150,7 +151,7 @@ def build(ctx):
 	PLATFORM = ctx.env.PLATFORM
 	DIORITE_GLIB = "dioriteglib"
 	packages = 'posix glib-2.0 gio-2.0'
-	uselib = 'GLIB'
+	uselib = 'GLIB GTHREAD'
 	vala_defines = ctx.env.VALA_DEFINES
 	
 	if PLATFORM == WIN:
@@ -223,6 +224,7 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = "2.32",
 		)
+	
 	ctx.add_post_fun(post)
 
 def post(ctx):
