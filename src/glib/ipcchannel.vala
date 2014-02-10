@@ -119,35 +119,45 @@ public class Channel
 	public void listen() throws IOError
 	{
 		check_connected();
-		#if WIN
-		lock (_listening)
+		try
 		{
-			_listening = true;
+			#if WIN
+			lock (_listening)
+			{
+				_listening = true;
+			}
+			if (!pipe.connect() && Win32.get_last_error() != Win32.ERROR_PIPE_CONNECTED)
+			{
+				close();
+				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
+			}
+			#else
+			var result = Posix.listen(local_socket, 5);
+			if (result < 0)
+			{
+				close();
+				throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, Posix.get_last_error_msg());
+			}
+			lock (_listening)
+			{
+				_listening = true;
+			}
+			
+			remote_socket = socket_accept(local_socket);
+			if (remote_socket < 0)
+			{
+				close();
+				throw new IOError.CONN_FAILED("Failed to accept on socket '%s'. %s", path, Posix.get_last_error_msg());
+			}
+			#endif
 		}
-		if (!pipe.connect() && Win32.get_last_error() != Win32.ERROR_PIPE_CONNECTED)
+		finally
 		{
-			close();
-			throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
+			lock (_listening)
+			{
+				_listening = false;
+			}
 		}
-		#else
-		var result = Posix.listen(local_socket, 5);
-		if (result < 0)
-		{
-			close();
-			throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, Posix.get_last_error_msg());
-		}
-		lock (_listening)
-		{
-			_listening = true;
-		}
-		
-		remote_socket = socket_accept(local_socket);
-		if (remote_socket < 0)
-		{
-			close();
-			throw new IOError.CONN_FAILED("Failed to accept on socket '%s'. %s", path, Posix.get_last_error_msg());
-		}
-		#endif
 	}
 	
 	public void disconnect() throws IOError
@@ -207,11 +217,6 @@ public class Channel
 	
 	public void close()
 	{
-		lock (_listening)
-		{
-			_listening = false;
-		}
-		
 		#if WIN
 		if (connected)
 		{

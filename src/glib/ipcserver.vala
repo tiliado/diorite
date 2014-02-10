@@ -28,6 +28,7 @@ namespace Diorite.Ipc
 public class Server
 {
 	private Channel channel;
+	private bool quit = false;
 	public bool listening
 	{
 		get {return channel.listening;}
@@ -38,26 +39,56 @@ public class Server
 		channel = new Channel(name);
 	}
 	
+	~Server()
+	{
+		stop();
+	}
+	
 	public void listen() throws IOError
 	{
-		while (true)
+		Server? @ref = this; // Prevent destroying before disconnect is called
+		while (!quit)
 		{
 			channel.create();
-			while (true)
+			while (!quit)
 			{
-				channel.listen();
-				ByteArray request;
-				ByteArray response;
+				try
+				{
+					channel.listen();
+					ByteArray request;
+					ByteArray response;
+					
+					channel.read_bytes(out request);
+					
+					if (!handle((owned) request, out response))
+						response = new ByteArray();
+					
+					channel.write_bytes(response);
+					channel.disconnect();
+					@ref = null;
+				}
+				catch (IOError e)
+				{
+					try
+					{
+						channel.disconnect();
+					}
+					catch (IOError e)
+					{
+						// ignored
+					}
+					@ref = null;
+					throw e;
+				}
 				
-				channel.read_bytes(out request);
-				
-				if (!handle((owned) request, out response))
-					response = new ByteArray();
-				
-				channel.write_bytes(response);
-				channel.disconnect();
 			}
 		}
+		@ref = null;
+	}
+	
+	public void stop()
+	{
+		quit = true;
 	}
 	
 	protected virtual bool handle(owned ByteArray request, out ByteArray? response)
