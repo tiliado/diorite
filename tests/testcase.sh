@@ -35,16 +35,21 @@ build()
 	dist
 	echo "*** $0 build ***"
 	mkdir -p ${OUT}/testgen
+	set -x
 	$TESTGEN -d ${OUT}/testgen --vapidir $BUILD --vapidir ../vapi *.vala
 	
-	valac -d ${OUT} -b . --thread --save-temps -v \
-	--library=${NAME} -o ${LIBPREFIX}${NAME}${LIBSUFFIX} \
-	--vapidir $BUILD -X -I$BUILD -X -L$BUILD -X -ldioriteglib \
+	valac -C -g -d ${OUT}/tests -b ${OUT}/testgen --thread --save-temps -v \
+	--library=${NAME}  --vapidir $BUILD  \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
 	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
-	-X -fPIC -X -shared -g -X -g3 \
-	-X '-DG_LOG_DOMAIN="Diorite"' \
 	${OUT}/testgen/*.vala
+	
+	cc -g -o ${OUT}/${LIBPREFIX}${NAME}${LIBSUFFIX} \
+	-fPIC -shared -g3 '-DG_LOG_DOMAIN="Diorite"' \
+	-I$BUILD -L$BUILD -ldioriteglib \
+	$(pkg-config --cflags --libs gmodule-2.0 glib-2.0) \
+	${OUT}/tests/*.c
+	set +x
 }
 
 run()
@@ -52,7 +57,9 @@ run()
 	build
 	dist
 	echo "*** $0 run ***"
+	set -x
 	$TESTER ${OUT}/testcase ${OUT}/testgen/tests.spec
+	set +x
 }
 
 $CMD
