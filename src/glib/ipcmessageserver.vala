@@ -26,14 +26,14 @@ namespace Diorite.Ipc
 {
 
 [CCode (has_target=false)]
-public delegate bool MessageHandler(GLib.Object target, MessageServer server, Variant params,  out Variant? response);
+public delegate bool MessageHandler(GLib.Object? target, MessageServer server, Variant params,  out Variant? response);
 
 private class HandlerAdaptor
 {
-	private GLib.Object target;
+	private GLib.Object? target;
 	private MessageHandler handler;
 	
-	public HandlerAdaptor(GLib.Object target, MessageHandler handler)
+	public HandlerAdaptor(GLib.Object? target, MessageHandler handler)
 	{
 		this.target = target;
 		this.handler = handler;
@@ -55,7 +55,7 @@ public class MessageServer: Server
 		handlers = new HashTable<string, HandlerAdaptor>(str_hash, str_equal);
 	}
 	
-	public void add_handler(string message_name, GLib.Object target, MessageHandler handler)
+	public void add_handler(string message_name, GLib.Object? target, MessageHandler handler)
 	{
 		handlers.set(message_name, new HandlerAdaptor(target, handler));
 	}
