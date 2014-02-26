@@ -78,12 +78,7 @@ public class Channel
 	{
 		get
 		{
-			bool result;
-			lock (_listening)
-			{
-				result = _listening;
-			}
-			return result;
+			return _listening;
 		}
 	}
 	
@@ -122,10 +117,8 @@ public class Channel
 		try
 		{
 			#if WIN
-			lock (_listening)
-			{
-				_listening = true;
-			}
+			_listening = true;
+			
 			if (!pipe.connect() && Win32.get_last_error() != Win32.ERROR_PIPE_CONNECTED)
 			{
 				close();
@@ -138,10 +131,8 @@ public class Channel
 				close();
 				throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, Posix.get_last_error_msg());
 			}
-			lock (_listening)
-			{
-				_listening = true;
-			}
+			
+			_listening = true;
 			
 			remote_socket = socket_accept(local_socket);
 			if (remote_socket < 0)
@@ -153,10 +144,7 @@ public class Channel
 		}
 		finally
 		{
-			lock (_listening)
-			{
-				_listening = false;
-			}
+			_listening = false;
 		}
 	}
 	
@@ -213,6 +201,18 @@ public class Channel
 	{
 		var bytes = new ByteArray.take((owned) data);
 		write_bytes(bytes);
+	}
+	
+	public void stop() throws IOError
+	{
+		#if WIN
+		// FIXME:
+		if(!false)
+			throw new IOError.OP_FAILED("Failed to cancel io on pipe '%s'. %s", path, Win32.get_last_error_msg());
+		#else
+		if (Posix.shutdown(local_socket, 2) < 0)
+			throw new IOError.CONN_FAILED("Failed to cancel io on socket '%s'. %s", path, Posix.get_last_error_msg());
+		#endif
 	}
 	
 	public void close()

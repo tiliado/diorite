@@ -43,7 +43,8 @@ public errordomain IOError
 	READ,
 	WRITE,
 	TOO_MANY_DATA,
-	NOT_CONNECTED;
+	NOT_CONNECTED,
+	OP_FAILED;
 }
 
 } // namespace Diorite

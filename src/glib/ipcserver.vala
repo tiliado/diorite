@@ -65,7 +65,6 @@ public class Server
 					
 					channel.write_bytes(response);
 					channel.disconnect();
-					@ref = null;
 				}
 				catch (IOError e)
 				{
@@ -78,7 +77,8 @@ public class Server
 						// ignored
 					}
 					@ref = null;
-					throw e;
+					if (!quit)
+						throw e;
 				}
 				
 			}
@@ -86,9 +86,10 @@ public class Server
 		@ref = null;
 	}
 	
-	public void stop()
+	public void stop() throws IOError
 	{
 		quit = true;
+		channel.stop();
 	}
 	
 	protected virtual bool handle(owned ByteArray request, out ByteArray? response)
