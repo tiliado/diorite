@@ -38,17 +38,18 @@ build()
 	set -x
 	$TESTGEN -d ${OUT}/testgen --vapidir $BUILD --vapidir ../vapi *.vala
 	
-	valac -C -g -d ${OUT}/tests -b ${OUT}/testgen --thread --save-temps -v \
+	valac -C -d ${OUT}/tests -b ${OUT}/testgen --thread --save-temps -v \
 	--library=${NAME}  --vapidir $BUILD  \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
 	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
 	${OUT}/testgen/*.vala
 	
-	cc -g -o ${OUT}/${LIBPREFIX}${NAME}${LIBSUFFIX} \
-	-fPIC -shared -g3 '-DG_LOG_DOMAIN="Diorite"' \
-	-I$BUILD -L$BUILD -ldioriteglib \
-	$(pkg-config --cflags --libs gmodule-2.0 glib-2.0) \
-	${OUT}/tests/*.c
+	$CC ${OUT}/tests/*.c -o ${OUT}/${LIBPREFIX}${NAME}${LIBSUFFIX} \
+	$LIB_CFLAGS $CFLAGS '-DG_LOG_DOMAIN="Diorite"' \
+	-I$BUILD "-L$(readlink -e "$BUILD")" -ldioriteglib \
+	$(pkg-config --cflags --libs glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0) \
+	
+	
 	set +x
 }
 

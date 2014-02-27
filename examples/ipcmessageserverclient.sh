@@ -18,7 +18,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if [ "$#" -lt 2 ]; then
-	echo "Usage: $0 build|dist|run lin|mingw"
+	echo "Usage: $0 build|dist|run|debug lin|mingw"
 	exit 1
 fi
 
@@ -41,15 +41,13 @@ build()
 	--pkg glib-2.0 --target-glib=2.32 --pkg=dioriteglib \
 	${NAME}.vala
 	
-	cc ${OUT}/${NAME}.c -o ${OUT}/${NAME}${EXECSUFFIX} \
-	-g3 '-DG_LOG_DOMAIN="MyDiorite"' \
-	-I$BUILD -L$BUILD  -ldioriteglib \
+	$CC ${OUT}/${NAME}.c -o ${OUT}/${NAME}${EXECSUFFIX} \
+	$CFLAGS '-DG_LOG_DOMAIN="MyDiorite"' \
+	-I$BUILD -L$BUILD  "-L$(readlink -e "$BUILD")" -ldioriteglib \
 	$(pkg-config --cflags --libs glib-2.0 gobject-2.0 gthread-2.0)
 	
 	
 }
-
-
 
 run()
 {
@@ -58,6 +56,15 @@ run()
 	echo "*** $0 run ***"
 	set -x
 	LD_LIBRARY_PATH=../build ${LAUNCHER} ${OUT}/${NAME}${EXECSUFFIX}
+}
+
+debug()
+{
+	build
+	dist
+	echo "*** $0 debug ***"
+	set -x
+	LD_LIBRARY_PATH=../build ${DEBUGGER} ${OUT}/${NAME}${EXECSUFFIX}
 }
 
 $CMD

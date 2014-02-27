@@ -127,8 +127,11 @@ def configure(ctx):
 	
 	# Include debugging symbols
 	if ctx.options.debug:
-		ctx.env.append_unique('CFLAGS', '-g3')
-		ctx.env.append_unique('VALAFLAGS', '-g')
+		#~ ctx.env.append_unique('VALAFLAGS', '-g')
+		if PLATFORM == LINUX:
+			ctx.env.append_unique('CFLAGS', '-g3')
+		elif PLATFORM == WIN:
+			ctx.env.append_unique('CFLAGS', ['-g', '-gdwarf-2'])
 	
 	# Anti-underlinking and anti-overlinking linker flags.
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])

@@ -22,6 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if WIN
+using Win32;
+#endif
+
 namespace Diorite.Ipc
 {
 
@@ -58,6 +62,8 @@ public class Channel
 	private bool _listening = false; 
 	#if WIN
 	private Win32.NamedPipe pipe = Win32.NamedPipe.INVALID;
+	private Overlapped? overlapped = null;
+	private Handle[] events;
 	#else
 	private int local_socket = -1;
 	private int remote_socket = -1;
@@ -91,8 +97,14 @@ public class Channel
 	public void create()  throws IOError
 	{
 		#if WIN
+		overlapped = {};
+		events = {CreateEvent(null, true, false, null), CreateEvent(null, true, false, null)};
+        if (((void*) events[0]) == null || ((void*) events[1]) == null)
+			throw new IOError.CONN_FAILED("Failed to create event for pipe '%s'. %s", path, Win32.get_last_error_msg());
+		
+		overlapped.hEvent = events[1];
 		pipe = Win32.NamedPipe.create((Win32.String) path,
-		Win32.PIPE_ACCESS_DUPLEX,
+		Win32.PIPE_ACCESS_DUPLEX|Win32.FILE_FLAG_OVERLAPPED|Win32.FILE_FLAG_FIRST_PIPE_INSTANCE,
 		Win32.PIPE_TYPE_BYTE | Win32.PIPE_READMODE_BYTE | Win32.PIPE_WAIT, 
 		Win32.PIPE_UNLIMITED_INSTANCES, PIPE_BUFSIZE, PIPE_BUFSIZE, 0, null);
 		if (pipe == Win32.Handle.INVALID)
@@ -111,6 +123,18 @@ public class Channel
 		#endif
 	}
 	
+	#if WIN
+	private void wait(ulong miliseconds=0) throws IOError
+	{
+		
+		var index = WaitForMultipleObjects(events, false, miliseconds == 0 ? INFINITE : miliseconds);
+		assert(index - WAIT_OBJECT_0 >= 0 && index - WAIT_OBJECT_0 < 2);
+		index -= WAIT_OBJECT_0;
+		if (index == 0)
+			throw new IOError.OP_FAILED("Waiting for pipe '%s' canceled.", path); // stop() called
+	}
+	#endif
+	
 	public void listen() throws IOError
 	{
 		check_connected();
@@ -119,9 +143,22 @@ public class Channel
 			#if WIN
 			_listening = true;
 			
-			if (!pipe.connect() && Win32.get_last_error() != Win32.ERROR_PIPE_CONNECTED)
+			// Overlapped ConnectNamedPipe should return false
+			if (pipe.connect(overlapped))
 			{
 				close();
+				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
+			}
+			
+			switch (Win32.get_last_error())
+			{
+			case ERROR_IO_PENDING:
+					wait(); // wait for connection
+				break;
+			case ERROR_PIPE_CONNECTED: 
+				// connected
+				break;
+			default:
 				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
 			}
 			#else
@@ -205,9 +242,9 @@ public class Channel
 	
 	public void stop() throws IOError
 	{
+		_listening = false;
 		#if WIN
-		// FIXME:
-		if(!false)
+		if (!SetEvent(events[0]))
 			throw new IOError.OP_FAILED("Failed to cancel io on pipe '%s'. %s", path, Win32.get_last_error_msg());
 		#else
 		if (Posix.shutdown(local_socket, 2) < 0)
@@ -253,8 +290,23 @@ public class Channel
 		data.length = len;
 		if (!pipe.write(data, out bytes_written))
 		{
-			close();
-			throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
+			if (Win32.get_last_error() == Win32.ERROR_IO_PENDING)
+			{
+				wait(); // wait for reading
+				if (!Win32.GetOverlappedResult(pipe, overlapped, out bytes_written, false) || bytes_written == 0)
+					throw new IOError.WRITE("Failed to read overlapped result of pipe. %s", Win32.get_last_error_msg());
+				
+				if (!pipe.write(data, out bytes_written))
+				{
+					close();
+					throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
+				}
+			}
+			else
+			{
+				close();
+				throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
+			}
 		}
 		#else
 		var fd = remote_socket >= 0 ? remote_socket : local_socket;
@@ -338,8 +390,24 @@ public class Channel
 		var result = pipe.read(buffer, out bytes_read);
 		if (!result && Win32.get_last_error() != Win32.ERROR_MORE_DATA)
 		{
-			close();
-			throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
+			if (Win32.get_last_error() == Win32.ERROR_IO_PENDING)
+			{
+				wait(); // wait for reading
+				if (!Win32.GetOverlappedResult(pipe, overlapped, out bytes_read, false) || bytes_read == 0)
+					throw new IOError.READ("Failed to read overlapped result of pipe. %s", Win32.get_last_error_msg());
+				
+				result = pipe.read(buffer, out bytes_read);
+				if (!result && Win32.get_last_error() != Win32.ERROR_MORE_DATA)
+				{
+					close();
+					throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
+				}
+			}
+			else if(Win32.get_last_error() != Win32.ERROR_MORE_DATA)
+			{
+				close();
+				throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
+			}
 		}
 		#else
 		var fd = remote_socket >= 0 ? remote_socket : local_socket;

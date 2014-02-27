@@ -33,6 +33,7 @@ void main(string[] args)
 	try
 	{
 		var response = client.send_message("echo", variant);
+		message("Response: %s", response.get_string());
 		assert(response.get_string() == HELLO_WORLD);
 	}
 	catch(Diorite.Ipc.MessageError e)

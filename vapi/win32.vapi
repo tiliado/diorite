@@ -203,10 +203,10 @@ public struct FileHandle: Handle
 	
 	// http://msdn.microsoft.com/en-us/library/aa365467.aspx
 	[CCode (cname = "ReadFile", cheader_filename = "windows.h")]
-	public bool read(uint8[] buffer, out ulong bytes_read, out LPOVERLAPPED? overlapped=null);
+	public bool read(uint8[] buffer, out ulong bytes_read, out Overlapped? overlapped=null);
 	
 	[CCode (cname = "WriteFile", cheader_filename = "windows.h")]
-	public bool write(uint8[] buffer, out ulong bytes_written, out LPOVERLAPPED? lpOverlapped=null);
+	public bool write(uint8[] buffer, out ulong bytes_written, out Overlapped? Overlapped=null);
 	
 	[CCode (cname = "FlushFileBuffers", cheader_filename = "windows.h")]
 	public bool flush();
@@ -231,7 +231,7 @@ public struct NamedPipe: FileHandle
 	long flag, FileHandle? template_file=null);
 	
 	[CCode (cname = "ConnectNamedPipe", cheader_filename = "windows.h")]
-	public bool connect(out LPOVERLAPPED? overlapped=null);
+	public bool connect(Overlapped? overlapped);
 	
 	[CCode (cname = "DisconnectNamedPipe", cheader_filename = "windows.h")]
 	public bool disconnect();
@@ -245,9 +245,45 @@ public struct NamedPipe: FileHandle
 	public static bool wait(String name, ulong timeout);
 }
 
-[SimpleType]
-[CCode (cname = "LPOVERLAPPED", cheader_filename = "windows.h")]
-public struct LPOVERLAPPED{}
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms682396(v=vs.85).aspx
+[CCode (cname = "CreateEvent", cheader_filename = "windows.h", free_function="")]
+public Handle CreateEvent(
+  LPSECURITY_ATTRIBUTES? lpEventAttributes,
+  bool bManualReset,
+  bool bInitialState,
+  string? lpName
+);
+
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms686211%28v=vs.85%29.aspx
+[CCode (cname = "SetEvent", cheader_filename = "windows.h", free_function="")]
+public bool SetEvent(
+  Handle hEvent
+);
+
+[CCode (cname = "OVERLAPPED", cheader_filename = "windows.h", free_function="")]
+public struct Overlapped
+{
+	ulong Internal;
+	ulong InternalHigh;
+	Handle hEvent;
+}
+
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms683209%28v=vs.85%29.aspx
+[CCode (cname = "GetOverlappedResult", cheader_filename = "windows.h")]
+public bool GetOverlappedResult(
+  Handle hFile,
+  Overlapped lpOverlapped,
+  out ulong lpNumberOfBytesTransferred,
+  bool bWait
+);
+
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ms687025%28v=vs.85%29.aspx
+[CCode (cname = "WaitForMultipleObjects", cheader_filename = "windows.h")]
+ulong WaitForMultipleObjects(
+  [CCode (aray_length_type="ulong", array_length_pos = 0.1)]  Handle[] lpHandles,
+  bool bWaitAll,
+  ulong dwMilliseconds
+);
 	
 [SimpleType]
 [CCode (cname = "LPSECURITY_ATTRIBUTES", cheader_filename = "windows.h")]
@@ -255,53 +291,68 @@ public struct LPSECURITY_ATTRIBUTES{}
 
 
 [CCode (cname="PIPE_ACCESS_DUPLEX", cheader_filename="windows.h")]
-public long PIPE_ACCESS_DUPLEX;
+public const long PIPE_ACCESS_DUPLEX;
 
 [CCode (cname="PIPE_TYPE_BYTE", cheader_filename="windows.h")]
-public long PIPE_TYPE_BYTE;
+public const long PIPE_TYPE_BYTE;
 
 [CCode (cname="PIPE_TYPE_MESSAGE", cheader_filename="windows.h")]
-public long PIPE_TYPE_MESSAGE;
+public const long PIPE_TYPE_MESSAGE;
 
 [CCode (cname="PIPE_READMODE_BYTE", cheader_filename="windows.h")]
-public long PIPE_READMODE_BYTE;
+public const long PIPE_READMODE_BYTE;
 
 [CCode (cname="PIPE_READMODE_MESSAGE", cheader_filename="windows.h")]
-public long PIPE_READMODE_MESSAGE;
+public const long PIPE_READMODE_MESSAGE;
 
 [CCode (cname="PIPE_WAIT", cheader_filename="windows.h")]
-public long PIPE_WAIT;
+public const long PIPE_WAIT;
+
+[CCode (cname="FILE_FLAG_FIRST_PIPE_INSTANCE", cheader_filename="windows.h")]
+public const long FILE_FLAG_FIRST_PIPE_INSTANCE;
+
+[CCode (cname="FILE_FLAG_OVERLAPPED", cheader_filename="windows.h")]
+public const long FILE_FLAG_OVERLAPPED;
 
 [CCode (cname="PIPE_UNLIMITED_INSTANCES", cheader_filename="windows.h")]
-public long PIPE_UNLIMITED_INSTANCES;
+public const long PIPE_UNLIMITED_INSTANCES;
 
 [CCode (cname="GENERIC_READ", cheader_filename="windows.h")]
-public long GENERIC_READ;
+public const long GENERIC_READ;
 
 [CCode (cname="GENERIC_WRITE", cheader_filename="windows.h")]
-public long GENERIC_WRITE;
+public const long GENERIC_WRITE;
 
 [CCode (cname="FILE_WRITE_ATTRIBUTES", cheader_filename="windows.h")]
-public long FILE_WRITE_ATTRIBUTES;
+public const long FILE_WRITE_ATTRIBUTES;
 
 [CCode (cname="FILE_SHARE_READ", cheader_filename="windows.h")]
-public long FILE_SHARE_READ;
+public const long FILE_SHARE_READ;
 
 [CCode (cname="FILE_SHARE_WRITE", cheader_filename="windows.h")]
-public long  FILE_SHARE_WRITE;
+public const long  FILE_SHARE_WRITE;
 
 [CCode (cname="OPEN_EXISTING", cheader_filename="windows.h")]
-public long OPEN_EXISTING;
+public const long OPEN_EXISTING;
 
 [CCode (cname="FILE_ATTRIBUTE_NORMAL", cheader_filename="windows.h")]
-public long FILE_ATTRIBUTE_NORMAL;
+public const long FILE_ATTRIBUTE_NORMAL;
 
 [CCode (cname="ERROR_MORE_DATA", cheader_filename="windows.h")]
-public ulong ERROR_MORE_DATA;
+public const ulong ERROR_MORE_DATA;
 
 [CCode (cname="ERROR_PIPE_BUSY", cheader_filename="windows.h")]
-public ulong ERROR_PIPE_BUSY;
+public const ulong ERROR_PIPE_BUSY;
 
 [CCode (cname="ERROR_PIPE_CONNECTED", cheader_filename="windows.h")]
-public ulong ERROR_PIPE_CONNECTED;
+public const ulong ERROR_PIPE_CONNECTED;
+
+[CCode (cname="ERROR_IO_PENDING", cheader_filename="windows.h")]
+public const ulong ERROR_IO_PENDING;
+
+[CCode (cname="INFINITE", cheader_filename="windows.h")]
+public const ulong INFINITE;
+[CCode (cname="WAIT_OBJECT_0", cheader_filename="windows.h")]
+public const ulong WAIT_OBJECT_0;
+
 } // namespace Win32

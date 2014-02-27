@@ -30,9 +30,11 @@ mingw*)
 	LIBSUFFIX=".dll"
 	EXECSUFFIX=".exe"
 	LAUNCHER="wine"
+	DEBUGGER="winedbg --gdb"
 	TESTER="${LAUNCHER} ${OUT}/dioritetester.exe"
 	TESTGEN="${LAUNCHER} ${OUT}/dioritetestgen.exe"
-	
+	CFLAGS="${CFLAGS:-} -g -gdwarf-2"
+	LIB_CFLAGS="-fPIC -shared"
 ;;
 lin*)
 	PLATFORM="LINUX"
@@ -40,8 +42,11 @@ lin*)
 	LIBSUFFIX=".so"
 	EXECSUFFIX=""
 	LAUNCHER=""
+	DEBUGGER="gdb --args"
 	TESTER="dioritetester"
 	TESTGEN="dioritetestgen"
+	CFLAGS="${CFLAGS:-} -g -g3"
+	LIB_CFLAGS="-shared"
 ;;
 *)
 	echo "Unsupported platform: $PLATFORM"
