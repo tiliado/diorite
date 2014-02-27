@@ -34,7 +34,7 @@ mingw*)
 	TESTER="${LAUNCHER} ${OUT}/dioritetester.exe"
 	TESTGEN="${LAUNCHER} ${OUT}/dioritetestgen.exe"
 	CFLAGS="${CFLAGS:-} -g -gdwarf-2"
-	LIB_CFLAGS="-fPIC -shared"
+	LIB_CFLAGS="-shared"
 ;;
 lin*)
 	PLATFORM="LINUX"
@@ -46,7 +46,7 @@ lin*)
 	TESTER="dioritetester"
 	TESTGEN="dioritetestgen"
 	CFLAGS="${CFLAGS:-} -g -g3"
-	LIB_CFLAGS="-shared"
+	LIB_CFLAGS="-fPIC -shared"
 ;;
 *)
 	echo "Unsupported platform: $PLATFORM"

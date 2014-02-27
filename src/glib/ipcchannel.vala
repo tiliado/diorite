@@ -24,6 +24,8 @@
 
 #if WIN
 using Win32;
+#elif LINUX
+using Posix;
 #endif
 
 namespace Diorite.Ipc
@@ -32,7 +34,7 @@ namespace Diorite.Ipc
 public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
 {
 	var size = sizeof(uint32);
-	assert(buffer.length >= offset + size);
+	GLib.assert(buffer.length >= offset + size);
 	for(var i = 0; i < size; i ++)
 		buffer[offset + i] = (uint8)((data >> ((3 - i) * 8)) & 0xFF);
 }
@@ -40,7 +42,7 @@ public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
 public void uint32_from_bytes(ref uint8[] buffer, out uint32 data, uint offset=0)
 {
 	var size = sizeof(uint32);
-	assert(buffer.length >= offset + size);
+	GLib.assert(buffer.length >= offset + size);
 	data = 0;
 	for(var i = 0; i < size; i ++)
 		data += buffer[offset + i] * (1 << (3 - i) * 8);
@@ -111,15 +113,15 @@ public class Channel
 		if (pipe == INVALID_HANDLE_VALUE)
 			throw new IOError.CONN_FAILED("Failed to create pipe '%s'. %s", path, GetLastErrorMsg());
 		#else
-		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
+		local_socket = socket(AF_UNIX, SOCK_STREAM, 0);
 		if (local_socket < 0)
-			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, Posix.get_last_error_msg());
-		Posix.unlink(path);
+			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, get_last_error_msg());
+		unlink(path);
 		var result = socket_bind(local_socket, path);
 		if (result < 0)
 		{
 			close();
-			throw new IOError.CONN_FAILED("Failed to bind socket '%s'. %s", path, Posix.get_last_error_msg());
+			throw new IOError.CONN_FAILED("Failed to bind socket '%s'. %s", path, get_last_error_msg());
 		}
 		#endif
 	}
@@ -167,7 +169,7 @@ public class Channel
 			if (result < 0)
 			{
 				close();
-				throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, Posix.get_last_error_msg());
+				throw new IOError.CONN_FAILED("Failed to listen on socket '%s'. %s", path, get_last_error_msg());
 			}
 			
 			_listening = true;
@@ -176,7 +178,7 @@ public class Channel
 			if (remote_socket < 0)
 			{
 				close();
-				throw new IOError.CONN_FAILED("Failed to accept on socket '%s'. %s", path, Posix.get_last_error_msg());
+				throw new IOError.CONN_FAILED("Failed to accept on socket '%s'. %s", path, get_last_error_msg());
 			}
 			#endif
 		}
@@ -224,14 +226,14 @@ public class Channel
 			throw new IOError.CONN_FAILED("Failed to set up pipe '%s'. %s", path, GetLastErrorMsg()); 
 		}
 		#else
-		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
+		local_socket = socket(AF_UNIX, SOCK_STREAM, 0);
 		if (local_socket < 0)
-			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, Posix.get_last_error_msg());
+			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, get_last_error_msg());
 		var result = socket_connect(local_socket, path);
 		if (result < 0)
 		{
 			close();
-			throw new IOError.CONN_FAILED("Failed to connect to '%s'. %s", path, Posix.get_last_error_msg());
+			throw new IOError.CONN_FAILED("Failed to connect to '%s'. %s", path, get_last_error_msg());
 		}
 		#endif
 	}
@@ -250,7 +252,7 @@ public class Channel
 			throw new IOError.OP_FAILED("Failed to cancel io on pipe '%s'. %s", path, GetLastErrorMsg());
 		#else
 		if (Posix.shutdown(local_socket, 2) < 0)
-			throw new IOError.CONN_FAILED("Failed to cancel io on socket '%s'. %s", path, Posix.get_last_error_msg());
+			throw new IOError.CONN_FAILED("Failed to cancel io on socket '%s'. %s", path, get_last_error_msg());
 		#endif
 	}
 	
@@ -316,7 +318,7 @@ public class Channel
 		if (result < 0)
 		{
 			close();
-			throw new IOError.WRITE("Failed write to socket '%s': %s", path, Posix.get_last_error_msg());
+			throw new IOError.WRITE("Failed write to socket '%s': %s", path, get_last_error_msg());
 		}
 		bytes_written = (ulong) result;
 		#endif
@@ -417,7 +419,7 @@ public class Channel
 		if (result < 0)
 		{
 			close();
-			throw new IOError.READ("Failed to read from socket. %s", Posix.get_last_error_msg());
+			throw new IOError.READ("Failed to read from socket. %s", get_last_error_msg());
 		}
 		bytes_read = (ulong) result;
 		#endif
@@ -444,7 +446,7 @@ namespace Posix
 private string get_last_error_msg()
 {
 	var last_error = Posix.errno;
-	return "Error %d: %s".printf(last_error, Posix.strerror(last_error));
+	return "Error %d: %s".printf(last_error, strerror(last_error));
 }
 
 } // namespace Posix
