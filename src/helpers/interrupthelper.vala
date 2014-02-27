@@ -22,6 +22,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Win32;
+
 namespace Diorite
 {
 
@@ -40,32 +42,32 @@ int main(string[] args)
 		return 1;
 	}
 	
-	if (!Win32.attach_console((ulong) pid))
+	if (!AttachConsole((ulong) pid))
 	{
-		if(!Win32.free_console())
-			stderr.printf("Failed to free console. Not fatal. %s\n", Win32.get_last_error_msg());
+		if(!FreeConsole())
+			stderr.printf("Failed to free console. Not fatal. %s\n", GetLastErrorMsg());
 		
-		if (!Win32.attach_console((ulong) pid))
+		if (!AttachConsole((ulong) pid))
 		{
-			stderr.printf("Failed to attach to the console of %s. %s\n", args[1], Win32.get_last_error_msg());
+			stderr.printf("Failed to attach to the console of %s. %s\n", args[1], GetLastErrorMsg());
 			return 2;
 		}
 	}
 	
-	if (!Win32.set_console_ctrl_handler(null))
+	if (!SetConsoleCtrlHandler(null))
 	{
-		stderr.printf("Failed to unset control handler. %s\n", Win32.get_last_error_msg());
+		stderr.printf("Failed to unset control handler. %s\n", GetLastErrorMsg());
 		return 2;
 	}
 	
 
 	
-	stderr.printf("Last error: %s\n", Win32.get_last_error_msg());
-	if (!Win32.generate_console_ctrl_event(Win32.CTRL_BREAK_EVENT, (ulong) pid))
+	stderr.printf("Last error: %s\n", GetLastErrorMsg());
+	if (!GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, (ulong) pid))
 	{
-		stderr.printf("Failed to send Ctrl-Break event to %s. %s\n", args[1], Win32.get_last_error_msg());
+		stderr.printf("Failed to send Ctrl-Break event to %s. %s\n", args[1], GetLastErrorMsg());
 		
-		if (!Win32.generate_console_ctrl_event(Win32.CTRL_C_EVENT, 0))
+		if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0))
 		{
 			stderr.printf("Failed to send Ctrl-C event to %s.\n", args[1]);
 			return 2;

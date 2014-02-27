@@ -61,7 +61,7 @@ public class Channel
 	private string path;
 	private bool _listening = false; 
 	#if WIN
-	private Win32.NamedPipe pipe = Win32.NamedPipe.INVALID;
+	private Handle pipe = INVALID_HANDLE_VALUE;
 	private Overlapped? overlapped = null;
 	private Handle[] events;
 	#else
@@ -73,7 +73,7 @@ public class Channel
 		get
 		{
 			#if WIN
-			return pipe != Win32.Handle.INVALID;
+			return pipe != INVALID_HANDLE_VALUE;
 			#else
 			return local_socket > -1;
 			#endif
@@ -100,15 +100,16 @@ public class Channel
 		overlapped = {};
 		events = {CreateEvent(null, true, false, null), CreateEvent(null, true, false, null)};
         if (((void*) events[0]) == null || ((void*) events[1]) == null)
-			throw new IOError.CONN_FAILED("Failed to create event for pipe '%s'. %s", path, Win32.get_last_error_msg());
+			throw new IOError.CONN_FAILED("Failed to create event for pipe '%s'. %s", path, GetLastErrorMsg());
 		
 		overlapped.hEvent = events[1];
-		pipe = Win32.NamedPipe.create((Win32.String) path,
-		Win32.PIPE_ACCESS_DUPLEX|Win32.FILE_FLAG_OVERLAPPED|Win32.FILE_FLAG_FIRST_PIPE_INSTANCE,
-		Win32.PIPE_TYPE_BYTE | Win32.PIPE_READMODE_BYTE | Win32.PIPE_WAIT, 
-		Win32.PIPE_UNLIMITED_INSTANCES, PIPE_BUFSIZE, PIPE_BUFSIZE, 0, null);
-		if (pipe == Win32.Handle.INVALID)
-			throw new IOError.CONN_FAILED("Failed to create pipe '%s'. %s", path, Win32.get_last_error_msg());
+		pipe = CreateNamedPipe((String) path,
+			PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE,
+			PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 
+			PIPE_UNLIMITED_INSTANCES, PIPE_BUFSIZE, PIPE_BUFSIZE, 0, null
+		);
+		if (pipe == INVALID_HANDLE_VALUE)
+			throw new IOError.CONN_FAILED("Failed to create pipe '%s'. %s", path, GetLastErrorMsg());
 		#else
 		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
 		if (local_socket < 0)
@@ -144,13 +145,13 @@ public class Channel
 			_listening = true;
 			
 			// Overlapped ConnectNamedPipe should return false
-			if (pipe.connect(overlapped))
+			if (ConnectNamedPipe(pipe, overlapped))
 			{
 				close();
-				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
+				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, GetLastErrorMsg());
 			}
 			
-			switch (Win32.get_last_error())
+			switch (GetLastError())
 			{
 			case ERROR_IO_PENDING:
 					wait(); // wait for connection
@@ -159,7 +160,7 @@ public class Channel
 				// connected
 				break;
 			default:
-				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, Win32.get_last_error_msg());
+				throw new IOError.CONN_FAILED("Failed to connect pipe '%s'. %s", path, GetLastErrorMsg());
 			}
 			#else
 			var result = Posix.listen(local_socket, 5);
@@ -189,7 +190,7 @@ public class Channel
 	{
 		check_connected();
 		#if WIN
-		pipe.disconnect();
+		DisconnectNamedPipe(pipe);
 		#else
 		Posix.close(remote_socket);
 		remote_socket = -1;
@@ -201,25 +202,26 @@ public class Channel
 		#if WIN
 		while (true)
 		{
-			pipe = Win32.NamedPipe.open((Win32.String) path,
-			Win32.GENERIC_READ | Win32.GENERIC_WRITE, 0,
-			null, Win32.OPEN_EXISTING, 0);
-			if (pipe != Win32.FileHandle.INVALID)
+			pipe = CreateFile((String) path,
+				GENERIC_READ | GENERIC_WRITE, 0,
+				null, OPEN_EXISTING, 0
+			);
+			if (pipe != INVALID_HANDLE_VALUE)
 				break;
 			
-			if (Win32.get_last_error() != Win32.ERROR_PIPE_BUSY) 
-				throw new IOError.CONN_FAILED("Failed to connect to pipe '%s'. %s", path, Win32.get_last_error_msg()); 
+			if (GetLastError() != ERROR_PIPE_BUSY) 
+				throw new IOError.CONN_FAILED("Failed to connect to pipe '%s'. %s", path, GetLastErrorMsg()); 
 		
-			if (!Win32.NamedPipe.wait((Win32.String) name, timeout))
-				throw new IOError.TIMEOUT("Timeout reached for pipe '%s'. %s", path, Win32.get_last_error_msg()); 
+			if (!WaitNamedPipe((String) name, timeout))
+				throw new IOError.TIMEOUT("Timeout reached for pipe '%s'. %s", path, GetLastErrorMsg()); 
 		}
 		
-		ulong mode = Win32.PIPE_READMODE_BYTE;
-		if (!pipe.set_state(ref mode, null, null) && Win32.get_last_error() != 0)
+		ulong mode = PIPE_READMODE_BYTE;
+		if (!SetNamedPipeHandleState(pipe, ref mode, null, null) && GetLastError() != 0)
 		{
-			pipe.close();
-			pipe = Win32.NamedPipe.INVALID;
-			throw new IOError.CONN_FAILED("Failed to set up pipe '%s'. %s", path, Win32.get_last_error_msg()); 
+			CloseHandle(pipe);
+			pipe = INVALID_HANDLE_VALUE;
+			throw new IOError.CONN_FAILED("Failed to set up pipe '%s'. %s", path, GetLastErrorMsg()); 
 		}
 		#else
 		local_socket = Posix.socket(Posix.AF_UNIX, Posix.SOCK_STREAM, 0);
@@ -245,7 +247,7 @@ public class Channel
 		_listening = false;
 		#if WIN
 		if (!SetEvent(events[0]))
-			throw new IOError.OP_FAILED("Failed to cancel io on pipe '%s'. %s", path, Win32.get_last_error_msg());
+			throw new IOError.OP_FAILED("Failed to cancel io on pipe '%s'. %s", path, GetLastErrorMsg());
 		#else
 		if (Posix.shutdown(local_socket, 2) < 0)
 			throw new IOError.CONN_FAILED("Failed to cancel io on socket '%s'. %s", path, Posix.get_last_error_msg());
@@ -257,8 +259,8 @@ public class Channel
 		#if WIN
 		if (connected)
 		{
-			pipe.close();
-			pipe = Win32.NamedPipe.INVALID;
+			CloseHandle(pipe);
+			pipe = INVALID_HANDLE_VALUE;
 		}
 		#else
 		if (local_socket >= 0)
@@ -278,7 +280,7 @@ public class Channel
 	{
 		check_connected();
 		#if WIN
-		pipe.flush();
+		FlushFileBuffers(pipe);
 		#endif
 	}
 	
@@ -288,24 +290,24 @@ public class Channel
 		#if WIN
 		unowned uint8[] data = (uint8[]) buffer;
 		data.length = len;
-		if (!pipe.write(data, out bytes_written))
+		if (!WriteFile(pipe, data, out bytes_written))
 		{
-			if (Win32.get_last_error() == Win32.ERROR_IO_PENDING)
+			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				wait(); // wait for reading
-				if (!Win32.GetOverlappedResult(pipe, overlapped, out bytes_written, false) || bytes_written == 0)
-					throw new IOError.WRITE("Failed to read overlapped result of pipe. %s", Win32.get_last_error_msg());
+				if (!GetOverlappedResult(pipe, overlapped, out bytes_written, false) || bytes_written == 0)
+					throw new IOError.WRITE("Failed to read overlapped result of pipe. %s", GetLastErrorMsg());
 				
-				if (!pipe.write(data, out bytes_written))
+				if (!WriteFile(pipe, data, out bytes_written))
 				{
 					close();
-					throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
+					throw new IOError.WRITE("Failed write to pipe '%s': %s", path, GetLastErrorMsg());
 				}
 			}
 			else
 			{
 				close();
-				throw new IOError.WRITE("Failed write to pipe '%s': %s", path, Win32.get_last_error_msg());
+				throw new IOError.WRITE("Failed write to pipe '%s': %s", path, GetLastErrorMsg());
 			}
 		}
 		#else
@@ -387,26 +389,26 @@ public class Channel
 	{
 		bytes_read = 0;
 		#if WIN
-		var result = pipe.read(buffer, out bytes_read);
-		if (!result && Win32.get_last_error() != Win32.ERROR_MORE_DATA)
+		var result = ReadFile(pipe, buffer, out bytes_read);
+		if (!result && GetLastError() != ERROR_MORE_DATA)
 		{
-			if (Win32.get_last_error() == Win32.ERROR_IO_PENDING)
+			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				wait(); // wait for reading
-				if (!Win32.GetOverlappedResult(pipe, overlapped, out bytes_read, false) || bytes_read == 0)
-					throw new IOError.READ("Failed to read overlapped result of pipe. %s", Win32.get_last_error_msg());
+				if (!GetOverlappedResult(pipe, overlapped, out bytes_read, false) || bytes_read == 0)
+					throw new IOError.READ("Failed to read overlapped result of pipe. %s", GetLastErrorMsg());
 				
-				result = pipe.read(buffer, out bytes_read);
-				if (!result && Win32.get_last_error() != Win32.ERROR_MORE_DATA)
+				result = ReadFile(pipe, buffer, out bytes_read);
+				if (!result && GetLastError() != ERROR_MORE_DATA)
 				{
 					close();
-					throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
+					throw new IOError.READ("Failed to read from pipe. %s", GetLastErrorMsg());
 				}
 			}
-			else if(Win32.get_last_error() != Win32.ERROR_MORE_DATA)
+			else if(GetLastError() != ERROR_MORE_DATA)
 			{
 				close();
-				throw new IOError.READ("Failed to read from pipe. %s", Win32.get_last_error_msg());
+				throw new IOError.READ("Failed to read from pipe. %s", GetLastErrorMsg());
 			}
 		}
 		#else

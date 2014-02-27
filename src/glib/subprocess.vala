@@ -22,6 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if WIN
+using Win32;
+#endif
+
 namespace Diorite
 {
 
@@ -164,14 +168,14 @@ public class Subprocess: GLib.Object
 		#if LINUX
 		send_signal(Posix.SIGTERM);
 		#elif WIN
-		var pid = ((Win32.Process) this.pid).get_id();
+		var pid = GetProcessId((Handle) this.pid);
 		var wm_close_sent = false;
-		if (!Win32.enum_windows((window) =>
+		if (!EnumWindows((window) =>
 		{
 			ulong win_pid;
-			if (!window.get_process_id(out win_pid))
+			if (!GetWindowThreadProcessId(window, out win_pid))
 			{
-				warning("Failed to get window process id. %s", Win32.get_last_error_msg());
+				warning("Failed to get window process id. %s", GetLastErrorMsg());
 				return false;
 			}
 			
@@ -179,24 +183,24 @@ public class Subprocess: GLib.Object
 			if (win_pid != pid)
 					return true;
 			
-			if (!window.send_message(Win32.Message.WM_CLOSE) && Win32.get_last_error() != 0)
+			if (!SendMessage(window, WM_CLOSE) && GetLastError() != 0)
 			{
-				warning("Failed to send WM_CLOSE message. %s", Win32.get_last_error_msg());
+				warning("Failed to send WM_CLOSE message. %s", GetLastErrorMsg());
 				return false;
 			}
 			
 			debug("WM_CLOSE sent to %lu", win_pid);
 			wm_close_sent = true;
 			return true;
-		}) && Win32.get_last_error() != 0)
-			warning("Failed to enum windows. %s", Win32.get_last_error_msg());
+		}) && GetLastError() != 0)
+			warning("Failed to enum windows. %s", GetLastErrorMsg());
 			
 		if (!wm_close_sent)
 		{
 			const string HELPER = "dioriteinterrupthelper.exe";
 			string[] argv = {HELPER, pid.to_string()};
 			Pid? child_pid = null;
-			Win32.set_console_ctrl_handler(null, true);
+			SetConsoleCtrlHandler(null, true);
 			try
 			{
 				int status;
@@ -208,7 +212,7 @@ public class Subprocess: GLib.Object
 			{
 				critical("Failed to spawn helper: %s", e.message);
 			}
-			Win32.set_console_ctrl_handler(null, false);
+			SetConsoleCtrlHandler(null, false);
 			if (child_pid != null)
 				Process.close_pid(child_pid);
 		}
@@ -228,7 +232,7 @@ public class Subprocess: GLib.Object
 		#if LINUX
 		send_signal(Posix.SIGKILL);
 		#elif WIN
-		((Win32.Process) pid).terminate(0);
+		TerminateProcess((Handle) pid, 0);
 		#else
 		UNSUPPORTED PLATFORM!
 		#endif
