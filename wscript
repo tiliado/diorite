@@ -139,6 +139,8 @@ def configure(ctx):
 	# Check dependencies
 	ctx.check_dep('glib-2.0', 'GLIB', '2.32')
 	ctx.check_dep('gio-2.0', 'GIO', '2.32')
+	ctx.check_dep('gtk+-3.0', 'GTK+', '3.4')
+	ctx.check_dep('gdk-3.0', 'GDK', '3.4')
 	# FUTURE: make optional, maybe separate diorite test to a separate library?
 	ctx.check_dep('libvala-0.16', 'LIBVALA', '0.16')
 	ctx.check_dep('gmodule-2.0', 'GMODULE', '2.32')
@@ -153,17 +155,20 @@ def build(ctx):
 	#~ print ctx.env
 	PLATFORM = ctx.env.PLATFORM
 	DIORITE_GLIB = "dioriteglib"
+	DIORITE_GTK = "dioritegtk"
 	packages = 'posix glib-2.0 gio-2.0'
 	uselib = 'GLIB GTHREAD'
 	vala_defines = ctx.env.VALA_DEFINES
 	
 	if PLATFORM == WIN:
-		LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
+		DIORITE_GLIB_LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
+		DIORITE_GTK_LIBNAME = "dioritegtk-" + API_VERSION.split(".")[0]
 		CFLAGS="-mms-bitfields"
 		uselib += " WINGIO"
 		packages += " gio-windows-2.0 win32"
 	else:
-		LIBNAME = "dioriteglib"
+		DIORITE_GLIB_LIBNAME = "dioriteglib"
+		DIORITE_GTK_LIBNAME = "dioritegtk"
 		CFLAGS=""
 		uselib += " UNIXGIO"
 		packages += " gio-unix-2.0"
@@ -181,6 +186,20 @@ def build(ctx):
 		vala_target_glib = "2.32",
 	)
 	
+	ctx(features = "c cshlib",
+		target = DIORITE_GTK,
+		name = DIORITE_GTK,
+		vnum = "0.1.0",
+		source = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.c'),
+		packages = " gtk+-3.0 gdk-3.0 glib-2.0",
+		uselib = "GTK+ GDK GLIB",
+		use = [DIORITE_GLIB],
+		includes = ["src/gtk"],
+		vala_defines = vala_defines,
+		vapi_dirs = ['vapi'],
+		vala_target_glib = "2.32",
+	)
+	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
 		target='dioriteglib.pc',
@@ -192,7 +211,21 @@ def build(ctx):
 		APPNAME=APPNAME,
 		API_VERSION=API_VERSION,
 		CFLAGS=CFLAGS,
-		LIBNAME=LIBNAME
+		LIBNAME=DIORITE_GLIB_LIBNAME
+		)
+	
+	ctx(features = 'subst',
+		source='src/dioritegtk.pc.in',
+		target='dioritegtk.pc',
+		install_path='${LIBDIR}/pkgconfig',
+		VERSION=VERSION,
+		PREFIX=ctx.env.PREFIX,
+		INCLUDEDIR = ctx.env.INCLUDEDIR,
+		LIBDIR = ctx.env.LIBDIR,
+		APPNAME=APPNAME,
+		API_VERSION=API_VERSION,
+		CFLAGS=CFLAGS,
+		LIBNAME=DIORITE_GTK_LIBNAME
 		)
 	
 	testgen = "dioritetestgen"

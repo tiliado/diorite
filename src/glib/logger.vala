@@ -22,6 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+private const string G_LOG_DOMAIN="DioriteGlib";
 namespace Diorite
 {
 

@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: DirotiteGtk
+Description: Utility library for GTK+
+Version: @VERSION@
+Requires.private: glib-2.0 dioriteglib
+Libs: -L${libdir} -l@LIBNAME@
+Cflags: -I${includedir}/@APPNAME@-@API_VERSION@ @CFLAGS@

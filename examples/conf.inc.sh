@@ -68,13 +68,16 @@ dist()
 		libglib-2.0-0.dll libgobject-2.0-0.dll libgthread-2.0-0.dll \
 		libgcc_s_sjlj-1.dll libintl-8.dll libffi-6.dll iconv.dll \
 		libgio-2.0-0.dll libgmodule-2.0-0.dll zlib1.dll libvala-0.16-0.dll \
+		libgtk-3-0.dll libgdk-3-0.dll libatk-1.0-0.dll libcairo-gobject-2.dll \
+		libcairo-2.dll libgdk_pixbuf-2.0-0.dll libpango-1.0-0.dll libpangocairo-1.0-0.dll \
+		libpixman-1-0.dll libpng16-16.dll libpangowin32-1.0-0.dll \
 		gspawn-win32-helper.exe gspawn-win32-helper-console.exe
 		do
 			cp -spuvf ${MINGW_BIN}/$file ${OUT}
 		done
 		
 		for file in \
-		dioriteglib-0.dll dioriteinterrupthelper.exe dioritetestgen.exe dioritetester.exe
+		dioriteglib-0.dll dioritegtk-0.dll dioriteinterrupthelper.exe dioritetestgen.exe dioritetester.exe
 		do
 			cp -lpuvf ${BUILD}/$file ${OUT}
 		done

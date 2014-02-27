@@ -1,4 +1,4 @@
-#!/usr/bin/make -f
+#!/bin/bash
 
 # Author: Jiří Janoušek <janousek.jiri@gmail.com>
 #
@@ -17,35 +17,54 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-OUT=./_build
-BASE=.
-BINARY=logger
-MINGW_BIN=/usr/i686-w64-mingw32/sys-root/mingw/bin
-MINGW_LIB=/usr/i686-w64-mingw32/sys-root/mingw/lib
+if [ "$#" -lt 2 ]; then
+	echo "Usage: $0 build|dist|run|debug lin|mingw"
+	exit 1
+fi
 
-default:
-	@echo "targets: build|run-linux|dist-win|clean"
+set -eu
+NAME="myapp"
+CMD="$1"
+PLATFORM="$2"
+. conf.inc.sh 
 
-run-linux: build
-	${OUT}/${BINARY}
-
-build:
-	@mkdir -p ${OUT}
-	valac -d ${OUT} -b ${BASE} --thread --save-temps -v \
-	--pkg=dioriteglib \
-	-X '-DG_LOG_DOMAIN="Diorite"' \
-	logger.vala
-
-dist-win: build
-	cp ${MINGW_BIN}/libglib-2.0-0.dll ${OUT}/libglib-2.0-0.dll
-	cp ${MINGW_BIN}/libgobject-2.0-0.dll ${OUT}/libgobject-2.0-0.dll
-	cp ${MINGW_BIN}/libgthread-2.0-0.dll ${OUT}/libgthread-2.0-0.dll
-	cp ${MINGW_BIN}/libgcc_s_sjlj-1.dll ${OUT}/libgcc_s_sjlj-1.dll
-	cp ${MINGW_BIN}/libintl-8.dll ${OUT}/libintl-8.dll
-	cp ${MINGW_BIN}/libffi-6.dll ${OUT}/libffi-6.dll
-	cp ${MINGW_BIN}/iconv.dll ${OUT}/iconv.dll
+build()
+{
+	dist
+	echo "*** $0 build ***"
+	mkdir -p ${OUT}
 	
-	cp ${MINGW_LIB}/dioriteglib-0.dll ${OUT}/dioriteglib-0.dll
+	set -x
+	
+	valac -C -d ${OUT} -b . --thread --save-temps -v \
+	--vapidir $BUILD  --vapidir ../vapi \
+	--pkg gio-2.0 --pkg gtk+-3.0 --pkg glib-2.0 --target-glib=2.32 --pkg=dioriteglib --pkg dioritegtk \
+	${NAME}.vala
+	
+	$CC ${OUT}/${NAME}.c -o ${OUT}/${NAME}${EXECSUFFIX} \
+	$CFLAGS '-DG_LOG_DOMAIN="MyDiorite"' \
+	-I$BUILD -L$BUILD  "-L$(readlink -e "$BUILD")" -ldioriteglib -l dioritegtk \
+	$(pkg-config --cflags --libs gtk+-3.0 gio-2.0 glib-2.0 gobject-2.0 gthread-2.0)
+	
+	
+}
 
-clean:
-	rm -rf ${OUT}
+run()
+{
+	build
+	dist
+	echo "*** $0 run ***"
+	set -x
+	LD_LIBRARY_PATH=../build ${LAUNCHER} ${OUT}/${NAME}${EXECSUFFIX}
+}
+
+debug()
+{
+	build
+	dist
+	echo "*** $0 debug ***"
+	set -x
+	LD_LIBRARY_PATH=../build ${DEBUGGER} ${OUT}/${NAME}${EXECSUFFIX}
+}
+
+$CMD

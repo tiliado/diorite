@@ -1,0 +1,147 @@
+/*
+ * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met: 
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution. 
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+private const string G_LOG_DOMAIN="DioriteGtk";
+namespace Diorite
+{
+	
+#if LINUX
+[CCode (cheader_filename = "sys/prctl.h", cname = "prctl")]
+extern int prctl (int option, string arg2, ulong arg3, ulong arg4, ulong arg5);
+#endif
+
+public errordomain AppError
+{
+	NOT_RUNNING,
+	ALREADY_RUNNING,
+	UNABLE_TO_TERMINATE,
+	UNABLE_TO_ACTIVATE
+}
+
+#if LINUX
+private const int XFCE_SESSION_END = 4;
+private const string XFCE_SESSION_SERVICE_NAME = "org.xfce.SessionManager";
+private const string XFCE_SESSION_SERVICE_OBJECT = "/org/xfce/SessionManager";
+#endif
+
+public abstract class Application : Gtk.Application
+{
+	private static Application? instance;
+	public string desktop_entry {get; protected set;}
+	public string app_name {get; protected set;}
+	public string path_name {get; protected set;}
+	public string icon {get; protected set; default = "";}
+	public string version {get; protected set; default = "";}
+	#if LINUX
+	private XfceSessionManager? xfce_session = null;
+	#endif
+	
+	public Application(string app_id, string name, string desktop_entry, string path_name)
+	{
+		Object(application_id: app_id, flags: GLib.ApplicationFlags.FLAGS_NONE);
+		this.app_name = name;
+		this.desktop_entry = desktop_entry;
+		this.path_name = path_name;
+	}
+	
+	public override void startup()
+	{
+		/* Set program name */
+		#if LINUX
+		prctl(15, app_name, 0, 0, 0);
+		#endif
+		GLib.Environment.set_application_name(app_name);
+		Gdk.set_program_class(app_name); // must be set after Gtk.init()!
+		
+		instance = this;
+		
+		#if LINUX
+		Posix.signal(Posix.SIGINT, terminate_handler);
+		Posix.signal(Posix.SIGTERM, terminate_handler);
+		Posix.signal(Posix.SIGHUP, terminate_handler);
+		Bus.watch_name(BusType.SESSION, XFCE_SESSION_SERVICE_NAME,
+		BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
+		#else
+		// TODO: How about signal handling on Windows?
+		#endif
+		base.startup();
+	}
+	
+	#if LINUX
+	private static void terminate_handler(int sig_num)
+	{
+		debug("Caught signal %d, exiting ...", sig_num);
+		if (instance == null)
+			error("No instance to terminate");
+		
+		instance.quit();
+	}
+	
+	private void on_xfce_session_appeared(DBusConnection conn, string name, string owner)
+	{
+		debug("XFCE session appeared: %s, %s", name, owner);
+		try
+		{
+			xfce_session = Bus.get_proxy_sync(BusType.SESSION, XFCE_SESSION_SERVICE_NAME, XFCE_SESSION_SERVICE_OBJECT);
+			xfce_session.state_changed.connect(on_xfce_session_state_changed);
+		}
+		catch(GLib.IOError e)
+		{
+			warning("Unable to get proxy for Xfce session: %s", e.message);
+			xfce_session = null;
+		}
+	}
+	
+	/**
+	 * Removes proxy object
+	 */
+	private void on_xfce_session_vanished(DBusConnection conn, string name)
+	{
+		debug("XFCE session vanished: %s", name);
+		if (xfce_session == null)
+			return;
+		xfce_session.state_changed.disconnect(on_xfce_session_state_changed);
+		xfce_session = null;
+	}
+	
+	private void on_xfce_session_state_changed(uint32 old_value, uint32 new_value)
+	{
+		if (new_value == XFCE_SESSION_END)
+		{
+			debug("XFCE session end");
+			quit();
+		}
+	}
+	#endif
+}
+
+} // namespace Diorite
+
+#if LINUX
+[DBus(name = "org.xfce.Session.Manager")]
+private interface XfceSessionManager : Object
+{
+	public signal void state_changed(uint32 old_value, uint32 new_value);
+}
+#endif
