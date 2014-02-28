@@ -1,0 +1,243 @@
+/*
+ * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met: 
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer. 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution. 
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+namespace Diorite
+{
+
+
+public class ActionsRegistry : GLib.Object
+{
+	private HashTable<string, SingleList<Action?>> groups;
+	private HashTable<string, Action?> actions;
+	public Gtk.Application app {get; private set;}
+	public Gtk.ApplicationWindow? window {get; private set;}
+	
+	
+	public ActionsRegistry(Gtk.Application app, Gtk.ApplicationWindow? window = null)
+	{
+		this.app = app;
+		this.window = window;
+		groups = new HashTable<string, SingleList<Action?>>(str_hash, str_equal); 
+		actions = new HashTable<string, Action?>(str_hash, str_equal); 
+	}
+	
+	public signal void action_added(Action action);
+	public signal void action_removed(Action action);
+	public signal void action_changed(Action action, ParamSpec p);
+	
+	public void add_actions(Action[] actions)
+	{
+		foreach (var action in actions)
+			add_action(action);
+	}
+	
+	public void add_action(Action action, bool prepend=false)
+	{
+		var group_name = action.group;
+		var group = groups.get(group_name);
+		if (group == null)
+		{
+			group = new SingleList<Action>();
+			groups.insert((owned) group_name, group);
+		}
+		if (prepend)
+			group.prepend(action);
+		else
+			group.append(action);
+		actions.set(action.name, action);
+		action.activated.connect(on_action_activated);
+		var keybinding = action.keybinding;
+		if (keybinding != null)
+			app.add_accelerator(keybinding, action.scope + "." + action.name, null);
+		action.notify.connect_after(on_action_changed);
+		switch(action.scope)
+		{
+		case Action.SCOPE_APP:
+			action.add_to_map(app);
+			break;
+		case Action.SCOPE_WIN:
+			if (window != null)
+				action.add_to_map(window);
+			break;
+		}
+		action_added(action);
+	}
+	
+	public void remove_action(Action action)
+	{
+		var group_name = action.group;
+		var group = groups.get(group_name);
+		if (group != null)
+			group.remove(action);
+		
+		if (actions.remove(action.name))
+		{
+			action.activated.disconnect(on_action_activated);
+			action.notify.disconnect(on_action_changed);
+			action_removed(action);
+		}
+	}
+	
+	public Action? get_action(string name)
+	{
+		return actions.get(name);
+	}
+	
+	public SList<Action?> get_group(string group_name)
+	{
+		var group = groups.get(group_name);
+		if (group == null)
+			return new SList<Action?>();
+		return group.to_slist();
+	}
+	
+	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
+	{
+		var menu = new Menu();
+		foreach (var name in actions)
+		{
+			var action = this.actions.get(name);
+			if (action == null)
+			{
+				warning("Action '%s' not found in registry.", name);
+				continue;
+			}
+			
+			var label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
+			? action.mnemo_label : action.label;
+			var item = new MenuItem(label, action.scope + "." + action.name);
+			if (use_icons)
+			{
+				var icon = action.icon;
+				if (icon != null)
+					item.set_icon(new ThemedIcon(icon));
+			}
+			menu.append_item(item);
+		}
+		return menu;
+	}
+	
+	public Gtk.Toolbar build_toolbar(string[] actions, Gtk.Toolbar? toolbar=null)
+	{
+		var t = toolbar ?? new Gtk.Toolbar();
+		foreach (var name in actions)
+		{
+			if (name == "|")
+			{
+				var item = new Gtk.SeparatorToolItem();
+				item.draw = true;
+				item.expand = false;
+				t.add(item);
+			}
+			else if (name == " ")
+			{
+				var item = new Gtk.SeparatorToolItem();
+				item.draw = false;
+				item.expand = true;
+				t.add(item);
+			}
+			else
+			{
+				var action = this.actions.get(name);
+				if (action == null)
+				{
+					warning("Action '%s' not found.", name);
+					continue;
+				}
+				var button = new Gtk.ToolButton(null, action.label);
+				button.set_action_name(action.scope + "." + action.name);
+				if (action.icon != null)
+					button.set_icon_name(action.icon);
+				t.add(button);
+			}
+		}
+		return t;
+	}
+	
+	public void add_to_map_by_scope(string scope, ActionMap map)
+	{
+		foreach (var action in actions.get_values())
+			if (action.scope == scope)
+				action.add_to_map(map);
+	}
+	
+	public void add_to_map_by_name(string[] names, ActionMap map)
+	{
+		foreach (var name in names)
+		{
+			var action = actions.get(name);
+			if (action != null)
+				action.add_to_map(map);
+		}
+	}
+	
+	private void on_action_activated(Action action, Variant? parameter)
+	{
+		var a = action as Action;
+		assert(a != null);
+		debug("Action activated: %s/%s.%s", a.group, a.scope, a.name);
+	}
+	
+	private void on_action_changed(GLib.Object o, ParamSpec p)
+	{
+		var action = o as Action;
+		if (action == null)
+		{
+			critical("Passed object has to be Diorite.Action.");
+			return;
+		}
+		
+		if (p.name == "keybinding")
+		{
+			var full_name = action.scope + "." + action.name;
+			var accel_name = "<GAction>/" + full_name;
+			var keybinding = action.keybinding;
+			var found = Gtk.AccelMap.lookup_entry(accel_name, null);
+			if (!found && keybinding != null)
+			{
+				app.add_accelerator(keybinding, full_name, null);
+			}
+			else if (found)
+			{
+				uint key = 0;
+				Gdk.ModifierType mods = 0;
+				if (keybinding != null)
+				{
+					Gtk.accelerator_parse(keybinding, out key, out mods);
+					if (key == 0)
+						warning("Failed to parse accelerator: '%s'\n", keybinding);
+					else
+						Gtk.AccelMap.change_entry(accel_name, key, mods, true);
+				}
+				else
+				{
+					Gtk.AccelMap.change_entry(accel_name, key, mods, true);
+				}
+			}
+		}
+		action_changed(action, p);
+	}
+}
+
+} // namespace Diorite

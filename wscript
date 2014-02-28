@@ -182,6 +182,7 @@ def build(ctx):
 		uselib = uselib,
 		includes = ["src/glib"],
 		vala_defines = vala_defines,
+		cflags = ['-DG_LOG_DOMAIN="DioriteGlib"'],
 		vapi_dirs = ['vapi'],
 		vala_target_glib = "2.32",
 	)
@@ -191,11 +192,12 @@ def build(ctx):
 		name = DIORITE_GTK,
 		vnum = "0.1.0",
 		source = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.c'),
-		packages = " gtk+-3.0 gdk-3.0 glib-2.0",
-		uselib = "GTK+ GDK GLIB",
+		packages = " gtk+-3.0 gdk-3.0 gio-2.0 glib-2.0",
+		uselib = "GTK+ GDK GIO GLIB",
 		use = [DIORITE_GLIB],
 		includes = ["src/gtk"],
 		vala_defines = vala_defines,
+		cflags = ['-DG_LOG_DOMAIN="DioriteGtk"'],
 		vapi_dirs = ['vapi'],
 		vala_target_glib = "2.32",
 	)
