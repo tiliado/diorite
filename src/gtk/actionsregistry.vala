@@ -31,8 +31,20 @@ public class ActionsRegistry : GLib.Object
 	private HashTable<string, SingleList<Action?>> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
-	public Gtk.ApplicationWindow? window {get; private set;}
-	
+	private Gtk.ApplicationWindow? _window = null;
+	public Gtk.ApplicationWindow? window
+	{
+		get
+		{
+			return _window;
+		}
+		set
+		{
+			_window = value;
+			if (_window != null)
+				add_to_map_by_scope(Action.SCOPE_WIN, _window);
+		}
+	}
 	
 	public ActionsRegistry(Gtk.Application app, Gtk.ApplicationWindow? window = null)
 	{
@@ -147,14 +159,14 @@ public class ActionsRegistry : GLib.Object
 			{
 				var item = new Gtk.SeparatorToolItem();
 				item.draw = true;
-				item.expand = false;
+				item.set_expand(false);
 				t.add(item);
 			}
 			else if (name == " ")
 			{
 				var item = new Gtk.SeparatorToolItem();
 				item.draw = false;
-				item.expand = true;
+				item.set_expand(true);
 				t.add(item);
 			}
 			else

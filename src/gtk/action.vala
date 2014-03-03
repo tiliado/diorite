@@ -42,7 +42,11 @@ public class Action: GLib.Object
 	public string? icon {get; construct; default = null;}
 	public string? keybinding {get; set; default = null;}
 	public string name {get {return action.name;}}
-	public bool enabled {get {return action.enabled;}}
+	public bool enabled
+	{
+		get {return action.enabled;}
+		set {action.set_enabled(value);}
+	}
 	
 	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
 	{
