@@ -63,16 +63,19 @@ public abstract class Application : Gtk.Application
 		this.app_name = name;
 		this.desktop_entry = desktop_entry;
 		this.path_name = path_name;
+		#if LINUX
+		prctl(15, path_name, 0, 0, 0);
+		#endif
+		GLib.Environment.set_prgname(path_name);
+		GLib.Environment.set_application_name(app_name);
+		
 	}
 	
 	public override void startup()
 	{
 		/* Set program name */
-		#if LINUX
-		prctl(15, app_name, 0, 0, 0);
-		#endif
-		GLib.Environment.set_application_name(app_name);
-		Gdk.set_program_class(app_name); // must be set after Gtk.init()!
+		
+		Gdk.set_program_class(path_name); // must be set after Gtk.init()!
 		
 		instance = this;
 		
