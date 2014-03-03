@@ -68,7 +68,7 @@ namespace Diorite.System
 	 * @param recursive    recursive removal
 	 * @throw              Error on failure
 	 */
-	public void purge_directory_content(File dir, bool recursive=false) throws Error
+	public void purge_directory_content(File dir, bool recursive=false) throws GLib.Error
 	{
 		var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
 		FileInfo file_info;
@@ -91,16 +91,38 @@ namespace Diorite.System
 	 * @param recursive    recursive removal
 	 * @return             true on success, false on failure
 	 */
-	public bool try_purge_dir(File dir, bool recursive=true){
+	public bool try_purge_dir(File dir, bool recursive=true)
+	{
 		try
 		{
 			purge_directory_content(dir, recursive);
 			dir.delete();
 		}
-		catch (Error e)
+		catch (GLib.Error e)
 		{
 			return false;
 		}
 		return true;
+	}
+	
+	public void copy_tree(File source_dir, File dest_dir, Cancellable? cancellable=null) throws GLib.Error
+	{
+		if (!dest_dir.query_exists())
+			dest_dir.make_directory_with_parents();
+		
+		var enumerator = source_dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
+		FileInfo file_info;
+		while ((file_info = enumerator.next_file ()) != null)
+		{
+			var name = file_info.get_name();
+			var source_item = source_dir.get_child(name);
+			var dest_item = dest_dir.get_child(name);
+			if (source_item.query_file_type(0) == FileType.DIRECTORY)
+				copy_tree(source_item, dest_item, cancellable);
+			else if(source_item.query_file_type(0) == FileType.REGULAR)
+				source_item.copy(dest_item, 0, cancellable); 
+			else
+				warning("Skipped: %s", source_item.get_path());
+		}
 	}
 }
