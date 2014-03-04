@@ -53,6 +53,8 @@ public abstract class Application : Gtk.Application
 	public string path_name {get; protected set;}
 	public string icon {get; protected set; default = "";}
 	public string version {get; protected set; default = "";}
+	public bool app_menu_shown {get; private set; default = false;}
+	public bool menubar_shown {get; private set; default = false;}
 	#if LINUX
 	private XfceSessionManager? xfce_session = null;
 	#endif
@@ -68,7 +70,6 @@ public abstract class Application : Gtk.Application
 		#endif
 		GLib.Environment.set_prgname(path_name);
 		GLib.Environment.set_application_name(app_name);
-		
 	}
 	
 	public override void startup()
@@ -89,6 +90,16 @@ public abstract class Application : Gtk.Application
 		// TODO: How about signal handling on Windows?
 		#endif
 		base.startup();
+		var gtk_settings = Gtk.Settings.get_default();
+		debug("Shell: app_menu = %s, menubar = %s",
+		gtk_settings.gtk_shell_shows_app_menu.to_string(),
+		gtk_settings.gtk_shell_shows_menubar.to_string());
+		
+		if (gtk_settings.gtk_shell_shows_app_menu)
+		{
+			app_menu_shown = true;
+			menubar_shown = gtk_settings.gtk_shell_shows_menubar;
+		}
 	}
 	
 	#if LINUX
