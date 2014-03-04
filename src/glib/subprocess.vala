@@ -29,6 +29,7 @@ using Win32;
 namespace Diorite
 {
 
+[Flags]
 public enum SubprocessFlags
 {
 	NONE,
