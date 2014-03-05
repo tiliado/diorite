@@ -72,6 +72,27 @@ public abstract class Application : Gtk.Application
 		GLib.Environment.set_application_name(app_name);
 	}
 	
+	public virtual signal void fatal_error(string title, string message)
+	{
+		critical("%s. %s", title, message);
+		quit();
+	}
+	
+	public virtual signal void show_error(string title, string message)
+	{
+		warning("%s. %s", title, message);
+	}
+	
+	public virtual signal void show_warning(string title, string message)
+	{
+		warning("%s. %s", title, message);
+	}
+	
+	public virtual signal void show_info(string title, string message)
+	{
+		GLib.message("%s. %s", title, message);
+	}
+	
 	public override void startup()
 	{
 		/* Set program name */
