@@ -51,16 +51,17 @@ namespace Diorite
 	 * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
 	 * @return byte array with serialized message
 	 */
-	public uint8[] serialize_message(string name, Variant params, uint offset=0)
+	public uint8[] serialize_message(string name, Variant? params, uint offset=0)
 	{
-		unowned string type_str = params.get_type_string();
+		string type_str = params != null ? params.get_type_string() : "";
 		uint variant_offset = (uint) (offset + name.length + 1 + type_str.length + 1);
 		if (variant_offset % SERIALIZE_ALIGN != 0)
 			variant_offset += SERIALIZE_ALIGN - (variant_offset % SERIALIZE_ALIGN);
-		uint32 buffer_size = (uint32) (variant_offset + params.get_size());
+		
+		uint32 buffer_size = (uint32) (variant_offset + (params != null ? params.get_size() : 0));
 		uint8[] buffer = new uint8[buffer_size];
 		uint8* p = buffer;
-		
+			
 		uint size = name.length + 1;
 		Memory.copy(p + offset, (void*) name, size);
 		offset += size;
@@ -69,7 +70,8 @@ namespace Diorite
 		Memory.copy(p + offset, (void*) type_str, size);
 		offset += size;
 		
-		assert(serialize_variant(params, buffer, variant_offset));
+		if (params != null)
+			assert(serialize_variant(params, buffer, variant_offset));
 		return buffer;
 	}
 	
@@ -102,7 +104,7 @@ namespace Diorite
 	 * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
 	 * @return true on success, false on failure (i. e. invalid data)
 	 */
-	public bool deserialize_message(owned uint8[] buffer, out string name, out Variant params, uint offset=0)
+	public bool deserialize_message(owned uint8[] buffer, out string name, out Variant? params, uint offset=0)
 	{
 		name = null;
 		params = null;
@@ -121,17 +123,19 @@ namespace Diorite
 		
 		/* find type string */
 		index = Posix.memchr(p, 0, limit);
-		return_val_if_fail(index != null && index - p > 0, false);
+		return_val_if_fail(index != null && index - p >= 0, false);
 		size = (uint) (index - p + 1);
 		string type_str = (string) Memory.dup(p, size);
-		
 		offset += size;
 		
 		if (offset % SERIALIZE_ALIGN != 0)
 			offset += SERIALIZE_ALIGN - offset % SERIALIZE_ALIGN;
 		
-		params = deserialize_variant(type_str, (owned) buffer, offset);
-		return_val_if_fail(params != null, false);
+		if (type_str != "")
+		{
+			params = deserialize_variant(type_str, (owned) buffer, offset);
+			return_val_if_fail(params != null, false);
+		}
 		
 		name = (owned) tmp_name;
 		return true;

@@ -180,4 +180,15 @@ class SerializeTest: Diorite.TestCase
 		check_variant(params, true);
 	}
 	
+	[DTest(start=0, end=50, step=3)]
+	public void test_serialize_message_null_variant(int offset)
+	{
+		var name = "offset%d".printf(offset);
+		uint8[] buffer = Diorite.serialize_message(name, null, offset);
+		string? name2 = null;
+		Variant? params = null;
+		assert(Diorite.deserialize_message((owned) buffer, out name2, out params, offset));
+		expect(name == name2);
+		expect(params == null);
+	}
 }
