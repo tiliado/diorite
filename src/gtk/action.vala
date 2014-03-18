@@ -47,12 +47,17 @@ public class Action: GLib.Object
 		get {return action.enabled;}
 		set {action.set_enabled(value);}
 	}
+	public Variant? state
+	{
+		owned get {return action.state;}
+		set {action.set_state(value);}
+	}
 	
-	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
+	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant? state=null)
 	{
 		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
 		this.callback = (owned) callback;
-		action = new SimpleAction(name, null);
+		action = state == null ? new SimpleAction(name, null) : new SimpleAction.stateful(name, null, state);
 		action.activate.connect(on_action_activated);
 	}
 	
