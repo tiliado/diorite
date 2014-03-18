@@ -26,6 +26,7 @@ namespace Diorite
 {
 
 public delegate void ActionCallback();
+public delegate void ActionCallbackWithParam(Variant parameter);
 
 public class Action: GLib.Object
 {
@@ -35,6 +36,7 @@ public class Action: GLib.Object
 	
 	private SimpleAction action;
 	private ActionCallback? callback;
+	private ActionCallbackWithParam? param_callback;
 	public string group {get; construct; default = "main";}
 	public string scope {get; construct; default = SCOPE_NONE;}
 	public string? label {get; construct; default = null;}
@@ -53,17 +55,35 @@ public class Action: GLib.Object
 		set {action.set_state(value);}
 	}
 	
-	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant? state=null)
+	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
 	{
 		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
 		this.callback = (owned) callback;
-		action = state == null ? new SimpleAction(name, null) : new SimpleAction.stateful(name, null, state);
+		action = new SimpleAction(name, null);
+		action.activate.connect(on_action_activated);
+	}
+	
+	public Action.toggle(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant state)
+	{
+		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		this.callback = (owned) callback;
+		action = new SimpleAction.stateful(name, null, state);
+		action.activate.connect(on_action_activated);
+	}
+	
+	public Action.radio(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallbackWithParam? callback, Variant state)
+	{
+		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		this.param_callback = (owned) callback;
+		action = new SimpleAction.stateful(name, state.get_type(), state);
 		action.activate.connect(on_action_activated);
 	}
 	
 	public virtual signal void activated(Variant? parameter)
 	{
-		if (callback != null)
+		if (param_callback != null)
+			param_callback(parameter);
+		else if (callback != null)
 			callback();
 	}
 	

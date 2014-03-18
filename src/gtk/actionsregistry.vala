@@ -129,6 +129,10 @@ public class ActionsRegistry : GLib.Object
 		var menu = new Menu();
 		foreach (var name in actions)
 		{
+			string? bare_detailed_name = null;
+			Variant? target = null;
+			string? target_label = null;
+			name = parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
 			var action = this.actions.get(name);
 			if (action == null)
 			{
@@ -138,7 +142,10 @@ public class ActionsRegistry : GLib.Object
 			
 			var label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
 			? action.mnemo_label : action.label;
-			var item = new MenuItem(label, action.scope + "." + action.name);
+			if (target_label != null)
+				label += target_label;
+			
+			var item = new MenuItem(label, action.scope + "." + bare_detailed_name);
 			if (use_icons)
 			{
 				var icon = action.icon;
@@ -171,14 +178,22 @@ public class ActionsRegistry : GLib.Object
 			}
 			else
 			{
+				Variant? target = null;
+				string? target_label = null;
+				string? bare_detailed_name = null;
+				name = parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
 				var action = this.actions.get(name);
 				if (action == null)
 				{
 					warning("Action '%s' not found.", name);
 					continue;
 				}
-				var button = new Gtk.ToolButton(null, action.label);
-				button.set_action_name(action.scope + "." + action.name);
+				
+				var label = action.label;
+				if (target_label != null)
+					label += target_label;
+				var button = new Gtk.ToolButton(null, label);
+				button.set_action_name(action.scope + "." + bare_detailed_name);
 				if (action.icon != null)
 					button.set_icon_name(action.icon);
 				t.add(button);
@@ -208,7 +223,7 @@ public class ActionsRegistry : GLib.Object
 	{
 		var a = action as Action;
 		assert(a != null);
-		debug("Action activated: %s/%s.%s", a.group, a.scope, a.name);
+		debug("Action activated: %s/%s.%s(%s)", a.group, a.scope, a.name, parameter == null ? "null" : parameter.print(false));
 	}
 	
 	private void on_action_changed(GLib.Object o, ParamSpec p)
@@ -249,6 +264,33 @@ public class ActionsRegistry : GLib.Object
 			}
 		}
 		action_changed(action, p);
+	}
+	
+	private string parse_detailed_name(string detailed_name, out string? bare_detailed_name, out Variant? target, out string? label)
+	{
+		label = null;
+		var i = detailed_name.index_of("|");
+		if (i >= 0)
+		{
+			label = detailed_name.substring(i + 1);
+			bare_detailed_name = detailed_name.substring(0, i);
+		}
+		else
+		{
+			bare_detailed_name = detailed_name;
+		}
+		
+		string action_name = null;
+		try
+		{
+			GLib.Action.parse_detailed_name(bare_detailed_name, out action_name, out target);
+		}
+		catch (GLib.Error e)
+		{
+			critical("Invalid detailed name: %s", detailed_name);
+			return detailed_name;
+		}
+		return action_name;
 	}
 }
 
