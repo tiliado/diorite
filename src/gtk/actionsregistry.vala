@@ -132,7 +132,7 @@ public class ActionsRegistry : GLib.Object
 			string? bare_detailed_name = null;
 			Variant? target = null;
 			string? target_label = null;
-			name = parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
+			name = ActionsRegistry.parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
 			var action = this.actions.get(name);
 			if (action == null)
 			{
@@ -181,7 +181,7 @@ public class ActionsRegistry : GLib.Object
 				Variant? target = null;
 				string? target_label = null;
 				string? bare_detailed_name = null;
-				name = parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
+				name = ActionsRegistry.parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
 				var action = this.actions.get(name);
 				if (action == null)
 				{
@@ -266,7 +266,7 @@ public class ActionsRegistry : GLib.Object
 		action_changed(action, p);
 	}
 	
-	private string parse_detailed_name(string detailed_name, out string? bare_detailed_name, out Variant? target, out string? label)
+	public static string parse_detailed_name(string detailed_name, out string? bare_detailed_name, out Variant? target, out string? label)
 	{
 		label = null;
 		var i = detailed_name.index_of("|");
