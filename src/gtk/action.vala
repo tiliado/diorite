@@ -28,15 +28,15 @@ namespace Diorite
 public delegate void ActionCallback();
 public delegate void ActionCallbackWithParam(Variant parameter);
 
-public class Action: GLib.Object
+public abstract class Action: GLib.Object
 {
 	public static const string SCOPE_NONE = "none";
 	public static const string SCOPE_APP = "app";
 	public static const string SCOPE_WIN = "win";
 	
-	private SimpleAction action;
-	private ActionCallback? callback;
-	private ActionCallbackWithParam? param_callback;
+	protected GLib.SimpleAction action;
+	protected ActionCallback? callback;
+	protected ActionCallbackWithParam? param_callback;
 	public string group {get; construct; default = "main";}
 	public string scope {get; construct; default = SCOPE_NONE;}
 	public string? label {get; construct; default = null;}
@@ -53,30 +53,6 @@ public class Action: GLib.Object
 	{
 		owned get {return action.state;}
 		set {action.set_state(value);}
-	}
-	
-	public Action(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
-	{
-		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
-		this.callback = (owned) callback;
-		action = new SimpleAction(name, null);
-		action.activate.connect(on_action_activated);
-	}
-	
-	public Action.toggle(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant state)
-	{
-		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
-		this.callback = (owned) callback;
-		action = new SimpleAction.stateful(name, null, state);
-		action.activate.connect(on_action_activated);
-	}
-	
-	public Action.radio(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallbackWithParam? callback, Variant state)
-	{
-		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
-		this.param_callback = (owned) callback;
-		action = new SimpleAction.stateful(name, state.get_type(), state);
-		action.activate.connect(on_action_activated);
 	}
 	
 	public virtual signal void activated(Variant? parameter)
@@ -97,9 +73,42 @@ public class Action: GLib.Object
 		map.add_action(action);
 	}
 	
-	private void on_action_activated(Variant? parameter)
+	protected void on_action_activated(Variant? parameter)
 	{
 		activated(parameter);
+	}
+}
+
+public class SimpleAction : Action
+{
+	public SimpleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
+	{
+		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		this.callback = (owned) callback;
+		action = new GLib.SimpleAction(name, null);
+		action.activate.connect(on_action_activated);
+	}
+}
+
+public class ToggleAction : Action
+{
+	public ToggleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant state)
+	{
+		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		this.callback = (owned) callback;
+		action = new GLib.SimpleAction.stateful(name, null, state);
+		action.activate.connect(on_action_activated);
+	}
+}
+
+public class RadioAction: Action
+{
+	public RadioAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallbackWithParam? callback, Variant state)
+	{
+		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		this.param_callback = (owned) callback;
+		action = new GLib.SimpleAction.stateful(name, state.get_type(), state);
+		action.activate.connect(on_action_activated);
 	}
 }
 
