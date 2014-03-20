@@ -87,6 +87,7 @@ public class SimpleAction : Action
 		this.callback = (owned) callback;
 		action = new GLib.SimpleAction(name, null);
 		action.activate.connect(on_action_activated);
+		action.change_state.connect(on_action_activated);
 	}
 }
 
@@ -98,6 +99,7 @@ public class ToggleAction : Action
 		this.callback = (owned) callback;
 		action = new GLib.SimpleAction.stateful(name, null, state);
 		action.activate.connect(on_action_activated);
+		action.change_state.connect(on_action_activated);
 	}
 }
 
@@ -109,6 +111,7 @@ public class RadioAction: Action
 		this.param_callback = (owned) callback;
 		action = new GLib.SimpleAction.stateful(name, state.get_type(), state);
 		action.activate.connect(on_action_activated);
+		action.change_state.connect(on_action_activated);
 	}
 }
 
