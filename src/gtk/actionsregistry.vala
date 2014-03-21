@@ -127,28 +127,34 @@ public class ActionsRegistry : GLib.Object
 	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		var menu = new Menu();
-		foreach (var name in actions)
+		foreach (var full_name in actions)
 		{
-			string? bare_detailed_name = null;
-			Variant? target = null;
-			string? target_label = null;
-			name = ActionsRegistry.parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
-			var action = this.actions.get(name);
-			if (action == null)
+			string? detailed_name = null;
+			Action? action = null;
+			RadioOption? option = null;
+			if (!find_and_parse_action(full_name, out detailed_name, out action, out option))
 			{
-				warning("Action '%s' not found in registry.", name);
+				warning("Action '%s' not found in registry.", full_name);
 				continue;
 			}
 			
-			var label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
-			? action.mnemo_label : action.label;
-			if (target_label != null)
-				label += target_label;
-			
-			var item = new MenuItem(label, action.scope + "." + bare_detailed_name);
+			string? label;
+			string? icon;
+			if (option != null)
+			{
+				label = (use_mnemonic && option.mnemo_label != null && option.mnemo_label != "")
+					? option.mnemo_label : option.label;
+				icon = option.icon;
+			}
+			else
+			{
+				label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
+					? action.mnemo_label : action.label;
+				icon = action.icon;
+			}
+			var item = new MenuItem(label, action.scope + "." + detailed_name);
 			if (use_icons)
 			{
-				var icon = action.icon;
 				if (icon != null)
 					item.set_icon(new ThemedIcon(icon));
 			}
@@ -157,19 +163,46 @@ public class ActionsRegistry : GLib.Object
 		return menu;
 	}
 	
+	public bool find_and_parse_action(string full_name, out string? detailed_name, out Action? action, out RadioOption? option)
+	{
+		detailed_name = null;
+		action = null;
+		option = null;
+		int option_index = -1;
+		string name = ActionsRegistry.parse_full_name(full_name, out option_index);
+		action = this.actions.get(name);
+		if (action == null)
+			return false;
+			
+		if (option_index >= 0)
+		{
+			var radio = action as RadioAction;
+			if (radio == null)
+				return false;
+			
+			option = radio.get_option(option_index);
+			detailed_name = GLib.Action.print_detailed_name(name, option.parameter);
+		}
+		else
+		{
+			detailed_name = name;
+		}
+		return true;
+	}
+	
 	public Gtk.Toolbar build_toolbar(string[] actions, Gtk.Toolbar? toolbar=null)
 	{
 		var t = toolbar ?? new Gtk.Toolbar();
-		foreach (var name in actions)
+		foreach (var full_name in actions)
 		{
-			if (name == "|")
+			if (full_name == "|")
 			{
 				var item = new Gtk.SeparatorToolItem();
 				item.draw = true;
 				item.set_expand(false);
 				t.add(item);
 			}
-			else if (name == " ")
+			else if (full_name == " ")
 			{
 				var item = new Gtk.SeparatorToolItem();
 				item.draw = false;
@@ -178,24 +211,32 @@ public class ActionsRegistry : GLib.Object
 			}
 			else
 			{
-				Variant? target = null;
-				string? target_label = null;
-				string? bare_detailed_name = null;
-				name = ActionsRegistry.parse_detailed_name(name, out bare_detailed_name, out target, out target_label);
-				var action = this.actions.get(name);
-				if (action == null)
+				string? detailed_name = null;
+				Action? action = null;
+				RadioOption? option = null;
+				if (!find_and_parse_action(full_name, out detailed_name, out action, out option))
 				{
-					warning("Action '%s' not found.", name);
+					warning("Action '%s' not found in registry.", full_name);
 					continue;
 				}
 				
-				var label = action.label;
-				if (target_label != null)
-					label += target_label;
+				string? label;
+				string? icon;
+				if (option != null)
+				{
+					label = option.label;
+					icon = option.icon;
+				}
+				else
+				{
+					label = action.label;
+					icon = action.icon;
+				}
+				
 				var button = new Gtk.ToolButton(null, label);
-				button.set_action_name(action.scope + "." + bare_detailed_name);
-				if (action.icon != null)
-					button.set_icon_name(action.icon);
+				button.set_action_name(action.scope + "." + detailed_name);
+				if (icon != null)
+					button.set_icon_name(icon);
 				t.add(button);
 			}
 		}
@@ -266,31 +307,17 @@ public class ActionsRegistry : GLib.Object
 		action_changed(action, p);
 	}
 	
-	public static string parse_detailed_name(string detailed_name, out string? bare_detailed_name, out Variant? target, out string? label)
+	public static string parse_full_name(string full_name, out int option)
 	{
-		label = null;
-		var i = detailed_name.index_of("|");
-		if (i >= 0)
+		var i = full_name.index_of("::");
+		if (i == -1)
 		{
-			label = detailed_name.substring(i + 1);
-			bare_detailed_name = detailed_name.substring(0, i);
-		}
-		else
-		{
-			bare_detailed_name = detailed_name;
+			option = -1;
+			return full_name;
 		}
 		
-		string action_name = null;
-		try
-		{
-			GLib.Action.parse_detailed_name(bare_detailed_name, out action_name, out target);
-		}
-		catch (GLib.Error e)
-		{
-			critical("Invalid detailed name: %s", detailed_name);
-			return detailed_name;
-		}
-		return action_name;
+		option = int.parse(full_name.substring(i + 2));
+		return full_name.substring(0, i);
 	}
 }
 

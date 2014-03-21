@@ -105,13 +105,44 @@ public class ToggleAction : Action
 
 public class RadioAction: Action
 {
-	public RadioAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallbackWithParam? callback, Variant state)
+	private RadioOption[] options;
+	
+	public RadioAction(string group, string scope, string name, owned ActionCallbackWithParam? callback, Variant state, RadioOption[] options)
 	{
-		Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
+		Object(group: group, scope: scope, label: null, icon: null, keybinding: null, mnemo_label: null);
 		this.param_callback = (owned) callback;
+		this.options = options;
 		action = new GLib.SimpleAction.stateful(name, state.get_type(), state);
 		action.activate.connect(on_action_activated);
 		action.change_state.connect(on_action_activated);
+	}
+	
+	public unowned RadioOption[] get_options()
+	{
+		return options;
+	}
+	
+	public RadioOption get_option(int i)
+	{
+		return options[i];
+	}
+}
+
+public class RadioOption
+{
+	public Variant parameter {get; private set;}
+	public string? label {get; private set;}
+	public string? mnemo_label {get; private set;}
+	public string? icon {get; private set;}
+	public string? keybinding {get; private set;}
+	
+	public RadioOption(Variant parameter, string? label, string? mnemo_label, string? icon, string? keybinding)
+	{
+		this.parameter = parameter;
+		this.label = label;
+		this.mnemo_label = mnemo_label;
+		this.icon = icon;
+		this.keybinding = keybinding;
 	}
 }
 
