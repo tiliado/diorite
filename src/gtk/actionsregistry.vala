@@ -124,6 +124,11 @@ public class ActionsRegistry : GLib.Object
 		return group.to_slist();
 	}
 	
+	public List<weak Action?> list_actions()
+	{
+		return actions.get_values();
+	}
+	
 	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		var menu = new Menu();
