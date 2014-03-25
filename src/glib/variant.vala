@@ -34,7 +34,20 @@ public string[] variant_to_strv(Variant variant)
 		var size = variant.n_children();
 		result = new string[size];
 		for (size_t i = 0; i < size; i++)
-			result[i] = variant.get_child_value(i).get_string();
+		{
+			Variant? val = variant.get_child_value(i);
+			if (val.is_of_type(VariantType.MAYBE))
+			{
+				val = val.get_maybe();
+				if (val == null)
+					continue;
+			}
+			
+			if (val.is_of_type(VariantType.VARIANT))
+				val = val.get_variant();
+			if (val.is_of_type(VariantType.STRING))
+				result[i] = val.get_string();
+		}
 	}
 	else
 	{
