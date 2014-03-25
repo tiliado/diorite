@@ -52,7 +52,12 @@ public Variant[] variant_to_array(Variant variant)
 		var size = variant.n_children();
 		result = new Variant[size];
 		for (size_t i = 0; i < size; i++)
-			result[i] = variant.get_child_value(i);
+		{
+			var val = variant.get_child_value(i);
+			if (val.is_of_type(VariantType.VARIANT))
+				val = val.get_variant();
+			result[i] = val;
+		}
 	}
 	else
 	{
@@ -69,9 +74,20 @@ public HashTable<string, Variant> variant_to_hashtable(Variant variant)
 		var iter = variant.iterator();
 		Variant? val = null;
 		string? key = null;
-		while (iter.next("{sv}", &key, &val))
+		while (iter.next("{s*}", &key, &val))
 			if (key != null)
+			{
+				
+				if (val.is_of_type(VariantType.MAYBE))
+					val = val.get_maybe();
+				if (val.is_of_type(VariantType.VARIANT))
+					val = val.get_variant();
 				result.insert(key, val);
+			}
+	}
+	else
+	{
+		critical("Wrong type: %s %s", variant.get_type_string(), variant.print(true));
 	}
 	return result;
 }
