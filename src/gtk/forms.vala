@@ -294,6 +294,15 @@ public class Form : Gtk.Grid
 			l.halign = Gtk.Align.START;
 			widget = l;
 			break;
+		case "header":
+			var text = entry_spec[1].get_string();
+			var l = new Gtk.Label(text);
+			l.halign = Gtk.Align.CENTER;
+			var text_attrs = new Pango.AttrList();
+			text_attrs.change(Pango.attr_weight_new(Pango.Weight.BOLD));
+			l.set_attributes(text_attrs);
+			widget = l;
+			break;
 		default:
 			warning("Unsupported type: %s", type);
 			return;
