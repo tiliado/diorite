@@ -41,7 +41,7 @@ public interface ValueEntry: GLib.Object
 public interface ToggleEntry: GLib.Object
 {
 	public signal void toggled();
-	public abstract bool state {get;}
+	public abstract bool state {get; set;}
 	public abstract unowned string[] get_enables();
 	public abstract unowned string[] get_disables();
 }
@@ -100,14 +100,17 @@ public class BoolEntry : FormEntry, ToggleEntry
 		set {entry.sensitive = value;}
 	}
 	
-	public bool state {get{return entry.active;}}
+	public bool state
+	{
+		get {return entry.active;}
+		set {entry.active = value;}
+	}
 	
-	public BoolEntry(string label, bool value, string[] enables, string[] disables)
+	public BoolEntry(string label, string[] enables, string[] disables)
 	{
 		this.enables = enables;
 		this.disables = disables;
 		entry = new Gtk.CheckButton.with_label(label);
-		entry.active = value;
 		entry.show();
 		entry.toggled.connect(on_toggled);
 	}
@@ -142,7 +145,11 @@ public class OptionEntry : FormEntry, ToggleEntry
 		set {entry.sensitive = value;}
 	}
 	
-	public bool state {get{return entry.active;}}
+	public bool state
+	{
+		get {return entry.active;}
+		set {entry.active = value;}
+	}
 	
 	public Gtk.RadioButton group
 	{
@@ -156,12 +163,11 @@ public class OptionEntry : FormEntry, ToggleEntry
 		}
 	}
 	
-	public OptionEntry(string label, bool checked, string[] enables, string[] disables)
+	public OptionEntry(string label, string[] enables, string[] disables)
 	{
 		this.enables = enables;
 		this.disables = disables;
 		entry = new Gtk.RadioButton.with_label_from_widget(null, label);
-		entry.active = checked;
 		entry.show();
 		entry.toggled.connect(on_toggled);
 	}
@@ -252,7 +258,8 @@ public class Form : Gtk.Grid
 				e_disables = variant_to_strv(entry_spec[4]);
 			else
 				e_disables = {};
-			var entry = new Diorite.BoolEntry(e_label, e_value, e_enables, e_disables);
+			var entry = new Diorite.BoolEntry(e_label, e_enables, e_disables);
+			entry.state = e_value;
 			entry.toggled.connect(on_entry_toggled);
 			label = entry.label;
 			widget = entry.widget;
@@ -277,8 +284,8 @@ public class Form : Gtk.Grid
 				e_disables = variant_to_strv(entry_spec[4]);
 			else
 				e_disables = {};
-			var entry = new Diorite.OptionEntry(e_label, e_checked, e_enables, e_disables);
-			entry.toggled.connect(on_entry_toggled);
+			var entry = new Diorite.OptionEntry(e_label, e_enables, e_disables);
+			
 			label = entry.label;
 			widget = entry.widget;
 			entries.set(full_id, entry);
@@ -287,6 +294,8 @@ public class Form : Gtk.Grid
 				radios.set(id, entry.group);
 			else
 				entry.group = group;
+			entry.state = e_checked;
+			entry.toggled.connect(on_entry_toggled);
 			break;
 		case "label":
 			var text = entry_spec[1].get_string();
