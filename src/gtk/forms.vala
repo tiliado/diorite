@@ -216,8 +216,8 @@ public class Form : Gtk.Grid
 	
 	public void add_entry(Variant[] entry_spec)
 	{
-		weak Gtk.Label label = null;
-		weak Gtk.Widget widget = null;
+		Gtk.Label label = null;
+		Gtk.Widget widget = null;
 		string type = entry_spec[0].get_string();
 		switch (type)
 		{
@@ -288,6 +288,12 @@ public class Form : Gtk.Grid
 			else
 				entry.group = group;
 			break;
+		case "label":
+			var text = entry_spec[1].get_string();
+			var l = new Gtk.Label(text);
+			l.halign = Gtk.Align.START;
+			widget = l;
+			break;
 		default:
 			warning("Unsupported type: %s", type);
 			return;
@@ -298,6 +304,7 @@ public class Form : Gtk.Grid
 			attach_next_to(label, null, Gtk.PositionType.BOTTOM, 1, 1);
 			label.margin_left = 8;
 			label.margin_top = 5;
+			label.halign = Gtk.Align.START;
 			label.show();
 			attach_next_to(widget, label, Gtk.PositionType.RIGHT, 1, 1);
 		}
