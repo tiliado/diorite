@@ -35,7 +35,7 @@ int main(string[] args)
 	values.insert("host", new Variant.string(""));
 	values.insert("port", new Variant.string(""));
 	
-	form = new Diorite.Form.from_spec(Diorite.variant_from_hashtable(values), new Variant.tuple({
+	form = new Diorite.Form.from_spec(values, new Variant.tuple({
 		new Variant.tuple({new Variant.string("bool"), new Variant.string("entrytype"), new Variant.string("Use short string"), new Variant.strv({"shortstring"}), new Variant.strv({"longstring"})}),
 		new Variant.tuple({new Variant.string("string"), new Variant.string("shortstring"), new Variant.string("Label")}),
 		new Variant.tuple({new Variant.string("string"), new Variant.string("longstring")}),

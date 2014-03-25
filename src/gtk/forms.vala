@@ -195,9 +195,9 @@ public class Form : Gtk.Grid
 		radios = new HashTable<string, Gtk.RadioButton>(str_hash, str_equal);
 	}
 	
-	public Form.from_spec(Variant values, Variant entries_spec)
+	public Form.from_spec(HashTable<string, Variant> values, Variant entries_spec)
 	{
-		this(variant_to_hashtable(values));
+		this(values);
 		add_entries(entries_spec);
 	}
 	
@@ -320,6 +320,11 @@ public class Form : Gtk.Grid
 			if (toggle != null)
 				entry_toggled(toggle);
 		}
+	}
+	
+	public HashTable<string, Variant> get_original_values()
+	{
+		return values;
 	}
 	
 	public HashTable<string, Variant> get_values()
