@@ -270,6 +270,10 @@ def build(ctx):
 	
 	ctx.add_post_fun(post)
 
+def dist(ctx):
+	ctx.algo = "tar.gz"
+	ctx.excl = '.bzr .bzrignore build/* **/.waf* **/*~ **/*.swp **/.lock* bzrcommit.txt **/*.pyc'
+
 def post(ctx):
 	if ctx.cmd in ('install', 'uninstall'):
 		if ctx.env.PLATFORM == LINUX and ctx.options.ldconfig:
