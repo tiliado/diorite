@@ -53,6 +53,7 @@ public class MessageServer: Server
 	{
 		base(name);
 		handlers = new HashTable<string, HandlerAdaptor>(str_hash, str_equal);
+		add_handler("echo", null, (MessageHandler) echo_handler);
 	}
 	
 	public void add_handler(string message_name, GLib.Object? target, MessageHandler handler)
@@ -71,6 +72,17 @@ public class MessageServer: Server
 		return false;
 	}
 	
+	public bool wait_for_listening(int timeout)
+	{
+		var client = new MessageClient(name, timeout);
+		return client.wait_for_echo(timeout); 
+	}
+	
+	public static bool echo_handler(GLib.Object? target, Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
+	{
+		response = request;
+		return true;
+	}
 	protected override bool handle(owned ByteArray request, out ByteArray? response)
 	{
 		var bytes = ByteArray.free_to_bytes((owned) request);

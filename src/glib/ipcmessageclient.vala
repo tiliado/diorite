@@ -71,6 +71,28 @@ public class MessageClient: Client
 			throw new MessageError.IOERROR("%s", e.message);
 		}
 	}
+	
+	/**
+	 * @param timeout miliseconds
+	 */
+	public bool wait_for_echo(int timeout)
+	{
+		int sleep = 10000;
+		int attempts = timeout * 1000 / sleep;
+		var message = new Variant.string("HELLO");
+		while (attempts-- > 0)
+		{
+			try
+			{
+				if (send_message("echo", message).equal(message))
+					return true;
+				
+				Thread.usleep(sleep);
+			}
+			catch(MessageError e) {}
+		}
+		return false;
+	}
 }
 
 } // namespace Diorote

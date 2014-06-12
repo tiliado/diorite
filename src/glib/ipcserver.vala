@@ -34,8 +34,11 @@ public class Server
 		get {return channel.listening;}
 	}
 	
+	public string name {get; private set;}
+	
 	public Server(string name)
 	{
+		this.name = name;
 		channel = new Channel(name);
 	}
 	
