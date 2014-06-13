@@ -39,7 +39,7 @@ public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
 		buffer[offset + i] = (uint8)((data >> ((3 - i) * 8)) & 0xFF);
 }
 
-public void uint32_from_bytes(ref uint8[] buffer, out uint32 data, uint offset=0)
+public void uint32_from_bytes(uint8[] buffer, out uint32 data, uint offset=0)
 {
 	var size = sizeof(uint32);
 	GLib.assert(buffer.length >= offset + size);
@@ -96,7 +96,7 @@ public class Channel
 		this.path = create_path(name);
 	}
 	
-	public void create()  throws IOError
+	public void create() throws IOError
 	{
 		#if WIN
 		overlapped = {};
@@ -113,7 +113,7 @@ public class Channel
 		if (pipe == INVALID_HANDLE_VALUE)
 			throw new IOError.CONN_FAILED("Failed to create pipe '%s'. %s", path, GetLastErrorMsg());
 		#else
-		local_socket = socket(AF_UNIX, SOCK_STREAM, 0);
+		local_socket = Posix.socket(AF_UNIX, SOCK_STREAM, 0);
 		if (local_socket < 0)
 			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, get_last_error_msg());
 		unlink(path);
@@ -135,6 +135,25 @@ public class Channel
 		index -= WAIT_OBJECT_0;
 		if (index == 0)
 			throw new IOError.OP_FAILED("Waiting for pipe '%s' canceled.", path); // stop() called
+	}
+	#endif
+	
+	#if LINUX
+	public SocketService create_service() throws IOError
+	{
+		unlink(path);
+		var address = new UnixSocketAddress(path);
+		var service = new SocketService();
+		SocketAddress effective_address;
+		try
+		{
+			service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
+		}
+		catch (GLib.Error e)
+		{
+			throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
+		}
+		return service;
 	}
 	#endif
 	
@@ -226,7 +245,7 @@ public class Channel
 			throw new IOError.CONN_FAILED("Failed to set up pipe '%s'. %s", path, GetLastErrorMsg()); 
 		}
 		#else
-		local_socket = socket(AF_UNIX, SOCK_STREAM, 0);
+		local_socket = Posix.socket(AF_UNIX, SOCK_STREAM, 0);
 		if (local_socket < 0)
 			throw new IOError.CONN_FAILED("Failed to create socket '%s'. %s", path, get_last_error_msg());
 		var result = socket_connect(local_socket, path);
@@ -348,6 +367,39 @@ public class Channel
 		while (bytes_written_total < total_size);
 	}
 	
+	public async void write_bytes_async(OutputStream out_stream, ByteArray bytes) throws IOError
+	{
+		if (bytes.len > get_max_message_size())
+			throw new IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
+		
+		uint32 size = bytes.len;
+		uint8[] size_buffer = new uint8[sizeof(uint32)];
+		uint32_to_bytes(ref size_buffer, size);
+		bytes.prepend(size_buffer);
+		
+		uint8* data = bytes.data;
+		var total_size = bytes.len;
+		ulong bytes_written_total = 0;
+		ulong bytes_written;
+		do
+		{
+			try
+			{
+				unowned uint8[] buffer = (uint8[]) (data + bytes_written_total);
+				buffer.length = int.min(MESSAGE_BUFSIZE, (int)(total_size - bytes_written_total));
+				var result = yield out_stream.write_async(buffer);
+				bytes_written = (ulong) result;
+			}
+			catch (GLib.IOError e)
+			{
+				close();
+				throw new IOError.WRITE("Failed write to socket '%s': %s", path, e.message);
+			}
+			bytes_written_total += bytes_written;
+		}
+		while (bytes_written_total < total_size);
+	}
+	
 	public void read_data(out uint8[] data) throws IOError
 	{
 		ByteArray bytes;
@@ -368,7 +420,7 @@ public class Channel
 			read(buffer, out bytes_read);
 			if (bytes_read_total == 0)
 			{
-				uint32_from_bytes(ref buffer, out message_size);
+				uint32_from_bytes(buffer, out message_size);
 				bytes_read_total += bytes_read - sizeof(uint32);
 				unowned uint8[] shorter_buffer = (uint8[])((uint8*) buffer + sizeof(uint32));
 				shorter_buffer.length = (int) (buffer.length - sizeof(uint32));
@@ -423,6 +475,72 @@ public class Channel
 		}
 		bytes_read = (ulong) result;
 		#endif
+	}
+	
+	public async void read_bytes_async(InputStream in_stream, out ByteArray bytes, uint timeout=0, owned Cancellable? cancellable=null) throws IOError
+	{
+		bytes = new ByteArray();
+		uint cancel_id = 0;
+		if (timeout > 0)
+		{
+			if (cancellable == null)
+				cancellable = new Cancellable();
+			cancel_id = Timeout.add(timeout, () =>
+			{
+				cancel_id = 0;
+				cancellable.cancel();
+				return false;
+			});
+		}
+		
+		try
+		{
+			uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
+			unowned uint8[] buffer = real_buffer;
+			var bytes_to_read = (int) sizeof(uint32);
+			uint64 message_size = 0;
+			try
+			{
+				buffer.length = bytes_to_read;
+				var result = yield in_stream.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+				
+				if (result != bytes_to_read)
+					throw new IOError.READ("Failed to read message size.");
+				
+				uint32_from_bytes(buffer, out message_size);
+			}
+			catch (GLib.IOError e)
+			{
+				throw new IOError.READ("Failed to read from socket. %s", e.message);
+			}
+			
+			if (message_size == 0)
+				throw new IOError.READ("Empty message received.");
+			
+			size_t bytes_read_total = 0;
+			size_t bytes_read;
+			while (bytes_read_total < message_size)
+			{
+				try
+				{
+					buffer.length = int.min((int)(message_size - bytes_read_total), MESSAGE_BUFSIZE);
+					bytes_read = yield in_stream.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+				}
+				catch (GLib.IOError e)
+				{
+					throw new IOError.READ("Failed to read from socket. %s", e.message);
+				}
+				
+				buffer.length = (int) bytes_read;
+				bytes.append(buffer);
+				bytes_read_total += bytes_read;
+			}
+		}
+		finally
+		{
+			if (cancel_id != 0)
+				Source.remove(cancel_id);
+		}
 	}
 	
 	protected void check_connected() throws IOError

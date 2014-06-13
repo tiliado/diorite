@@ -34,11 +34,14 @@ public class Server
 		get {return channel.listening;}
 	}
 	
+	public uint timeout {get; set;}
 	public string name {get; private set;}
+	private SocketService? service=null;
 	
-	public Server(string name)
+	public Server(string name, uint timeout=5000)
 	{
 		this.name = name;
+		this.timeout = timeout;
 		channel = new Channel(name);
 	}
 	
@@ -87,6 +90,59 @@ public class Server
 			}
 		}
 		@ref = null;
+	}
+	
+	public void start_service() throws IOError
+	{
+		service = channel.create_service();
+		service.incoming.connect(on_incoming);
+		service.start();
+	}
+	
+	public void stop_service() throws IOError
+	{
+		if (service != null)
+		{
+			service.stop();
+			service = null;
+		}
+	}
+	
+	public virtual signal void async_error(IOError e)
+	{
+		warning("Async IOError: %s", e.message);
+	}
+	
+	private bool on_incoming(SocketConnection connection, GLib.Object? source_object)
+	{
+		process_connection.begin(connection, on_process_incoming_done);
+		return true;
+	}
+	
+	private void on_process_incoming_done(GLib.Object? o, AsyncResult result)
+	{
+		try
+		{
+			process_connection.end(result);
+		}
+		catch (IOError e)
+		{
+			async_error(e);
+		}
+	}
+	
+	private async void process_connection(SocketConnection connection) throws IOError
+	{
+		ByteArray request;
+		var in_stream = new DataInputStream(connection.input_stream);
+		yield channel.read_bytes_async(in_stream, out request, timeout);
+		
+		ByteArray response;
+		if (!handle((owned) request, out response))
+				response = new ByteArray();
+		
+		var out_stream = new DataOutputStream(connection.output_stream);
+		yield channel.write_bytes_async(out_stream, response);
 	}
 	
 	public void stop() throws IOError
