@@ -89,7 +89,6 @@ def check_dep(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=No
 def options(ctx):
 	ctx.load('compiler_c vala')
 	ctx.add_option('--noopt', action='store_true', default=False, dest='noopt', help="Turn off compiler optimizations")
-	ctx.add_option('--with-tester', action='store_true', default=False, dest='with_tester', help="Build Diorite Tester")
 	ctx.add_option('--debug', action='store_true', default=True, dest='debug', help="Turn on debugging symbols")
 	ctx.add_option('--no-debug', action='store_false', dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--no-ldconfig', action='store_false', default=True, dest='ldconfig', help="Don't run ldconfig after installation")
@@ -144,11 +143,6 @@ def configure(ctx):
 	ctx.check_dep('gtk+-3.0', 'GTK+', '3.4')
 	ctx.check_dep('gdk-3.0', 'GDK', '3.4')
 	ctx.check_dep('gthread-2.0', 'GTHREAD', '2.32')
-	
-	if ctx.env.with_tester:
-		ctx.check_dep('libvala-0.16', 'LIBVALA', '0.16')
-		ctx.check_dep('gmodule-2.0', 'GMODULE', '2.32')
-	
 	
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
@@ -233,29 +227,6 @@ def build(ctx):
 		CFLAGS=CFLAGS,
 		LIBNAME=DIORITE_GTK_LIBNAME
 		)
-	
-	if ctx.env.with_tester:
-		testgen = "dioritetestgen"
-		ctx.program(
-			target = testgen,
-			source = ctx.path.ant_glob('src/testgen/*.vala'),
-			use = [DIORITE_GLIB],
-			packages = 'glib-2.0 libvala-0.16',
-			uselib = 'GLIB LIBVALA',
-			vapi_dirs = ['vapi'],
-			vala_target_glib = "2.32",
-			)
-		
-		tester = "dioritetester"
-		ctx.program(
-			target = tester,
-			source = ctx.path.ant_glob('src/tester/*.vala'),
-			use = [DIORITE_GLIB],
-			packages = 'glib-2.0 libvala-0.16 gmodule-2.0',
-			uselib = 'GLIB LIBVALA GMODULE',
-			vapi_dirs = ['vapi'],
-			vala_target_glib = "2.32",
-			)
 	
 	if PLATFORM == WIN :
 		ctx.program(
