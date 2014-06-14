@@ -32,25 +32,38 @@ build()
 {
 	dist
 	echo "*** $0 build ***"
-	mkdir -p ${OUT}/testgen
-	$TESTGEN -d ${OUT}/testgen --vapidir $BUILD --vapidir ../vapi testcase.vala
+	mkdir -p ${OUT}
 	
 	valac -d ${OUT} -b . --thread --save-temps -v \
-	--library=${NAME} -o ${LIBPREFIX}${NAME}${LIBSUFFIX} \
+	--library=${NAME} -H ${OUT}/${NAME}.h -o ${LIBPREFIX}${NAME}${LIBSUFFIX} \
+	-X -fPIC -X -shared \
 	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib --pkg=posix --pkg gmodule-2.0 \
-	-X -fPIC -X -shared \
-	-X '-DG_LOG_DOMAIN="Diorite"' \
-	${OUT}/testgen/testcase.vala
+	--pkg=dioriteglib \
+	-X '-DG_LOG_DOMAIN="MyDiorite"' -X -g -X -O2 \
+	${NAME}.vala
+	
+	../testgen.py -o "${OUT}/run-${NAME}.vala" ${NAME}.vala
+	
+	valac -d ${OUT} -b . --thread --save-temps -v \
+	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
+	--vapidir $OUT -X -I$OUT -X -L$OUT -X -l${NAME} \
+	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
+	--pkg=dioriteglib --pkg ${NAME} \
+	-X '-DG_LOG_DOMAIN="MyDiorite"' -X -g -X -O2 \
+	"${OUT}/run-${NAME}.vala"
 }
+
+
 
 run()
 {
 	build
 	dist
 	echo "*** $0 run ***"
-	$TESTER build/testcase build/testgen/tests.spec
+	for path in $(${LAUNCHER} ${OUT}/run-${NAME}${EXECSUFFIX} -l); do
+		${LAUNCHER} ${OUT}/run-${NAME}${EXECSUFFIX} --verbose -p $path || true
+	done
 }
 
 $CMD

@@ -17,45 +17,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Diorite.Test;
-
 namespace My
 {
 
-class TestCase: Diorite.TestCase
+public class MyTest: Diorite.TestCase
 {
+	
+	public override void set_up()
+	{
+		message("set up");
+	}
+	
+	public override void tear_down()
+	{
+		message("tear_down");
+	}
 	
 	public void test_one()
 	{
 		message("One");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		expect("foo" == "goo");
-		assert("foo" == "goo");
+		assert("foo" == "foo", "");
+		expect("foo" == "foo", "");
+		expect("foo" == "goo", "");
+		assert("foo" == "goo", "");
 	}
 	
 	public void test_two()
 	{
 		message("Two");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
+		assert("foo" == "foo", "");
+		expect("foo" == "foo", "");
+		assert("foo" == "goo", "");
 	}
 	
 	public void test_three()
 	{
 		message("Three");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
+		assert("foo" == "foo", "");
+		expect("foo" == "foo", "");
+		assert("foo" == "goo", "");
 	}
 	
 	public void test_four()
 	{
 		message("four");
-		assert("foo" == "foo");
-		expect("foo" == "foo");
-		assert("foo" == "goo");
+		assert("foo" == "foo", "");
+		expect("foo" == "foo", "");
+		assert("foo" == "goo", "");
 		message("four success");
 	}
 	
@@ -64,7 +72,7 @@ class TestCase: Diorite.TestCase
 		message("five starts");
 		Idle.add(test_five.callback);
 		yield;
-		assert(5 == 4 + 1);
+		assert(5 == 4 + 1, "");
 		message("five ends");
 	}
 	
@@ -73,18 +81,13 @@ class TestCase: Diorite.TestCase
 		int[] arr2 = {1, 2, 3, 4, 5, 6, 7, 8};
 		int[] arr3 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 		message("Expect second");
-		expect_array(sizeof(int), arr2, arr3, int_eq, str_int);
+		expect_array<int>(arr2, arr3, int_eq, "");
 		message("Expect second done");
 		
 		string[] arr1 = {"hello", "world1"};
 		string[] arr1b = {"hello", "world2", "yes"};
-		expect_array(sizeof(string), arr1, arr1b, str_eq, str_str);
+		assert_array<string>(arr1, arr1b, str_eq, "");
 	}
 }
 
 } // namespace Diorite
-
-[ModuleInit]
-public void module_init(GLib.TypeModule type_module)
-{
-}
