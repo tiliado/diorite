@@ -31,7 +31,9 @@ public errordomain MessageError
 	UNSUPPORTED,
 	IOERROR,
 	UNKNOWN,
-	INVALID_RESPONSE;
+	INVALID_RESPONSE,
+	INVALID_REQUEST,
+	INVALID_ARGUMENTS;
 }
 
 public class MessageClient: Client
@@ -48,23 +50,31 @@ public class MessageClient: Client
 		ByteArray? response = null;
 		string? response_status = null;
 		Variant? response_params;
+		
 		try
 		{
 			send(request, out response);
 			var bytes = ByteArray.free_to_bytes((owned) response);
 			buffer = Bytes.unref_to_data((owned) bytes);
 			if (!deserialize_message((owned) buffer, out response_status, out response_params))
-				throw new MessageError.INVALID_RESPONSE("Server returned invalid response.");
+				throw new MessageError.INVALID_RESPONSE("Server returned invalid response. Cannot deserialize message.");
 
 			if (response_status == RESPONSE_OK)
 				return response_params;
 			
 			if (response_status == RESPONSE_ERROR)
-				throw new MessageError.REMOTE_ERROR(response_params.get_string());
-			else if (response_status == RESPONSE_UNSUPPORTED)
-				throw new MessageError.UNSUPPORTED(response_params.get_string());
-			else
-				throw new MessageError.UNKNOWN(response_params.get_string());
+			{
+				var e = deserialize_error(response_params);
+				if (e is MessageError)
+				{
+					MessageError e2 = (MessageError) e;
+					throw e2;
+				}
+				
+				throw new MessageError.INVALID_RESPONSE("Server returned invalid error: %s", e.message);
+			}
+			
+			throw new MessageError.INVALID_RESPONSE("Server returned invalid response status '%s'.", response_status);
 		}
 		catch (IOError e)
 		{

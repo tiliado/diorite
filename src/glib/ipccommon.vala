@@ -35,7 +35,6 @@ private const string SOCKET_FORMAT = "libdiorite.%s(%s)";
 
 public const string RESPONSE_OK = "OK";
 public const string RESPONSE_ERROR = "ERROR";
-public const string RESPONSE_UNSUPPORTED = "UNSUPPORTED";
 
 private string create_path(string name)
 {

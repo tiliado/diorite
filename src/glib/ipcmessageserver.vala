@@ -82,31 +82,23 @@ public class MessageServer: Server
 		Variant? request_params = null;
 		Variant? response_params = null;
 		string? response_name;
-		if(!deserialize_message((owned) buffer, out request_name, out request_params))
+		
+		try 
 		{
-			response_name = RESPONSE_ERROR;
-			response_params = new Variant.string("Received invalid request.");
-		}
-		else
-		{
+			if (!deserialize_message((owned) buffer, out request_name, out request_params))
+				throw new MessageError.INVALID_REQUEST("Received invalid request. Cannot deserialize message.");
+		
 			var adaptor = handlers[request_name];
 			if (adaptor == null)
-			{
-				response_params = new Variant.string("No handler for message '%s'".printf(request_name));
-				response_name = RESPONSE_UNSUPPORTED;
-			}
-			else
-			{
-				try 
-				{
-					adaptor.handle(this, request_params, out response_params);
-					response_name = RESPONSE_OK;
-				}
-				catch (MessageError e)
-				{
-					response_name = RESPONSE_ERROR;
-				}
-			}
+				throw new MessageError.UNSUPPORTED("No handler for message '%s'", request_name);
+		
+			adaptor.handle(this, request_params, out response_params);
+			response_name = RESPONSE_OK;
+		}
+		catch (MessageError e)
+		{
+			response_name = RESPONSE_ERROR;
+			response_params = serialize_error(e);
 		}
 		
 		buffer = serialize_message(response_name, response_params);

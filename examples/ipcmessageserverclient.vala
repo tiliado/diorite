@@ -32,15 +32,25 @@ void main(string[] args)
 	const string HELLO_WORLD = "Hello world";
 	var variant = new Variant.string(HELLO_WORLD);
 	var client = new Diorite.Ipc.MessageClient("test", 5000);
+	
 	try
 	{
 		var response = client.send_message("echo2", variant);
 		message("Response: %s", response.get_string());
 		assert(response.get_string() == HELLO_WORLD);
 	}
-	catch(Diorite.Ipc.MessageError e)
+	catch (Diorite.Ipc.MessageError e)
 	{
 		critical("Client error: %s".printf(e.message));
+	}
+	
+	try
+	{
+		client.send_message("failing", variant);
+	}
+	catch (Diorite.Ipc.MessageError e)
+	{
+		message("Client error: %s".printf(e.message));
 	}
 	
 	message("Stop server");
@@ -60,6 +70,7 @@ private void* run_server()
 {
 	server = new Diorite.Ipc.MessageServer("test");
 	server.add_handler("echo2", echo_handler);
+	server.add_handler("failing", failing_handler);
 	try
 	{
 		message("Start server");
@@ -76,4 +87,9 @@ private void* run_server()
 private void echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws Diorite.Ipc.MessageError
 {
 	response = request;
+}
+
+private void failing_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws Diorite.Ipc.MessageError
+{
+	throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Bad type signature, dude!");
 }
