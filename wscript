@@ -104,7 +104,6 @@ def configure(ctx):
 	
 	ctx.define(PLATFORM, 1)
 	ctx.env.VALA_DEFINES = [PLATFORM]
-	ctx.env.with_tester = ctx.options.with_tester
 	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
