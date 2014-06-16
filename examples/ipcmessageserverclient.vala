@@ -73,8 +73,7 @@ private void* run_server()
 	return null;
 }
 
-private bool echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
+private void echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws Diorite.Ipc.MessageError
 {
 	response = request;
-	return true;
 }

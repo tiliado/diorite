@@ -25,11 +25,21 @@
 namespace Diorite.Ipc
 {
 
-public delegate bool MessageHandler(MessageServer server, Variant params,  out Variant? response);
+public delegate void MessageHandler(MessageServer server, Variant params,  out Variant? response) throws MessageError;
 
-private struct HandlerAdaptor
+private class HandlerAdaptor
 {
-	public MessageHandler handler;
+	private MessageHandler handler;
+	
+	public HandlerAdaptor(owned MessageHandler handler)
+	{
+		this.handler = (owned) handler;
+	}
+	
+	public void handle(MessageServer server, Variant params,  out Variant? response) throws MessageError
+	{
+		handler(server, params,  out response);
+	}
 }
 
 public class MessageServer: Server
@@ -43,20 +53,14 @@ public class MessageServer: Server
 		add_handler("echo", echo_handler);
 	}
 	
-	public void add_handler(string message_name, MessageHandler handler)
+	public void add_handler(string message_name, owned MessageHandler handler)
 	{
-		handlers[message_name] = {handler};
+		handlers[message_name] = new HandlerAdaptor((owned) handler);
 	}
 	
 	public bool remove_handler(string message_name)
 	{
 		return handlers.remove(message_name);
-	}
-	
-	public bool create_error(string message, out Variant response)
-	{
-		response = new Variant.string(message);
-		return false;
 	}
 	
 	public bool wait_for_listening(int timeout)
@@ -65,11 +69,11 @@ public class MessageServer: Server
 		return client.wait_for_echo(timeout); 
 	}
 	
-	public static bool echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
+	public static void echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws MessageError
 	{
 		response = request;
-		return true;
 	}
+	
 	protected override bool handle(owned ByteArray request, out ByteArray? response)
 	{
 		var bytes = ByteArray.free_to_bytes((owned) request);
@@ -91,13 +95,18 @@ public class MessageServer: Server
 				response_params = new Variant.string("No handler for message '%s'".printf(request_name));
 				response_name = RESPONSE_UNSUPPORTED;
 			}
-			else if (adaptor.handler(this, request_params, out response_params))
-				response_name = RESPONSE_OK;
 			else
-				response_name = RESPONSE_ERROR;
-			
-			if (response_params == null)
-				response_params = new Variant.string("No response data.");
+			{
+				try 
+				{
+					adaptor.handle(this, request_params, out response_params);
+					response_name = RESPONSE_OK;
+				}
+				catch (MessageError e)
+				{
+					response_name = RESPONSE_ERROR;
+				}
+			}
 		}
 		
 		buffer = serialize_message(response_name, response_params);
