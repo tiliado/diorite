@@ -25,40 +25,27 @@
 namespace Diorite.Ipc
 {
 
-[CCode (has_target=false)]
-public delegate bool MessageHandler(GLib.Object? target, MessageServer server, Variant params,  out Variant? response);
+public delegate bool MessageHandler(MessageServer server, Variant params,  out Variant? response);
 
-private class HandlerAdaptor
+private struct HandlerAdaptor
 {
-	private GLib.Object? target;
-	private MessageHandler handler;
-	
-	public HandlerAdaptor(GLib.Object? target, MessageHandler handler)
-	{
-		this.target = target;
-		this.handler = handler;
-	}
-	
-	public bool handle(MessageServer server, Variant params,  out Variant? response)
-	{
-		return handler(target, server, params, out response);
-	}
+	public MessageHandler handler;
 }
 
 public class MessageServer: Server
 {
-	private HashTable<string, HandlerAdaptor> handlers;
+	private HashTable<string, HandlerAdaptor?> handlers;
 	
 	public MessageServer(string name)
 	{
 		base(name);
-		handlers = new HashTable<string, HandlerAdaptor>(str_hash, str_equal);
-		add_handler("echo", null, (MessageHandler) echo_handler);
+		handlers = new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
+		add_handler("echo", echo_handler);
 	}
 	
-	public void add_handler(string message_name, GLib.Object? target, MessageHandler handler)
+	public void add_handler(string message_name, MessageHandler handler)
 	{
-		handlers.set(message_name, new HandlerAdaptor(target, handler));
+		handlers[message_name] = {handler};
 	}
 	
 	public bool remove_handler(string message_name)
@@ -78,7 +65,7 @@ public class MessageServer: Server
 		return client.wait_for_echo(timeout); 
 	}
 	
-	public static bool echo_handler(GLib.Object? target, Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
+	public static bool echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
 	{
 		response = request;
 		return true;
@@ -97,14 +84,14 @@ public class MessageServer: Server
 			response_params = new Variant.string("Received invalid request.");
 		}
 		else
-		{	
-			var handler = handlers.lookup(request_name);
-			if (handler == null)
+		{
+			var adaptor = handlers[request_name];
+			if (adaptor == null)
 			{
 				response_params = new Variant.string("No handler for message '%s'".printf(request_name));
 				response_name = RESPONSE_UNSUPPORTED;
 			}
-			else if (handler.handle(this, request_params, out response_params))
+			else if (adaptor.handler(this, request_params, out response_params))
 				response_name = RESPONSE_OK;
 			else
 				response_name = RESPONSE_ERROR;

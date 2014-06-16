@@ -22,17 +22,19 @@ Diorite.Ipc.MessageServer server;
 void main(string[] args)
 {
 	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	
 	server = null;
+	
 	var thread = new Thread<void*>("server", run_server);
 	message("Sleep");
-	
 	Thread.usleep(1*1000000);
+	
 	const string HELLO_WORLD = "Hello world";
 	var variant = new Variant.string(HELLO_WORLD);
 	var client = new Diorite.Ipc.MessageClient("test", 5000);
 	try
 	{
-		var response = client.send_message("echo", variant);
+		var response = client.send_message("echo2", variant);
 		message("Response: %s", response.get_string());
 		assert(response.get_string() == HELLO_WORLD);
 	}
@@ -40,6 +42,7 @@ void main(string[] args)
 	{
 		critical("Client error: %s".printf(e.message));
 	}
+	
 	message("Stop server");
 	try
 	{
@@ -56,7 +59,7 @@ void main(string[] args)
 private void* run_server()
 {
 	server = new Diorite.Ipc.MessageServer("test");
-	server.add_handler("echo", null, (Diorite.Ipc.MessageHandler) echo_handler);
+	server.add_handler("echo2", echo_handler);
 	try
 	{
 		message("Start server");
@@ -70,7 +73,7 @@ private void* run_server()
 	return null;
 }
 
-private bool echo_handler(GLib.Object? target, Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
+private bool echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response)
 {
 	response = request;
 	return true;
