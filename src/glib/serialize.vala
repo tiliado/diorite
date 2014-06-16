@@ -140,4 +140,18 @@ namespace Diorite
 		name = (owned) tmp_name;
 		return true;
 	}
+	
+	public Variant serialize_error(GLib.Error e)
+	{
+		return new Variant("(sis)", e.domain.to_string(), e.code, e.message);
+	}
+	
+	public GLib.Error deserialize_error(Variant e)
+	{
+		string domain = null;
+		int code = 0;
+		string message = null;
+		e.get("(sis)", ref domain, ref code, ref message);
+		return new GLib.Error(GLib.Quark.from_string(domain), code, "%s", message);
+	}
 } // namespace Diorite
