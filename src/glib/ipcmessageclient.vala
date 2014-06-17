@@ -43,7 +43,39 @@ public class MessageClient: Client
 		base(name, timeout);
 	}
 	
+	/**
+	 * Convenience wrapper around send_message_async() that waits in main loop
+	 * and then returns result.
+	 */
 	public Variant send_message(string name, Variant params) throws MessageError
+	{
+		var loop = new MainLoop();
+		MessageError error = null;
+		Variant result = null;
+		
+		send_message_async.begin(name, params, (o, res) =>
+		{
+			try
+			{
+				result = send_message_async.end(res);
+			}
+			catch (MessageError e)
+			{
+				error = e;
+			}
+			
+			loop.quit();
+		});
+		
+		loop.run();
+		
+		if (error != null)
+			throw error;
+		
+		return result;
+	}
+	
+	public async Variant send_message_async(string name, Variant params) throws MessageError
 	{
 		var buffer = serialize_message(name, params);
 		var request = new ByteArray.take((owned) buffer);
@@ -53,7 +85,7 @@ public class MessageClient: Client
 		
 		try
 		{
-			send(request, out response);
+			yield send_async(request, out response);
 			var bytes = ByteArray.free_to_bytes((owned) response);
 			buffer = Bytes.unref_to_data((owned) bytes);
 			if (!deserialize_message((owned) buffer, out response_status, out response_params))

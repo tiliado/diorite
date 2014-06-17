@@ -44,6 +44,17 @@ public class Client
 		channel.read_bytes(out response);
 		channel.close();
 	}
+	
+	public async void send_async(ByteArray request, out ByteArray? response) throws IOError
+	{
+		var connection = channel.create_connection(null);
+		
+		var out_stream = new DataOutputStream(connection.output_stream);
+		yield channel.write_bytes_async(out_stream, request);
+		
+		var in_stream = new DataInputStream(connection.input_stream);
+		yield channel.read_bytes_async(in_stream, out response, timeout);
+	}
 }
 
 } // namespace Diorote
