@@ -74,6 +74,13 @@ public class MessageServer: Server
 		response = request;
 	}
 	
+	public static void check_type_str(Variant request, string type_str)  throws MessageError
+	{
+		unowned string request_type_str = request.get_type_string();
+		if (request_type_str != type_str)
+			throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
+	}
+	
 	protected override bool handle(owned ByteArray request, out ByteArray? response)
 	{
 		var bytes = ByteArray.free_to_bytes((owned) request);

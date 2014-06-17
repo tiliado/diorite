@@ -53,6 +53,15 @@ void main(string[] args)
 		message("Client error: %s".printf(e.message));
 	}
 	
+	try
+	{
+		client.send_message("check_type", variant);
+	}
+	catch (Diorite.Ipc.MessageError e)
+	{
+		message("Client error: %s".printf(e.message));
+	}
+	
 	message("Stop server");
 	try
 	{
@@ -71,6 +80,7 @@ private void* run_server()
 	server = new Diorite.Ipc.MessageServer("test");
 	server.add_handler("echo2", echo_handler);
 	server.add_handler("failing", failing_handler);
+	server.add_handler("check_type", check_type_handler);
 	try
 	{
 		message("Start server");
@@ -91,5 +101,12 @@ private void echo_handler(Diorite.Ipc.MessageServer server, Variant request, out
 
 private void failing_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws Diorite.Ipc.MessageError
 {
+	response = null;
 	throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Bad type signature, dude!");
+}
+
+private void check_type_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws Diorite.Ipc.MessageError
+{
+	response = null;
+	Diorite.Ipc.MessageServer.check_type_str(request, "(sisi)");
 }
