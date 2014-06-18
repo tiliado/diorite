@@ -151,7 +151,7 @@ public class Server
 		channel.stop();
 	}
 	
-	protected virtual bool handle(owned ByteArray request, out ByteArray? response)
+	protected virtual bool handle(owned ByteArray request, out ByteArray response)
 	{
 		response = (owned) request;
 		return true;

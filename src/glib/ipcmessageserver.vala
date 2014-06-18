@@ -25,7 +25,7 @@
 namespace Diorite.Ipc
 {
 
-public delegate void MessageHandler(MessageServer server, Variant params,  out Variant? response) throws MessageError;
+public delegate void MessageHandler(MessageServer server, Variant? params,  out Variant? response) throws MessageError;
 
 private class HandlerAdaptor
 {
@@ -36,7 +36,7 @@ private class HandlerAdaptor
 		this.handler = (owned) handler;
 	}
 	
-	public void handle(MessageServer server, Variant params,  out Variant? response) throws MessageError
+	public void handle(MessageServer server, Variant? params,  out Variant? response) throws MessageError
 	{
 		handler(server, params,  out response);
 	}
@@ -69,19 +69,29 @@ public class MessageServer: Server
 		return client.wait_for_echo(timeout); 
 	}
 	
-	public static void echo_handler(Diorite.Ipc.MessageServer server, Variant request, out Variant? response) throws MessageError
+	public static void echo_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws MessageError
 	{
 		response = request;
 	}
 	
-	public static void check_type_str(Variant request, string type_str)  throws MessageError
+	public static void check_type_str(Variant? request, string? type_str) throws MessageError
 	{
-		unowned string request_type_str = request.get_type_string();
-		if (request_type_str != type_str)
-			throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
+		if (request == null && type_str != null)
+			throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type null, expected '%s'.", type_str);
+		
+		if (request != null)
+		{
+			unowned string request_type_str = request.get_type_string();
+			
+			if (type_str == null)
+				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected null.", request_type_str);
+			
+			if (request_type_str != type_str)
+				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
+		}
 	}
 	
-	protected override bool handle(owned ByteArray request, out ByteArray? response)
+	protected override bool handle(owned ByteArray request, out ByteArray response)
 	{
 		var bytes = ByteArray.free_to_bytes((owned) request);
 		var buffer = Bytes.unref_to_data((owned) bytes);

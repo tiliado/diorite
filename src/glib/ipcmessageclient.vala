@@ -47,11 +47,11 @@ public class MessageClient: Client
 	 * Convenience wrapper around send_message_async() that waits in main loop
 	 * and then returns result.
 	 */
-	public Variant send_message(string name, Variant params) throws MessageError
+	public Variant? send_message(string name, Variant? params=null) throws MessageError
 	{
 		var loop = new MainLoop();
-		MessageError error = null;
-		Variant result = null;
+		MessageError? error = null;
+		Variant? result = null;
 		
 		send_message_async.begin(name, params, (o, res) =>
 		{
@@ -75,27 +75,32 @@ public class MessageClient: Client
 		return result;
 	}
 	
-	public async Variant send_message_async(string name, Variant params) throws MessageError
+	public async Variant? send_message_async(string name, Variant? params=null) throws MessageError
 	{
 		var buffer = serialize_message(name, params);
 		var request = new ByteArray.take((owned) buffer);
-		ByteArray? response = null;
-		string? response_status = null;
+		ByteArray response;
+		string response_status;
 		Variant? response_params;
 		
 		try
 		{
 			yield send_async(request, out response);
+			assert(response != null);
+			
 			var bytes = ByteArray.free_to_bytes((owned) response);
 			buffer = Bytes.unref_to_data((owned) bytes);
 			if (!deserialize_message((owned) buffer, out response_status, out response_params))
 				throw new MessageError.INVALID_RESPONSE("Server returned invalid response. Cannot deserialize message.");
-
+			
 			if (response_status == RESPONSE_OK)
 				return response_params;
 			
 			if (response_status == RESPONSE_ERROR)
 			{
+				if (response_params == null)
+					throw new MessageError.INVALID_RESPONSE("Server returned empty error.");
+				
 				var e = deserialize_error(response_params);
 				if (e is MessageError)
 				{
@@ -126,7 +131,8 @@ public class MessageClient: Client
 		{
 			try
 			{
-				if (send_message("echo", message).equal(message))
+				var response = send_message("echo", message);
+				if (response != null && response.equal(message))
 					return true;
 				
 				Thread.usleep(sleep);
