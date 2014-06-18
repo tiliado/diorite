@@ -33,6 +33,18 @@ public class Logger
 {
 	private static GLib.LogLevelFlags display_level;
 	private static unowned FileStream output;
+	private static bool colorful;
+	
+	public static const int COLOR_FOREGROUND = 30;
+	public static const int COLOR_BACKGROUND = 40;
+	public static const int COLOR_BLACK = 0;
+	public static const int COLOR_RED = 1;
+	public static const int COLOR_GREEN = 2;
+	public static const int COLOR_YELLOW = 3;
+	public static const int COLOR_BLUE = 4;
+	public static const int COLOR_MAGENTA = 5;
+	public static const int COLOR_CYAN = 6;
+	public static const int COLOR_WHITE = 7;
 	
 	/**
 	 * Initializes new logger for GLib
@@ -44,7 +56,32 @@ public class Logger
 	{
 		Logger.output = output;
 		Logger.display_level = display_level;
+		var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
+		if (use_colors == "yes")
+		{
+			colorful = true;
+		}
+		else if (use_colors == "no")
+		{
+			colorful = false;
+		}
+		else
+		{
+			colorful = colors_supported();
+			// For subprocesses (they might have redirected output)
+			Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
+		}
+		
 		GLib.Log.set_default_handler(Logger.log_handler);
+	}
+	
+	public static bool colors_supported()
+	{
+		#if LINUX
+			return Posix.isatty(output.fileno());
+		#else
+			return false;
+		#endif
 	}
 	
 	/**
@@ -99,24 +136,30 @@ public class Logger
 	private static void print(string domain, LogLevelFlags level, string message)
 	{
 		string name = "";
+		var color = -1;
 		switch ((int)level)
 		{
 		case LogLevelFlags.LEVEL_CRITICAL:
 			name = "CRITICAL";
+			color = COLOR_RED;
 			break;
 		case LogLevelFlags.LEVEL_ERROR:
 		case 6:
 			name = "ERROR";
+			color = COLOR_RED;
 			break;
 		case LogLevelFlags.LEVEL_WARNING:
 			name = "WARNING";
+			color = COLOR_YELLOW;
 			break;
 		case LogLevelFlags.LEVEL_MESSAGE:
 		case LogLevelFlags.LEVEL_INFO:
 			name = "INFO";
+			color = COLOR_GREEN;
 			break;
 		case LogLevelFlags.LEVEL_DEBUG:
 			name = "DEBUG";
+			color = COLOR_BLUE;
 			break;
 		case LogLevelFlags.LEVEL_MASK:
 			name = "MASK";
@@ -134,7 +177,10 @@ public class Logger
 		
 		lock (output)
 		{
-			output.printf("[%-8s %5s] %s\n", name, domain, message);
+			if (Logger.colorful && color >= 0)
+				output.printf("\x1b[%dm[%-8s %5s]\x1b[0m %s\n", COLOR_FOREGROUND + color, name, domain, message);
+			else
+				output.printf("[%-8s %5s] %s\n", name, domain, message);
 			output.flush();
 		}
 	}
