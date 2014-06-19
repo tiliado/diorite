@@ -34,6 +34,7 @@ public class Logger
 	private static GLib.LogLevelFlags display_level;
 	private static unowned FileStream output;
 	private static bool colorful;
+	private static string? hint;
 	
 	public static const int COLOR_FOREGROUND = 30;
 	public static const int COLOR_BACKGROUND = 40;
@@ -52,10 +53,11 @@ public class Logger
 	 * @param output           output to write logger messages to (e. g. sys.stderr)
 	 * @param display_level    lowest log level to log
 	 */
-	public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG)
+	public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, string? hint=null)
 	{
 		Logger.output = output;
 		Logger.display_level = display_level;
+		Logger.hint = hint != null ? hint + ":" : null;
 		var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
 		if (use_colors == "yes")
 		{
@@ -94,6 +96,12 @@ public class Logger
 	{
 		lock (output)
 		{
+			if (hint != null)
+			{
+				output.puts(hint);
+				output.putc(' ');
+			}
+			
 			output.vprintf(format, va_list());
 			output.flush();
 			output.flush();
@@ -109,6 +117,12 @@ public class Logger
 	{
 		lock (output)
 		{
+			if (hint != null)
+			{
+				output.puts(hint);
+				output.putc(' ');
+			}
+			
 			output.puts(line);
 			output.flush();
 		}
@@ -175,12 +189,14 @@ public class Logger
 			break;
 		}
 		
+		var hint = Logger.hint ?? "";
+			
 		lock (output)
 		{
 			if (Logger.colorful && color >= 0)
-				output.printf("\x1b[%dm[%-8s %5s]\x1b[0m %s\n", COLOR_FOREGROUND + color, name, domain, message);
+				output.printf("\x1b[%dm[%s%-8s %5s]\x1b[0m %s\n", COLOR_FOREGROUND + color, hint, name, domain, message);
 			else
-				output.printf("[%-8s %5s] %s\n", name, domain, message);
+				output.printf("[%s%-8s %5s] %s\n", hint, name, domain, message);
 			output.flush();
 		}
 	}
