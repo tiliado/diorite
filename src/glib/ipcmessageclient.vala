@@ -33,7 +33,8 @@ public errordomain MessageError
 	UNKNOWN,
 	INVALID_RESPONSE,
 	INVALID_REQUEST,
-	INVALID_ARGUMENTS;
+	INVALID_ARGUMENTS,
+	NOT_READY;
 }
 
 public class MessageClient: Client
