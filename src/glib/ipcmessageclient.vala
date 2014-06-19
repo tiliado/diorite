@@ -134,10 +134,10 @@ public class MessageClient: Client
 				var response = send_message("echo", message);
 				if (response != null && response.equal(message))
 					return true;
-				
-				Thread.usleep(sleep);
 			}
-			catch(MessageError e) {}
+			catch(MessageError e){}
+			
+			Thread.usleep(sleep);
 		}
 		return false;
 	}
