@@ -45,12 +45,18 @@ private class HandlerAdaptor
 public class MessageServer: Server
 {
 	private HashTable<string, HandlerAdaptor?> handlers;
+	private static bool log_comunication;
 	
 	public MessageServer(string name)
 	{
 		base(name);
 		handlers = new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
 		add_handler("echo", echo_handler);
+	}
+	
+	static construct
+	{
+		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_SERVER") == "yes";
 	}
 	
 	public void add_handler(string message_name, owned MessageHandler handler)
@@ -104,7 +110,10 @@ public class MessageServer: Server
 		{
 			if (!deserialize_message((owned) buffer, out request_name, out request_params))
 				throw new MessageError.INVALID_REQUEST("Received invalid request. Cannot deserialize message.");
-		
+			
+			if (log_comunication)
+				debug("Request '%s': %s", request_name, request_params != null ? request_params.print(false) : "NULL");
+			
 			var adaptor = handlers[request_name];
 			if (adaptor == null)
 				throw new MessageError.UNSUPPORTED("No handler for message '%s'", request_name);
@@ -117,6 +126,9 @@ public class MessageServer: Server
 			response_name = RESPONSE_ERROR;
 			response_params = serialize_error(e);
 		}
+		
+		if (log_comunication)
+				debug("Response '%s': %s", response_name, response_params != null ? response_params.print(false) : "NULL");
 		
 		buffer = serialize_message(response_name, response_params);
 		response = new ByteArray.take((owned) buffer);
