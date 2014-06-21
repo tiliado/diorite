@@ -92,7 +92,7 @@ public class MessageServer: Server
 			if (type_str == null)
 				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected null.", request_type_str);
 			
-			if (request_type_str != type_str)
+			if (!request.check_format_string(type_str, false))
 				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
 		}
 	}
