@@ -104,25 +104,25 @@ private void* run_server()
 	return null;
 }
 
-private void echo_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws Diorite.Ipc.MessageError
+private Variant? echo_handler(Diorite.Ipc.MessageServer server, Variant? request) throws Diorite.Ipc.MessageError
 {
-	response = request;
+	return request;
 }
 
-private void failing_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws Diorite.Ipc.MessageError
+private Variant? failing_handler(Diorite.Ipc.MessageServer server, Variant? request) throws Diorite.Ipc.MessageError
 {
-	response = null;
 	throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Bad type signature, dude!");
+	return null;
 }
 
-private void check_type_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws Diorite.Ipc.MessageError
+private Variant? check_type_handler(Diorite.Ipc.MessageServer server, Variant? request) throws Diorite.Ipc.MessageError
 {
-	response = null;
 	Diorite.Ipc.MessageServer.check_type_str(request, "(sisi)");
+	return null;
 }
 
-private void check_type_null_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws Diorite.Ipc.MessageError
+private Variant? check_type_null_handler(Diorite.Ipc.MessageServer server, Variant? request) throws Diorite.Ipc.MessageError
 {
-	response = null;
 	Diorite.Ipc.MessageServer.check_type_str(request, null);
+	return null;
 }

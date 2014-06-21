@@ -25,7 +25,7 @@
 namespace Diorite.Ipc
 {
 
-public delegate void MessageHandler(MessageServer server, Variant? params,  out Variant? response) throws MessageError;
+public delegate Variant? MessageHandler(MessageServer server, Variant? params) throws MessageError;
 
 private class HandlerAdaptor
 {
@@ -38,7 +38,7 @@ private class HandlerAdaptor
 	
 	public void handle(MessageServer server, Variant? params,  out Variant? response) throws MessageError
 	{
-		handler(server, params,  out response);
+		response = handler(server, params);
 	}
 }
 
@@ -75,9 +75,9 @@ public class MessageServer: Server
 		return client.wait_for_echo(timeout); 
 	}
 	
-	public static void echo_handler(Diorite.Ipc.MessageServer server, Variant? request, out Variant? response) throws MessageError
+	public static Variant? echo_handler(Diorite.Ipc.MessageServer server, Variant? request) throws MessageError
 	{
-		response = request;
+		return request;
 	}
 	
 	public static void check_type_str(Variant? request, string? type_str) throws MessageError
