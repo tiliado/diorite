@@ -97,6 +97,33 @@ public class MessageServer: Server
 		}
 	}
 	
+	/**
+	 * Convenience method to invoke message handler from server's process.
+	 */
+	public Variant? send_local_message(string name, Variant? data) throws MessageError
+	{
+		if (log_comunication)
+			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
+		
+		var response = handle_message(name, data);
+		
+		if (log_comunication)
+			debug("Local response: %s", response != null ? response.print(false) : "NULL");
+		
+		return response;
+	}
+	
+	protected Variant? handle_message(string name, Variant? data) throws MessageError
+	{
+		Variant? response = null;
+		var adaptor = handlers[name];
+		if (adaptor == null)
+			throw new MessageError.UNSUPPORTED("No handler for message '%s'", name);
+	
+		adaptor.handle(this, data, out response);
+		return response;
+	}
+	
 	protected override bool handle(owned ByteArray request, out ByteArray response)
 	{
 		var bytes = ByteArray.free_to_bytes((owned) request);
@@ -114,11 +141,7 @@ public class MessageServer: Server
 			if (log_comunication)
 				debug("Request '%s': %s", request_name, request_params != null ? request_params.print(false) : "NULL");
 			
-			var adaptor = handlers[request_name];
-			if (adaptor == null)
-				throw new MessageError.UNSUPPORTED("No handler for message '%s'", request_name);
-		
-			adaptor.handle(this, request_params, out response_params);
+			response_params = handle_message(request_name, request_params);
 			response_name = RESPONSE_OK;
 		}
 		catch (MessageError e)
