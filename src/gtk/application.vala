@@ -48,9 +48,9 @@ private const string XFCE_SESSION_SERVICE_OBJECT = "/org/xfce/SessionManager";
 public abstract class Application : Gtk.Application
 {
 	private static Application? instance;
-	public string desktop_entry {get; protected set;}
+	public string desktop_name {get; protected set;}
+	public string app_id {get; protected set;}
 	public string app_name {get; protected set;}
-	public string path_name {get; protected set;}
 	public string icon {get; protected set; default = "";}
 	public string version {get; protected set; default = "";}
 	public bool app_menu_shown {get; private set; default = false;}
@@ -59,16 +59,17 @@ public abstract class Application : Gtk.Application
 	private XfceSessionManager? xfce_session = null;
 	#endif
 	
-	public Application(string app_id, string name, string desktop_entry, string path_name)
+	public Application(string app_uid, string app_name, string desktop_name, string app_id,
+	  GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
 	{
-		Object(application_id: app_id, flags: GLib.ApplicationFlags.FLAGS_NONE);
-		this.app_name = name;
-		this.desktop_entry = desktop_entry;
-		this.path_name = path_name;
+		Object(application_id: app_uid, flags: flags);
+		this.app_name = app_name;
+		this.desktop_name = desktop_name;
+		this.app_id = app_id;
 		#if LINUX
-		prctl(15, path_name, 0, 0, 0);
+		prctl(15, app_id, 0, 0, 0);
 		#endif
-		GLib.Environment.set_prgname(path_name);
+		GLib.Environment.set_prgname(app_id);
 		GLib.Environment.set_application_name(app_name);
 	}
 	
@@ -97,7 +98,7 @@ public abstract class Application : Gtk.Application
 	{
 		/* Set program name */
 		
-		Gdk.set_program_class(path_name); // must be set after Gtk.init()!
+		Gdk.set_program_class(app_id); // must be set after Gtk.init()!
 		
 		instance = this;
 		
