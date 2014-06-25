@@ -1,0 +1,16 @@
+g_clear_pointer
+g_compute_checksum_for_bytes
+g_datalist_id_dup_data
+g_datalist_id_replace_data
+G_DEFINE_QUARK
+GLIB_VERSION_2_34
+g_list_copy_deep
+g_mapped_file_get_bytes
+g_regex_get_has_cr_or_lf
+g_slist_copy_deep
+g_spawn_check_exit_status
+g_string_free_to_bytes
+g_test_add_data_func_full
+g_test_assert_expected_messages
+g_test_expect_message
+g_variant_check_format_string

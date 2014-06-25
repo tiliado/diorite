@@ -1,0 +1,16 @@
+g_assert_false
+g_assert_null
+g_assert_true
+g_regex_get_max_lookbehind
+GTestFileType
+g_test_build_filename
+g_test_failed
+g_test_get_dir
+g_test_get_filename
+g_test_incomplete
+g_test_set_nonfatal_assertions
+g_test_skip
+g_test_subprocess
+g_test_trap_subprocess
+g_variant_new_printf
+g_variant_new_take_string

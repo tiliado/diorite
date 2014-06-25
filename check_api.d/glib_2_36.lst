@@ -1,0 +1,16 @@
+g_close
+g_get_num_processors
+GLIB_VERSION_2_36
+g_markup_parse_context_ref
+g_markup_parse_context_unref
+g_source_add_unix_fd
+g_source_modify_unix_fd
+g_source_query_unix_fd
+g_source_remove_unix_fd
+g_source_set_ready_time
+g_test_initialized
+g_unix_fd_add
+g_unix_fd_add_full
+g_unix_fd_source_new
+g_variant_get_data_as_bytes
+g_variant_new_from_bytes

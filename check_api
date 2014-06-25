@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eu
+
+LIBS="glib gio gtk"
+
+check_symbol()
+{
+	if grep -r -I -w -n -o $SYMBOL ../build/src; then
+		REQUIRED=" - ${VERSION%.*}"
+	fi
+}
+
+REPORT="Required versions:"
+
+cd check_api.d
+
+for LIB in $LIBS; do
+	REQUIRED=""
+	for VERSION in $LIB*; do
+		echo "${VERSION%.*}:"
+		while read -r -u 8 SYMBOL; do
+			check_symbol
+		done 8< $VERSION
+		#~ LIB_VERSION="${LIB}_${VERSION}"
+		#~ for SYMBOL in ${!LIB_VERSION}; do
+			#~ check_symbol
+		#~ done
+	done
+	REPORT="$REPORT"$'\n'"$REQUIRED"
+done
+echo
+echo "$REPORT"
