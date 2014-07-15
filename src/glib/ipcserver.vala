@@ -27,6 +27,13 @@ namespace Diorite.Ipc
 
 public class Server
 {
+	private static bool log_comunication;
+	
+	static construct
+	{
+		log_comunication = Environment.get_variable("DIORITE_LOG_IPC_SERVER") == "yes";
+	}
+	
 	private Channel channel;
 	private bool quit = false;
 	public bool listening
@@ -115,6 +122,9 @@ public class Server
 	
 	private bool on_incoming(SocketConnection connection, GLib.Object? source_object)
 	{
+		if (log_comunication)
+			debug("Incoming connection");
+		
 		process_connection.begin(connection, on_process_incoming_done);
 		return true;
 	}
@@ -124,9 +134,13 @@ public class Server
 		try
 		{
 			process_connection.end(result);
+			if (log_comunication)
+				debug("Connection processed successfully");
 		}
 		catch (IOError e)
 		{
+			if (log_comunication)
+				debug("Connection processed with error: %s", e.message);
 			async_error(e);
 		}
 	}
