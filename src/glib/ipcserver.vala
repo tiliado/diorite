@@ -35,7 +35,6 @@ public class Server
 	}
 	
 	private Channel channel;
-	private bool quit = false;
 	public bool listening
 	{
 		get {return channel.listening;}
@@ -50,53 +49,6 @@ public class Server
 		this.name = name;
 		this.timeout = timeout;
 		channel = new Channel(name);
-	}
-	
-	~Server()
-	{
-		stop();
-	}
-	
-	public void listen() throws IOError
-	{
-		Server? @ref = this; // Prevent destroying before disconnect is called
-		while (!quit)
-		{
-			channel.create();
-			while (!quit)
-			{
-				try
-				{
-					channel.listen();
-					ByteArray request;
-					ByteArray response;
-					
-					channel.read_bytes(out request);
-					
-					if (!handle((owned) request, out response))
-						response = new ByteArray();
-					
-					channel.write_bytes(response);
-					channel.disconnect();
-				}
-				catch (IOError e)
-				{
-					try
-					{
-						channel.disconnect();
-					}
-					catch (IOError e)
-					{
-						// ignored
-					}
-					@ref = null;
-					if (!quit)
-						throw e;
-				}
-				
-			}
-		}
-		@ref = null;
 	}
 	
 	public void start_service() throws IOError
@@ -157,12 +109,6 @@ public class Server
 		
 		var out_stream = new DataOutputStream(connection.output_stream);
 		yield channel.write_bytes_async(out_stream, response);
-	}
-	
-	public void stop() throws IOError
-	{
-		quit = true;
-		channel.stop();
 	}
 	
 	protected virtual bool handle(owned ByteArray request, out ByteArray response)
