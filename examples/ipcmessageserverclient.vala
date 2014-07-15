@@ -25,7 +25,7 @@ void main(string[] args)
 	
 	server = null;
 	
-	var thread = new Thread<void*>("server", run_server);
+	run_server();
 	message("Sleep");
 	Thread.usleep(1*1000000);
 	
@@ -74,34 +74,32 @@ void main(string[] args)
 	message("Stop server");
 	try
 	{
-		server.stop();
+		server.stop_service();
 	}
 	catch (Diorite.IOError e)
 	{
 		critical("Server error: %s", e.message);
 	}
-	thread.join();
-	
 }
 
-private void* run_server()
+private void run_server()
 {
 	server = new Diorite.Ipc.MessageServer("test");
 	server.add_handler("echo2", echo_handler);
 	server.add_handler("failing", failing_handler);
 	server.add_handler("check_type", check_type_handler);
 	server.add_handler("check_type_null", check_type_null_handler);
+	
 	try
 	{
 		message("Start server");
-		server.listen();
+		server.start_service();
 		message("Server has ended");
 	}
 	catch (Diorite.IOError e)
 	{
 		critical("Server error: %s", e.message);
 	}
-	return null;
 }
 
 private Variant? echo_handler(Diorite.Ipc.MessageServer server, Variant? request) throws Diorite.Ipc.MessageError
