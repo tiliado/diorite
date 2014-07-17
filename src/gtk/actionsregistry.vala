@@ -25,6 +25,7 @@
 namespace Diorite
 {
 
+public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
 
 public class ActionsRegistry : GLib.Object
 {
@@ -158,6 +159,7 @@ public class ActionsRegistry : GLib.Object
 				icon = action.icon;
 			}
 			var item = new MenuItem(label, action.scope + "." + detailed_name);
+			item.set_attribute_value(ATTRIBUTE_ITEM_ID, full_name);
 			if (use_icons)
 			{
 				if (icon != null)
