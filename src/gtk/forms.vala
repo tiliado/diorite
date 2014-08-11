@@ -273,7 +273,7 @@ public class Form : Gtk.Grid
 			var e_target = full_id.substring(i + 1);
 			string e_label = entry_spec[2].get_string();
 			var value = values.get(id);
-			bool e_checked = value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
+			bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
 			string[] e_enables;
 			if (entry_spec.length > 3)
 				e_enables = variant_to_strv(entry_spec[3]);
