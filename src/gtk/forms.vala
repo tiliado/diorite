@@ -266,22 +266,20 @@ public class Form : Gtk.Grid
 			entries.set(id, entry);
 			break;
 		case "option":
-			var full_id = entry_spec[1].get_string();
-			var i = full_id.index_of(":");
-			return_if_fail(i > 0);
-			var id = full_id.substring(0, i);
-			var e_target = full_id.substring(i + 1);
-			string e_label = entry_spec[2].get_string();
+			var id = entry_spec[1].get_string();
+			var e_target = entry_spec[2].get_string();
+			var full_id = "%s:%s".printf(id, e_target);
+			string e_label = entry_spec[3].get_string();
 			var value = values.get(id);
 			bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
 			string[] e_enables;
-			if (entry_spec.length > 3)
-				e_enables = variant_to_strv(entry_spec[3]);
+			if (entry_spec.length > 4)
+				e_enables = variant_to_strv(entry_spec[4]);
 			else
 				e_enables = {};
 			string[] e_disables;
-			if (entry_spec.length > 4)
-				e_disables = variant_to_strv(entry_spec[4]);
+			if (entry_spec.length > 5)
+				e_disables = variant_to_strv(entry_spec[5]);
 			else
 				e_disables = {};
 			var entry = new Diorite.OptionEntry(e_label, e_enables, e_disables);
