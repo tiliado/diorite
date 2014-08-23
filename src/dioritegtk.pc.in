@@ -5,6 +5,6 @@ includedir=@INCLUDEDIR@
 Name: DirotiteGtk
 Description: Utility library for GTK+
 Version: @VERSION@
-Requires.private: glib-2.0 dioriteglib
+Requires.private: glib-2.0 @DIORITE_GLIB@
 Libs: -L${libdir} -l@LIBNAME@
-Cflags: -I${includedir}/@APPNAME@-@API_VERSION@ @CFLAGS@
+Cflags: -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@

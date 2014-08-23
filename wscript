@@ -31,7 +31,7 @@ out = 'build'
 # Application name and version
 APPNAME = "diorite"
 VERSION = "0.1.0"
-API_VERSION = "0.1"
+SERIES = VERSION.rsplit(".", 1)[0]
 
 import sys
 from waflib.Configure import conf
@@ -151,8 +151,8 @@ def configure(ctx):
 def build(ctx):
 	#~ print ctx.env
 	PLATFORM = ctx.env.PLATFORM
-	DIORITE_GLIB = "dioriteglib"
-	DIORITE_GTK = "dioritegtk"
+	DIORITE_GLIB = "{}glib-{}".format(APPNAME, SERIES)
+	DIORITE_GTK = "{}gtk-{}".format(APPNAME, SERIES)
 	packages = 'posix glib-2.0 gio-2.0'
 	uselib = 'GLIB GTHREAD'
 	vala_defines = ctx.env.VALA_DEFINES
@@ -160,20 +160,19 @@ def build(ctx):
 	if PLATFORM == WIN:
 		DIORITE_GLIB_LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
 		DIORITE_GTK_LIBNAME = "dioritegtk-" + API_VERSION.split(".")[0]
-		CFLAGS="-mms-bitfields"
+		PC_CFLAGS="-mms-bitfields"
 		uselib += " WINGIO"
 		packages += " gio-windows-2.0 win32"
 	else:
-		DIORITE_GLIB_LIBNAME = "dioriteglib"
-		DIORITE_GTK_LIBNAME = "dioritegtk"
-		CFLAGS=""
+		DIORITE_GLIB_LIBNAME = DIORITE_GLIB
+		DIORITE_GTK_LIBNAME = DIORITE_GTK
+		PC_CFLAGS=""
 		uselib += " UNIXGIO"
 		packages += " gio-unix-2.0"
 	
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
-		vnum = "0.1.0",
 		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.c'),
 		packages = packages,
 		uselib = uselib,
@@ -187,7 +186,6 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
-		vnum = "0.1.0",
 		source = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.c'),
 		packages = " gtk+-3.0 gdk-3.0 gio-2.0 glib-2.0",
 		uselib = "GTK+ GDK GIO GLIB",
@@ -201,30 +199,30 @@ def build(ctx):
 	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
-		target='dioriteglib.pc',
+		target='{}glib-{}.pc'.format(APPNAME, SERIES),
 		install_path='${LIBDIR}/pkgconfig',
 		VERSION=VERSION,
 		PREFIX=ctx.env.PREFIX,
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
-		API_VERSION=API_VERSION,
-		CFLAGS=CFLAGS,
-		LIBNAME=DIORITE_GLIB_LIBNAME
+		PC_CFLAGS=PC_CFLAGS,
+		LIBNAME=DIORITE_GLIB_LIBNAME,
+		SERIES=SERIES,
 		)
 	
 	ctx(features = 'subst',
 		source='src/dioritegtk.pc.in',
-		target='dioritegtk.pc',
+		target='{}gtk-{}.pc'.format(APPNAME, SERIES),
 		install_path='${LIBDIR}/pkgconfig',
 		VERSION=VERSION,
 		PREFIX=ctx.env.PREFIX,
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
-		API_VERSION=API_VERSION,
-		CFLAGS=CFLAGS,
-		LIBNAME=DIORITE_GTK_LIBNAME
+		PC_CFLAGS=PC_CFLAGS,
+		LIBNAME=DIORITE_GTK_LIBNAME,
+		DIORITE_GLIB=DIORITE_GLIB,
 		)
 	
 	if PLATFORM == WIN :

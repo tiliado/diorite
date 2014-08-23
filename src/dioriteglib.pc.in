@@ -7,4 +7,4 @@ Description: Utility library for GLib
 Version: @VERSION@
 Requires.private: glib-2.0
 Libs: -L${libdir} -l@LIBNAME@
-Cflags: -I${includedir}/@APPNAME@-@API_VERSION@ @CFLAGS@
+Cflags: -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@
