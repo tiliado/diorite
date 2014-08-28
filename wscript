@@ -30,8 +30,17 @@ out = 'build'
 
 # Application name and version
 APPNAME = "diorite"
-VERSION = "0.1.0"
+VERSION = "0.1.0+"
 SERIES = VERSION.rsplit(".", 1)[0]
+
+if VERSION[-1] == "+":
+	from datetime import datetime
+	import subprocess
+	try:
+		commit = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%h"], stdout=subprocess.PIPE).communicate()[0]
+		VERSION = "{}{}.{}".format(VERSION, datetime.utcnow().strftime("%Y%m%d"), commit)
+	except Exception, e:
+		VERSION = VERSION[:-1]
 
 import sys
 from waflib.Configure import conf
