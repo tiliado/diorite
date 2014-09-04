@@ -113,4 +113,34 @@ public Variant variant_from_hashtable(HashTable<string, Variant> hashtable)
 	return builder.end ();
 }
 
+/**
+ * Extract string from variant with unboxing and data type checking.
+ */
+public bool variant_string(Variant variant, out string? data)
+{
+	if (variant.is_of_type(VariantType.STRING))
+	{
+		data = variant.get_string();
+		return true;
+	}
+	
+	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
+	{
+		Variant? maybe_variant = null;
+		variant.get("m*", &maybe_variant);
+		if (maybe_variant == null)
+		{
+			data = null;
+			return true;
+		}
+		return variant_string(maybe_variant, out data);
+	}
+	
+	if (variant.is_of_type(VariantType.VARIANT))
+		return variant_string(variant.get_variant(), out data);
+	
+	data = null;
+	return false;
+}
+
 } // namespace Diorite
