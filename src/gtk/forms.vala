@@ -291,7 +291,7 @@ public class Form : Gtk.Grid
 				print_entry_spec(entry_spec));
 			
 			string e_label;
-			if (!variant_string(entry_spec[1], out e_label) || e_label == null)
+			if (!variant_string(entry_spec[2], out e_label) || e_label == null)
 				throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
 				print_entry_spec(entry_spec));
 			
