@@ -30,27 +30,25 @@ public string[] variant_to_strv(Variant variant)
 	string[] result;
 	if (variant.is_container() && variant.n_children() > 0)
 	{
-		
 		var size = variant.n_children();
 		result = new string[size];
 		for (size_t i = 0; i < size; i++)
 		{
-			Variant? val = variant.get_child_value(i);
-			if (val.is_of_type(VariantType.MAYBE))
+			var child = variant.get_child_value(i);
+			string? str;
+			if (!variant_string(child, out str) || str == null)
 			{
-				val = val.get_maybe();
-				if (val == null)
-					continue;
+				warning("Wrong child type %s: %s", child.get_type_string(), child.print(true));
+				str = child.print(false);
 			}
-			
-			if (val.is_of_type(VariantType.VARIANT))
-				val = val.get_variant();
-			if (val.is_of_type(VariantType.STRING))
-				result[i] = val.get_string();
+			result[i] = str;
 		}
 	}
 	else
 	{
+		if (!variant.is_container())
+			warning("Variant is not a container: %s: %s", variant.get_type_string(), variant.print(true));
+		
 		result = {};
 	}
 	return result;
