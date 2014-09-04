@@ -35,18 +35,26 @@ int main(string[] args)
 	values.insert("host", new Variant.string(""));
 	values.insert("port", new Variant.string(""));
 	
-	form = new Diorite.Form.from_spec(values, new Variant.tuple({
-		new Variant.tuple({new Variant.string("bool"), new Variant.string("entrytype"), new Variant.string("Use short string"), new Variant.strv({"shortstring"}), new Variant.strv({"longstring"})}),
-		new Variant.tuple({new Variant.string("string"), new Variant.string("shortstring"), new Variant.string("Label")}),
-		new Variant.tuple({new Variant.string("label"), new Variant.string("Label:")}),
-		new Variant.tuple({new Variant.string("string"), new Variant.string("longstring")}),
-		new Variant.tuple({new Variant.string("header"), new Variant.string("Device settings")}),
-		new Variant.tuple({new Variant.string("label"), new Variant.string("Address of your device")}),
-		new Variant.tuple({new Variant.string("option"), new Variant.string("address:default"), new Variant.string("use default address ('localhost:9000')"), new Variant("mv", null), new Variant.strv({"host", "port"})}),
-		new Variant.tuple({new Variant.string("option"), new Variant.string("address:custom"), new Variant.string("use custom address"), new Variant.strv({"host", "port"}), new Variant("mv", null)}),
-		new Variant.tuple({new Variant.string("string"), new Variant.string("host"), new Variant.string("Host")}),
-		new Variant.tuple({new Variant.string("string"), new Variant.string("port"), new Variant.string("Port")})
-	}));
+	try
+	{
+		form = Diorite.Form.create_from_spec(values, new Variant.tuple({
+			//new Variant.tuple({new Variant.string("bool"), new Variant.string("string"), new Variant.string("string"), new Variant.array(null, {new Variant.variant(new Variant.string("string")), new Variant.variant(new Variant.int32(12))})}),
+			new Variant.tuple({new Variant.string("bool"), new Variant.string("entrytype"), new Variant.string("Use short string"), new Variant.strv({"shortstring"}), new Variant.strv({"longstring"})}),
+			new Variant.tuple({new Variant.string("string"), new Variant.string("shortstring"), new Variant.string("Label")}),
+			new Variant.tuple({new Variant.string("label"), new Variant.string("Label:")}),
+			new Variant.tuple({new Variant.string("string"), new Variant.string("longstring")}),
+			new Variant.tuple({new Variant.string("header"), new Variant.string("Device settings")}),
+			new Variant.tuple({new Variant.string("label"), new Variant.string("Address of your device")}),
+			new Variant.tuple({new Variant.string("option"), new Variant.string("address"), new Variant.string("default"), new Variant.string("use default address ('localhost:9000')"), new Variant("mv", null), new Variant.strv({"host", "port"})}),
+			new Variant.tuple({new Variant.string("option"), new Variant.string("address"),new Variant.string("custom"), new Variant.string("use custom address"), new Variant.strv({"host", "port"}), new Variant("mv", null)}),
+			new Variant.tuple({new Variant.string("string"), new Variant.string("host"), new Variant.string("Host")}),
+			new Variant.tuple({new Variant.string("string"), new Variant.string("port"), new Variant.string("Port")})
+		}));
+	}
+	catch(Diorite.FormError e)
+	{
+		error("%s", e.message);
+	}
 	
 	form.check_toggles();
 	window.add(form);
