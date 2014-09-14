@@ -46,6 +46,7 @@ import sys
 from waflib.Configure import conf
 from waflib.Errors import ConfigurationError
 from waflib.Context import WAFVERSION
+from waflib import Utils
 
 WAF_VERSION = map(int, WAFVERSION.split("."))
 REQUIRED_VERSION = [1, 7, 14] 
@@ -245,6 +246,7 @@ def build(ctx):
 		vala_target_glib = "2.32",
 		)
 	
+	ctx.install_as('${BINDIR}/diorite-testgen', 'testgen.py', chmod=Utils.O755)
 	ctx.add_post_fun(post)
 
 def dist(ctx):
