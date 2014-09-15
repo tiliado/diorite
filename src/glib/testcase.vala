@@ -81,6 +81,20 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	/**
+	 * Assertion failed
+	 * 
+	 * Test is terminated.
+	 * 
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected void assert_not_reached(string format, ...)
+	{
+		process(false, format, va_list());
+		failure();
+	}
+	
+	/**
 	 * Expectation
 	 * 
 	 * Test is not terminated when expectation fails.
