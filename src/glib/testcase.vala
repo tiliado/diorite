@@ -108,6 +108,18 @@ public abstract class TestCase: GLib.Object
 		return process(expression, format, va_list());
 	}
 	
+	/**
+	 * Expectation failed
+	 * 
+	 * Test is not terminated.
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expectation_failed(string format, ...)
+	{
+		return process(false, format, va_list());
+	}
+	
 	[Diagnostics]
 	[PrintFormat]
 	protected void fail(string format="", ...)
