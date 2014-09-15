@@ -56,6 +56,22 @@ void %s()
 }
 """
 
+run_block_async = """
+void {func}()
+{{
+	var test = new {klass}();
+	test.set_up();
+	var loop = new MainLoop();
+	test.{test}.begin((res) =>
+	{{
+		loop.quit();
+	}});
+	loop.run();
+	test.tear_down();
+	test.summary();
+}}
+"""
+
 def parse_source(source):
 	test_cases = []
 	with open(source, "tr") as f:
@@ -92,11 +108,11 @@ def write_tests(out, test_cases):
 		runners_block = []
 		register_block = []
 		for path, klass, method, async in test_cases:
-			
-			if async:
-				continue
 			run_func = "run" + path.replace("/", "_")
-			runners_block.append(run_block % (run_func, klass, method))
+			if not async:
+				runners_block.append(run_block % (run_func, klass, method))
+			else:
+				runners_block.append(run_block_async.format(func=run_func, klass=klass, test=method))
 			register_block.append('\tTest.add_func("%s", %s);' % (path, run_func))
 		
 		out.write(header_block)
