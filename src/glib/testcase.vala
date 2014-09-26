@@ -189,6 +189,44 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
+	protected bool expect_str_match(string pattern, string data, string format, ...)
+	{
+		return process_str_match(true, pattern, data, format, va_list());
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_str_not_match(string pattern, string data, string format, ...)
+	{
+		return process_str_match(false, pattern, data, format, va_list());
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected void assert_str_match(string pattern, string data, string format, ...)
+	{
+		if (!process_str_match(true, pattern, data, format, va_list()))
+			failure();
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected void assert_str_not_match(string pattern, string data, string format, ...)
+	{
+		if (!process_str_match(false, pattern, data, format, va_list()))
+			failure();
+	}
+	
+	private bool process_str_match(bool expected, string pattern, string data, string format, va_list args)
+	{
+		var result = process(PatternSpec.match_simple(pattern, data) == expected, format, args);
+		if (!result && !Test.quiet())
+			stdout.printf("\tPattern %s should%s match string '%s'.\n", pattern, expected ? "" : " not", data);
+		return result;
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
 	protected void assert_array<T>(T[] expected, T[] found, EqualData eq, string format, ...)
 	{
 		if(!process_array<T>(expected, found, eq, format, va_list()))
