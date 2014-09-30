@@ -141,4 +141,28 @@ public bool variant_string(Variant variant, out string? data)
 	return false;
 }
 
+public bool variant_bool(Variant? variant, ref bool result)
+{
+	if (variant == null)
+		return false;
+	
+	if (variant.is_of_type(VariantType.BOOLEAN))
+	{
+		result = variant.get_boolean();
+		return true;
+	}
+	
+	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
+	{
+		Variant? maybe_variant = null;
+		variant.get("m*", &maybe_variant);
+		return variant_bool(maybe_variant, ref result);
+	}
+	
+	if (variant.is_of_type(VariantType.VARIANT))
+		return variant_bool(variant.get_variant(), ref result);
+	
+	return false;
+}
+
 } // namespace Diorite
