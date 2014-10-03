@@ -125,6 +125,11 @@ public class ActionsRegistry : GLib.Object
 		return group.to_slist();
 	}
 	
+	public List<unowned string> list_groups()
+	{
+		return groups.get_keys();
+	}
+	
 	public List<weak Action?> list_actions()
 	{
 		return actions.get_values();
