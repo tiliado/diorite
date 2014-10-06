@@ -165,4 +165,24 @@ public bool variant_bool(Variant? variant, ref bool result)
 	return false;
 }
 
+public static string? variant_dict_str(Variant dict, string key)
+{
+	var val = dict.lookup_value(key, null);
+	if (val == null)
+		return null;
+	
+	if (val.is_of_type(VariantType.MAYBE))
+	{
+		val = val.get_maybe();
+		if (val == null)
+			return null;
+	}
+		
+	if (val.is_of_type(VariantType.VARIANT))
+		val = val.get_variant();
+	if (val.is_of_type(VariantType.STRING))
+		return val.get_string();
+	return null;
+}
+
 } // namespace Diorite
