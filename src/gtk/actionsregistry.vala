@@ -202,6 +202,51 @@ public class ActionsRegistry : GLib.Object
 		return true;
 	}
 	
+	public Gtk.Button? create_action_button(string full_name, bool use_image, bool symbolic_images)
+	{
+		Diorite.Action action;
+		Diorite.RadioOption option;
+		string detailed_name;
+		if (find_and_parse_action(full_name, out detailed_name, out action, out option))
+		{
+			string action_name;
+			Variant target_value;
+			try
+			{
+				GLib.Action.parse_detailed_name(action.scope + "." + detailed_name, out action_name, out target_value);
+			}
+			catch (GLib.Error e)
+			{
+				critical("Failed to parse '%s': %s", action.scope + "." + detailed_name, e.message);
+				return null;
+			}
+			if (action is Diorite.SimpleAction)
+			{
+				var button = use_image && action.icon != null
+				? new Gtk.Button.from_icon_name(
+					symbolic_images ? action.icon + "-symbolic" : action.icon,
+					Gtk.IconSize.SMALL_TOOLBAR)
+				: new Gtk.Button.with_label(action.label);
+				button.action_name = action_name;
+				button.action_target = target_value;
+				return button;
+			}
+			else if (action is Diorite.ToggleAction)
+			{
+				var button = new Gtk.CheckButton.with_label(action.label);
+				button.action_name = action_name;
+				button.action_target = target_value;
+				return button;
+			}
+			else if (action is Diorite.RadioAction)
+			{
+				warning("Diorite.ActionsRegistry.create_action_button doesn't support radio actions.");
+				return null;
+			}
+		}
+		return null;
+	}
+	
 	public Gtk.Toolbar build_toolbar(string[] actions, Gtk.Toolbar? toolbar=null)
 	{
 		var t = toolbar ?? new Gtk.Toolbar();
