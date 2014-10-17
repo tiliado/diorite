@@ -112,10 +112,34 @@ public abstract class Application : Gtk.Application
 		// TODO: How about signal handling on Windows?
 		#endif
 		base.startup();
+		
 		var gtk_settings = Gtk.Settings.get_default();
-		debug("Shell: app_menu = %s, menubar = %s",
-		gtk_settings.gtk_shell_shows_app_menu.to_string(),
-		gtk_settings.gtk_shell_shows_menubar.to_string());
+		/* Use this enviroment variable only for debugging purposes */
+		var gui_mode = Environment.get_variable("DIORITE_GUI_MODE");
+		if (gui_mode != null)
+		{
+			switch (gui_mode)
+			{
+			case "unity":
+				gtk_settings.gtk_shell_shows_app_menu = true;
+				gtk_settings.gtk_shell_shows_menubar = true;
+				break;
+			case "gnome":
+				gtk_settings.gtk_shell_shows_app_menu = true;
+				gtk_settings.gtk_shell_shows_menubar = false;
+				break;
+			case "xfce":
+				gtk_settings.gtk_shell_shows_app_menu = false;
+				gtk_settings.gtk_shell_shows_menubar = false;
+				break;
+			case "":
+			case "default":
+				break;
+			default:
+				warning("DIORITE_GUI_MODE should be one of default|unity|gnome|xfce, not %s", gui_mode);
+				break;
+			}
+		}
 		
 		if (gtk_settings.gtk_shell_shows_app_menu)
 		{
