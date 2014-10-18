@@ -28,11 +28,11 @@ namespace Diorite
 public class ApplicationWindow: Gtk.ApplicationWindow
 {
 	public Gtk.Grid top_grid {get; private set;}
-	private Gtk.HeaderBar? header_bar = null;
-	private Diorite.SlideInRevealer? toolbar_revealer = null;
-	private Gtk.CheckMenuItem? toolbar_checkbox = null;
+	private Gtk.HeaderBar header_bar;
+	private Diorite.SlideInRevealer? header_bar_revealer = null;
+	private Gtk.CheckMenuItem? header_bar_checkbox = null;
 	
-	public ApplicationWindow(Gtk.Application app, bool collapsible_toolbar)
+	public ApplicationWindow(Gtk.Application app, bool collapsible_header_bar)
 	{
 		top_grid = new Gtk.Grid();
 		top_grid.orientation = Gtk.Orientation.VERTICAL;
@@ -43,105 +43,117 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		 * by a toolbar. Actually, menu bar model is used only for Unity. */
 		show_menubar = false;
 		
+		header_bar = new Gtk.HeaderBar();
+		header_bar.show();
 		var gs = Gtk.Settings.get_default();
 		if (!gs.gtk_shell_shows_menubar && gs.gtk_shell_shows_app_menu)
 		{
-			/* Assume we are in GNOME Shell, so it's safe to use HeaderBar */
-			header_bar = new Gtk.HeaderBar();
+			/* Assume we are in GNOME Shell, so it's safe to use HeaderBar as window title */
 			header_bar.show_close_button = true;
-			header_bar.show();
 			set_titlebar(header_bar);
 		}
-		else if(collapsible_toolbar)
+		else if(collapsible_header_bar)
 		{
 			/* Other desktop environments, show collapsible toolbar */
-			toolbar_revealer = new Diorite.SlideInRevealer();
-			top_grid.attach_next_to(toolbar_revealer, null, Gtk.PositionType.TOP, 1, 1);
-			toolbar_revealer.revealer.notify["reveal-child"].connect_after(
-				on_toolbar_revealer_expanded_changed);
+			header_bar_revealer = new Diorite.SlideInRevealer();
+			top_grid.attach_next_to(header_bar_revealer, null, Gtk.PositionType.TOP, 1, 1);
+			header_bar_revealer.revealer.notify["reveal-child"].connect_after(
+				on_header_bar_revealer_expanded_changed);
+			header_bar_revealer.add(header_bar);
+			header_bar_revealer.show();
 		}
+		else
+		{
+			top_grid.attach_next_to(header_bar, null, Gtk.PositionType.TOP, 1, 1);
+		}
+	}
+	
+	public Gtk.Button? create_menu_button(Gtk.Application app)
+	{
+		var gs = Gtk.Settings.get_default();
+		Gtk.Menu? menu;
+		if (gs.gtk_shell_shows_app_menu && !gs.gtk_shell_shows_menubar || app.app_menu == null)
+			menu = null;
+		else
+			menu = new Gtk.Menu.from_model(app.app_menu);
+		
+		if (header_bar_revealer != null)
+		{
+			header_bar_checkbox = new Gtk.CheckMenuItem.with_label("Show toolbar");
+			header_bar_checkbox.active = header_bar_revealer.revealer.reveal_child;
+			header_bar_checkbox.show();
+			header_bar_checkbox.toggled.connect_after(on_header_bar_checkbox_toggled);
+			header_bar_revealer.show_all();
+			if (menu == null)
+			{
+				menu = new Gtk.Menu();
+				menu.add(header_bar_checkbox);
+			}
+			else
+			{
+				menu.add(header_bar_checkbox);
+				menu.reorder_child(header_bar_checkbox, 0);
+			}
+		}
+		
+		if (menu == null)
+			return null;
+		
+		var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
+			Gtk.IconSize.SMALL_TOOLBAR);
+		var menu_button = new Gtk.MenuButton();
+		menu_button.image = image;
+		menu_button.popup = menu;
+		return menu_button;
 	}
 	
 	public void create_toolbar(Gtk.Application app, Diorite.ActionsRegistry actions, string[] items)
 	{
-		if (header_bar != null)
+		Gtk.Button? button;
+		for (var i = 0; i < items.length; i++)
 		{
-			Gtk.Button? button;
-			for (var i = 0; i < items.length; i++)
+			if (items[i] == " ")
 			{
-				if (items[i] == " ")
+				button = create_menu_button(app);
+				if (button != null)
+						header_bar.pack_end(button);
+				for (var j = items.length - 1; j > i; j--)
 				{
-					for (var j = items.length - 1; j > i; j--)
-					{
-						button = actions.create_action_button(items[j], true, true);
-						if (button != null)
-							header_bar.pack_end(button);
-					}
-					break;
+					button = actions.create_action_button(items[j], true, true);
+					if (button != null)
+						header_bar.pack_end(button);
 				}
-				
+				break;
+			}
+			
+			
 				button = actions.create_action_button(items[i], true, true);
 				if (button != null)
 					header_bar.pack_start(button);
-			}
-			header_bar.show_all();
-		}
-		else
-		{
-			var toolbar = actions.build_toolbar(items);
-			var separator = new Gtk.SeparatorToolItem();
-			separator.draw = false;
-			separator.set_expand(true);
-			toolbar.add(separator);
-			var gs = Gtk.Settings.get_default();
-			Gtk.Menu menu;
-			if (gs.gtk_shell_shows_app_menu && !gs.gtk_shell_shows_menubar || app.app_menu == null)
-				menu = new Gtk.Menu();
-			else
-				menu = new Gtk.Menu.from_model(app.app_menu);
-			var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
-				Gtk.IconSize.SMALL_TOOLBAR);
-			var menu_button = new Gtk.MenuButton();
-			menu_button.relief = Gtk.ReliefStyle.NONE;
-			menu_button.image = image;
-			menu_button.popup = menu;
-			var tool_item = new Gtk.ToolItem();
-			tool_item.add(menu_button);
-			tool_item.show_all();
-			toolbar.add(tool_item);
-			toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
-			
-			if (toolbar_revealer != null)
+			if (i == items.length -1)
 			{
-				toolbar_checkbox = new Gtk.CheckMenuItem.with_label("Show toolbar");
-				toolbar_checkbox.active = toolbar_revealer.revealer.reveal_child;
-				toolbar_checkbox.show();
-				toolbar_checkbox.toggled.connect_after(on_toolbar_checkbox_toggled);
-				menu_button.popup.add(toolbar_checkbox);
-				menu_button.popup.reorder_child(toolbar_checkbox, 0);
-				toolbar_revealer.add(toolbar);
-				toolbar_revealer.show_all();
-			}
-			else
-			{
-				top_grid.attach_next_to(toolbar, null, Gtk.PositionType.TOP, 1, 1);
-				toolbar.show();
+				button = create_menu_button(app);
+				if (button != null)
+					header_bar.pack_end(button);
 			}
 		}
+		
+		header_bar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+		header_bar.show_all();
 	}
 	
-	private void on_toolbar_revealer_expanded_changed(GLib.Object o, ParamSpec p)
+	private void on_header_bar_revealer_expanded_changed(GLib.Object o, ParamSpec p)
 	{
-		var revelaed = toolbar_revealer.revealer.reveal_child;
-		toolbar_revealer.button.visible = !revelaed;
-		if (toolbar_checkbox != null)
-			toolbar_checkbox.active = revelaed;
+		var revelaed = header_bar_revealer.revealer.reveal_child;
+		header_bar_revealer.button.visible = !revelaed;
+		if (header_bar_checkbox != null)
+			header_bar_checkbox.active = revelaed;
 	}
 	
-	private void on_toolbar_checkbox_toggled()
+	private void on_header_bar_checkbox_toggled()
 	{
-		if (toolbar_revealer.revealer.reveal_child != toolbar_checkbox.active)
-			toolbar_revealer.revealer.reveal_child = toolbar_checkbox.active;
+		if (header_bar_revealer.revealer.reveal_child != header_bar_checkbox.active)
+			header_bar_revealer.revealer.reveal_child = header_bar_checkbox.active;
 	}
 }
 
