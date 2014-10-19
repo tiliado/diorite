@@ -38,7 +38,7 @@ if VERSION[-1] == "+":
 	import subprocess
 	try:
 		commit = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%h"], stdout=subprocess.PIPE).communicate()[0]
-		VERSION = "{}{}.{}".format(VERSION, datetime.utcnow().strftime("%Y%m%d"), commit)
+		VERSION = "{}{}.{}".format(VERSION, datetime.utcnow().strftime("%Y%m%d%H%M"), commit)
 	except Exception, e:
 		VERSION = VERSION[:-1]
 
