@@ -51,6 +51,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			/* Assume we are in GNOME Shell, so it's safe to use HeaderBar as window title */
 			header_bar.show_close_button = true;
 			set_titlebar(header_bar);
+			notify["title"].connect_after(on_title_changed);
 		}
 		else if(collapsible_header_bar)
 		{
@@ -156,6 +157,13 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	{
 		if (header_bar_revealer.revealer.reveal_child != header_bar_checkbox.active)
 			header_bar_revealer.revealer.reveal_child = header_bar_checkbox.active;
+	}
+	
+	private void on_title_changed(GLib.Object o, ParamSpec p)
+	{
+		/* Beware of infinite loop: Newer GTK versions seem to set header bar title automatically. */
+		if (header_bar.title != title)
+			header_bar.title = title;
 	}
 }
 
