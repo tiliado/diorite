@@ -56,6 +56,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		{
 			/* Other desktop environments, show collapsible toolbar */
 			header_bar_revealer = new Diorite.SlideInRevealer();
+			header_bar_revealer.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+			header_bar_revealer.button.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 			top_grid.attach_next_to(header_bar_revealer, null, Gtk.PositionType.TOP, 1, 1);
 			header_bar_revealer.revealer.notify["reveal-child"].connect_after(
 				on_header_bar_revealer_expanded_changed);
