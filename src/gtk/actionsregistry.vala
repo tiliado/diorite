@@ -112,6 +112,15 @@ public class ActionsRegistry : GLib.Object
 		}
 	}
 	
+	public bool activate_action(string name, Variant? param=null)
+	{
+		var action = get_action(name);
+		if (action == null)
+			return false;
+		action.activate(param);
+		return true;
+	}
+	
 	public Action? get_action(string name)
 	{
 		return actions.get(name);
