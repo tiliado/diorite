@@ -28,6 +28,7 @@ namespace Diorite
 public class ApplicationWindow: Gtk.ApplicationWindow
 {
 	public Gtk.Grid top_grid {get; private set;}
+	public InfoBarStack info_bars {get; private set;}
 	private Gtk.HeaderBar header_bar;
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
 	private Gtk.CheckMenuItem? header_bar_checkbox = null;
@@ -38,7 +39,9 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		top_grid.orientation = Gtk.Orientation.VERTICAL;
 		top_grid.show();
 		add(top_grid);
-		
+		info_bars = new Diorite.InfoBarStack();
+		top_grid.add(info_bars);
+		info_bars.show();
 		/* Don't show fallback menubar, because all significant actions should be already provided
 		 * by a toolbar. Actually, menu bar model is used only for Unity. */
 		show_menubar = false;
