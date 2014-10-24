@@ -1,7 +1,12 @@
 Diorite Library
 ===============
 
-_Private utility and widget library for Nuvola Player project based on GLib, GIO and GTK._
+![Diorite stone](diorite.jpg)
+
+Diorite is a a grey to dark-grey intermediate intrusive igneous rock. Diorite library is a utility
+and widget library for Nuvola Player project based on GLib, GIO and GTK.
+
+*Photo by Michael C. Rygel via Wikimedia Commons, [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)*
 
 Status: Early alpha
 --------------------
