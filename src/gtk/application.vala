@@ -94,6 +94,51 @@ public abstract class Application : Gtk.Application
 		GLib.message("%s. %s", title, message);
 	}
 	
+	/**
+	 * Try to show URI and show info bar warning on failure.
+	 */
+	public void show_uri(string uri, uint32 timestamp=Gdk.CURRENT_TIME)
+	{
+		try
+		{
+			Gtk.show_uri(null, uri, timestamp);
+		}
+		catch (GLib.Error e)
+		{
+			warning("Failed to show URI %s. %s", uri, e.message);
+			var app_window = active_window as ApplicationWindow;
+			if (app_window == null)
+			{
+				unowned List<weak Gtk.Window> windows = get_windows();
+				foreach (var window in windows)
+				{
+					if (window is ApplicationWindow)
+					{
+						app_window = (ApplicationWindow) window;
+						break;
+					}
+				}
+			}
+			if (app_window != null)
+			{
+				var info_bar = new Gtk.InfoBar();
+				info_bar.show_close_button = true;
+				info_bar.message_type = Gtk.MessageType.WARNING;
+				var label = new Gtk.Label(Markup.printf_escaped(
+					"Failed to open URI <a href=\"%1$s\">%1$s</a>", uri));
+				label.use_markup = true;
+				label.set_line_wrap(true);
+				label.hexpand = false;
+				label.selectable = false;
+				info_bar.get_content_area().add(label);
+				info_bar.response.connect((bar, resp) => {app_window.info_bars.remove(bar);});
+				info_bar.show_all();
+				app_window.info_bars.add(info_bar);
+			}
+			
+		}
+	}
+	
 	public override void startup()
 	{
 		/* Set program name */
