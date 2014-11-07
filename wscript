@@ -147,11 +147,11 @@ def configure(ctx):
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
 	
 	# Check dependencies
-	ctx.check_dep('glib-2.0', 'GLIB', '2.40') # <= 2.40.0 (Ubuntu 14.04)
-	ctx.check_dep('gthread-2.0', 'GTHREAD', '2.40') # <= 2.40.0 (Ubuntu 14.04)
-	ctx.check_dep('gio-2.0', 'GIO', '2.40') # <= 2.40.0 (Ubuntu 14.04)
-	ctx.check_dep('gtk+-3.0', 'GTK+', '3.10') # <= 3.10.8 (Ubuntu 14.04)
-	ctx.check_dep('gdk-3.0', 'GDK', '3.10')  # <= 3.10.8 (Ubuntu 14.04)
+	ctx.check_dep('glib-2.0', 'GLIB', '2.38')
+	ctx.check_dep('gthread-2.0', 'GTHREAD', '2.38')
+	ctx.check_dep('gio-2.0', 'GIO', '2.38')
+	ctx.check_dep('gtk+-3.0', 'GTK+', '3.10')
+	ctx.check_dep('gdk-3.0', 'GDK', '3.10')
 	
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
