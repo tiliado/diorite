@@ -238,6 +238,8 @@ public class ActionsRegistry : GLib.Object
 				: new Gtk.Button.with_label(action.label);
 				button.action_name = action_name;
 				button.action_target = target_value;
+				button.valign = Gtk.Align.CENTER;
+				button.vexpand = false;
 				return button;
 			}
 			else if (action is Diorite.ToggleAction)
@@ -245,6 +247,8 @@ public class ActionsRegistry : GLib.Object
 				var button = new Gtk.CheckButton.with_label(action.label);
 				button.action_name = action_name;
 				button.action_target = target_value;
+				button.valign = Gtk.Align.CENTER;
+				button.vexpand = false;
 				return button;
 			}
 			else if (action is Diorite.RadioAction)

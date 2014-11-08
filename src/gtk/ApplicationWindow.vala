@@ -122,7 +122,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			{
 				button = create_menu_button(app);
 				if (button != null)
-						header_bar.pack_end(button);
+					header_bar.pack_end(button);
+				
 				for (var j = items.length - 1; j > i; j--)
 				{
 					button = actions.create_action_button(items[j], true, true);
@@ -132,10 +133,10 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 				break;
 			}
 			
+			button = actions.create_action_button(items[i], true, true);
+			if (button != null)
+				header_bar.pack_start(button);
 			
-				button = actions.create_action_button(items[i], true, true);
-				if (button != null)
-					header_bar.pack_start(button);
 			if (i == items.length -1)
 			{
 				button = create_menu_button(app);
@@ -144,7 +145,6 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			}
 		}
 		
-		header_bar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 		header_bar.show_all();
 	}
 	
