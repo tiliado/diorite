@@ -32,14 +32,14 @@ public class SlideInRevealer: Gtk.Box
 {
 	public Gtk.Revealer revealer {get; construct;}
 	public Gtk.Arrow arrow {get; private set;}
-	public Gtk.EventBox button {get; private set;}
+	public Gtk.Widget button {get; private set;}
 	
 	public SlideInRevealer(Gtk.Revealer? revealer=null)
 	{
 		GLib.Object(
 			revealer: revealer ?? new Gtk.Revealer(),
 			orientation: Gtk.Orientation.VERTICAL,
-			spacing: 0);
+			spacing: 0, margin: 0, border_width: 0);
 		if (revealer == null)
 			this.revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
 	}
@@ -50,19 +50,29 @@ public class SlideInRevealer: Gtk.Box
 		arrow.set_padding(0, 0);
 		arrow.margin = 0;
 		arrow.opacity = 0.7;
+		arrow.set_size_request(18, 18);
+		arrow.hexpand = true;
+		arrow.halign = arrow.valign = Gtk.Align.CENTER;
 		
-		button =  new Gtk.EventBox();
-		button.override_background_color(Gtk.StateFlags.PRELIGHT, {1.0, 1.0, 1.0, 0.4});
-		button.button_press_event.connect(on_button_press_event);
-		button.enter_notify_event.connect(on_enter_notify_event);
-		button.leave_notify_event.connect(on_leave_notify_event);
+		var event_box =  new Gtk.EventBox();
+		event_box.visible_window = false;
+		event_box.override_background_color(Gtk.StateFlags.PRELIGHT, {1.0, 1.0, 1.0, 0.4});
+		event_box.button_press_event.connect(on_button_press_event);
+		event_box.enter_notify_event.connect(on_enter_notify_event);
+		event_box.leave_notify_event.connect(on_leave_notify_event);
+		event_box.hexpand = true;
+		event_box.halign = Gtk.Align.FILL;
+		event_box.add(arrow);
 		
-		button.add(arrow);
-		base.add(revealer);
-		base.pack_end(button, false, true, 0);
+		
+		var grid = new Gtk.Grid();
+		this.button = grid;
+		grid.add(event_box);
+		base.pack_start(revealer, true, true, 0);
+		base.pack_start(grid, false, true, 0);
 		revealer.notify["reveal-child"].connect_after(on_reveal_child_changed);
 		revealer.show();
-		button.show_all();
+		grid.show_all();
 	}
 	
 	public override void add(Gtk.Widget child)
