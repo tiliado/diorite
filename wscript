@@ -33,6 +33,9 @@ APPNAME = "diorite"
 VERSION = "0.1.0+"
 SERIES = VERSION.rsplit(".", 1)[0]
 
+TARGET_GLIB_TUPLE = (2, 38)
+TARGET_GLIB = '{}.{}'.format(*TARGET_GLIB_TUPLE)
+
 if VERSION[-1] == "+":
 	from datetime import datetime
 	import subprocess
@@ -147,16 +150,19 @@ def configure(ctx):
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
 	
 	# Check dependencies
-	ctx.check_dep('glib-2.0', 'GLIB', '2.38')
-	ctx.check_dep('gthread-2.0', 'GTHREAD', '2.38')
-	ctx.check_dep('gio-2.0', 'GIO', '2.38')
+	ctx.check_dep('glib-2.0', 'GLIB', TARGET_GLIB)
+	ctx.check_dep('gthread-2.0', 'GTHREAD', TARGET_GLIB)
+	ctx.check_dep('gio-2.0', 'GIO', TARGET_GLIB)
 	ctx.check_dep('gtk+-3.0', 'GTK+', '3.10')
 	ctx.check_dep('gdk-3.0', 'GDK', '3.10')
 	
+	ctx.define('GLIB_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GLIB_TUPLE))
+	ctx.define('GLIB_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GLIB_TUPLE))
+	
 	if PLATFORM == LINUX:
-		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', '2.32')
+		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', TARGET_GLIB)
 	elif PLATFORM == WIN:
-		ctx.check_dep('gio-windows-2.0', 'WINGIO', '2.32')
+		ctx.check_dep('gio-windows-2.0', 'WINGIO', TARGET_GLIB)
 
 def build(ctx):
 	#~ print ctx.env
@@ -190,7 +196,7 @@ def build(ctx):
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGlib"'],
 		vapi_dirs = ['vapi'],
-		vala_target_glib = "2.32",
+		vala_target_glib = TARGET_GLIB,
 	)
 	
 	ctx(features = "c cshlib",
@@ -204,7 +210,7 @@ def build(ctx):
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGtk"'],
 		vapi_dirs = ['vapi'],
-		vala_target_glib = "2.32",
+		vala_target_glib = TARGET_GLIB,
 	)
 	
 	ctx(features = 'subst',
@@ -243,7 +249,7 @@ def build(ctx):
 		packages = 'glib-2.0 win32',
 		uselib = 'GLIB',
 		vapi_dirs = ['vapi'],
-		vala_target_glib = "2.32",
+		vala_target_glib = TARGET_GLIB,
 		)
 	
 	ctx.install_as('${BINDIR}/diorite-testgen', 'testgen.py', chmod=Utils.O755)
@@ -257,3 +263,6 @@ def post(ctx):
 	if ctx.cmd in ('install', 'uninstall'):
 		if ctx.env.PLATFORM == LINUX and ctx.options.ldconfig:
 			ctx.exec_command('/sbin/ldconfig') 
+
+def _glib_encode_version(major, minor):
+	return major << 16 | minor << 8
