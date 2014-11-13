@@ -35,6 +35,8 @@ SERIES = VERSION.rsplit(".", 1)[0]
 
 TARGET_GLIB_TUPLE = (2, 38)
 TARGET_GLIB = '{}.{}'.format(*TARGET_GLIB_TUPLE)
+TARGET_GTK_TUPLE = (3, 10)
+TARGET_GTK = '{}.{}'.format(*TARGET_GTK_TUPLE)
 
 if VERSION[-1] == "+":
 	from datetime import datetime
@@ -153,11 +155,13 @@ def configure(ctx):
 	ctx.check_dep('glib-2.0', 'GLIB', TARGET_GLIB)
 	ctx.check_dep('gthread-2.0', 'GTHREAD', TARGET_GLIB)
 	ctx.check_dep('gio-2.0', 'GIO', TARGET_GLIB)
-	ctx.check_dep('gtk+-3.0', 'GTK+', '3.10')
-	ctx.check_dep('gdk-3.0', 'GDK', '3.10')
+	ctx.check_dep('gtk+-3.0', 'GTK+', TARGET_GTK)
+	ctx.check_dep('gdk-3.0', 'GDK', TARGET_GTK)
 	
 	ctx.define('GLIB_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GLIB_TUPLE))
 	ctx.define('GLIB_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GLIB_TUPLE))
+	ctx.define('GDK_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GTK_TUPLE))
+	ctx.define('GDK_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GTK_TUPLE))
 	
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', TARGET_GLIB)
