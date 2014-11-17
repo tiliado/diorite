@@ -185,4 +185,88 @@ public static string? variant_dict_str(Variant dict, string key)
 	return null;
 }
 
+/**
+ * Unboxes variant value.
+ * 
+ *  * Null maybe variant is converted to null.
+ *  * Child value is returned for values of type variant.
+ * 
+ * @param value    value to unbox
+ * @return unboxed value or null
+ */
+public Variant? unbox_variant(Variant? value)
+{
+	if (value == null)
+		return null;
+	
+	if (value.get_type().is_subtype_of(VariantType.MAYBE))
+	{
+		Variant? maybe_variant = null;
+		value.get("m*", &maybe_variant);
+		return unbox_variant(maybe_variant);
+	}
+	
+	if (value.is_of_type(VariantType.VARIANT))
+		return unbox_variant(value.get_variant());
+	
+	return value;
+}
+
+/**
+ * Converts any Variant value to boolean.
+ * 
+ * @param value    value to convert
+ * @return actual boolean value if the value is of type boolean, false otherwise
+ */
+public bool variant_to_bool(Variant? value)
+{
+	var unboxed = unbox_variant(value);
+	if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN))
+		return unboxed.get_boolean();
+	return false;
+}
+
+/**
+ * Converts any Variant value to int64.
+ * 
+ * @param value    value to convert
+ * @return actual int64 value if the value is of type int64, zero otherwise
+ */
+public int64 variant_to_int64(Variant? value)
+{
+	var unboxed = unbox_variant(value);
+	if (unboxed != null && unboxed.is_of_type(VariantType.INT64))
+		return unboxed.get_int64();
+	return (int64) 0;
+}
+
+/**
+ * Converts any Variant value to double.
+ * 
+ * @param value    value to convert
+ * @return actual double value if the value is of type double, 0.0 otherwise
+ */
+public double variant_to_double(Variant? value)
+{
+	var unboxed = unbox_variant(value);
+	if (unboxed != null && unboxed.is_of_type(VariantType.DOUBLE))
+		return unboxed.get_double();
+	return 0.0;
+}
+
+/**
+ * Converts any Variant value to string.
+ * 
+ * @param value      value to convert
+ * @param default    default value (usually null or empty string)
+ * @return actual string value if the value is of type string, default value otherwise
+ */
+public string? variant_to_string(Variant? value, string? default=null)
+{
+	var unboxed = unbox_variant(value);
+	if (unboxed != null && unboxed.is_of_type(VariantType.STRING))
+		return unboxed.get_string();
+	return default;
+}
+
 } // namespace Diorite
