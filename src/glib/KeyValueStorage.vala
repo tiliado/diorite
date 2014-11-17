@@ -33,42 +33,40 @@ public interface KeyValueStorage: GLib.Object
 	
 	public abstract Variant? get_value(string key);
 	
-	public abstract void set_value(string key, Variant? value);
-	
 	public abstract void unset(string key);
 	
-	public abstract void set_default_value(string key, Variant? value);
+	protected abstract void set_default_value_unboxed(string key, Variant? value);
+	
+	protected abstract void set_value_unboxed(string key, Variant? value);
+	
+	public void set_value(string key, Variant? value)
+	{
+		set_value_unboxed(key, unbox_variant(value));
+	}
+	
+	public void set_default_value(string key, Variant? value)
+	{
+		set_default_value_unboxed(key, unbox_variant(value));
+	}
 	
 	public bool get_bool(string key)
 	{
-		var value = get_value(key);
-		if (value != null && value.is_of_type(VariantType.BOOLEAN))
-			return value.get_boolean();
-		return false;
+		return variant_to_bool(get_value(key));
 	}
 	
 	public int64 get_int64(string key)
 	{
-		var value = get_value(key);
-		if (value != null && value.is_of_type(VariantType.INT64))
-			return value.get_int64();
-		return (int64) 0;
+		return variant_to_int64(get_value(key));
 	}
 	
 	public double get_double(string key)
 	{
-		var value = get_value(key);
-		if (value != null && value.is_of_type(VariantType.DOUBLE))
-			return value.get_double();
-		return 0.0;
+		return variant_to_double(get_value(key));
 	}
 	
 	public string? get_string(string key)
 	{
-		var value = get_value(key);
-		if (value != null && value.is_of_type(VariantType.STRING))
-			return value.get_string();
-		return null;
+		return variant_to_string(get_value(key), null);
 	}
 	
 	public void set_string(string key, string? value)

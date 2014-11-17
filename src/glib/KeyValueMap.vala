@@ -50,14 +50,6 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 		return default_values[key];
 	}
 	
-	public void set_value(string key, Variant? value)
-	{
-		var old_value = get_value(key);
-		values[key] = value;
-		if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
-			changed(key, old_value);
-	}
-	
 	public void unset(string key)
 	{
 		var old_value = get_value(key);
@@ -65,7 +57,15 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
-	public void set_default_value(string key, Variant? value)
+	protected void set_value_unboxed(string key, Variant? value)
+	{
+		var old_value = get_value(key);
+		values[key] = value;
+		if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
+			changed(key, old_value);
+	}
+	
+	protected void set_default_value_unboxed(string key, Variant? value)
 	{
 		default_values[key] = value;
 	}
