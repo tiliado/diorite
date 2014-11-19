@@ -27,11 +27,13 @@ namespace Diorite.Ipc
 
 public class Client
 {
+	public string name {get; private set;}
 	private Channel channel;
 	private uint timeout;
 	
 	public Client(string name, uint timeout)
 	{
+		this.name = name;
 		this.timeout = timeout;
 		channel = new Channel(name);
 	}
