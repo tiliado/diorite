@@ -26,7 +26,7 @@ import re
 
 S = r"[ \t\r\f\v]" 
 NAMESPACE_RE = re.compile(r"^" + S + r"*namespace" + S + r"+(?P<name>(\w+\.)*\w+)" + S + r"*\{?" + S + r"*$", re.M)
-TEST_CASE_RE = re.compile(r"^\s*public\s+class\s+(?P<name>(\w+)\w+Test)\s*:")
+TEST_CASE_RE = re.compile(r"^\s*public\s+(?P<abstract>abstract\s+)?class\s+(?P<name>(\w+)\w+Test)\s*:\s*(?P<parents>.+)")
 TEST_FUNC_RE = re.compile(r"^\s*public\s+(?P<async>async\s+)?void\s+(?P<name>test_\w+)\s*\(\s*\)\s*\{?\s*$")
 
 header_block = """\
@@ -44,7 +44,7 @@ end_block = """
 	return Test.run();
 }
 """
-
+	
 run_block = """
 void %s()
 {
@@ -72,8 +72,34 @@ void {func}()
 }}
 """
 
-def parse_source(source):
-	test_cases = []
+class TestCase:
+	def __init__(self, name, abstract, ns, parents, source):
+		self.name = name
+		self.abstract = abstract
+		self.ns = ns
+		self.parents = parents
+		self.tests = []
+		self.source = source
+	
+	def __str__(self):
+		return ("abstract {} : {}" if self.abstract else "{} : {}").format(
+			self.name, ",".join(self.parents))
+	
+	def __repr__(self):
+		return "<{}>".format(self)
+
+class Test:
+	def __init__(self, name, async):
+		self.name = name
+		self.async = async
+	
+	def __str__(self):
+		return "{} {}".format("async" if self.async else "sync", self.name)
+	
+	def __repr__(self):
+		return "<{}>".format(self)
+
+def parse_source(test_cases, source):
 	with open(source, "tr") as f:
 		data = f.read()
 	
@@ -91,29 +117,40 @@ def parse_source(source):
 	for line in data.splitlines():
 		m = TEST_CASE_RE.match(line)
 		if m:
-			test_case = namespace + m.group("name")
+			name = namespace + m.group("name")
+			parents = [i for i in m.group("parents").split() if i != "Diorite.TestCase"]
+			abstract = bool(m.group("abstract"))
+			test_cases[name] = test_case = TestCase(name, abstract, namespace, parents, source)
 		else:
 			m = TEST_FUNC_RE.match(line)
 			if m:
 				if test_case is None:
 					raise Exception("Test method without a test case: %s" % m.group(0).strip())
-				method = m.group("name")
-				path = "/" + (test_case + "." + method).replace(".", "/")
-				test_cases.append((path, test_case, method, bool(m.group("async"))))
+				test_case.tests.append(Test(m.group("name"), bool(m.group("async"))))
+
+def append_tests(runners_block, register_block, test_case, klass=None):
+	if klass is None:
+		klass = test_case
+	 
+	for parent in test_case.parents:
+		append_tests(runners_block, register_block, parent, klass)
 	
-	return test_cases
+	for t in test_case.tests:
+		path = "/" + klass.name.replace(".", "/") + "/" + t.name[5:]
+		run_func = "run" + path.replace("/", "_")
+		if not t.async:
+			runners_block.append(run_block % (run_func, klass.name, t.name))
+		else:
+			runners_block.append(run_block_async.format(func=run_func, klass=klass.name, test=t.name))
+		register_block.append('\tTest.add_func("%s", %s);' % (path, run_func))
 
 def write_tests(out, test_cases):
 	if test_cases:
 		runners_block = []
 		register_block = []
-		for path, klass, method, async in test_cases:
-			run_func = "run" + path.replace("/", "_")
-			if not async:
-				runners_block.append(run_block % (run_func, klass, method))
-			else:
-				runners_block.append(run_block_async.format(func=run_func, klass=klass, test=method))
-			register_block.append('\tTest.add_func("%s", %s);' % (path, run_func))
+		for test_case in test_cases.values():
+			if not test_case.abstract:
+				append_tests(runners_block, register_block, test_case)
 		
 		out.write(header_block)
 		out.write("".join(runners_block))
@@ -122,18 +159,37 @@ def write_tests(out, test_cases):
 		out.write(end_block)
 		out.write("\n")
 
-def generate(output, sources):
-	test_cases = []
+def find_test_cases(test_cases, sources):
 	errors = []
-	
 	for source in sources:
 		try:
-			test_cases.extend(parse_source(source))
+			parse_source(test_cases, source)
 		except Exception as e:
 			errors.append((source, e))
-	
-	write_tests(output, test_cases)
-	
+	return errors
+
+def find_parents(test_cases):
+	errors = []
+	for test_case in test_cases.values():
+		parents = []
+		ns = test_case.ns
+		for parent in test_case.parents:
+			print(ns, parent)
+			try:
+				parents.append(test_cases[parent])
+			except KeyError as e:
+				try:
+					parents.append(test_cases[ns + parent])
+				except KeyError as e:
+					errors.append((test_cas.source, "Cannot find parent class {}.".format(parent)))
+		test_case.parents = parents
+	return errors
+
+def generate(output, sources):
+	test_cases = {}
+	errors = find_test_cases(test_cases, sources)
+	errors.extend(find_parents(test_cases))
+	write_tests(output, test_cases)	
 	return errors
 
 if __name__ == "__main__":
