@@ -32,25 +32,10 @@ public class ActionsRegistry : GLib.Object
 	private HashTable<string, SingleList<Action?>> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
-	private Gtk.ApplicationWindow? _window = null;
-	public Gtk.ApplicationWindow? window
-	{
-		get
-		{
-			return _window;
-		}
-		set
-		{
-			_window = value;
-			if (_window != null)
-				add_to_map_by_scope(Action.SCOPE_WIN, _window);
-		}
-	}
 	
-	public ActionsRegistry(Gtk.Application app, Gtk.ApplicationWindow? window = null)
+	public ActionsRegistry(Gtk.Application app)
 	{
 		this.app = app;
-		this.window = window;
 		groups = new HashTable<string, SingleList<Action?>>(str_hash, str_equal); 
 		actions = new HashTable<string, Action?>(str_hash, str_equal); 
 	}
@@ -84,16 +69,9 @@ public class ActionsRegistry : GLib.Object
 		if (keybinding != null)
 			app.add_accelerator(keybinding, action.scope + "." + action.name, null);
 		action.notify.connect_after(on_action_changed);
-		switch(action.scope)
-		{
-		case Action.SCOPE_APP:
+		if (action.scope == Action.SCOPE_APP)
 			action.add_to_map(app);
-			break;
-		case Action.SCOPE_WIN:
-			if (window != null)
-				action.add_to_map(window);
-			break;
-		}
+		
 		action_added(action);
 	}
 	

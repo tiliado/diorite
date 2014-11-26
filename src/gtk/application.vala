@@ -55,6 +55,7 @@ public abstract class Application : Gtk.Application
 	public string version {get; protected set; default = "";}
 	public bool app_menu_shown {get; private set; default = false;}
 	public bool menubar_shown {get; private set; default = false;}
+	public ActionsRegistry? actions {get; private set; default = null;}
 	#if LINUX
 	private XfceSessionManager? xfce_session = null;
 	#endif
@@ -66,6 +67,7 @@ public abstract class Application : Gtk.Application
 		this.app_name = app_name;
 		this.desktop_name = desktop_name;
 		this.app_id = app_id;
+		actions = new ActionsRegistry(this);
 		#if LINUX
 		prctl(15, app_id, 0, 0, 0);
 		#endif

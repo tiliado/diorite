@@ -32,9 +32,15 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	private Gtk.HeaderBar header_bar;
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
 	private Gtk.CheckMenuItem? header_bar_checkbox = null;
+	private unowned Application app;
 	
-	public ApplicationWindow(Gtk.Application app, bool collapsible_header_bar)
+	public ApplicationWindow(Application app, bool collapsible_header_bar)
 	{
+		GLib.Object(application: app);
+		this.app = app;
+		app.add_window(this);
+		app.actions.add_to_map_by_scope(Action.SCOPE_WIN, this);
+		app.actions.action_added.connect(on_action_added);
 		top_grid = new Gtk.Grid();
 		top_grid.orientation = Gtk.Orientation.VERTICAL;
 		top_grid.show();
@@ -75,7 +81,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 	}
 	
-	public Gtk.Button? create_menu_button(Gtk.Application app)
+	public Gtk.Button? create_menu_button()
 	{
 		var gs = Gtk.Settings.get_default();
 		Gtk.Menu? menu;
@@ -114,14 +120,15 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		return menu_button;
 	}
 	
-	public void create_toolbar(Gtk.Application app, Diorite.ActionsRegistry actions, string[] items)
+	public void create_toolbar(string[] items)
 	{
 		Gtk.Button? button;
+		var actions = app.actions;
 		for (var i = 0; i < items.length; i++)
 		{
 			if (items[i] == " ")
 			{
-				button = create_menu_button(app);
+				button = create_menu_button();
 				if (button != null)
 					header_bar.pack_end(button);
 				
@@ -140,7 +147,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			
 			if (i == items.length -1)
 			{
-				button = create_menu_button(app);
+				button = create_menu_button();
 				if (button != null)
 					header_bar.pack_end(button);
 			}
@@ -168,6 +175,12 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		/* Beware of infinite loop: Newer GTK versions seem to set header bar title automatically. */
 		if (header_bar.title != title)
 			header_bar.title = title;
+	}
+	
+	private void on_action_added(Action action)
+	{
+		if (action.scope == Action.SCOPE_WIN)
+			action.add_to_map(this);
 	}
 }
 
