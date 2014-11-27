@@ -50,7 +50,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		info_bars.show();
 		/* Don't show fallback menubar, because all significant actions should be already provided
 		 * by a toolbar. Actually, menu bar model is used only for Unity. */
-		show_menubar = false;
+		show_menubar = Environment.get_variable("DIORITE_SHOW_MENUBAR") == "true";
 		
 		header_bar = new Gtk.HeaderBar();
 		header_bar.show();
