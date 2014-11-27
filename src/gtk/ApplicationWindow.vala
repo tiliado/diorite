@@ -31,7 +31,6 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	public InfoBarStack info_bars {get; private set;}
 	private Gtk.HeaderBar header_bar;
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
-	private Gtk.CheckMenuItem? header_bar_checkbox = null;
 	private unowned Application app;
 	
 	public ApplicationWindow(Application app, bool collapsible_header_bar)
@@ -83,40 +82,42 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	
 	public Gtk.Button? create_menu_button()
 	{
+		var actions = app.actions;
 		var gs = Gtk.Settings.get_default();
-		Gtk.Menu? menu;
-		if (gs.gtk_shell_shows_app_menu && !gs.gtk_shell_shows_menubar || app.app_menu == null)
-			menu = null;
-		else
-			menu = new Gtk.Menu.from_model(app.app_menu);
-		
+		var menu = new Menu();
 		if (header_bar_revealer != null)
 		{
-			header_bar_checkbox = new Gtk.CheckMenuItem.with_label("Show toolbar");
-			header_bar_checkbox.active = header_bar_revealer.revealer.reveal_child;
-			header_bar_checkbox.show();
-			header_bar_checkbox.toggled.connect_after(on_header_bar_checkbox_toggled);
-			header_bar_revealer.show_all();
-			if (menu == null)
-			{
-				menu = new Gtk.Menu();
-				menu.add(header_bar_checkbox);
-			}
+			var toggle_toolbar_action = "toggle-toolbar";
+			var toggle_toolbar_item = actions.create_menu_item(toggle_toolbar_action, true, false);
+			if (toggle_toolbar_item == null)
+				actions.add_action(new ToggleAction("view", "win",
+					toggle_toolbar_action, "Show toolbar", null, null, null,
+					on_header_bar_checkbox_toggled, header_bar_revealer.revealer.reveal_child));
+			toggle_toolbar_item = actions.create_menu_item(toggle_toolbar_action, true, false);
+			if (toggle_toolbar_item != null)
+				menu.append_item(toggle_toolbar_item);
 			else
-			{
-				menu.add(header_bar_checkbox);
-				menu.reorder_child(header_bar_checkbox, 0);
-			}
+				warning("Failed to create %s item.", toggle_toolbar_action);
 		}
 		
-		if (menu == null)
+		var app_menu = app.app_menu;
+		if (app_menu != null && (!gs.gtk_shell_shows_app_menu || gs.gtk_shell_shows_menubar))
+		{
+			var size = app_menu.get_n_items();
+			var section = new Menu();
+			for (var i = 0; i < size; i++)
+				section.append_item(new MenuItem.from_model(app_menu, i));
+			menu.append_section(null, section);
+		}
+		
+		if (menu.get_n_items() == 0)
 			return null;
 		
 		var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
 			Gtk.IconSize.SMALL_TOOLBAR);
 		var menu_button = new Gtk.MenuButton();
 		menu_button.image = image;
-		menu_button.popup = menu;
+		menu_button.menu_model = menu;
 		return menu_button;
 	}
 	
@@ -160,14 +161,11 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	{
 		var revelaed = header_bar_revealer.revealer.reveal_child;
 		header_bar_revealer.button.visible = !revelaed;
-		if (header_bar_checkbox != null)
-			header_bar_checkbox.active = revelaed;
 	}
 	
 	private void on_header_bar_checkbox_toggled()
 	{
-		if (header_bar_revealer.revealer.reveal_child != header_bar_checkbox.active)
-			header_bar_revealer.revealer.reveal_child = header_bar_checkbox.active;
+		header_bar_revealer.revealer.reveal_child = !header_bar_revealer.revealer.reveal_child;
 	}
 	
 	private void on_title_changed(GLib.Object o, ParamSpec p)
