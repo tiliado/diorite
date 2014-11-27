@@ -122,42 +122,48 @@ public class ActionsRegistry : GLib.Object
 		return actions.get_values();
 	}
 	
+	public MenuItem? create_menu_item(string action_name, bool use_mnemonic=true, bool use_icons=true)
+	{
+		string? detailed_name = null;
+		Action? action = null;
+		RadioOption? option = null;
+		if (!find_and_parse_action(action_name, out detailed_name, out action, out option))
+			return null;
+		
+		string? label;
+		string? icon;
+		if (option != null)
+		{
+			label = (use_mnemonic && option.mnemo_label != null && option.mnemo_label != "")
+				? option.mnemo_label : option.label;
+			icon = option.icon;
+		}
+		else
+		{
+			label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
+				? action.mnemo_label : action.label;
+			icon = action.icon;
+		}
+		var item = new MenuItem(label, action.scope + "." + detailed_name);
+		item.set_attribute_value(ATTRIBUTE_ITEM_ID, action_name);
+		if (use_icons)
+		{
+			if (icon != null)
+				item.set_icon(new ThemedIcon(icon));
+		}
+		return item;
+	}
+	
 	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		var menu = new Menu();
 		foreach (var full_name in actions)
 		{
-			string? detailed_name = null;
-			Action? action = null;
-			RadioOption? option = null;
-			if (!find_and_parse_action(full_name, out detailed_name, out action, out option))
-			{
-				warning("Action '%s' not found in registry.", full_name);
-				continue;
-			}
-			
-			string? label;
-			string? icon;
-			if (option != null)
-			{
-				label = (use_mnemonic && option.mnemo_label != null && option.mnemo_label != "")
-					? option.mnemo_label : option.label;
-				icon = option.icon;
-			}
+			var item = create_menu_item(full_name, use_mnemonic, use_icons);
+			if (item != null)
+				menu.append_item(item);
 			else
-			{
-				label = (use_mnemonic && action.mnemo_label != null && action.mnemo_label != "")
-					? action.mnemo_label : action.label;
-				icon = action.icon;
-			}
-			var item = new MenuItem(label, action.scope + "." + detailed_name);
-			item.set_attribute_value(ATTRIBUTE_ITEM_ID, full_name);
-			if (use_icons)
-			{
-				if (icon != null)
-					item.set_icon(new ThemedIcon(icon));
-			}
-			menu.append_item(item);
+				warning("Action '%s' not found in registry.", full_name);
 		}
 		return menu;
 	}
