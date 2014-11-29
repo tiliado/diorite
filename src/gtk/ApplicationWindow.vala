@@ -32,6 +32,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	private Gtk.HeaderBar header_bar;
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
 	private unowned Application app;
+	private Gtk.MenuButton menu_button = null;
 	
 	public ApplicationWindow(Application app, bool collapsible_header_bar)
 	{
@@ -80,11 +81,21 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 	}
 	
-	public Gtk.Button? create_menu_button()
+	public void create_menu_button(string[] items)
 	{
+		if (menu_button == null)
+		{
+			menu_button = new Gtk.MenuButton();
+			var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
+				Gtk.IconSize.SMALL_TOOLBAR);
+			menu_button.image = image;
+			menu_button.no_show_all = true;
+		}
+		
 		var actions = app.actions;
 		var gs = Gtk.Settings.get_default();
-		var menu = new Menu();
+		var menu = actions.build_menu(items, false, false);
+		
 		if (header_bar_revealer != null)
 		{
 			var toggle_toolbar_action = "toggle-toolbar";
@@ -110,29 +121,22 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			menu.append_section(null, section);
 		}
 		
-		if (menu.get_n_items() == 0)
-			return null;
-		
-		var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
-			Gtk.IconSize.SMALL_TOOLBAR);
-		var menu_button = new Gtk.MenuButton();
-		menu_button.image = image;
 		menu_button.menu_model = menu;
-		return menu_button;
+		menu_button.visible = menu.get_n_items() > 0;
 	}
 	
 	public void create_toolbar(string[] items)
 	{
 		Gtk.Button? button;
 		var actions = app.actions;
+		if (menu_button == null)
+			create_menu_button({});
+		
 		for (var i = 0; i < items.length; i++)
 		{
 			if (items[i] == " ")
 			{
-				button = create_menu_button();
-				if (button != null)
-					header_bar.pack_end(button);
-				
+				header_bar.pack_end(menu_button);
 				for (var j = items.length - 1; j > i; j--)
 				{
 					button = actions.create_action_button(items[j], true, true);
@@ -146,12 +150,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			if (button != null)
 				header_bar.pack_start(button);
 			
-			if (i == items.length -1)
-			{
-				button = create_menu_button();
-				if (button != null)
-					header_bar.pack_end(button);
-			}
+			if (i == items.length - 1)
+				header_bar.pack_end(menu_button);
 		}
 		
 		header_bar.show_all();
