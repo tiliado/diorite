@@ -65,3 +65,16 @@ You probably want to use ``pkg-config``:
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
     -L/usr/local/lib -ldioritegtk-0.1
+
+Environment Variables
+---------------------
+
+Diorite recognizes several environment variables for debugging:
+
+  * `DIORITE_SHOW_MENUBAR` - if `true` ApplicationWindow shows menubar. This is useful if you test
+    menubar in other environments than Unity, because the menubar is not show by default.
+ 
+  * `DIORITE_GUI_MODE` - set to `unity`, `gnome`, `xfce` or `default` to simulate look of
+    a application window (menu bar, header bar, app menu, etc.) in different environment.
+  
+  * `DIORITE_LOG_MESSAGE_SERVER` - if `yes` IPC Message server communication will be logged
