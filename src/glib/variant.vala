@@ -244,13 +244,19 @@ public int64 variant_to_int64(Variant? value)
  * Converts any Variant value to double.
  * 
  * @param value    value to convert
- * @return actual double value if the value is of type double, 0.0 otherwise
+ * @return actual double value if the value is of type double or int64, 0.0 otherwise
  */
 public double variant_to_double(Variant? value)
 {
 	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.DOUBLE))
-		return unboxed.get_double();
+	if (unboxed != null)
+	{
+		if (unboxed.is_of_type(VariantType.DOUBLE))
+			return unboxed.get_double();
+		/* double value that happens to be integer may be actually stored as integer */
+		if (unboxed.is_of_type(VariantType.INT64))
+			return (double) unboxed.get_int64();
+	}
 	return 0.0;
 }
 
