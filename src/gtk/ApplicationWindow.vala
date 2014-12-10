@@ -132,6 +132,10 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		if (menu_button == null)
 			create_menu_button({});
 		
+		var children = header_bar.get_children();
+		foreach (var child in children)
+			header_bar.remove(child);
+		
 		for (var i = 0; i < items.length; i++)
 		{
 			if (items[i] == " ")
