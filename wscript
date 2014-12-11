@@ -158,12 +158,6 @@ def configure(ctx):
 	ctx.check_dep('gtk+-3.0', 'GTK+', TARGET_GTK)
 	ctx.check_dep('gdk-3.0', 'GDK', TARGET_GTK)
 	
-	valac_version = ctx.env.VALAC_VERSION
-	glib_version = tuple(int(i) for i in ctx.check_cfg(modversion='glib-2.0').split("."))
-	if glib_version >= (2, 41, 2) and valac_version < (0, 25, 2):
-		args = glib_version + valac_version + ("https://mail.gnome.org/archives/vala-list/2014-December/msg00018.html",)
-		ctx.fatal("glib2 {}.{}.{} and valac {}.{}.{} are not compatible: \n{}".format(*args))
-	
 	ctx.define('GLIB_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GLIB_TUPLE))
 	ctx.define('GLIB_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GLIB_TUPLE))
 	ctx.define('GDK_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GTK_TUPLE))
