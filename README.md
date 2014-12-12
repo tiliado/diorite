@@ -20,7 +20,7 @@ Status: Early alpha
 Dependencies
 ------------
 
-  - Python 2 to run ./waf
+  - Python 2 or 3 to run ./waf
   - Python 3 to run ./testgen.py
   - glib-2.0 >= 2.38
   - ghread-2.0 >= 2.38

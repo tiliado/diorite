@@ -44,7 +44,7 @@ if VERSION[-1] == "+":
 	try:
 		commit = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%h"], stdout=subprocess.PIPE).communicate()[0]
 		VERSION = "{}{}.{}".format(VERSION, datetime.utcnow().strftime("%Y%m%d%H%M"), commit)
-	except Exception, e:
+	except Exception as e:
 		VERSION = VERSION[:-1]
 
 import sys
@@ -53,8 +53,8 @@ from waflib.Errors import ConfigurationError
 from waflib.Context import WAFVERSION
 from waflib import Utils
 
-WAF_VERSION = map(int, WAFVERSION.split("."))
-REQUIRED_VERSION = [1, 7, 14] 
+WAF_VERSION = tuple(int(i) for i in WAFVERSION.split("."))
+REQUIRED_VERSION = (1, 7, 14) 
 if WAF_VERSION < REQUIRED_VERSION:
 	print("Too old waflib %s < %s. Use waf binary distributed with the source code!" % (WAF_VERSION, REQUIRED_VERSION))
 	sys.exit(1)
@@ -91,7 +91,7 @@ def check_dep(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=No
 		if define:
 			for key, value in define.iteritems():
 				ctx.define(key, value)
-	except ConfigurationError, e:
+	except ConfigurationError as e:
 		result = False
 		if mandatory:
 			raise e
