@@ -27,11 +27,13 @@ namespace Diorite
 
 public class KeyValueTree: GLib.Object, KeyValueStorage
 {
+	public SingleList<PropertyBinding> property_bindings {get; protected set;}
 	protected Node<Item?> root;
 	protected HashTable<string, unowned Node<Item?>> nodes;
 	
 	public KeyValueTree()
 	{
+		property_bindings = new SingleList<PropertyBinding>();
 		root = new Node<Item?>(null);
 		nodes = new HashTable<string, unowned Node<Item?>>(str_hash, str_equal);
 	}

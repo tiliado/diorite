@@ -27,6 +27,8 @@ namespace Diorite
 
 public interface KeyValueStorage: GLib.Object
 {
+	public abstract SingleList<PropertyBinding> property_bindings {get; protected set;}
+	
 	public signal void changed(string key, Variant? old_value);
 	
 	public abstract bool has_key(string key);
@@ -87,6 +89,36 @@ public interface KeyValueStorage: GLib.Object
 	public void set_double(string key, double value)
 	{
 		set_value(key, new Variant.double(value));
+	}
+	
+	public void bind_object_property(string key, GLib.Object object, string property_name,
+		PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL)
+	{
+		var property = object.get_class().find_property(property_name);
+		return_if_fail(property != null);
+		property_bindings.prepend(new PropertyBinding(this, key, object, property, flags));
+	}
+	
+	public void unbind_object_property(string key, GLib.Object object, string property_name)
+	{
+		var binding = get_property_binding(key, object, property_name);
+		if (binding != null)
+			remove_property_binding(binding);
+	}
+	
+	public PropertyBinding? get_property_binding(string key, GLib.Object object,
+		string property_name)
+	{
+		foreach (var binding in property_bindings)
+			if (binding.object == object && binding.key == key
+			&& binding.property.name == property_name)
+				return binding;
+		return null;
+	}
+	
+	public void remove_property_binding(PropertyBinding binding)
+	{
+		property_bindings.remove(binding);
 	}
 }
 

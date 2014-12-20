@@ -26,6 +26,7 @@ namespace Diorite
 
 public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 {
+	public SingleList<PropertyBinding> property_bindings {get; protected set;}
 	public KeyValueStorageClient client {get; construct;}
 	public string name {get; construct;}
 	private uint32 timeout;
@@ -33,6 +34,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 	public KeyValueStorageProxy(KeyValueStorageClient client, string name, uint32 timeout)
 	{
 		GLib.Object(name: name, client: client);
+		property_bindings = new SingleList<PropertyBinding>();
 		this.timeout = timeout;
 		client.changed.connect(on_changed);
 		toggle_listener(true);

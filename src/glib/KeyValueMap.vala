@@ -27,12 +27,14 @@ namespace Diorite
 
 public class KeyValueMap: GLib.Object, KeyValueStorage
 {
+	public SingleList<PropertyBinding> property_bindings {get; protected set;}
 	protected HashTable<string, Variant> values;
 	protected HashTable<string, Variant> default_values;
 	
 	public KeyValueMap(HashTable<string, Variant>? default_values=null,
 		HashTable<string, Variant>? values=null)
 	{
+		property_bindings = new SingleList<PropertyBinding>();
 		this.values = values ?? new HashTable<string, Variant>(str_hash, str_equal);
 		this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
 	}

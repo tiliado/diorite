@@ -34,4 +34,35 @@ void main(string[] args)
 	stdout.puts(tree.to_string());
 	stdout.puts("\n\nBullet: '- '\n");
 	stdout.puts(tree.print("- "));
+	
+	var person = new Person("Jiří Janoušek", 25, 65.5);
+	tree.bind_object_property("person.name", person, "name");
+	tree.bind_object_property("person.age", person, "age", Diorite.PropertyBindingFlags.PROPERTY_TO_KEY);
+	tree.bind_object_property("person.weight", person, "weight", Diorite.PropertyBindingFlags.KEY_TO_PROPERTY);
+	person.name = "John";
+	person.age = 16;
+	person.weight = 100.25;
+	
+	tree.set_double("person.weight", 50.5);
+	tree.set_string("person.name", "My name");
+	
+	stdout.puts("\n\nBullet: '- '\n");
+	stdout.puts(tree.print("- "));
+}
+
+class Person: GLib.Object
+{
+	public string name {get; construct set;}
+	public int age {get; construct set;}
+	public double weight {get; construct set;}
+	
+	public Person(string name, int age, double weight)
+	{
+		GLib.Object(name: name, age: age, weight: weight);
+	}
+	
+	~Person()
+	{
+		message("~Person");
+	}
 }
