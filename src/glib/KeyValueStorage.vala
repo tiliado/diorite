@@ -91,12 +91,14 @@ public interface KeyValueStorage: GLib.Object
 		set_value(key, new Variant.double(value));
 	}
 	
-	public void bind_object_property(string key, GLib.Object object, string property_name,
+	public PropertyBinding? bind_object_property(string key, GLib.Object object, string property_name,
 		PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL)
 	{
 		var property = object.get_class().find_property(property_name);
-		return_if_fail(property != null);
-		property_bindings.prepend(new PropertyBinding(this, make_full_key(key, property_name), object, property, flags));
+		return_val_if_fail(property != null, null);
+		var binding = new PropertyBinding(this, make_full_key(key, property_name), object, property, flags);
+		property_bindings.prepend(binding);
+		return binding;
 	}
 	
 	public void unbind_object_property(string key, GLib.Object object, string property_name)
