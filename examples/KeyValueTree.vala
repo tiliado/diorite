@@ -36,9 +36,9 @@ void main(string[] args)
 	stdout.puts(tree.print("- "));
 	
 	var person = new Person("Jiří Janoušek", 25, 65.5);
-	tree.bind_object_property("person.name", person, "name");
-	tree.bind_object_property("person.age", person, "age", Diorite.PropertyBindingFlags.PROPERTY_TO_KEY);
-	tree.bind_object_property("person.weight", person, "weight", Diorite.PropertyBindingFlags.KEY_TO_PROPERTY);
+	tree.bind_object_property("person.", person, "name");
+	tree.bind_object_property("person.", person, "age", Diorite.PropertyBindingFlags.PROPERTY_TO_KEY);
+	tree.bind_object_property("person.", person, "weight", Diorite.PropertyBindingFlags.KEY_TO_PROPERTY);
 	person.name = "John";
 	person.age = 16;
 	person.weight = 100.25;
