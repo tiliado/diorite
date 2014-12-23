@@ -111,6 +111,12 @@ public class PropertyBinding
 			object.get(property.name, &str_value, null);
 			storage.set_string(key, str_value);
 		}
+		else if (property.value_type == typeof(bool))
+		{
+			bool value = false;
+			object.get(property.name, &value, null);
+			storage.set_bool(key, value);
+		}
 		else
 		{
 			critical("Unsupported type for property binding. %s.", to_string());
@@ -128,6 +134,17 @@ public class PropertyBinding
 				return false;
 			
 			object.set(property.name, new_str_value, null);
+			return true;
+		}
+		else if (property.value_type == typeof(bool))
+		{
+			bool value = false;
+			object.get(property.name, &value, null);
+			var new_value = storage.get_bool(key);
+			if (value == new_value)
+				return false;
+			
+			object.set(property.name, new_value, null);
 			return true;
 		}
 		else
