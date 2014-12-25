@@ -154,6 +154,24 @@ public class PropertyBinding
 		return false;
 	}
 	
+	/**
+	 * Set default value of the associated key.
+	 * 
+	 * Useful for chaining
+	 * 
+	 * ```
+	 * binding.set_default(true).update_property()
+	 * ```
+	 * 
+	 * @param default_value    default value to set
+	 * @return self
+	 */
+	public PropertyBinding set_default(Variant? default_value)
+	{
+		storage.set_default_value(key, default_value);
+		return this;
+	}
+	
 	private void on_property_changed(GLib.Object o, ParamSpec p)
 	{
 		update_key();
