@@ -53,7 +53,6 @@ public class PropertyBinding
 	
 	public PropertyBinding(KeyValueStorage storage, string key, GLib.Object object, ParamSpec property, PropertyBindingFlags flags)
 	{
-		
 		if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0
 		&& (flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0)
 			flags |= PropertyBindingFlags.BIDIRECTIONAL;
@@ -125,33 +124,39 @@ public class PropertyBinding
 	
 	public bool update_property()
 	{
+		toggle_property_notify_handler(false);
+		
+		bool result = false;
 		if (property.value_type == typeof(string))
 		{
 			string? str_value = null;
 			object.get(property.name, &str_value, null);
 			var new_str_value = storage.get_string(key);
-			if (str_value == new_str_value)
-				return false;
-			
-			object.set(property.name, new_str_value, null);
-			return true;
+			if (str_value != new_str_value)
+			{
+				object.set(property.name, new_str_value, null);
+				result = true;
+			}
 		}
 		else if (property.value_type == typeof(bool))
 		{
 			bool value = false;
 			object.get(property.name, &value, null);
 			var new_value = storage.get_bool(key);
-			if (value == new_value)
-				return false;
-			
-			object.set(property.name, new_value, null);
-			return true;
+			if (value != new_value)
+			{
+				object.set(property.name, new_value, null);
+				result = true;
+			}
 		}
 		else
 		{
 			critical("Unsupported type for property binding. %s.", to_string());
 		}
-		return false;
+		
+		toggle_property_notify_handler(true);
+		
+		return result;
 	}
 	
 	/**
@@ -170,6 +175,22 @@ public class PropertyBinding
 	{
 		storage.set_default_value(key, default_value);
 		return this;
+	}
+	
+	private void toggle_property_notify_handler(bool enabled)
+	{
+		uint signal_id;
+		Quark detail;
+		return_if_fail(Signal.parse_name(
+			"notify::" + property.name, typeof(GLib.Object), out signal_id, out detail, true));
+		if (enabled)
+			SignalHandler.unblock_matched(
+				object, SignalMatchType.ID | SignalMatchType.DATA,
+				signal_id, detail, null, null, this);
+		else
+			SignalHandler.block_matched(
+				object, SignalMatchType.ID | SignalMatchType.DATA,
+				signal_id, detail, null, null, this);
 	}
 	
 	private void on_property_changed(GLib.Object o, ParamSpec p)
