@@ -104,6 +104,8 @@ public class PropertyBinding
 	
 	public void update_key()
 	{
+		toggle_changed_notify_handler(false);
+		
 		if (property.value_type == typeof(string))
 		{
 			string? str_value = null;
@@ -120,6 +122,8 @@ public class PropertyBinding
 		{
 			critical("Unsupported type for property binding. %s.", to_string());
 		}
+		
+		toggle_changed_notify_handler(true);
 	}
 	
 	public bool update_property()
@@ -191,6 +195,21 @@ public class PropertyBinding
 			SignalHandler.block_matched(
 				object, SignalMatchType.ID | SignalMatchType.DATA,
 				signal_id, detail, null, null, this);
+	}
+	
+	private void toggle_changed_notify_handler(bool enabled)
+	{
+		uint signal_id;
+		return_if_fail(Signal.parse_name(
+			"changed", typeof(KeyValueStorage), out signal_id, null, false));
+		if (enabled)
+			SignalHandler.unblock_matched(
+				storage, SignalMatchType.ID | SignalMatchType.DATA,
+				signal_id, 0, null, null, this);
+		else
+			SignalHandler.block_matched(
+				storage, SignalMatchType.ID | SignalMatchType.DATA,
+				signal_id, 0, null, null, this);
 	}
 	
 	private void on_property_changed(GLib.Object o, ParamSpec p)
