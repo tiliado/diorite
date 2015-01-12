@@ -121,26 +121,54 @@ public class MessageClient: Client
 	}
 	
 	/**
+	 * Wait for successful echo message
+	 * 
+	 * Use to be sure server has already started listening. This method doesn't block event loop.
+	 * 
 	 * @param timeout miliseconds
 	 */
 	public bool wait_for_echo(int timeout)
 	{
-		int sleep = 10000;
-		int attempts = timeout * 1000 / sleep;
+		int sleep = 50;  // ms
 		var message = new Variant.string("HELLO");
-		while (attempts-- > 0)
+		bool result = false;
+		
+		try
 		{
-			try
-			{
-				var response = send_message("echo", message);
-				if (response != null && response.equal(message))
-					return true;
-			}
-			catch(MessageError e){}
-			
-			Thread.usleep(sleep);
+			var response = send_message("echo", message);
+			if (response != null && response.equal(message))
+				result = true;
 		}
-		return false;
+		catch (MessageError e)
+		{
+			var loop = new MainLoop();
+			var attempts = timeout / sleep;
+			Timeout.add(sleep, () =>
+			{
+				try
+				{
+					var response = send_message("echo", message);
+					if (response != null && response.equal(message))
+					{
+						result = true;
+						loop.quit();
+						return false; // stop
+					}
+				}
+				catch (MessageError e)
+				{
+				}
+				
+				if (--attempts <= 0)
+				{
+					loop.quit();
+					return false; // stop
+				}
+				return true; // continue
+			});
+			loop.run();
+		}
+		return result;
 	}
 }
 
