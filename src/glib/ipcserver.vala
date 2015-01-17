@@ -74,9 +74,6 @@ public class Server
 	
 	private bool on_incoming(SocketConnection connection, GLib.Object? source_object)
 	{
-		if (log_comunication)
-			debug("Incoming connection");
-		
 		process_connection.begin(connection, on_process_incoming_done);
 		return true;
 	}
@@ -86,8 +83,6 @@ public class Server
 		try
 		{
 			process_connection.end(result);
-			if (log_comunication)
-				debug("Connection processed successfully");
 		}
 		catch (IOError e)
 		{
