@@ -159,6 +159,10 @@ public class ActionsRegistry : GLib.Object
 		var menu = new Menu();
 		foreach (var full_name in actions)
 		{
+			// TODO: Support separators in build_menu()
+			if (full_name == "|")
+				continue;
+				
 			var item = create_menu_item(full_name, use_mnemonic, use_icons);
 			if (item != null)
 				menu.append_item(item);
