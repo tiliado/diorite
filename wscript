@@ -274,7 +274,7 @@ def build(ctx):
 		vala_target_glib = TARGET_GLIB,
 		)
 	
-	ctx.install_as('${BINDIR}/diorite-testgen', 'testgen.py', chmod=Utils.O755)
+	ctx.install_as('${BINDIR}/diorite-testgen-' + SERIES, 'testgen.py', chmod=Utils.O755)
 	ctx.add_post_fun(post)
 
 def dist(ctx):
