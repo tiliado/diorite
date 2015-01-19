@@ -38,13 +38,25 @@ TARGET_GLIB = '{}.{}'.format(*TARGET_GLIB_TUPLE)
 TARGET_GTK_TUPLE = (3, 10)
 TARGET_GTK = '{}.{}'.format(*TARGET_GTK_TUPLE)
 
-if VERSION[-1] == "+":
-	from datetime import datetime
-	import subprocess
+import subprocess
+try:
 	try:
-		commit = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%h"], stdout=subprocess.PIPE).communicate()[0]
-		VERSION = "{}{}.{}".format(VERSION, datetime.utcnow().strftime("%Y%m%d%H%M"), commit)
+		# Read revision info from file revision-info created by ./waf dist
+		timestamp, short_id, long_id = open("upstream-revision", "r").read().split(" ", 2)
 	except Exception as e:
+		# Read revision info from current branch
+		output = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%ct %h %H"], stdout=subprocess.PIPE).communicate()[0]
+		timestamp, short_id, long_id = output.split(" ", 2)
+	
+	from datetime import datetime
+	timestamp = datetime.utcfromtimestamp(int(timestamp))
+except Exception as e:
+	timestamp, short_id, long_id = None, "fuzzy", "fuzzy"
+
+if VERSION[-1] == "+":
+	if timestamp:
+		VERSION += "{}.{}".format(timestamp.strftime("%Y%m%d%H%M"), short_id)
+	else:
 		VERSION = VERSION[:-1]
 
 import sys
@@ -116,6 +128,12 @@ def configure(ctx):
 	if PLATFORM not in (WIN, LINUX):
 		print("Unsupported platform %s. Please try to talk to devs to consider support of your platform." % sys.platform)
 		sys.exit(1)
+	
+	ctx.msg("Version", VERSION, "GREEN")
+	if long_id != "fuzzy":
+		ctx.msg("Upstream revision", long_id, "GREEN")
+	else:
+		ctx.msg("Upstream revision", "unknown (unsupported build)", "RED")
 	
 	ctx.define(PLATFORM, 1)
 	ctx.env.VALA_DEFINES = [PLATFORM]
@@ -261,7 +279,16 @@ def build(ctx):
 
 def dist(ctx):
 	ctx.algo = "tar.gz"
-	ctx.excl = '.bzr .bzrignore build/* **/.waf* **/*~ **/*.swp **/.lock* bzrcommit.txt **/*.pyc'
+	ctx.excl = '.git .gitignore build/* **/.waf* **/*~ **/*.swp **/.lock* **/*.pyc'
+	ctx.exec_command("git log -n 1 --pretty='format:%ct %h %H' > upstream-revision")
+	
+	def archive():
+		ctx._archive()
+		node = ctx.path.find_node("upstream-revision")
+		if node:
+			node.delete()
+	ctx._archive = ctx.archive
+	ctx.archive = archive
 
 def post(ctx):
 	if ctx.cmd in ('install', 'uninstall'):
