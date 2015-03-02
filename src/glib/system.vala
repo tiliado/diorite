@@ -60,6 +60,57 @@ namespace Diorite.System
 		file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
 	}
 	
+	public async void make_directory_with_parents_async(
+		File directory, int io_priority=Priority.DEFAULT, Cancellable? cancellable = null) throws GLib.Error
+	{
+		
+		SingleList<File> dirs = new SingleList<File>();
+		dirs.prepend(directory);
+		File? dir;
+		while ((dir = dirs[0]) != null)
+		{
+			try
+			{
+				yield dir.make_directory_async(io_priority, cancellable);
+				dirs.remove_at(0);
+			}
+			catch (GLib.Error e)
+			{
+				if (e is GLib.IOError.NOT_FOUND)
+				{
+					dirs.prepend(dir.get_parent());
+				}
+				else
+				{
+					dirs = null;
+					throw e;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Replaces contents of a file with text in UTF-8 encoding
+	 * 
+	 * @param file        file to overwrite
+	 * @param contents    contents of the file
+	 * @throws GLib.Error on failure
+	 */
+	public async void overwrite_file_async(
+		File file, string contents, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable = null)
+		throws GLib.Error
+	{
+		try
+		{
+			yield make_directory_with_parents_async(file.get_parent(), io_priority, cancellable);
+		}
+		catch (GLib.Error e)
+		{
+		}
+		yield file.replace_contents_async(contents.data, null, false, FileCreateFlags.NONE, cancellable, null);
+	}
+	
 	
 	/**
 	 * Removes files in a directory.
