@@ -54,6 +54,20 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		
 		header_bar = new Gtk.HeaderBar();
 		header_bar.show();
+		
+		/* Add some padding in GTK+ < 3.11, looks fine in GTK+ 3.12 */
+		if (get_gtk_version() < 31100)
+		{
+			Gtk.Box? title_box = null;
+			header_bar.forall((widget) =>
+			{
+				if (title_box == null && widget is Gtk.Box && widget.get_parent() == header_bar)
+					title_box = (Gtk.Box) widget;
+			});
+			if (title_box != null)
+				title_box.margin_left = title_box.margin_right = 12;
+		}
+		
 		var gs = Gtk.Settings.get_default();
 		if (!gs.gtk_shell_shows_menubar && gs.gtk_shell_shows_app_menu)
 		{
