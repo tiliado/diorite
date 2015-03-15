@@ -143,8 +143,6 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	
 	public void create_toolbar(string[] items)
 	{
-		Gtk.Button? button;
-		var actions = app.actions;
 		if (menu_button == null)
 			create_menu_button({});
 		
@@ -156,25 +154,52 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		{
 			if (items[i] == " ")
 			{
-				header_bar.pack_end(menu_button);
-				for (var j = items.length - 1; j > i; j--)
+				/* GTK+ < 3.11.?? seems to have reversed ordering in HeaderBar.pack_end() */
+				if (get_gtk_version() >= 31100)
 				{
-					button = actions.create_action_button(items[j], true, true);
-					if (button != null)
-						header_bar.pack_end(button);
+					header_bar.pack_end(menu_button);
+					for (var j = items.length - 1; j > i; j--)
+						toolbar_pack_end(items[j]);
+				}
+				else
+				{
+					for (var j = i + 1; j < items.length; j++)
+						toolbar_pack_end(items[j]);
+					header_bar.pack_end(menu_button);
 				}
 				break;
 			}
 			
-			button = actions.create_action_button(items[i], true, true);
-			if (button != null)
-				header_bar.pack_start(button);
-			
+			toolbar_pack_start(items[i]);
 			if (i == items.length - 1)
 				header_bar.pack_end(menu_button);
 		}
 		
 		header_bar.show_all();
+	}
+	
+	private bool toolbar_pack_start(string action)
+	{
+		return_val_if_fail(header_bar != null, false);
+		var button = app.actions.create_action_button(action, true, true);
+		if (button != null)
+		{
+			header_bar.pack_start(button);
+			return true;
+		}
+		return false;
+	}
+	
+	private bool toolbar_pack_end(string action)
+	{
+		return_val_if_fail(header_bar != null, false);
+		var button = app.actions.create_action_button(action, true, true);
+		if (button != null)
+		{
+			header_bar.pack_end(button);
+			return true;
+		}
+		return false;
 	}
 	
 	private void on_header_bar_revealer_expanded_changed(GLib.Object o, ParamSpec p)
