@@ -103,6 +103,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
 				Gtk.IconSize.SMALL_TOOLBAR);
 			menu_button.image = image;
+			menu_button.valign = Gtk.Align.CENTER;
+			menu_button.vexpand = false;
 			menu_button.no_show_all = true;
 		}
 		
