@@ -32,7 +32,7 @@ public delegate bool EqualData(void* data1, void* data2);
  * Base class for test cases.
  */
 public abstract class TestCase: GLib.Object
-{
+{	
 	public static bool str_eq(void* data1, void* data2)
 	{
 		uint8* p1 = *((uint8**) data1);
@@ -47,15 +47,21 @@ public abstract class TestCase: GLib.Object
 		return *((int*)data1) == *((int*)data2);
 	}
 
-	
 	public int passed = 0;
 	public int failed = 0;
+	public string? last_fatal_log_message = null;
 	
+	public virtual bool log_fatal_func(string? log_domain, LogLevelFlags log_levels, string message)
+	{
+		last_fatal_log_message = message;
+		return false;
+	}
 	/**
 	 * Set up environment before each test of this test case.
 	 */
 	public virtual void set_up()
 	{
+		Test.log_set_fatal_handler(log_fatal_func);
 	}
 	
 	/**
