@@ -120,6 +120,7 @@ def options(ctx):
 	ctx.add_option('--no-debug', action='store_false', dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--no-ldconfig', action='store_false', default=True, dest='ldconfig', help="Don't run ldconfig after installation")
 	ctx.add_option('--platform', default=_PLATFORM, help="Target platform")
+	ctx.add_option('--with-experimental-api', action='store_true', default=False, dest='experimental', help="Include experimental API.")
 
 # Configure build process
 def configure(ctx):
@@ -140,6 +141,12 @@ def configure(ctx):
 	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
+	# Enable experimental API
+	ctx.env.EXPERIMENTAL = ctx.options.experimental
+	if ctx.env.EXPERIMENTAL:
+		ctx.vala_def("EXPERIMENTAL")
+	
+	# Find Valac
 	ctx.load('compiler_c vala')
 	ctx.check_vala(min_version=(0,22,1))
 	
