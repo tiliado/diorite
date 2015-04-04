@@ -183,6 +183,9 @@ def configure(ctx):
 	ctx.check_dep('gtk+-3.0', 'GTK+', TARGET_GTK)
 	ctx.check_dep('gdk-3.0', 'GDK', TARGET_GTK)
 	
+	if ctx.env.EXPERIMENTAL:
+		ctx.check_dep('sqlite3', 'SQLITE', "3.7")
+	
 	ctx.define('GLIB_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GLIB_TUPLE))
 	ctx.define('GLIB_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GLIB_TUPLE))
 	ctx.define('GDK_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GTK_TUPLE))
@@ -198,6 +201,7 @@ def build(ctx):
 	PLATFORM = ctx.env.PLATFORM
 	DIORITE_GLIB = "{}glib-{}".format(APPNAME, SERIES)
 	DIORITE_GTK = "{}gtk-{}".format(APPNAME, SERIES)
+	DIORITE_DB = "{}db-{}".format(APPNAME, SERIES)
 	packages = 'posix glib-2.0 gio-2.0'
 	uselib = 'GLIB GTHREAD'
 	vala_defines = ctx.env.VALA_DEFINES
@@ -205,12 +209,14 @@ def build(ctx):
 	if PLATFORM == WIN:
 		DIORITE_GLIB_LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
 		DIORITE_GTK_LIBNAME = "dioritegtk-" + API_VERSION.split(".")[0]
+		DIORITE_DB_LIBNAME = "dioritedb-" + API_VERSION.split(".")[0]
 		PC_CFLAGS="-mms-bitfields"
 		uselib += " WINGIO"
 		packages += " gio-windows-2.0 win32"
 	else:
 		DIORITE_GLIB_LIBNAME = DIORITE_GLIB
 		DIORITE_GTK_LIBNAME = DIORITE_GTK
+		DIORITE_DB_LIBNAME = DIORITE_DB
 		PC_CFLAGS=""
 		uselib += " UNIXGIO"
 		packages += " gio-unix-2.0"
@@ -242,6 +248,21 @@ def build(ctx):
 		vala_target_glib = TARGET_GLIB,
 	)
 	
+	if ctx.env.EXPERIMENTAL:
+		ctx(features = "c cshlib",
+			target = DIORITE_DB,
+			name = DIORITE_DB,
+			source = ctx.path.ant_glob('src/db/*.vala') + ctx.path.ant_glob('src/db/*.c'),
+			packages = packages + " sqlite3",
+			uselib = uselib + " SQLITE",
+			use = [DIORITE_GLIB],
+			includes = ["src/db"],
+			vala_defines = vala_defines,
+			cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
+			vapi_dirs = ['vapi'],
+			vala_target_glib = TARGET_GLIB,
+		)
+	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
 		target='{}glib-{}.pc'.format(APPNAME, SERIES),
@@ -270,6 +291,21 @@ def build(ctx):
 		DIORITE_GLIB=DIORITE_GLIB,
 		)
 	
+	if ctx.env.EXPERIMENTAL:
+		ctx(features = 'subst',
+		source='src/dioritedb.pc.in',
+		target='{}db-{}.pc'.format(APPNAME, SERIES),
+		install_path='${LIBDIR}/pkgconfig',
+		VERSION=VERSION,
+		PREFIX=ctx.env.PREFIX,
+		INCLUDEDIR = ctx.env.INCLUDEDIR,
+		LIBDIR = ctx.env.LIBDIR,
+		APPNAME=APPNAME,
+		PC_CFLAGS=PC_CFLAGS,
+		LIBNAME=DIORITE_DB_LIBNAME,
+		DIORITE_GLIB=DIORITE_GLIB,
+		)
+		
 	if PLATFORM == WIN :
 		ctx.program(
 		target = "dioriteinterrupthelper",

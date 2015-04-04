@@ -18,11 +18,11 @@ H_FILE = $(OUT)/$(NAME).h
 VAPI_FILE = $(OUT)/$(NAME).vapi
 CFLAGS += -I$(OUT) -I$(BUILD)
 CFLAGS += $(shell pkg-config --cflags $(PACKAGES))
-LDFLAGS += -L$(OUT) -L$(BUILD) -ldioriteglib-0.1 -ldioritegtk-0.1
+LDFLAGS += -L$(OUT) -L$(BUILD) -ldioriteglib-0.1 -ldioritegtk-0.1 -ldioritedb-0.1
 LDFLAGS += $(shell pkg-config --libs $(PACKAGES))
 VALAFLAGS += --vapidir $(OUT) --vapidir $(BUILD) --vapidir ../vapi
 VALAFLAGS += $(PACKAGES:%=--pkg=%)
-VALAFLAGS += --pkg dioriteglib-0.1 --pkg dioritegtk-0.1
+VALAFLAGS += --pkg dioriteglib-0.1 --pkg dioritegtk-0.1 --pkg dioritedb-0.1
 LIBPREFIX = lib
 LIBSUFFIX = .so
 LIBRARYSO=$(LIBPREFIX)$(NAME)$(LIBSUFFIX)

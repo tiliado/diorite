@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: DirotiteDB
+Description: Utility library for SQLite3/GLib
+Version: @VERSION@
+Requires.private: glib-2.0 @DIORITE_GLIB@
+Libs: -L${libdir} -l@LIBNAME@
+Cflags: -I${includedir}/@APPNAME@-1.0 @PC_CFLAGS@
