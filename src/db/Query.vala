@@ -25,46 +25,30 @@
 namespace Dioritedb
 {
 
-public errordomain DatabaseError
+public class Query : GLib.Object
 {
-	UNKNOWN,
-	IOERROR,
-	DATABASE_NOT_OPENED,
-	GENERAL;
-}
-
-
-// http://www.sqlite.org/rescode.html
-private static int convert_error(Sqlite.Database? db, int result, string? sql=null,
-	Sqlite.Statement? stm = null) throws DatabaseError
-{
-	switch (result)
+	public Connection connection {get; private set;}
+	private Sqlite.Statement statement = null;
+	
+	public Query(Connection connection, string sql) throws DatabaseError
 	{
-		case Sqlite.OK:
-		case Sqlite.ROW:
-		case Sqlite.DONE:
-			return result;
-		
+		this.connection = connection;
+		throw_on_error(connection.db.prepare_v2(sql, sql.length, out statement), sql);
 	}
-	var msg = "SQLite Error %d: %s. |%s|".printf(
-		result,
-		db != null ? db.errmsg() : "(unknown database)",
-		sql ?? (stm != null ? stm.sql() : null));
-	throw new DatabaseError.GENERAL(msg);
-}
-
-/**
- * Usage:
- * 
- * {{{
- * throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
- * }}}
- */
-public void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
-	throws IOError
-{
-    if (cancellable != null && cancellable.is_cancelled())
-        throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
+	
+	public void exec(Cancellable? cancellable=null) throws Error, DatabaseError
+	{
+		do
+		{
+			throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
+		}
+		while (throw_on_error(statement.step()) != Sqlite.DONE);
+	}
+	
+	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
+	{
+		return Dioritedb.convert_error(connection.db, result, sql, statement);
+	}
 }
 
 } // namespace Dioritedb

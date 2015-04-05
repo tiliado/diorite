@@ -27,10 +27,10 @@ namespace Dioritedb
 
 public class Connection: GLib.Object
 {
-	private unowned Database database;
-	private Sqlite.Database db;
+	public unowned Database database {get; private set;}
+	internal Sqlite.Database db;
 	
-	public Connection(Database database, Cancellable? cancellable=null) throws Error
+	public Connection(Database database, Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		this.database = database;
@@ -42,6 +42,12 @@ public class Connection: GLib.Object
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		throw_on_error(db.exec(sql, null, null), sql);
+	}
+	
+	public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	{
+		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
+		return new Query(this, sql);
 	}
 	
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
