@@ -116,42 +116,6 @@ public class DatabaseTest: Diorite.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-		
-	public void test_query()
-	{
-		try
-		{
-			db.open();
-		}
-		catch (GLib.Error e)
-		{
-			assert_not_reached("%s", e.message);
-		}
-		try
-		{
-			db.get_master_connection().query("SELECT name FROM users WHERE id = 1").exec();
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such table: users*", e.message, "");
-		}
-		try
-		{
-			db.get_master_connection().query("CREATE TABLE users(id INTEGER PRIMARY KEY ASC, name TEXT)").exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		try
-		{
-			db.get_master_connection().query("SELECT name FROM users WHERE id = 1").exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
 }
 
 } // namespace Dioritedb

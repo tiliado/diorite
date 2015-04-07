@@ -29,11 +29,13 @@ public class Query : GLib.Object
 {
 	public Connection connection {get; private set;}
 	private Sqlite.Statement statement = null;
+	private int n_parameters = 0;
 	
 	public Query(Connection connection, string sql) throws DatabaseError
 	{
 		this.connection = connection;
 		throw_on_error(connection.db.prepare_v2(sql, sql.length, out statement), sql);
+		n_parameters = statement.bind_parameter_count();
 	}
 	
 	public void exec(Cancellable? cancellable=null) throws Error, DatabaseError
@@ -43,6 +45,110 @@ public class Query : GLib.Object
 			throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		}
 		while (throw_on_error(statement.step()) != Sqlite.DONE);
+	}
+	
+	public Query bind(int index, GLib.Value? value) throws DatabaseError
+	{
+		if (value == null)
+			return bind_null(index);
+		var type = value.type();
+		if (type == typeof(bool))
+			return bind_bool(index, value.get_boolean());
+		if (type == typeof(int))
+			return bind_int(index, value.get_int());
+		if (type == typeof(int64))
+			return bind_int64(index, value.get_int64());
+		if (type == typeof(string))
+			return bind_string(index, value.get_string());
+		if (type == typeof(double))
+			return bind_double(index, value.get_double());
+		if (type == typeof(float))
+			return bind_double(index, (double) value.get_float());
+		if (type == typeof(GLib.Bytes))
+			return bind_bytes(index, (GLib.Bytes) value.get_boxed());
+		if (type == typeof(GLib.ByteArray))
+			return bind_byte_array(index, (GLib.ByteArray) value.get_boxed());
+
+		throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+	}
+	
+	public Query bind_null(int index) throws DatabaseError
+	{
+		check_index(index);
+		throw_on_error(statement.bind_null(index));
+		return this;
+	}
+	
+	public Query bind_bool(int index, bool value) throws DatabaseError
+	{
+		return bind_int(index, value ? 1 : 0);
+	}
+	
+	public Query bind_int(int index, int value) throws DatabaseError
+	{
+		check_index(index);
+		throw_on_error(statement.bind_int(index, value));
+		return this;
+	}
+	
+	public Query bind_int64(int index, int64 value) throws DatabaseError
+	{
+		check_index(index);
+		throw_on_error(statement.bind_int64(index, value));
+		return this;
+	}
+	
+	public Query bind_string(int index, string? value) throws DatabaseError
+	{
+		if (value == null)
+			return bind_null(index);
+		check_index(index);
+		throw_on_error(statement.bind_text(index, value));
+		return this;
+	}
+	
+	public Query bind_double(int index, double value) throws DatabaseError
+	{
+		check_index(index);
+		throw_on_error(statement.bind_double(index, value));
+		return this;
+	}
+	
+	public Query bind_blob(int index, uint8[] value) throws DatabaseError
+	{
+		check_index(index);
+		throw_on_error(statement.bind_blob(index, value, value.length, null));
+		return this;
+	}
+	
+	public Query bind_bytes(int index, GLib.Bytes? value) throws DatabaseError
+	{
+		if (value == null)
+			return bind_null(index);
+		
+		check_index(index);
+		throw_on_error(statement.bind_blob(index, value.get_data(), (int) value.get_size(), null));
+		return this;
+	}
+	
+	public Query bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError
+	{
+		if (value == null)
+			return bind_null(index);
+		
+		check_index(index);
+		throw_on_error(statement.bind_blob(index, value.data, (int) value.len, null));
+		return this;
+	}
+	
+	protected int check_index(int index) throws DatabaseError
+	{
+		if (n_parameters == 0)
+			throw new DatabaseError.RANGE("Query doesn't have parameters. |%s|", statement.sql());
+		if (index <= 0 || index > n_parameters)
+			throw new DatabaseError.RANGE(
+				"Index %d is not in range 1..%d. |%s|", index, n_parameters, statement.sql());
+		return index;
 	}
 	
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError

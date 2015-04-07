@@ -30,7 +30,9 @@ public errordomain DatabaseError
 	UNKNOWN,
 	IOERROR,
 	DATABASE_NOT_OPENED,
-	GENERAL;
+	GENERAL,
+	RANGE,
+	DATA_TYPE;
 }
 
 
