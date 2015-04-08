@@ -32,7 +32,8 @@ public errordomain DatabaseError
 	DATABASE_NOT_OPENED,
 	GENERAL,
 	RANGE,
-	DATA_TYPE;
+	DATA_TYPE,
+	MISUSE;
 }
 
 

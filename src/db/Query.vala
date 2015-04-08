@@ -30,6 +30,7 @@ public class Query : GLib.Object
 	public Connection connection {get; private set;}
 	private Sqlite.Statement statement = null;
 	private int n_parameters = 0;
+	private bool executed = false;
 	
 	public Query(Connection connection, string sql) throws DatabaseError
 	{
@@ -40,11 +41,29 @@ public class Query : GLib.Object
 	
 	public void exec(Cancellable? cancellable=null) throws Error, DatabaseError
 	{
+		lock (executed)
+		{
+			check_not_executed();
+			executed = true;
+		}
+		
 		do
 		{
 			throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		}
 		while (throw_on_error(statement.step()) != Sqlite.DONE);
+	}
+	
+	public void reset(bool clear_bindings=false) throws Error, DatabaseError
+	{
+		throw_on_error(statement.reset());
+		if (clear_bindings)
+			throw_on_error(statement.clear_bindings());
+		
+		lock (executed)
+		{
+			executed = false;
+		}
 	}
 	
 	public Query bind(int index, GLib.Value? value) throws DatabaseError
@@ -75,6 +94,7 @@ public class Query : GLib.Object
 	public Query bind_null(int index) throws DatabaseError
 	{
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_null(index));
 		return this;
 	}
@@ -87,6 +107,7 @@ public class Query : GLib.Object
 	public Query bind_int(int index, int value) throws DatabaseError
 	{
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_int(index, value));
 		return this;
 	}
@@ -94,6 +115,7 @@ public class Query : GLib.Object
 	public Query bind_int64(int index, int64 value) throws DatabaseError
 	{
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_int64(index, value));
 		return this;
 	}
@@ -103,6 +125,7 @@ public class Query : GLib.Object
 		if (value == null)
 			return bind_null(index);
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_text(index, value));
 		return this;
 	}
@@ -110,6 +133,7 @@ public class Query : GLib.Object
 	public Query bind_double(int index, double value) throws DatabaseError
 	{
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_double(index, value));
 		return this;
 	}
@@ -117,6 +141,7 @@ public class Query : GLib.Object
 	public Query bind_blob(int index, uint8[] value) throws DatabaseError
 	{
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_blob(index, value, value.length, null));
 		return this;
 	}
@@ -127,6 +152,7 @@ public class Query : GLib.Object
 			return bind_null(index);
 		
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_blob(index, value.get_data(), (int) value.get_size(), null));
 		return this;
 	}
@@ -137,8 +163,15 @@ public class Query : GLib.Object
 			return bind_null(index);
 		
 		check_index(index);
+		check_not_executed();
 		throw_on_error(statement.bind_blob(index, value.data, (int) value.len, null));
 		return this;
+	}
+	
+	protected void check_not_executed() throws DatabaseError
+	{
+		if (executed)
+				throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
 	}
 	
 	protected int check_index(int index) throws DatabaseError
