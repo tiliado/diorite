@@ -56,12 +56,18 @@ public abstract class TestCase: GLib.Object
 		last_fatal_log_message = message;
 		return false;
 	}
+	
+	construct
+	{
+		stdout.puts("----------------------------8<----------------------------\n");
+		Test.log_set_fatal_handler(log_fatal_func);
+	}
+	
 	/**
 	 * Set up environment before each test of this test case.
 	 */
 	public virtual void set_up()
 	{
-		Test.log_set_fatal_handler(log_fatal_func);
 	}
 	
 	/**
@@ -188,8 +194,9 @@ public abstract class TestCase: GLib.Object
 	{
 		if (!Test.quiet())
 		{
-			stdout.printf(("[%s] %d run, %d passed, %d failed\n"),
-			failed > 0 ? "FAIL" : "PASS", passed + failed, passed, failed);
+			stdout.printf(("[%s] %d run, %d passed, %d failed\n%s"),
+			failed > 0 ? "FAIL" : "PASS", passed + failed, passed, failed,
+			"----------------------------8<----------------------------\n");
 		}
 	}
 	

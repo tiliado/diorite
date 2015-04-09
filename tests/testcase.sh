@@ -48,25 +48,34 @@ list()
 run()
 {
 	make all
+	n_failed=0
+	
 	if [ $# = 0 ]; then
-		all_ok=1
+		
 		for path in $(${LAUNCHER} ${RUN}/${NAME}${EXECSUFFIX} -l); do
 			echo
 			echo \$ $0 run $path
 			set -x
-			${LAUNCHER} ${RUN}/${NAME}${EXECSUFFIX} --verbose -p $path || all_ok=0
+			${LAUNCHER} ${RUN}/${NAME}${EXECSUFFIX} --verbose -p $path || (( n_failed = n_failed + 1 ))
 			{ set +x; } 2> /dev/null
+			echo "----------------------------8<----------------------------"
 		done
-		if [ $all_ok = 0 ]; then
-			echo "Test case failure!"
-			exit 1
-		fi
+		
 	else
 		for path in "$@"; do
 			set -x
-			${LAUNCHER} ${RUN}/${NAME}${EXECSUFFIX} --verbose -p $path
+			${LAUNCHER} ${RUN}/${NAME}${EXECSUFFIX} --verbose -p $path || (( n_failed = n_failed + 1 ))
 			{ set +x; } 2> /dev/null
+			echo "----------------------------8<----------------------------"
 		done
+	fi
+	
+	if [ $n_failed = 0 ]; then
+		echo "Congratulations! Zero failures :-)"
+		exit 0
+	else
+		echo "Oops! There are $n_failed test cases :-("
+		exit 1
 	fi
 }
 
