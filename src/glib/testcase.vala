@@ -121,6 +121,187 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expression    expression expected to be true
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_true(bool expression, string format, ...)
+	{
+		return process(expression, format, va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expression    expression expected to be false
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_false(bool expression, string format, ...)
+	{
+		return process(!expression, format, va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_int_equals(int expected, int value, string format, ...)
+	{
+		return process(expected == value, "%s: %d == %d".printf(format, expected, value), va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_int64_equals(int64 expected, int64 value, string format, ...)
+	{
+		return process(expected == value, "%s: %s == %s".printf(
+			format, expected.to_string(), value.to_string()), va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_double_equals(double expected, double value, string format, ...)
+	{
+		return process(expected == value, "%s: %s == %s".printf(
+			format, expected.to_string(), value.to_string()), va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_str_equals(string? expected, string? value, string format, ...)
+	{
+		var result = process(expected == value, format, va_list());
+		if (!result && !Test.quiet())
+			stdout.printf("\t '%s' == '%s' failed.\n", expected, value);
+		return result;
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_str_not_equal(string? expected, string? value, string format, ...)
+	{
+		var result = process(expected != value, format, va_list());
+		if (!result && !Test.quiet())
+			stdout.printf("\t '%s' != '%s' failed.\n", expected, value);
+		return result;
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_blob_equal(uint8[]? expected, uint8[]? value, string format, ...)
+	{
+		return process_bytes_equal(
+			expected != null ? new Bytes.static(expected): null,
+			value != null ? new Bytes.static(value): null,
+			format, va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, ...)
+	{
+		return process_bytes_equal(expected, value, format, va_list());
+	}
+	
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_byte_array_equal(GLib.ByteArray? expected, GLib.ByteArray? value, string format, ...)
+	{
+		return process_bytes_equal(
+			expected != null ? new Bytes.static(expected.data): null,
+			value != null ? new Bytes.static(value.data): null,
+			format, va_list());
+	}
+	
+	private bool process_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, va_list args)
+	{
+		var result = process(
+			(expected == null && value == null)
+			|| (expected != null && value != null && expected.compare(value) == 0),
+			format, args);
+		if (!result && !Test.quiet())
+		{
+			string? expected_hex = null, value_hex = null;
+			if (expected != null)
+				Diorite.bin_to_hex(expected.get_data(), out expected_hex);
+			if (value != null)
+				Diorite.bin_to_hex(value.get_data(), out value_hex);
+			stdout.printf("\t '%s' == '%s' failed.\n", expected_hex, value_hex);
+		}
+		return result;
+	}
+	
+	/**
 	 * Expectation failed
 	 * 
 	 * Test is not terminated.
