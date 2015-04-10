@@ -45,6 +45,7 @@ $(RUN)/$(NAME).o: $(RUN)/$(NAME).c
 $(RUN)/$(NAME).c: $(RUN)/$(NAME).vala $(OUT)/$(LIBRARYSO)
 	$(VALAC) -C -d $(OUT) -b $(OUT) --thread -v \
 	--target-glib=2.32 --pkg $(NAME) $(VALAFLAGS) $<
+	touch $@
 
 $(RUN)/$(NAME).vala: $(VALA_FILES) | $(RUN)
 	$(TESTGEN) -o $@ $(VALA_FILES)
@@ -59,6 +60,7 @@ $(C_FILES) : $(VALA_FILES)
 	$(VALAC) -C -d $(OUT) -b . --thread -v \
 	--library=$(NAME) -H $(H_FILE)  \
 	--target-glib=2.32 $(VALAFLAGS) $(VALA_FILES)
+	touch $(C_FILES)
 
 clean:
 	rm -rf $(C_FILES) $(H_FILE)  $(VAPI_FILE) $(O_FILES) $(LIBRARYSO) $(RUN)
