@@ -22,6 +22,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+private extern const int SQLITE_TRANSIENT;
+
 namespace Dioritedb
 {
 
@@ -142,7 +144,8 @@ public class Query : GLib.Object
 	{
 		check_index(index);
 		check_not_executed();
-		throw_on_error(statement.bind_blob(index, value, value.length, null));
+		/* SQLITE_TRANSIENT is necessary to support query.bind(new uint8[]{1, 2, 3, 4}); */
+		throw_on_error(statement.bind_blob(index, value, value.length, (DestroyNotify) SQLITE_TRANSIENT));
 		return this;
 	}
 	
