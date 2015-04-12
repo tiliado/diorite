@@ -30,7 +30,7 @@ namespace Dioritedb
 public class Query : GLib.Object
 {
 	public Connection connection {get; private set;}
-	private Sqlite.Statement statement = null;
+	internal Sqlite.Statement statement = null;
 	private int n_parameters = 0;
 	private bool executed = false;
 	
@@ -41,7 +41,7 @@ public class Query : GLib.Object
 		n_parameters = statement.bind_parameter_count();
 	}
 	
-	public void exec(Cancellable? cancellable=null) throws Error, DatabaseError
+	public Result exec(Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		lock (executed)
 		{
@@ -49,11 +49,30 @@ public class Query : GLib.Object
 			executed = true;
 		}
 		
-		do
+		var result = new Result(this);
+		result.next(cancellable);
+		return result;
+	}
+	
+	/**
+	 * Usage:
+	 * 
+	 * {{{
+	 * Result result = query.exec_select();
+	 * while (result.next())
+	 * {
+	 *        // process data
+	 * }
+	 * }}}
+	 */
+	public Result exec_select(Cancellable? cancellable=null) throws Error, DatabaseError
+	{
+		lock (executed)
 		{
-			throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
+			check_not_executed();
+			executed = true;
 		}
-		while (throw_on_error(statement.step()) != Sqlite.DONE);
+		return new Result(this);
 	}
 	
 	public void reset(bool clear_bindings=false) throws Error, DatabaseError

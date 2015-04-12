@@ -27,9 +27,10 @@ CREATE TABLE users(
 	id INTEGER PRIMARY KEY ASC,
 	name TEXT,
 	age INTEGER,
-	width DOUBLE,
+	height DOUBLE,
 	blob BLOB,
-	alive BOOLEAN
+	alive BOOLEAN,
+	extra BLOB
 )""";
 
 public class QueryTest: Diorite.TestCase
