@@ -108,6 +108,12 @@ public class Query : GLib.Object
 			return bind_bytes(index, (GLib.Bytes) value.get_boxed());
 		if (type == typeof(GLib.ByteArray))
 			return bind_byte_array(index, (GLib.ByteArray) value.get_boxed());
+		if (type == typeof(void*))
+		{
+			if (value.get_pointer() == null)
+				return bind_null(index);
+			throw new DatabaseError.DATA_TYPE("Data type %s is supported only with a null pointer.", type.name());
+		}
 
 		throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 	}

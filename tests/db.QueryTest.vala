@@ -490,6 +490,70 @@ public class QueryTest: Diorite.TestCase
 		}
 	}
 	
+	public void test_bind_void()
+	{
+		try
+		{
+			query(TABLE_USERS_SQL).exec();
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+		
+		try
+		{
+			var void_null = GLib.Value(typeof(void*)), void_non_null = GLib.Value(typeof(void*));
+			void_null.set_pointer(null);
+			void_non_null.set_pointer(this);
+			
+			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
+			{
+				try
+				{
+					q.bind(index, void_null);
+					expectation_failed("Expected error");
+				}
+				catch (GLib.Error e)
+				{
+					expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d, null", index);
+				}
+				try
+				{
+					q.bind(index, void_non_null);
+					expectation_failed("Expected error");
+				}
+				catch (GLib.Error e)
+				{
+					expect_str_match("*Data type gpointer is supported only with a null pointer.*", e.message, "index %d, non_null", index);
+				}
+			}
+			
+			try
+			{
+				q.bind(1, void_null);
+			}
+			catch (GLib.Error e)
+			{
+				expectation_failed("value null; %s", e.message);
+			}
+			try
+			{
+				q.bind(1, void_non_null);
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*Data type gpointer is supported only with a null pointer.*", e.message, "value non_null");
+			}
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+	}
+	
 	private uint8[] rand_blob(int min_size=1, int max_size=50)
 	{
 		if (rand == null)
