@@ -31,11 +31,15 @@ public class Result : GLib.Object
 	public int n_columns {get; private set; default = -1;}
 	public int counter {get; private set; default = 0;}
 	private unowned Sqlite.Statement statement;
+	private HashTable<unowned string, int> column_indexes;
+	private (unowned string)[]? column_names;
 	
 	public Result(Query query)
 	{
 		this.query = query;
 		this.statement = query.statement;
+		column_indexes = new HashTable<unowned string, int>(str_hash, str_equal);
+		column_names = null;
 	}
 	
 	public bool next(Cancellable? cancellable=null) throws Error, DatabaseError
@@ -51,7 +55,26 @@ public class Result : GLib.Object
 		{
 			n_columns = -1;
 		}
+		column_indexes.remove_all();
+		column_names = null;
 		return !done;
+	}
+	
+	public int get_column_index(string name)
+	{
+		map_column_names();
+		int index;
+		if (column_indexes.lookup_extended(name, null, out index))
+			return index;
+		return -1;
+	}
+	
+	public unowned string? get_column_name(int index)
+	{
+		map_column_names();
+		if (index < 0 || index >= n_columns)
+			return null;
+		return column_names[index];
 	}
 	
 	public bool fetch_is_null(int index) throws DatabaseError
@@ -133,6 +156,27 @@ public class Result : GLib.Object
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
 		return Dioritedb.convert_error(query.connection.db, result, sql, statement);
+	}
+	
+	private void map_column_names()
+	{
+		/*
+		 * name -> index mapping is created because SQLite doesn't offer API to get column index for name.
+		 * index -> name mapping is created because SQLite invalidates the previously returned column name
+		 *     if sqlite3_column_name() is called again for the same column index.
+		 * 
+		 * http://sqlite.org/c3ref/column_name.html
+		 */
+		if (column_names == null || column_indexes.length == 0)
+		{
+			column_names = new string?[n_columns];
+			for (var index = 0; index < n_columns; index++)
+			{
+				unowned string name = statement.column_name(index);
+				column_indexes[name] = index;
+				column_names[index] = name;
+			}
+		}
 	}
 }
 

@@ -33,6 +33,7 @@ public errordomain DatabaseError
 	GENERAL,
 	RANGE,
 	DATA_TYPE,
+	NAME,
 	MISUSE;
 }
 

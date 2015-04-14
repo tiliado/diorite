@@ -26,6 +26,7 @@ public class ResultTest: Diorite.TestCase
 {
 	private File db_file;
 	private Database db;
+	private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
 	
 	public override void set_up()
 	{
@@ -90,6 +91,38 @@ public class ResultTest: Diorite.TestCase
 	{
 		return query("SELECT id, name, age, height, blob, alive, extra FROM users WHERE id = ?")
 			.bind(1, 1).exec();
+	}
+	
+	public void test_get_column_name()
+	{
+		try
+		{
+			var result = select_data();
+			foreach (var index in new int[]{-int.MAX, -1, 7, 8, int.MAX})
+				expect_str_equals(null, result.get_column_name(index), "index %d", index);
+			for (var index = 0; index < column_names.length; index++)
+				expect_str_equals(column_names[index], result.get_column_name(index), "index %d", index);
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+	}
+	
+	public void test_get_column_index()
+	{
+		try
+		{
+			var result = select_data();
+			foreach (var name in new string[]{"hello", "", "baby"})
+				expect_int_equals(-1, result.get_column_index(name), "column '%s'", name);
+			for (var index = 0; index < column_names.length; index++)
+				expect_int_equals(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
 	}
 	
 	public void test_fetch_is_null()
