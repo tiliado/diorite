@@ -74,7 +74,7 @@ run()
 		echo "Congratulations! Zero failures :-)"
 		exit 0
 	else
-		echo "Oops! There are $n_failed test cases :-("
+		echo "Oops! There are $n_failed failed test cases :-("
 		exit 1
 	fi
 }

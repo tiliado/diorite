@@ -160,7 +160,6 @@ public class ResultTest: Diorite.TestCase
 		}
 	}
 	
-	// expect_str_equals("2", result.fetch_string(0), "");
 	public void test_fetch_int()
 	{
 		try
