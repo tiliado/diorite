@@ -302,6 +302,46 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...)
+	{
+		return process_value_equal(expected, actual, format, va_list());
+	}
+	
+	/**
+	 * Assertion
+	 * 
+	 * Test is terminated when assertion fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...)
+	{
+		if (!process_value_equal(expected, actual, format, va_list()))
+			failure();
+	}
+	
+	private bool process_value_equal(GLib.Value? expected, GLib.Value? actual, string format, va_list args)
+	{
+		string description;
+		var result = process(Value.equal_verbose(expected, actual, out description), format, args);
+		if (!result && !Test.quiet())
+			stdout.printf("\t %s\n", description);
+		return result;
+	}
+	
+	/**
 	 * Expectation failed
 	 * 
 	 * Test is not terminated.
