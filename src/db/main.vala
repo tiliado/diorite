@@ -37,6 +37,21 @@ public errordomain DatabaseError
 	MISUSE;
 }
 
+public bool is_type_supported(Type? type)
+{
+	return (
+		type == null
+		|| type == typeof(bool)
+		|| type == typeof(int)
+		|| type == typeof(int64)
+		|| type == typeof(string)
+		|| type == typeof(double)
+		|| type == typeof(float)
+		|| type == typeof(GLib.Bytes)
+		|| type == typeof(GLib.ByteArray)
+		|| type == typeof(void*)
+	);
+}
 
 // http://www.sqlite.org/rescode.html
 private static int convert_error(Sqlite.Database? db, int result, string? sql=null,

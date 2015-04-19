@@ -450,6 +450,67 @@ public class ResultTest: Diorite.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
+	
+	public void test_fetch_value_of_type()
+	{
+		try
+		{
+			var result = select_data();
+			
+			/* Test index check */
+			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
+			{
+				try
+				{
+					result.fetch_value_of_type(i, typeof(int));
+					expectation_failed("Expected error: index %d", i);
+				}
+				catch (GLib.Error e)
+				{
+					expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+				}
+			}
+			
+			/* Supported types */
+			expect_value_equal(1.72, result.fetch_value_of_type(3, typeof(double)), "double");
+			expect_value_equal((float)1.72, result.fetch_value_of_type(3, typeof(float)), "float");
+			expect_value_equal((int)1, result.fetch_value_of_type(3, typeof(int)), "int");
+			expect_value_equal((int64)1, result.fetch_value_of_type(3, typeof(int64)), "int64");
+			expect_value_equal(true, result.fetch_value_of_type(3, typeof(bool)), "bool");
+			expect_value_equal("1.72", result.fetch_value_of_type(3, typeof(string)), "string");
+			uint8[] blob = {7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7};
+			expect_value_equal(new GLib.Bytes(blob), result.fetch_value_of_type(4, typeof(GLib.Bytes)), "bytes");
+			expect_value_equal(new GLib.ByteArray.take(blob), result.fetch_value_of_type(4, typeof(GLib.ByteArray)), "byte array");
+			
+			/* Null value */
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(bool)), "bool - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(int)), "int - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(int64)), "int64 - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(float)), "float - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(double)), "double - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(string)), "string - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(GLib.Bytes)), "bytes - null");
+			expect_value_equal(null, result.fetch_value_of_type(6, typeof(GLib.ByteArray)), "byte array - null");
+			
+			/* Unsupported types */
+			foreach (var t in new Type[]{typeof(uint), typeof(uint8), typeof(uint8[]), this.get_type(), typeof(void*)})
+			{
+				try
+				{
+					result.fetch_value_of_type(1, t);
+					expectation_failed("Expected error: type %s", t.name());
+				}
+				catch (GLib.Error e)
+				{
+					expect_str_match("*type %s is not supported*".printf(t.name()), e.message, "type %s", t.name());
+				}
+			}
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+	}
 }
 
 } // namespace Dioritedb

@@ -77,6 +77,37 @@ public class Result : GLib.Object
 		return column_names[index];
 	}
 	
+	public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError
+	{
+		if (fetch_is_null(index))
+			return null;
+		
+		if (type == typeof(void*) || !is_type_supported(type))
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		
+		var value = GLib.Value(type);
+		if (type == typeof(bool))
+			value.set_boolean(fetch_bool(index));
+		else if (type == typeof(int))
+			value.set_int(fetch_int(index));
+		else if (type == typeof(int64))
+			value.set_int64(fetch_int64(index));
+		else if (type == typeof(string))
+			value.set_string(fetch_string(index));
+		else if (type == typeof(double))
+			value.set_double(fetch_double(index));
+		else if (type == typeof(float))
+			 value.set_float((float) fetch_double(index));
+		else if (type == typeof(GLib.Bytes))
+			value.set_boxed(fetch_bytes(index));
+		else if (type == typeof(GLib.ByteArray))
+			value.set_boxed(fetch_byte_array(index));
+		else
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		
+		return value;
+	}
+	
 	public bool fetch_is_null(int index) throws DatabaseError
 	{
 		check_index(index);
