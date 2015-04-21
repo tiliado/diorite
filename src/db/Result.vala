@@ -77,6 +77,60 @@ public class Result : GLib.Object
 		return column_names[index];
 	}
 	
+	public T? create_object<T>(string[]? properties = null) throws DatabaseError
+	{
+		var type = typeof(T);
+		if (!type.is_object())
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		
+		var properties_list = create_param_spec_list((ObjectClass) type.class_ref(), properties);
+		Parameter[] parameters = {};
+		foreach (var property in properties_list)
+		{
+			
+			var index = get_column_index(property.name);
+			if (index < 0)
+				throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
+				
+			var value = fetch_value_of_type(index, property.value_type);
+			if (value == null)
+				value = GLib.Value(property.value_type);
+			parameters += GLib.Parameter(){name = property.name, value = value};
+		}
+		
+		return (T) GLib.Object.newv(type, parameters);
+	}
+	
+	public void fill_object(GLib.Object object, string[]? properties = null) throws DatabaseError
+	{
+		var type = object.get_type();
+		var properties_list = create_param_spec_list((ObjectClass) type.class_ref(), properties);
+		foreach (var property in properties_list)
+		{
+			var index = get_column_index(property.name);
+			if (index < 0)
+				throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
+			
+			var value = fetch_value_of_type(index, property.value_type);
+			if (value == null)
+				value = GLib.Value(property.value_type);
+				
+			if ((property.flags & ParamFlags.WRITABLE) != 0
+			&& (property.flags & ParamFlags.CONSTRUCT_ONLY) == 0)
+			{
+				object.set_property(property.name, value);
+			}
+				
+			else if ((property.flags & ParamFlags.READABLE) != 0)
+			{
+				var current_value = GLib.Value(property.value_type);
+				object.get_property(property.name, ref current_value);
+				if (!Diorite.Value.equal(current_value, value))
+					throw new DatabaseError.MISMATCH("Read-only value of property '%s' doesn't match database data.", property.name);
+			}
+		}
+	}
+	
 	public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError
 	{
 		if (fetch_is_null(index))

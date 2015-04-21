@@ -511,6 +511,188 @@ public class ResultTest: Diorite.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
+	
+	public void test_create_object()
+	{
+		try
+		{
+			var result = select_data();
+			/* All fields */
+			try
+			{
+				result.create_object<User>(null);
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+			}
+			try
+			{
+				result.create_object<User>({});
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+			}
+			try
+			{
+				result.create_object<User>({"wrong-name"});
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*no property named 'wrong-name'*", e.message, "invalid property name");
+			}
+			
+			/* List of fields */
+			var user = result.create_object<User>({"id", "name", "age", "height", "alive", "blob", "extra"});
+			expect_int64_equals(1, user.id, "id");
+			expect_str_equals("George", user.name, "name");
+			expect_int_equals(30, user.age, "age");
+			expect_double_equals(1.72, user.height, "height");
+			expect_true(user.alive, "alive");
+			expect_bytes_equal(
+				new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+				user.blob, "blob");
+			expect(null == user.extra, "extra");
+			expect_int_equals(1024, user.not_in_db, "not_in_db");
+			
+			/* Not GObject */
+			try
+			{
+				result.create_object<SimpleUser>();
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*Data type DioritedbResultTestSimpleUser is not supported*", e.message, "invalid type");
+			}
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+	}
+	
+	public void test_fill_object()
+	{
+		try
+		{
+			var result = select_data();
+			User user;
+			string[] all_props = {"id", "name", "age", "height", "alive", "blob", "extra"};
+			
+			/* Mismatch - all fields */
+			try
+			{
+				user = new User(2, "Lololo", 45, 2.25, false);
+				result.fill_object(user, null);
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch, all fields");
+			}
+			
+			/* Mismatch - field list */
+			try
+			{
+				user = new User(2, "Lololo", 45, 2.25, false);
+				result.fill_object(user, all_props);
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch, field list");
+			}
+			
+			/* Matches, but all fields */
+			try
+			{
+				user = new User(1, "Lololo", 45, 2.25, false);
+				result.fill_object(user, null);
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+			}
+			
+			try
+			{
+				
+				user = new User(1, "Lololo", 45, 2.25, false);
+				result.fill_object(user, {"wrong-name"});
+				expectation_failed("Expected error");
+			}
+			catch (GLib.Error e)
+			{
+				expect_str_match("*no property named 'wrong-name'*", e.message, "invalid property name");
+			}
+			
+			/* Matches, field list */
+			user = new User(1, "Lololo", 45, 2.25, false);
+			result.fill_object(user, all_props);
+			expect_int64_equals(1, user.id, "id");
+			expect_str_equals("George", user.name, "name");
+			expect_int_equals(30, user.age, "age");
+			expect_double_equals(1.72, user.height, "height");
+			expect_true(user.alive, "alive");
+			expect_bytes_equal(
+				new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+				user.blob, "blob");
+			expect(null == user.extra, "extra");
+			expect_int_equals(1024, user.not_in_db, "not_in_db");
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
+	}
+	
+	private class User : GLib.Object
+	{
+		public int64 id {get; construct;}
+		public string name {get; construct set;}
+		public int age {get; construct set;}
+		public double height {get; construct set;}
+		public Bytes? blob {get; construct set;}
+		public bool alive {get; construct set;}
+		public ByteArray? extra {get; construct set;}
+		public int not_in_db {get; set; default = 1024;}
+		
+		public User(int64 id, string name, int age, double height, bool alive)
+		{
+			GLib.Object(id: id);
+			this.name = name;
+			this.age = age;
+			this.height = height;
+			this.alive = alive;
+		}
+	}
+	
+	private class SimpleUser
+	{
+		public int64 id {get; private set;}
+		public string name {get; set;}
+		public int age {get; set;}
+		public double height {get; set;}
+		public Bytes? blob {get; set;}
+		public bool alive {get; set;}
+		public ByteArray? extra {get; set;}
+		public int not_in_db {get; set; default = 1024;}
+		
+		public SimpleUser(int64 id, string name, int age, double height, bool alive)
+		{
+			this.id = id;
+			this.name = name;
+			this.age = age;
+			this.height = height;
+			this.alive = alive;
+		}
+	}
 }
 
 } // namespace Dioritedb

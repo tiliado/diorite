@@ -34,6 +34,7 @@ public errordomain DatabaseError
 	RANGE,
 	DATA_TYPE,
 	NAME,
+	MISMATCH,
 	MISUSE;
 }
 
@@ -51,6 +52,27 @@ public bool is_type_supported(Type? type)
 		|| type == typeof(GLib.ByteArray)
 		|| type == typeof(void*)
 	);
+}
+
+private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, string[]? properties = null)
+		throws DatabaseError
+{
+	(unowned ParamSpec)[] properties_list;
+	if (properties == null || properties.length == 0)
+	{
+		properties_list = class_spec.list_properties();
+	}
+	else
+	{
+		properties_list = new (unowned ParamSpec)[properties.length];
+		for (var i = 0; i < properties.length; i++)
+		{
+			properties_list[i] = class_spec.find_property(properties[i]);
+			if (properties_list[i] == null)
+				throw new DatabaseError.NAME("There is no property named '%s'.", properties[i]);
+		}
+	}
+	return properties_list;
 }
 
 // http://www.sqlite.org/rescode.html
