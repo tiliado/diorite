@@ -44,10 +44,10 @@ public class Connection: GLib.Object
 		throw_on_error(db.exec(sql, null, null), sql);
 	}
 	
-	public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	public RawQuery query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-		return new Query(this, sql);
+		return new RawQuery(this, sql);
 	}
 	
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError

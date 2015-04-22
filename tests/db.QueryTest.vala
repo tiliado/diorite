@@ -77,7 +77,7 @@ public class QueryTest: Diorite.TestCase
 		}
 	}
 	
-	private Query? query(string sql) throws GLib.Error, DatabaseError
+	private RawQuery? query(string sql) throws GLib.Error, DatabaseError
 	{
 		
 		if (!db.opened)

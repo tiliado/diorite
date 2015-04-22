@@ -27,52 +27,36 @@ private extern const int SQLITE_TRANSIENT;
 namespace Dioritedb
 {
 
-public class Query : GLib.Object
+public abstract class Query : GLib.Object
 {
 	public Connection connection {get; private set;}
 	internal Sqlite.Statement statement = null;
-	private int n_parameters = 0;
-	private bool executed = false;
+	protected int n_parameters = 0;
+	protected bool executed = false;
 	
 	public Query(Connection connection, string sql) throws DatabaseError
+	{
+		init(connection, sql);
+	}
+	
+	protected Query.out_error(Connection connection, string sql, out DatabaseError? error)
+	{
+		error = null;
+		try
+		{
+			init(connection, sql);
+		}
+		catch (DatabaseError e)
+		{
+			error = e;
+		}
+	}
+	
+	private void init(Connection connection, string sql) throws DatabaseError
 	{
 		this.connection = connection;
 		throw_on_error(connection.db.prepare_v2(sql, sql.length, out statement), sql);
 		n_parameters = statement.bind_parameter_count();
-	}
-	
-	public Result exec(Cancellable? cancellable=null) throws Error, DatabaseError
-	{
-		lock (executed)
-		{
-			check_not_executed();
-			executed = true;
-		}
-		
-		var result = new Result(this);
-		result.next(cancellable);
-		return result;
-	}
-	
-	/**
-	 * Usage:
-	 * 
-	 * {{{
-	 * Result result = query.exec_select();
-	 * while (result.next())
-	 * {
-	 *        // process data
-	 * }
-	 * }}}
-	 */
-	public Result exec_select(Cancellable? cancellable=null) throws Error, DatabaseError
-	{
-		lock (executed)
-		{
-			check_not_executed();
-			executed = true;
-		}
-		return new Result(this);
 	}
 	
 	public void reset(bool clear_bindings=false) throws Error, DatabaseError
@@ -198,8 +182,21 @@ public class Query : GLib.Object
 	
 	protected void check_not_executed() throws DatabaseError
 	{
-		if (executed)
+		lock (executed)
+		{
+			if (executed)
 				throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
+		}
+	}
+	
+	protected void check_not_executed_and_set(bool executed) throws DatabaseError
+	{
+		lock (this.executed)
+		{
+			if (this.executed)
+				throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
+			this.executed = executed;
+		}
 	}
 	
 	protected int check_index(int index) throws DatabaseError
