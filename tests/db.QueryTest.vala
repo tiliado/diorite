@@ -22,17 +22,6 @@
 namespace Dioritedb
 {
 
-private static const string TABLE_USERS_SQL = """
-CREATE TABLE users(
-	id INTEGER PRIMARY KEY ASC,
-	name TEXT,
-	age INTEGER,
-	height DOUBLE,
-	blob BLOB,
-	alive BOOLEAN,
-	extra BLOB
-)""";
-
 public class QueryTest: Diorite.TestCase
 {
 	private File db_file;
@@ -90,12 +79,12 @@ public class QueryTest: Diorite.TestCase
 	{
 		try
 		{
-			query("SELECT name FROM users WHERE id = 1").exec();
+			query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)).exec();
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such table: users*", e.message, "");
+			expect_str_match("*no such table: %s*".printf(TABLE_USERS_NAME), e.message, "");
 		}
 		try
 		{
@@ -107,7 +96,7 @@ public class QueryTest: Diorite.TestCase
 		}
 		try
 		{
-			query("SELECT name FROM users WHERE id = 1").exec();
+			query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)).exec();
 		}
 		catch (GLib.Error e)
 		{
@@ -128,7 +117,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				try
@@ -191,7 +180,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				int64 val = 2 * ((int64) int32.MAX);
@@ -254,7 +243,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				double val = 3.14;
@@ -317,7 +306,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				string val = "Hello!";
@@ -380,7 +369,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				try
@@ -444,7 +433,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				try
@@ -507,7 +496,7 @@ public class QueryTest: Diorite.TestCase
 			void_null.set_pointer(null);
 			void_non_null.set_pointer(this);
 			
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				try
@@ -580,7 +569,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				uint8[] val = "Hello!".data;
@@ -629,7 +618,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				GLib.Bytes val = new GLib.Bytes.take("Hello!".data);
@@ -697,7 +686,7 @@ public class QueryTest: Diorite.TestCase
 		
 		try
 		{
-			var q = query("SELECT name FROM users WHERE id = ? and age < ?");
+			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
 				GLib.ByteArray val = new GLib.ByteArray.take("Hello!".data);

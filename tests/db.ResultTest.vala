@@ -37,7 +37,7 @@ public class ResultTest: Diorite.TestCase
 		try
 		{
 			query(TABLE_USERS_SQL).exec();
-			query("INSERT INTO users(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)")
+			query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
 				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
 				.bind_blob(5, new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
 				.bind(6, true).bind_null(7).exec();
@@ -89,7 +89,7 @@ public class ResultTest: Diorite.TestCase
 	
 	private Result select_data()  throws GLib.Error, DatabaseError
 	{
-		return query("SELECT id, name, age, height, blob, alive, extra FROM users WHERE id = ?")
+		return query("SELECT id, name, age, height, blob, alive, extra FROM %s WHERE id = ?".printf(TABLE_USERS_NAME))
 			.bind(1, 1).exec();
 	}
 	
@@ -567,7 +567,7 @@ public class ResultTest: Diorite.TestCase
 			}
 			catch (GLib.Error e)
 			{
-				expect_str_match("*Data type DioritedbResultTestSimpleUser is not supported*", e.message, "invalid type");
+				expect_str_match("*Data type DioritedbSimpleUser is not supported*", e.message, "invalid type");
 			}
 		}
 		catch (GLib.Error e)
@@ -582,7 +582,6 @@ public class ResultTest: Diorite.TestCase
 		{
 			var result = select_data();
 			User user;
-			string[] all_props = {"id", "name", "age", "height", "alive", "blob", "extra"};
 			
 			/* Mismatch - all fields */
 			try
@@ -600,7 +599,7 @@ public class ResultTest: Diorite.TestCase
 			try
 			{
 				user = new User(2, "Lololo", 45, 2.25, false);
-				result.fill_object(user, all_props);
+				result.fill_object(user, User.all_props());
 				expectation_failed("Expected error");
 			}
 			catch (GLib.Error e)
@@ -634,7 +633,7 @@ public class ResultTest: Diorite.TestCase
 			
 			/* Matches, field list */
 			user = new User(1, "Lololo", 45, 2.25, false);
-			result.fill_object(user, all_props);
+			result.fill_object(user, User.all_props());
 			expect_int64_equals(1, user.id, "id");
 			expect_str_equals("George", user.name, "name");
 			expect_int_equals(30, user.age, "age");
@@ -652,47 +651,6 @@ public class ResultTest: Diorite.TestCase
 		}
 	}
 	
-	private class User : GLib.Object
-	{
-		public int64 id {get; construct;}
-		public string name {get; construct set;}
-		public int age {get; construct set;}
-		public double height {get; construct set;}
-		public Bytes? blob {get; construct set;}
-		public bool alive {get; construct set;}
-		public ByteArray? extra {get; construct set;}
-		public int not_in_db {get; set; default = 1024;}
-		
-		public User(int64 id, string name, int age, double height, bool alive)
-		{
-			GLib.Object(id: id);
-			this.name = name;
-			this.age = age;
-			this.height = height;
-			this.alive = alive;
-		}
-	}
-	
-	private class SimpleUser
-	{
-		public int64 id {get; private set;}
-		public string name {get; set;}
-		public int age {get; set;}
-		public double height {get; set;}
-		public Bytes? blob {get; set;}
-		public bool alive {get; set;}
-		public ByteArray? extra {get; set;}
-		public int not_in_db {get; set; default = 1024;}
-		
-		public SimpleUser(int64 id, string name, int age, double height, bool alive)
-		{
-			this.id = id;
-			this.name = name;
-			this.age = age;
-			this.height = height;
-			this.alive = alive;
-		}
-	}
 }
 
 } // namespace Dioritedb
