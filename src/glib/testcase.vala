@@ -173,6 +173,21 @@ public abstract class TestCase: GLib.Object
 	 */
 	[Diagnostics]
 	[PrintFormat]
+	protected bool expect_uint_equals(uint expected, uint value, string format, ...)
+	{
+		return process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list());
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
 	protected bool expect_int64_equals(int64 expected, int64 value, string format, ...)
 	{
 		return process(expected == value, "%s: %s == %s".printf(
