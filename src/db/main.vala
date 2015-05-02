@@ -35,7 +35,9 @@ public errordomain DatabaseError
 	DATA_TYPE,
 	NAME,
 	MISMATCH,
-	MISUSE;
+	MISUSE,
+	DOES_NOT_EXIST,
+	TOO_MANY_RESULTS;
 }
 
 public bool is_type_supported(Type? type)
@@ -106,6 +108,12 @@ public void throw_if_cancelled(Cancellable? cancellable, string? method=null, st
 {
     if (cancellable != null && cancellable.is_cancelled())
         throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
+}
+
+
+private inline string escape_sql_id(string sql)
+{
+	return sql.replace("\"", "\"\"");
 }
 
 } // namespace Dioritedb

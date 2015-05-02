@@ -650,7 +650,6 @@ public class ResultTest: Diorite.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
 }
 
 } // namespace Dioritedb

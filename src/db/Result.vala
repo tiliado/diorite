@@ -84,8 +84,17 @@ public class Result : GLib.Object
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 		
 		var properties_list = create_param_spec_list((ObjectClass) type.class_ref(), properties);
+		return create_object_pspec<T>(properties_list);
+	}
+	
+	public T? create_object_pspec<T>((unowned ParamSpec)[] properties) throws DatabaseError
+	{
+		var type = typeof(T);
+		if (!type.is_object())
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		
 		Parameter[] parameters = {};
-		foreach (var property in properties_list)
+		foreach (var property in properties)
 		{
 			
 			var index = get_column_index(property.name);
