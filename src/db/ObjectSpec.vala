@@ -25,36 +25,30 @@
 namespace Dioritedb
 {
 
-public class ObjectCursor<T>
+public class ObjectSpec
 {
-	public uint counter {get; private set; default=0;}
-	private Cancellable? cancellable;
-	private Result result;
+	public Type object_type {get; private set;}
+	public unowned ParamSpec primary_key {get; private set;}
+	public (unowned ParamSpec)[] properties {get; private set;}
 	
-	public ObjectCursor(Result result, Cancellable? cancellable=null)
+	public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError
 	{
-		this.result = result;
-		this.cancellable = cancellable;
+		if (!type.is_object())
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		var class_spec = (ObjectClass) type.class_ref();
+		var primary_pspec = class_spec.find_property(primary_key);
+		if (primary_pspec == null)
+			throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
+		this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
 	}
 	
-	public ObjectCursor<T> iterator()
+	public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError
 	{
-		return this;
-	}
-	
-	public bool next() throws Error, DatabaseError
-	{
-		 if (result.next())
-		 {
-			 counter++;
-			 return true;
-		 }
-		 return false;
-	}
-
-	public T get() throws Error, DatabaseError
-	{
-		return result.create_object<T>();
+		if (!type.is_object())
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		this.object_type = type;
+		this.properties = properties;
+		this.primary_key = primary_key;
 	}
 }
 

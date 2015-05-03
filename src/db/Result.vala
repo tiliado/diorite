@@ -77,24 +77,18 @@ public class Result : GLib.Object
 		return column_names[index];
 	}
 	
-	public T? create_object<T>(string[]? properties = null) throws DatabaseError
+	public T? create_object<T>() throws DatabaseError
 	{
 		var type = typeof(T);
 		if (!type.is_object())
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 		
-		var properties_list = create_param_spec_list((ObjectClass) type.class_ref(), properties);
-		return create_object_pspec<T>(properties_list);
-	}
-	
-	public T? create_object_pspec<T>((unowned ParamSpec)[] properties) throws DatabaseError
-	{
-		var type = typeof(T);
-		if (!type.is_object())
-			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		var object_spec = query.connection.database.get_object_spec(type);
+		if (object_spec == null)
+			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
 		
 		Parameter[] parameters = {};
-		foreach (var property in properties)
+		foreach (var property in object_spec.properties)
 		{
 			
 			var index = get_column_index(property.name);
@@ -110,11 +104,14 @@ public class Result : GLib.Object
 		return (T) GLib.Object.newv(type, parameters);
 	}
 	
-	public void fill_object(GLib.Object object, string[]? properties = null) throws DatabaseError
+	public void fill_object(GLib.Object object) throws DatabaseError
 	{
 		var type = object.get_type();
-		var properties_list = create_param_spec_list((ObjectClass) type.class_ref(), properties);
-		foreach (var property in properties_list)
+		var object_spec = query.connection.database.get_object_spec(type);
+		if (object_spec == null)
+			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+		
+		foreach (var property in object_spec.properties)
 		{
 			var index = get_column_index(property.name);
 			if (index < 0)

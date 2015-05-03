@@ -50,10 +50,12 @@ public class Database: GLib.Object
 	}
 	
 	private Connection? master_connection = null;
+	private HashTable<Type, ObjectSpec> object_specs;
 	
 	public Database (File db_file)
 	{
 		GLib.Object(db_file: db_file);
+		object_specs = new HashTable<Type, ObjectSpec>(Diorite.Types.type_hash, Diorite.Types.type_equal);
 	}
 	
 	public virtual void open(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
@@ -90,6 +92,16 @@ public class Database: GLib.Object
 	public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		get_master_connection(cancellable).exec(sql, cancellable);
+	}
+	
+	public void add_object_spec(ObjectSpec spec)
+	{
+		object_specs[spec.object_type] = spec;
+	}
+	
+	public ObjectSpec? get_object_spec(Type type)
+	{
+		return object_specs[type];
 	}
 	
 	private Connection open_connection(Cancellable? cancellable=null) throws GLib.Error, DatabaseError

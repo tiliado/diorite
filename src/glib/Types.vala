@@ -22,40 +22,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Diorite.Types
 {
 
-public class ObjectCursor<T>
+public uint type_hash(Type type)
 {
-	public uint counter {get; private set; default=0;}
-	private Cancellable? cancellable;
-	private Result result;
-	
-	public ObjectCursor(Result result, Cancellable? cancellable=null)
-	{
-		this.result = result;
-		this.cancellable = cancellable;
-	}
-	
-	public ObjectCursor<T> iterator()
-	{
-		return this;
-	}
-	
-	public bool next() throws Error, DatabaseError
-	{
-		 if (result.next())
-		 {
-			 counter++;
-			 return true;
-		 }
-		 return false;
-	}
-
-	public T get() throws Error, DatabaseError
-	{
-		return result.create_object<T>();
-	}
+	return (uint) type;
 }
 
-} // namespace Dioritedb
+public bool type_equal(Type type1, Type type2)
+{
+	return ((uint) type1) == ((uint) type2);
+}
+
+} // namespace Diorite.Types

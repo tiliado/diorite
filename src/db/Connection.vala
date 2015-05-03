@@ -50,15 +50,18 @@ public class Connection: GLib.Object
 		return new RawQuery(this, sql);
 	}
 	
-	public ObjectQuery<T> query_objects<T>(string? sql_filter=null, string[]? properties=null,
-		Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	public ObjectQuery<T> query_objects<T>(string? sql_filter=null, Cancellable? cancellable=null)
+		throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		var type = typeof(T);
 		if (!type.is_object())
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 		
-		var param_specs = create_param_spec_list((ObjectClass) type.class_ref(), properties);
+		var object_spec = database.get_object_spec(type);
+		if (object_spec == null)
+			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+		unowned (unowned ParamSpec)[] param_specs = object_spec.properties;
 		var sql = new StringBuilder("SELECT");
 		var table_name_escaped = escape_sql_id(type.name());
 		for (var i = 0; i <  param_specs.length; i++)
@@ -83,7 +86,7 @@ public class Connection: GLib.Object
 		if (sql_filter != null && sql_filter[0] != '\0')
 			sql.append(sql_filter);
 		
-		return new ObjectQuery<T>(this, sql.str, param_specs);
+		return new ObjectQuery<T>(this, sql.str);
 	}
 	
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError

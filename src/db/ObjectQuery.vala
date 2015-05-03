@@ -27,15 +27,12 @@ namespace Dioritedb
 
 public class ObjectQuery<T> : Query
 {
-	private (unowned ParamSpec)[] properties;
-	
-	public ObjectQuery(Connection connection, string sql, (unowned ParamSpec)[] properties) throws Error, DatabaseError
+	public ObjectQuery(Connection connection, string sql) throws Error, DatabaseError
 	{
 		DatabaseError caught_error;
 		base.out_error(connection, sql, out caught_error);
 		if (caught_error != null)
 			throw caught_error;
-		this.properties = properties;
 	}
 	
 	public T get_one(Cancellable? cancellable=null) throws Error, DatabaseError
@@ -44,7 +41,7 @@ public class ObjectQuery<T> : Query
 		var result = new Result(this);
 		if (!result.next(cancellable))
 			throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
-		var object = result.create_object_pspec<T>(properties);
+		var object = result.create_object<T>();
 		if (result.next(cancellable))
 			throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
 		return object;
@@ -53,7 +50,7 @@ public class ObjectQuery<T> : Query
 	public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		check_not_executed_and_set(true); 
-		return new ObjectCursor<T>(new Result(this), properties, cancellable);
+		return new ObjectCursor<T>(new Result(this), cancellable);
 	}
 	
 	public ObjectCursor<T> iterator() throws Error, DatabaseError

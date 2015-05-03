@@ -95,12 +95,44 @@ public class ObjectQueryTest: Diorite.TestCase
 	{
 		try
 		{
-			conn.query_objects<User>(null, {"foo"});
+			conn.query_objects<User>(null);
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no property named 'foo'.*", e.message, "invalid column");
+			expect_str_match("*ObjectSpec for DioritedbUser has not been found.*", e.message, "missing ospec");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+			conn.query_objects<User>(null);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id"));
+			conn.query_objects<User>(null);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			conn.query_objects<User>(null);
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("Unexpected error: %s", e.message);
 		}
 	}
 	
@@ -108,32 +140,17 @@ public class ObjectQueryTest: Diorite.TestCase
 	{
 		try
 		{
-			var cursor = conn.query_objects<User>().get_cursor();  // implicit default values
-			cursor.next();
-			cursor.get();
-			expectation_failed("Expected error");
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
-		}
-		
-		try
-		{
-			var cursor = conn.query_objects<User>(null, null).get_cursor(); // explicit default values
-			cursor.next();
-			cursor.get();
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+			expectation_failed("Unexpected error: %s", e.message);
 		}
 		
 		try
 		{
 			User[] users = {};
-			var cursor = conn.query_objects<User>(null, User.all_props()).get_cursor();
+			var cursor = conn.query_objects<User>().get_cursor();
 			uint counter = 0;
 			foreach (var user in cursor)
 			{
@@ -173,7 +190,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		try
 		{
 			User[] users = {};
-			var cursor = conn.query_objects<User>("WHERE id=?", User.all_props()).bind(1, 2).get_cursor();
+			var cursor = conn.query_objects<User>("WHERE id=?").bind(1, 2).get_cursor();
 			uint counter = 0;
 			foreach (var user in cursor)
 			{
@@ -204,8 +221,17 @@ public class ObjectQueryTest: Diorite.TestCase
 	{
 		try
 		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("Unexpected error: %s", e.message);
+		}
+		
+		try
+		{
 			User[] users = {};
-			var q = conn.query_objects<User>(null, User.all_props());
+			var q = conn.query_objects<User>(null);
 			foreach (var user in q)
 				users += user;
 			
@@ -244,17 +270,16 @@ public class ObjectQueryTest: Diorite.TestCase
 	{
 		try
 		{
-			conn.query_objects<User>(null, null).get_one();
-			expectation_failed("Expected error");
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+			expectation_failed("Unexpected error: %s", e.message);
 		}
 		
 		try
 		{
-			conn.query_objects<User>(null, User.all_props()).get_one();
+			conn.query_objects<User>(null).get_one();
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
@@ -264,7 +289,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		
 		try
 		{
-			conn.query_objects<User>("where id > 5", User.all_props()).get_one();
+			conn.query_objects<User>("where id > 5").get_one();
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
@@ -275,7 +300,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		try
 		{
 			
-			var user = conn.query_objects<User>("WHERE id=?", User.all_props()).bind(1, 2).get_one();
+			var user = conn.query_objects<User>("WHERE id=?").bind(1, 2).get_one();
 			expect_int64_equals(2, user.id, "id");
 			expect_str_equals("Jean", user.name, "name");
 			expect_int_equals(50, user.age, "age");
