@@ -90,52 +90,6 @@ public class ObjectQueryTest: Diorite.TestCase
 		return db.get_master_connection().query(sql);
 	}
 	
-	
-	public void test_query_objects()
-	{
-		try
-		{
-			conn.query_objects<User>(null);
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*ObjectSpec for DioritedbUser has not been found.*", e.message, "missing ospec");
-		}
-		
-		try
-		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-			conn.query_objects<User>(null);
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
-		}
-		
-		try
-		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id"));
-			conn.query_objects<User>(null);
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
-		}
-		
-		try
-		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-			conn.query_objects<User>(null);
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("Unexpected error: %s", e.message);
-		}
-	}
-	
 	public void test_get_cursor()
 	{
 		try

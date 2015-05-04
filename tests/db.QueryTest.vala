@@ -34,6 +34,14 @@ public class QueryTest: Diorite.TestCase
 		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
 		delete_db_file();
 		db = new Database(db_file);
+		try
+		{
+			query(TABLE_USERS_SQL).exec();
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("%s", e.message);
+		}
 	}
 	
 	public override void tear_down()
@@ -80,23 +88,6 @@ public class QueryTest: Diorite.TestCase
 		try
 		{
 			query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)).exec();
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such table: %s*".printf(TABLE_USERS_NAME), e.message, "");
-		}
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		try
-		{
-			query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)).exec();
 		}
 		catch (GLib.Error e)
 		{
@@ -106,15 +97,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_int()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
@@ -171,15 +153,6 @@ public class QueryTest: Diorite.TestCase
 	{
 		try
 		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
-		try
-		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
@@ -232,15 +205,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_double()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
@@ -297,15 +261,6 @@ public class QueryTest: Diorite.TestCase
 	{
 		try
 		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
-		try
-		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
@@ -358,15 +313,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_bool()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
@@ -424,15 +370,6 @@ public class QueryTest: Diorite.TestCase
 	{
 		try
 		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
-		try
-		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
@@ -481,15 +418,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_void()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var void_null = GLib.Value(typeof(void*)), void_non_null = GLib.Value(typeof(void*));
@@ -560,15 +488,6 @@ public class QueryTest: Diorite.TestCase
 	{
 		try
 		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
-		try
-		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
 			foreach (var index in new int[]{int.MIN, -2, -1, 0, 3, 4, int.MAX})
 			{
@@ -607,15 +526,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_bytes()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
@@ -675,15 +585,6 @@ public class QueryTest: Diorite.TestCase
 	
 	public void test_bind_byte_array()
 	{
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		
 		try
 		{
 			var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
