@@ -40,6 +40,14 @@ public class ConnectionTest: Diorite.TestCase
 			db.open();
 			conn = db.get_master_connection();
 			conn.query(TABLE_USERS_SQL).exec();
+			conn.query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
+				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
+				.bind_blob(5, new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
+				.bind(6, true).bind_null(7).exec();
+			conn.query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
+				.bind(1, 2).bind(2, "Jean").bind(3, 50).bind(4, 2.72)
+				.bind_blob(5, new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7})
+				.bind(6, false).bind_null(7).exec();
 		}
 		catch (GLib.Error e)
 		{
@@ -137,6 +145,105 @@ public class ConnectionTest: Diorite.TestCase
 		{
 			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 			conn.query_objects<User>(null);
+		}
+		catch (GLib.Error e)
+		{
+			expectation_failed("Unexpected error: %s", e.message);
+		}
+	}
+	
+	public void test_get_object()
+	{
+		try
+		{
+			conn.get_object<SimpleUser>(1);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*type DioritedbSimpleUser is not supported*", e.message, "wrong type");
+		}
+		
+		try
+		{
+			conn.get_object<User>(1);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*ObjectSpec for DioritedbUser has not been found.*", e.message, "missing ospec");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+			conn.get_object<User>(1);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid primary column");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id"));
+			conn.get_object<User>(1);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
+			conn.get_object<User>(1);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid primary column");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			conn.get_object<User>(0);
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*No data has been returned for object query*", e.message, "id == 0");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			conn.get_object<User>("hello");
+			expectation_failed("Expected error");
+		}
+		catch (GLib.Error e)
+		{
+			expect_str_match("*No data has been returned for object query*", e.message, "id == hello");
+		}
+		
+		try
+		{
+			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			var user = conn.get_object<User>(2);
+			expect_int64_equals(2, user.id, "id");
+			expect_str_equals("Jean", user.name, "name");
+			expect_int_equals(50, user.age, "age");
+			expect_double_equals(2.72, user.height, "height");
+			expect_false(user.alive, "alive");
+			expect_bytes_equal(
+				new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+				user.blob, "blob");
+			expect(null == user.extra, "extra");
+			expect_int_equals(1024, user.not_in_db, "not_in_db");
+
 		}
 		catch (GLib.Error e)
 		{

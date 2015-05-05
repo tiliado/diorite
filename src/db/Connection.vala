@@ -89,6 +89,27 @@ public class Connection: GLib.Object
 		return new ObjectQuery<T>(this, sql.str);
 	}
 	
+	public T get_object<T>(GLib.Value pk, Cancellable? cancellable=null)
+		throws GLib.Error, DatabaseError
+	{
+		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
+		var type = typeof(T);
+		if (!type.is_object())
+			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+		
+		var object_spec = database.get_object_spec(type);
+		if (object_spec == null)
+			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+		
+		/* Full qualified column name with table name are used because SQLite treat non-existent
+		 * column names in quotes as string literals otherwise. */
+		var table_escaped = escape_sql_id(type.name());
+		var column_escaped = escape_sql_id(object_spec.primary_key.name);
+		return query_objects<T>(
+			"WHERE \"%s\".\"%s\" == ?1".printf(table_escaped, column_escaped), cancellable)
+			.bind(1, pk).get_one(cancellable);
+	}
+	
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
 		return Dioritedb.convert_error(db, result, sql);
