@@ -28,6 +28,7 @@ namespace Dioritedb
 public class ObjectSpec
 {
 	public Type object_type {get; private set;}
+	public string table_name {get{ return object_type.name(); }}
 	public unowned ParamSpec primary_key {get; private set;}
 	public (unowned ParamSpec)[] properties {get; private set;}
 	

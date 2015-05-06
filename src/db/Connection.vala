@@ -63,7 +63,7 @@ public class Connection: GLib.Object
 			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
 		unowned (unowned ParamSpec)[] param_specs = object_spec.properties;
 		var sql = new StringBuilder("SELECT");
-		var table_name_escaped = escape_sql_id(type.name());
+		var table_name_escaped = escape_sql_id(object_spec.table_name);
 		for (var i = 0; i <  param_specs.length; i++)
 		{
 			var param = param_specs[i];
@@ -103,7 +103,7 @@ public class Connection: GLib.Object
 		
 		/* Full qualified column name with table name are used because SQLite treat non-existent
 		 * column names in quotes as string literals otherwise. */
-		var table_escaped = escape_sql_id(type.name());
+		var table_escaped = escape_sql_id(object_spec.table_name);
 		var column_escaped = escape_sql_id(object_spec.primary_key.name);
 		return query_objects<T>(
 			"WHERE \"%s\".\"%s\" == ?1".printf(table_escaped, column_escaped), cancellable)
