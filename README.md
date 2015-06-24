@@ -78,3 +78,6 @@ Diorite recognizes several environment variables for debugging:
     a application window (menu bar, header bar, app menu, etc.) in different environment.
   
   * `DIORITE_LOG_MESSAGE_SERVER` - if `yes` IPC Message server communication will be logged
+  
+  * `DIORITE_LOGGER_FATAL_STRING` - abort program when message matching the fatal
+    [string pattern](https://developer.gnome.org/glib/stable/glib-Glob-style-pattern-matching.html) is logged.

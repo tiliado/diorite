@@ -35,6 +35,7 @@ public class Logger
 	private static unowned FileStream output;
 	private static bool colorful;
 	private static string? hint;
+	private static PatternSpec? fatal_string;
 	
 	public static const int COLOR_FOREGROUND = 30;
 	public static const int COLOR_BACKGROUND = 40;
@@ -73,6 +74,10 @@ public class Logger
 			// For subprocesses (they might have redirected output)
 			Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
 		}
+		
+		var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
+		if (fatal_string != null && fatal_string[0] != '\0')
+			Logger.fatal_string = new PatternSpec(fatal_string);
 		
 		GLib.Log.set_default_handler(Logger.log_handler);
 	}
@@ -130,7 +135,8 @@ public class Logger
 	
 	private static void log_handler(string? domain, LogLevelFlags level, string message)
 	{
-		if (level > Logger.display_level)
+		var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
+		if (!is_fatal_string && level > Logger.display_level)
 			return;
 		
 		print(domain ?? "<unknown>", level, message);
@@ -144,6 +150,12 @@ public class Logger
 		case LogLevelFlags.LEVEL_CRITICAL:
 			print(domain ?? "<unknown>", level, "Application will not function properly.");
 			break;
+		}
+		
+		if (is_fatal_string)
+		{
+			print(domain ?? "<unknown>", LogLevelFlags.LEVEL_ERROR, "Will abort because of fatal string match.");
+			Process.abort();
 		}
 	}
 	
