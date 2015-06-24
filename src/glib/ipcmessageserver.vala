@@ -46,6 +46,7 @@ public class MessageServer: Server
 {
 	private HashTable<string, HandlerAdaptor?> handlers;
 	private static bool log_comunication;
+	private uint message_number = 0;
 	
 	public MessageServer(string name)
 	{
@@ -132,6 +133,13 @@ public class MessageServer: Server
 		Variant? request_params = null;
 		Variant? response_params = null;
 		string? response_name;
+		uint number;
+		
+		lock (message_number)
+		{
+			message_number++;
+			number = message_number;
+		}
 		
 		try 
 		{
@@ -139,7 +147,7 @@ public class MessageServer: Server
 				throw new MessageError.INVALID_REQUEST("Received invalid request. Cannot deserialize message.");
 			
 			if (log_comunication)
-				debug("Request '%s': %s", request_name, request_params != null ? request_params.print(false) : "NULL");
+				debug("Request %u '%s': %s", number, request_name, request_params != null ? request_params.print(false) : "NULL");
 			
 			response_params = handle_message(request_name, request_params);
 			response_name = RESPONSE_OK;
@@ -151,7 +159,7 @@ public class MessageServer: Server
 		}
 		
 		if (log_comunication)
-				debug("Response '%s': %s", response_name, response_params != null ? response_params.print(false) : "NULL");
+				debug("Response %u '%s': %s", number, response_name, response_params != null ? response_params.print(false) : "NULL");
 		
 		buffer = serialize_message(response_name, response_params);
 		response = new ByteArray.take((owned) buffer);
