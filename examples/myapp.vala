@@ -44,6 +44,11 @@ public class MyApp : Diorite.Application
 		main_window.set_title("My App Window");
 		append_actions();
 		
+		var app_menu = actions.build_menu({
+			Actions.FORMAT_SUPPORT, Actions.DONATE,
+			Actions.PREFERENCES, Actions.HELP, Actions.ABOUT, Actions.QUIT}, true, false);
+		set_app_menu(app_menu);
+		
 		main_window.create_toolbar({Actions.GO_BACK, Actions.GO_FORWARD, Actions.GO_RELOAD, Actions.GO_HOME, " ", Actions.DONATE});
 		main_window.create_menu_button({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR});
 		
@@ -52,10 +57,7 @@ public class MyApp : Diorite.Application
 		menubar.append_submenu("_View", actions.build_menu({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR}, true, false));
 		set_menubar(menubar);
 		
-		var app_menu = actions.build_menu({
-			Actions.FORMAT_SUPPORT, Actions.DONATE,
-			Actions.PREFERENCES, Actions.HELP, Actions.ABOUT, Actions.QUIT}, true, false);
-		set_app_menu(app_menu);
+		
 		
 		main_window.show_all();
 	}
