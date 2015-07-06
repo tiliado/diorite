@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2015 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -53,9 +53,8 @@ public abstract class Application : Gtk.Application
 	public string app_name {get; protected set;}
 	public string icon {get; protected set; default = "";}
 	public string version {get; protected set; default = "";}
-	public bool app_menu_shown {get; private set; default = false;}
-	public bool menubar_shown {get; private set; default = false;}
 	public ActionsRegistry? actions {get; private set; default = null;}
+	public DesktopShell? shell {get; private set; default = null;} 
 	#if LINUX
 	private XfceSessionManager? xfce_session = null;
 	#endif
@@ -160,7 +159,6 @@ public abstract class Application : Gtk.Application
 		#endif
 		base.startup();
 		
-		var gtk_settings = Gtk.Settings.get_default();
 		/* Use this enviroment variable only for debugging purposes */
 		var gui_mode = Environment.get_variable("DIORITE_GUI_MODE");
 		if (gui_mode != null)
@@ -168,16 +166,13 @@ public abstract class Application : Gtk.Application
 			switch (gui_mode)
 			{
 			case "unity":
-				gtk_settings.gtk_shell_shows_app_menu = true;
-				gtk_settings.gtk_shell_shows_menubar = true;
+				DesktopShell.set_default(new UnityDesktopShell());
 				break;
 			case "gnome":
-				gtk_settings.gtk_shell_shows_app_menu = true;
-				gtk_settings.gtk_shell_shows_menubar = false;
+				DesktopShell.set_default(new GnomeDesktopShell());
 				break;
 			case "xfce":
-				gtk_settings.gtk_shell_shows_app_menu = false;
-				gtk_settings.gtk_shell_shows_menubar = false;
+				DesktopShell.set_default(new XfceDesktopShell());
 				break;
 			case "":
 			case "default":
@@ -188,11 +183,7 @@ public abstract class Application : Gtk.Application
 			}
 		}
 		
-		if (gtk_settings.gtk_shell_shows_app_menu)
-		{
-			app_menu_shown = true;
-			menubar_shown = gtk_settings.gtk_shell_shows_menubar;
-		}
+		shell = DesktopShell.get_default();
 	}
 	
 	#if LINUX

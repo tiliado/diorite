@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2015 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -68,10 +68,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 				title_box.margin_left = title_box.margin_right = 12;
 		}
 		
-		var gs = Gtk.Settings.get_default();
-		if (!gs.gtk_shell_shows_menubar && gs.gtk_shell_shows_app_menu)
+		if (app.shell.client_side_decorations)
 		{
-			/* Assume we are in GNOME Shell, so it's safe to use HeaderBar as window title */
 			header_bar.show_close_button = true;
 			set_titlebar(header_bar);
 			notify["title"].connect_after(on_title_changed);
@@ -109,7 +107,6 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		
 		var actions = app.actions;
-		var gs = Gtk.Settings.get_default();
 		var menu = actions.build_menu(items, false, false);
 		
 		if (header_bar_revealer != null)
@@ -128,7 +125,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		
 		var app_menu = app.app_menu;
-		if (app_menu != null && (!gs.gtk_shell_shows_app_menu || gs.gtk_shell_shows_menubar))
+		if (app_menu != null && (!app.shell.shows_app_menu || app.shell.shows_menu_bar))
 		{
 			var size = app_menu.get_n_items();
 			var section = new Menu();
