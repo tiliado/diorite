@@ -182,6 +182,8 @@ def configure(ctx):
 	ctx.check_dep('gio-2.0', 'GIO', TARGET_GLIB)
 	ctx.check_dep('gtk+-3.0', 'GTK+', TARGET_GTK)
 	ctx.check_dep('gdk-3.0', 'GDK', TARGET_GTK)
+	ctx.check_dep('gdk-x11-3.0', 'GDKX11', TARGET_GTK)
+	ctx.check_dep('x11', 'X11', "0")
 	
 	if ctx.env.EXPERIMENTAL:
 		ctx.check_dep('sqlite3', 'SQLITE', "3.7")
@@ -238,8 +240,8 @@ def build(ctx):
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
 		source = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.c'),
-		packages = " gtk+-3.0 gdk-3.0 gio-2.0 glib-2.0",
-		uselib = "GTK+ GDK GIO GLIB",
+		packages = " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0 gio-2.0 glib-2.0",
+		uselib = "GTK+ GDK X11 GDKX11 GIO GLIB",
 		use = [DIORITE_GLIB],
 		includes = ["src/gtk"],
 		vala_defines = vala_defines,
