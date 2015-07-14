@@ -60,6 +60,7 @@ public abstract class DesktopShell: GLib.Object
 			{
 			case "gnome shell":
 			case "mutter":
+			case "mutter(gala)":
 				wm_version = X11.get_window_property_as_utf8(net_wm_check_window, "_MUTTER_VERSION");
 				break;
 			}
@@ -81,6 +82,7 @@ private class DefaultDesktopShell: DesktopShell
 		{
 		case "gnome shell":
 		case "mutter":
+		case "mutter(gala)":
 			client_side_decorations = true;
 			break;
 		}
