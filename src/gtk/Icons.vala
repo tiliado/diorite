@@ -35,7 +35,7 @@ public static Gdk.Pixbuf? load_theme_icon(string[] names, int size)
 			if (icon != null)
 				return icon;
 		}
-		catch (Error e)
+		catch (GLib.Error e)
 		{
 			warning("Failed to load icon '%s': %s", name, e.message);
 		}
