@@ -63,7 +63,7 @@ public abstract class Action: GLib.Object
 			callback();
 	}
 	
-	public void activate(Variant? parameter)
+	public virtual void activate(Variant? parameter)
 	{
 		action.activate(parameter);
 	}
@@ -100,6 +100,14 @@ public class ToggleAction : Action
 		action = new GLib.SimpleAction.stateful(name, null, state);
 		action.activate.connect(on_action_activated);
 		action.change_state.connect(on_action_activated);
+	}
+	
+	public override void activate(Variant? parameter)
+	{
+		if (parameter != null && state != null && parameter.equal(state))
+			debug("Toggle action '%s' not activated because of the same state '%s'.", name, parameter.print(false));
+		else
+			base.activate(parameter);
 	}
 }
 
