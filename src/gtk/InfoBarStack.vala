@@ -123,6 +123,35 @@ public class InfoBarStack: Gtk.Stack
 		return false;
 	}
 	
+	/**
+	 * Create and show new closable Gtk.InfoBar
+	 * 
+	 * The info bar has close button and is removed after a response signal.
+	 * 
+	 * @param text            text of the info bar
+	 * @param message_type    type of the info bar
+	 * @return a newly created Gtk.InfoBar
+	 */
+	public Gtk.InfoBar create_info_bar(string text, Gtk.MessageType message_type=Gtk.MessageType.INFO)
+	{
+		var bar = new Gtk.InfoBar();
+		bar.message_type = message_type;
+		bar.show_close_button = true;
+		var label = new Gtk.Label(text);
+		label.hexpand = true;
+		bar.get_content_area().add(label);
+		bar.show_all();
+		bar.response.connect(on_create_info_bar_response);
+		add(bar);
+		return bar;
+	}
+	
+	private void on_create_info_bar_response(Gtk.InfoBar bar, int response)
+	{
+		bar.response.disconnect(on_create_info_bar_response);
+		remove(bar);
+	}
+	
 	private void on_visible_child_changed(GLib.Object o, ParamSpec p)
 	{
 		Gtk.Container? parent;
