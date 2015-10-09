@@ -33,7 +33,7 @@ APPNAME = "diorite"
 VERSION = "0.1.0+"
 SERIES = VERSION.rsplit(".", 1)[0]
 
-TARGET_GLIB_TUPLE = (2, 38)
+TARGET_GLIB_TUPLE = (2, 40)
 TARGET_GLIB = '{}.{}'.format(*TARGET_GLIB_TUPLE)
 TARGET_GTK_TUPLE = (3, 10)
 TARGET_GTK = '{}.{}'.format(*TARGET_GTK_TUPLE)

@@ -22,9 +22,9 @@ Dependencies
 
   - Python 2 or 3 to run ./waf
   - Python 3 to run ./testgen.py
-  - glib-2.0 >= 2.38
-  - ghread-2.0 >= 2.38
-  - gio-2.0 >= 2.38
+  - glib-2.0 >= 2.40
+  - ghread-2.0 >= 2.40
+  - gio-2.0 >= 2.40
   - gtk+-3.0 >= 3.10
 
 Build
