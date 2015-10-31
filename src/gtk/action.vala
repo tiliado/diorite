@@ -65,7 +65,10 @@ public abstract class Action: GLib.Object
 	
 	public virtual void activate(Variant? parameter)
 	{
-		action.activate(parameter);
+		if (enabled)
+			action.activate(parameter);
+		else
+			warning("Cannot activate action '%s', because it is disabled.", name);
 	}
 	
 	public void add_to_map(ActionMap map)
@@ -75,7 +78,10 @@ public abstract class Action: GLib.Object
 	
 	protected void on_action_activated(Variant? parameter)
 	{
-		activated(parameter);
+		if (enabled)
+			activated(parameter);
+		else
+			warning("Cannot activate action '%s', because it is disabled.", name);
 	}
 }
 
