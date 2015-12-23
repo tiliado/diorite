@@ -58,7 +58,7 @@ public class Logger
 	{
 		Logger.output = output;
 		Logger.display_level = display_level;
-		Logger.hint = hint != null ? hint + ":" : null;
+		Logger.hint = hint != null ? hint + ": " : null;
 		var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
 		if (use_colors == "yes")
 		{
@@ -206,9 +206,9 @@ public class Logger
 		lock (output)
 		{
 			if (Logger.colorful && color >= 0)
-				output.printf("\x1b[%dm[%s%-8s %5s]\x1b[0m %s\n", COLOR_FOREGROUND + color, hint, name, domain, message);
+				output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
 			else
-				output.printf("[%s%-8s %5s] %s\n", hint, name, domain, message);
+				output.printf("%s[%-8s %5s] %s\n", hint, name, domain, message);
 			output.flush();
 		}
 	}
