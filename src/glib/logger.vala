@@ -92,12 +92,41 @@ public class Logger
 	}
 	
 	/**
-	 * Prints message to log
+	 * Prints message to log without any hint
 	 * 
 	 * @param format    message format
 	 */
 	[PrintfFormat]
 	public static void printf(string format, ...)
+	{
+		lock (output)
+		{
+			output.vprintf(format, va_list());
+			output.flush();
+		}
+	}
+	
+	/**
+	 * Prints line to log without any hint
+	 * 
+	 * @param line    line to log
+	 */
+	public static void puts(string line)
+	{
+		lock (output)
+		{
+			output.puts(line);
+			output.flush();
+		}
+	}
+	
+	/**
+	 * Prints message to log with hint if specified
+	 * 
+	 * @param format    message format
+	 */
+	[PrintfFormat]
+	public static void logf(string format, ...)
 	{
 		lock (output)
 		{
@@ -109,12 +138,11 @@ public class Logger
 			
 			output.vprintf(format, va_list());
 			output.flush();
-			output.flush();
 		}
 	}
 	
 	/**
-	 * Prints line to log
+	 * Prints line to log with hint if specified
 	 * 
 	 * @param line    line to log
 	 */
