@@ -1,5 +1,5 @@
-Diorite Library
-===============
+Diorite Library 0.2.0
+=====================
 
 ![Diorite stone](diorite.jpg)
 
@@ -8,7 +8,7 @@ and widget library for Nuvola Player project based on GLib, GIO and GTK.
 
 *Photo by Michael C. Rygel via Wikimedia Commons, [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)*
 
-Status: Early alpha
+Status: Private beta
 --------------------
 
   - No API & ABI stability
@@ -81,3 +81,8 @@ Diorite recognizes several environment variables for debugging:
   
   * `DIORITE_LOGGER_FATAL_STRING` - abort program when message matching the fatal
     [string pattern](https://developer.gnome.org/glib/stable/glib-Glob-style-pattern-matching.html) is logged.
+
+Changelog
+---------
+
+See [CHANGELOG.md](./CHANGELOG.md).
