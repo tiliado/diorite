@@ -85,6 +85,12 @@ private class DefaultDesktopShell: DesktopShell
 		case "mutter(gala)":
 			client_side_decorations = true;
 			break;
+		case "mutter(budgie)":
+			client_side_decorations = true;
+			/* Budgie desktop hasn't added proper Xsettings overrides yet to say it doesn't support appmenus.
+			 * https://github.com/tiliado/nuvolaplayer/issues/193 */
+			gs.gtk_shell_shows_app_menu = shows_app_menu = false;
+			break;
 		}
 		
 		debug(
