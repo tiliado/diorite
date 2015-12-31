@@ -87,7 +87,9 @@ private class DefaultDesktopShell: DesktopShell
 			break;
 		}
 		
-		debug("Shell: %s %s, CSD %s", wm_name, wm_version, client_side_decorations ? "on" : "off");
+		debug(
+			"Shell: %s %s, CSD %d, appmenu %d, menubar %d", wm_name, wm_version,
+			(int) client_side_decorations, (int) shows_app_menu, (int) shows_menu_bar);
 	}
 }
 
