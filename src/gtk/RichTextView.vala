@@ -113,11 +113,18 @@ public class RichTextView: Gtk.TextView
 		if (!get_style_context().lookup_color("link-color", out link_color)
 		&& !get_style_context().lookup_color("link_color", out link_color))
 		{
-			if (find_style_property("link-color") != null)
+			link_color = null;  // Clear link color
+			var prop = find_style_property("link-color");
+			if (prop != null)
 			{
 				unowned Gdk.Color? color = null;
 				style_get("link-color", out color);
-				link_color = {color.red / 65535.0, color.green / 65535.0, color.blue / 65535.0, 1.0};
+				if (!prop.value_type.is_a(typeof(Gdk.Color)))
+					warning("Style property link-color is not a Gdk.Color, but %s", prop.value_type.name());
+				else if (color == null) // See tiliado/nuvolaplayer#197
+					warning("Style property link-color is a Gdk.Color, but null");
+				else
+					link_color = {color.red / 65535.0, color.green / 65535.0, color.blue / 65535.0, 1.0};
 			}
 		}
 		
