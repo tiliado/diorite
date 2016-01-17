@@ -40,12 +40,12 @@ build()
 	
 	valac -C -d ${OUT} -b . --thread --save-temps -v \
 	--vapidir $BUILD  --vapidir ../vapi \
-	--pkg glib-2.0 --target-glib=2.32 --pkg=dioriteglib-0.1 \
+	--pkg glib-2.0 --target-glib=2.32 --pkg=dioriteglib-${ABI} \
 	${NAME}.vala
 	
 	$CC ${OUT}/${NAME}.c -o ${OUT}/${NAME}${EXECSUFFIX} \
 	$CFLAGS '-DG_LOG_DOMAIN="MyDiorite"' \
-	-I$BUILD -L$BUILD  "-L$(readlink -e "$BUILD")" -ldioriteglib-0.1 \
+	-I$BUILD -L$BUILD  "-L$(readlink -e "$BUILD")" -ldioriteglib-${ABI} \
 	$(pkg-config --cflags --libs glib-2.0 gobject-2.0 gthread-2.0)
 	
 	

@@ -39,7 +39,7 @@ build()
 	-X -fPIC -X -shared \
 	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib-0.1 \
+	--pkg=dioriteglib-${ABI} \
 	-X '-DG_LOG_DOMAIN="MyDiorite"' -X -g -X -O2 \
 	${NAME}.vala
 	
@@ -49,7 +49,7 @@ build()
 	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
 	--vapidir $OUT -X -I$OUT -X -L$OUT -X -l${NAME} \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib-0.1 --pkg ${NAME} \
+	--pkg=dioriteglib-${ABI} --pkg ${NAME} \
 	-X '-DG_LOG_DOMAIN="MyDiorite"' -X -g -X -O2 \
 	"${OUT}/run-${NAME}.vala"
 }

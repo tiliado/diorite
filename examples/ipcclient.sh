@@ -37,7 +37,7 @@ build()
 	-o ${NAME}${EXECSUFFIX} \
 	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
 	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib \
+	--pkg=dioriteglib-${ABI} \
 	-X '-DG_LOG_DOMAIN="MyDiorite"' \
 	${NAME}.vala
 }
