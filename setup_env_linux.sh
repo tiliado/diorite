@@ -9,8 +9,8 @@ CFLAGS="$CFLAGS -I$PWD/build -L$PWD/build"
 CC="gcc"
 export CC CFLAGS PKG_CONFIG_PATH PATH LD_LIBRARY_PATH
 
-alias configure="./waf configure"
-alias rebuild="./waf distclean configure build"
+alias configure="./waf configure --with-experimental-api"
+alias rebuild="./waf distclean configure build --with-experimental-api"
 alias fedora_configure="./waf configure --libdir /usr/local/lib64"
 alias fedora_rebuild="./waf distclean configure build --libdir /usr/local/lib64"
 alias update="./waf && sudo ./waf install"
