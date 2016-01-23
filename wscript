@@ -30,7 +30,7 @@ out = 'build'
 
 # Application name and version
 APPNAME = "diorite"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 SERIES = VERSION.rsplit(".", 1)[0]
 
 TARGET_GLIB_TUPLE = (2, 40)
