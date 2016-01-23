@@ -141,14 +141,15 @@ def configure(ctx):
 	ctx.msg('Target platform', PLATFORM, "GREEN")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
+	ctx.load('compiler_c vala')
+	
 	# Enable experimental API
 	ctx.env.EXPERIMENTAL = ctx.options.experimental
 	if ctx.env.EXPERIMENTAL:
 		ctx.vala_def("EXPERIMENTAL")
-	
-	# Find Valac
-	ctx.load('compiler_c vala')
-	ctx.check_vala(min_version=(0,22,1))
+		ctx.check_vala(min_version=(0,26,1))
+	else:
+		ctx.check_vala(min_version=(0,22,1))
 	
 	# Don't be quiet
 	ctx.env.VALAFLAGS.remove("--quiet")
