@@ -38,15 +38,6 @@ public class Client
 		channel = new Channel(name);
 	}
 	
-	public void send(ByteArray request, out ByteArray? response) throws IOError
-	{
-		response = null;
-		channel.connect(timeout);
-		channel.write_bytes(request);
-		channel.read_bytes(out response);
-		channel.close();
-	}
-	
 	public async void send_async(ByteArray request, out ByteArray response) throws IOError
 	{
 		var connection = channel.create_connection(null);

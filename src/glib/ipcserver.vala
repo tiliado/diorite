@@ -37,7 +37,7 @@ public class Server
 	private Channel channel;
 	public bool listening
 	{
-		get {return channel.listening;}
+		get {return service != null && service.is_active();}
 	}
 	
 	public uint timeout {get; set;}
