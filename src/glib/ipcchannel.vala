@@ -31,23 +31,6 @@ using Posix;
 namespace Diorite.Ipc
 {
 
-public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
-{
-	var size = sizeof(uint32);
-	GLib.assert(buffer.length >= offset + size);
-	for(var i = 0; i < size; i ++)
-		buffer[offset + i] = (uint8)((data >> ((3 - i) * 8)) & 0xFF);
-}
-
-public void uint32_from_bytes(uint8[] buffer, out uint32 data, uint offset=0)
-{
-	var size = sizeof(uint32);
-	GLib.assert(buffer.length >= offset + size);
-	data = 0;
-	for(var i = 0; i < size; i ++)
-		data += buffer[offset + i] * (1 << (3 - i) * 8);
-}
-
 #if LINUX
 [CCode(cheader_filename="socket.h")]
 private extern int socket_connect(int fd, string path);

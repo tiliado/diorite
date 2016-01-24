@@ -202,4 +202,35 @@ public void int64_to_hex(int64 val, out string result, char separator='\0')
 	bin_to_hex(data, out result, separator);
 }
 
+/**
+ * Converts uint32 value to bytes
+ * 
+ * @param buffer    buffer of size at least `sizeof(uint32)` where the result will be stored
+ * @param data      uint32 value to convert
+ * @param offset    offset of the buffer where the result will be stored
+ */
+public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
+{
+	var size = sizeof(uint32);
+	assert(buffer.length >= offset + size);
+	for (var i = 0; i < size; i ++)
+		buffer[offset + i] = (uint8)((data >> ((3 - i) * 8)) & 0xFF);
+}
+
+/**
+ * Converts bytes to uint32 value
+ * 
+ * @param buffer    buffer that contains the uint32 value
+ * @param data      where the uint32 value will be stored
+ * @param offset    offset of the buffer where the uint32 value is located
+ */
+public void uint32_from_bytes(uint8[] buffer, out uint32 data, uint offset=0)
+{
+	var size = sizeof(uint32);
+	assert(buffer.length >= offset + size);
+	data = 0;
+	for (var i = 0; i < size; i ++)
+		data += buffer[offset + i] * (1 << (3 - i) * 8);
+}
+
 } // namespace Diorite
