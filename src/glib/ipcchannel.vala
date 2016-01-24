@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -24,56 +24,24 @@
 
 #if LINUX
 
-
-
-namespace Diorite.Ipc
+namespace Diorite
 {
 
-public class Channel
+public class DuplexChannel
 {
-	private string name;
-	private string path;
+	private static const int MESSAGE_BUFSIZE = 512;
+	public string name {get; private set;}
+	public InputStream input {get; private set;}
+	public OutputStream output {get; private set;}
 	
-	public Channel(string name)
+	public DuplexChannel(string name, InputStream input, OutputStream output)
 	{
 		this.name = name;
-		this.path = create_path(name);
+		this.output = output;
+		this.input = input;
 	}
 	
-	public SocketService create_service() throws IOError
-	{
-		Posix.unlink(path);
-		var address = new UnixSocketAddress(path);
-		var service = new SocketService();
-		SocketAddress effective_address;
-		try
-		{
-			service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
-		}
-		catch (GLib.Error e)
-		{
-			throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
-		}
-		return service;
-	}
-	
-	public SocketConnection create_connection(Cancellable? cancellable=null) throws IOError
-	{
-		try
-		{
-			var address = new UnixSocketAddress(path);
-			var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
-			var connection = SocketConnection.factory_create_connection(socket);
-			connection.connect(address, cancellable);
-			return connection;
-		}
-		catch (GLib.Error e)
-		{
-			throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", path, e.message);
-		}
-	}
-	
-	public async void write_bytes_async(OutputStream out_stream, ByteArray bytes) throws IOError
+	public async void write_bytes_async(ByteArray bytes) throws IOError
 	{
 		if (bytes.len > get_max_message_size())
 			throw new IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
@@ -93,21 +61,19 @@ public class Channel
 			{
 				unowned uint8[] buffer = (uint8[]) (data + bytes_written_total);
 				buffer.length = int.min(MESSAGE_BUFSIZE, (int)(total_size - bytes_written_total));
-				var result = yield out_stream.write_async(buffer);
+				var result = yield output.write_async(buffer);
 				bytes_written = (ulong) result;
 			}
 			catch (GLib.IOError e)
 			{
-				throw new IOError.WRITE("Failed write to socket '%s': %s", path, e.message);
+				throw new IOError.WRITE("Failed write to socket '%s': %s", name, e.message);
 			}
 			bytes_written_total += bytes_written;
 		}
 		while (bytes_written_total < total_size);
 	}
 	
-	
-	
-	public async void read_bytes_async(InputStream in_stream, out ByteArray bytes, uint timeout=0, owned Cancellable? cancellable=null) throws IOError
+	public async void read_bytes_async(out ByteArray bytes, uint timeout=0, owned Cancellable? cancellable=null) throws IOError
 	{
 		bytes = new ByteArray();
 		uint cancel_id = 0;
@@ -132,7 +98,7 @@ public class Channel
 			try
 			{
 				buffer.length = bytes_to_read;
-				var result = yield in_stream.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+				var result = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
 				
 				if (result != bytes_to_read)
 					throw new IOError.READ("Failed to read message size.");
@@ -154,7 +120,7 @@ public class Channel
 				try
 				{
 					buffer.length = int.min((int)(message_size - bytes_read_total), MESSAGE_BUFSIZE);
-					bytes_read = yield in_stream.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+					bytes_read = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
 				}
 				catch (GLib.IOError e)
 				{

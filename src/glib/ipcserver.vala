@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -34,7 +34,6 @@ public class Server
 		log_comunication = Environment.get_variable("DIORITE_LOG_IPC_SERVER") == "yes";
 	}
 	
-	private Channel channel;
 	public bool listening
 	{
 		get {return service != null && service.is_active();}
@@ -48,12 +47,11 @@ public class Server
 	{
 		this.name = name;
 		this.timeout = timeout;
-		channel = new Channel(name);
 	}
 	
 	public void start_service() throws IOError
 	{
-		service = channel.create_service();
+		service = create_socket_service(create_path(name));
 		service.incoming.connect(on_incoming);
 		service.start();
 	}
@@ -95,15 +93,14 @@ public class Server
 	private async void process_connection(SocketConnection connection) throws IOError
 	{
 		ByteArray request;
-		var in_stream = new DataInputStream(connection.input_stream);
-		yield channel.read_bytes_async(in_stream, out request, timeout);
+		var channel = new DuplexChannel(create_path(name), connection.input_stream, connection.output_stream);
+		yield channel.read_bytes_async(out request, timeout);
 		
 		ByteArray response;
 		if (!handle((owned) request, out response))
 				response = new ByteArray();
 		
-		var out_stream = new DataOutputStream(connection.output_stream);
-		yield channel.write_bytes_async(out_stream, response);
+		yield channel.write_bytes_async(response);
 	}
 	
 	protected virtual bool handle(owned ByteArray request, out ByteArray response)

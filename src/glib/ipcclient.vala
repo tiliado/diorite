@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -28,25 +28,21 @@ namespace Diorite.Ipc
 public class Client
 {
 	public string name {get; private set;}
-	private Channel channel;
 	private uint timeout;
 	
 	public Client(string name, uint timeout)
 	{
 		this.name = name;
 		this.timeout = timeout;
-		channel = new Channel(name);
 	}
 	
 	public async void send_async(ByteArray request, out ByteArray response) throws IOError
 	{
-		var connection = channel.create_connection(null);
-		
-		var out_stream = new DataOutputStream(connection.output_stream);
-		yield channel.write_bytes_async(out_stream, request);
-		
-		var in_stream = new DataInputStream(connection.input_stream);
-		yield channel.read_bytes_async(in_stream, out response, timeout);
+		var path = create_path(name);
+		var connection = create_socket_connection(path, null);
+		var channel = new DuplexChannel(path, connection.input_stream, connection.output_stream);
+		yield channel.write_bytes_async(request);
+		yield channel.read_bytes_async(out response, timeout);
 	}
 }
 

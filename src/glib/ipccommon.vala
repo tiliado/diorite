@@ -29,7 +29,6 @@ public const uint PIPE_BUFSIZE = 4096;
 public const int MESSAGE_BUFSIZE = 512;
 private const string PIPE_FORMAT = "\\\\.\\pipe\\libdiorite.%s(%s)";
 #else
-public const int MESSAGE_BUFSIZE = 512;
 private const string SOCKET_FORMAT = "libdiorite.%s(%s)";
 #endif
 

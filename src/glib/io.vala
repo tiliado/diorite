@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -51,6 +51,39 @@ public GLib.OutputStream? output_stream_from_pipe(int fd)
 	#else
 	UNSUPPORTED PLATFORM!
 	#endif
+}
+
+public static SocketService create_socket_service(string path) throws IOError
+{
+	Posix.unlink(path);
+	var address = new UnixSocketAddress(path);
+	var service = new SocketService();
+	SocketAddress effective_address;
+	try
+	{
+		service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
+	}
+	catch (GLib.Error e)
+	{
+		throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
+	}
+	return service;
+}
+
+public static SocketConnection create_socket_connection(string path, Cancellable? cancellable=null) throws IOError
+{
+	try
+	{
+		var address = new UnixSocketAddress(path);
+		var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
+		var connection = SocketConnection.factory_create_connection(socket);
+		connection.connect(address, cancellable);
+		return connection;
+	}
+	catch (GLib.Error e)
+	{
+		throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", path, e.message);
+	}
 }
 
 } // namespace Diorite
