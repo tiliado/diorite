@@ -93,7 +93,7 @@ public class Server: GLib.Object
 	private async void process_connection(SocketConnection connection) throws IOError
 	{
 		ByteArray request;
-		var channel = new DuplexChannel(create_path(name), connection.input_stream, connection.output_stream);
+		var channel = new SocketChannel(create_path(name), connection);
 		yield channel.read_bytes_async(out request, timeout);
 		
 		ByteArray response;

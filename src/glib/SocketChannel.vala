@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,28 +22,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Ipc
+#if LINUX
+
+namespace Diorite
 {
 
-public class Client
+public class SocketChannel : DuplexChannel
 {
-	public string name {get; private set;}
-	private uint timeout;
+	public SocketConnection connection {get; private set;}
+	private uint io_condition_id;
 	
-	public Client(string name, uint timeout)
+	public SocketChannel(string name, SocketConnection connection)
 	{
-		this.name = name;
-		this.timeout = timeout;
+		base(name,  connection.input_stream, connection.output_stream);
+		this.connection = connection;
+		io_condition_id = Timeout.add(1, check_io_condition);
 	}
 	
-	public async void send_async(ByteArray request, out ByteArray response) throws IOError
+	public bool can_read()
 	{
-		var path = create_path(name);
-		var connection = create_socket_connection(path, null);
-		var channel = new SocketChannel(path, connection);
-		yield channel.write_bytes_async(request);
-		yield channel.read_bytes_async(out response, timeout);
+		return Flags.is_set(connection.socket.condition_check(IOCondition.IN), IOCondition.IN);
+	}
+	
+	public bool can_write()
+	{
+		return Flags.is_set(connection.socket.condition_check(IOCondition.OUT), IOCondition.OUT);
+	}
+	
+	public signal void io_condition(IOCondition condition);
+	
+	
+	private bool check_io_condition()
+	{
+		io_condition(connection.socket.condition_check(IOCondition.IN|IOCondition.OUT));
+		return true;
 	}
 }
 
 } // namespace Diorote
+
+#endif
