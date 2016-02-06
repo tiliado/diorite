@@ -35,4 +35,53 @@ public inline bool is_empty(string? str)
 	return str == null || str[0] == '\0';
 }
 
+
+/**	
+ * Splits a string into a maximum of `max_tokens` pieces, using the given `delimiter` and ignoring
+ * empty elements after stripping.
+ * 
+ * If `max_tokens` is reached, the remainder of string is appended to the last token.
+ * 
+ * @param data          a string to split
+ * @param delimiter     a string which specifies the places at which to split the string. The delimiter is not
+ *                      included in any of the resulting strings, unless `max_tokens` is reached.
+ * @param max_tokens    the maximum number of pieces to split string into. If this is less than 1, the string 
+ *                      is split completely.
+ * @return resulting list of strings
+ */
+public SList<string> split_strip(string? data, string delimiter, int max_tokens=0)
+{
+	if (is_empty(data))
+		return new SList<string>();
+	return array_to_slist(data.split(delimiter, max_tokens), true);
+}
+
+
+/**
+ * Creates list from array of strings
+ * 
+ * @param array    string array
+ * @param strip    strip array elements and ignore empty elements
+ * @return resulting list of strings
+ */
+public SList<string> array_to_slist(string[] array, bool strip=false)
+{
+	SList<string> result = null;
+	foreach (unowned string item in array)
+	{
+		if (!strip)
+		{
+			result.prepend(item);
+		}
+		else if (!is_empty(item))
+		{
+			var stripped_item = item.strip();
+			if (!is_empty(stripped_item))
+				result.prepend((owned) stripped_item);
+		}
+	}
+	result.reverse();
+	return (owned) result;
+}
+
 } // namespace Diorite.String
