@@ -105,16 +105,16 @@ public class KeyValueStorageServer: GLib.Object
 		return true;
 	}
 	
-	private unowned Provider get_provider(string name) throws Ipc.MessageError
+	private unowned Provider get_provider(string name) throws MessageError
 	{
 		unowned Provider? provider = providers[name];
 		if (provider == null)
-			throw new Ipc.MessageError.INVALID_REQUEST(
+			throw new MessageError.INVALID_REQUEST(
 				"No key-value storage provider named '%s' has been found.", name);
 		return provider;
 	}
 	
-	private Variant? handle_add_listener(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_add_listener(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ssu)");
 		string provider_name = null;
@@ -124,7 +124,7 @@ public class KeyValueStorageServer: GLib.Object
 		return new Variant.boolean(add_listener_by_name(provider_name, listener_name, (uint) timeout));
 	}
 	
-	private Variant? handle_remove_listener(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_remove_listener(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string provider_name = null;
@@ -133,7 +133,7 @@ public class KeyValueStorageServer: GLib.Object
 		return new Variant.boolean(remove_listener_by_name(provider_name, listener_name));
 	}
 	
-	private Variant? handle_has_key(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_has_key(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
@@ -142,7 +142,7 @@ public class KeyValueStorageServer: GLib.Object
 		return new Variant.boolean(get_provider(name).storage.has_key(key));
 	}
 	
-	private Variant? handle_get_value(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_get_value(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
@@ -151,7 +151,7 @@ public class KeyValueStorageServer: GLib.Object
 		return get_provider(name).storage.get_value(key);
 	}
 	
-	private Variant? handle_set_value(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_set_value(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ssmv)");
 		string name = null;
@@ -162,7 +162,7 @@ public class KeyValueStorageServer: GLib.Object
 		return null;
 	}
 	
-	private Variant? handle_unset(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_unset(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
@@ -172,7 +172,7 @@ public class KeyValueStorageServer: GLib.Object
 		return null;
 	}
 	
-	private Variant? handle_set_default_value(Ipc.MessageServer server, Variant? data) throws Ipc.MessageError
+	private Variant? handle_set_default_value(GLib.Object source, Variant? data) throws MessageError
 	{
 		Ipc.MessageServer.check_type_str(data, "(ssmv)");
 		string name = null;
@@ -212,7 +212,7 @@ public class KeyValueStorageServer: GLib.Object
 						warning("Invalid response to %s: %s", METHOD_CHANGED,
 							response == null ? "null" : response.print(false));
 				}
-				catch (Ipc.MessageError e)
+				catch (MessageError e)
 				{
 					critical("%s client error: %s", METHOD_CHANGED, e.message);
 				}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -25,24 +25,7 @@
 namespace Diorite.Ipc
 {
 
-public delegate Variant? MessageHandler(MessageServer server, Variant? params) throws MessageError;
-
-private class HandlerAdaptor
-{
-	private MessageHandler handler;
-	
-	public HandlerAdaptor(owned MessageHandler handler)
-	{
-		this.handler = (owned) handler;
-	}
-	
-	public void handle(MessageServer server, Variant? params,  out Variant? response) throws MessageError
-	{
-		response = handler(server, params);
-	}
-}
-
-public class MessageServer: Server
+public class MessageServer: Server, MessageListener
 {
 	private HashTable<string, HandlerAdaptor?> handlers;
 	private static bool log_comunication;
@@ -52,7 +35,7 @@ public class MessageServer: Server
 	{
 		base(name);
 		handlers = new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
-		add_handler("echo", echo_handler);
+		add_handler("echo", MessageListener.echo_handler);
 	}
 	
 	static construct
@@ -76,25 +59,20 @@ public class MessageServer: Server
 		return client.wait_for_echo(timeout); 
 	}
 	
-	public static Variant? echo_handler(Diorite.Ipc.MessageServer server, Variant? request) throws MessageError
-	{
-		return request;
-	}
-	
 	public static void check_type_str(Variant? request, string? type_str) throws MessageError
 	{
 		if (request == null && type_str != null)
-			throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type null, expected '%s'.", type_str);
+			throw new MessageError.INVALID_ARGUMENTS("Invalid request type null, expected '%s'.", type_str);
 		
 		if (request != null)
 		{
 			unowned string request_type_str = request.get_type_string();
 			
 			if (type_str == null)
-				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected null.", request_type_str);
+				throw new MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected null.", request_type_str);
 			
 			if (!request.check_format_string(type_str, false))
-				throw new Diorite.Ipc.MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
+				throw new MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
 		}
 	}
 	

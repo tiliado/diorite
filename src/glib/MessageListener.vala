@@ -21,37 +21,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 namespace Diorite
 {
 
-public class KeyValueStorageClient: GLib.Object
+public delegate Variant? MessageHandler(GLib.Object source, Variant? params) throws MessageError;
+
+public errordomain MessageError
 {
-	public Diorite.Ipc.MessageClient provider {get; construct;}
-	public Diorite.Ipc.MessageServer listener {get; construct;}
-	
-	public KeyValueStorageClient(Diorite.Ipc.MessageClient provider,
-		Diorite.Ipc.MessageServer listener)
+	REMOTE_ERROR,
+	UNSUPPORTED,
+	IOERROR,
+	UNKNOWN,
+	INVALID_RESPONSE,
+	INVALID_REQUEST,
+	INVALID_ARGUMENTS,
+	NOT_READY;
+}
+
+public interface MessageListener : GLib.Object
+{
+	public static Variant? echo_handler(GLib.Object source, Variant? request) throws MessageError
 	{
-		GLib.Object(provider: provider, listener: listener);
-		listener.add_handler("KeyValueStorageServer.changed", handle_changed);
+		return request;
 	}
 	
-	public signal void changed(string provider_name, string key, Variant? old_value);
+	public abstract void add_handler(string message_name, owned MessageHandler handler);
 	
-	public KeyValueStorage get_proxy(string provider_name, uint32 timeout)
+	public abstract bool remove_handler(string message_name);
+}
+
+public class HandlerAdaptor
+{
+	private MessageHandler handler;
+	
+	public HandlerAdaptor(owned MessageHandler handler)
 	{
-		return new KeyValueStorageProxy(this, provider_name, timeout);
+		this.handler = (owned) handler;
 	}
 	
-	private Variant? handle_changed(GLib.Object source, Variant? data) throws MessageError
+	public void handle(GLib.Object source, Variant? params,  out Variant? response) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ssmv)");
-		string provider_name = null;
-		string key = null;
-		Variant? old_value = null;
-		data.get("(ssmv)", &provider_name, &key, &old_value);
-		changed(provider_name, key, old_value);
-		return new Variant.boolean(true);
+		response = handler(source, params);
 	}
 }
 

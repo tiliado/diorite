@@ -25,7 +25,7 @@
 namespace Diorite.Ipc
 {
 
-public class Server
+public class Server: GLib.Object
 {
 	private static bool log_comunication;
 	
