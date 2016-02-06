@@ -33,7 +33,7 @@ public class KeyValueStorageClient: GLib.Object
 		Diorite.Ipc.MessageServer listener)
 	{
 		GLib.Object(provider: provider, listener: listener);
-		listener.add_handler("KeyValueStorageServer.changed", handle_changed);
+		listener.add_handler("KeyValueStorageServer.changed", "(ssmv)", handle_changed);
 	}
 	
 	public signal void changed(string provider_name, string key, Variant? old_value);
@@ -45,7 +45,6 @@ public class KeyValueStorageClient: GLib.Object
 	
 	private Variant? handle_changed(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ssmv)");
 		string provider_name = null;
 		string key = null;
 		Variant? old_value = null;

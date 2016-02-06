@@ -35,7 +35,7 @@ public class MessageServer: Server, MessageListener
 	{
 		base(name);
 		handlers = new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
-		add_handler("echo", MessageListener.echo_handler);
+		add_handler("echo", TYPE_STRING_ANY, MessageListener.echo_handler);
 	}
 	
 	static construct
@@ -43,9 +43,9 @@ public class MessageServer: Server, MessageListener
 		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_SERVER") == "yes";
 	}
 	
-	public void add_handler(string message_name, owned MessageHandler handler)
+	public void add_handler(string message_name, string? type_string, owned MessageHandler handler)
 	{
-		handlers[message_name] = new HandlerAdaptor((owned) handler);
+		handlers[message_name] = new HandlerAdaptor((owned) handler, type_string);
 	}
 	
 	public bool remove_handler(string message_name)
@@ -57,23 +57,6 @@ public class MessageServer: Server, MessageListener
 	{
 		var client = new MessageClient(name, timeout);
 		return client.wait_for_echo(timeout); 
-	}
-	
-	public static void check_type_str(Variant? request, string? type_str) throws MessageError
-	{
-		if (request == null && type_str != null)
-			throw new MessageError.INVALID_ARGUMENTS("Invalid request type null, expected '%s'.", type_str);
-		
-		if (request != null)
-		{
-			unowned string request_type_str = request.get_type_string();
-			
-			if (type_str == null)
-				throw new MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected null.", request_type_str);
-			
-			if (!request.check_format_string(type_str, false))
-				throw new MessageError.INVALID_ARGUMENTS("Invalid request type '%s', expected '%s'.", request_type_str, type_str);
-		}
 	}
 	
 	/**

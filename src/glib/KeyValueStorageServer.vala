@@ -44,13 +44,13 @@ public class KeyValueStorageServer: GLib.Object
 	{
 		GLib.Object(server: server);
 		providers = new HashTable<string, Provider?>(str_hash, str_equal);
-		server.add_handler(METHOD_ADD_LISTENER, handle_add_listener);
-		server.add_handler(METHOD_REMOVE_LISTENER, handle_remove_listener);
-		server.add_handler(METHOD_HAS_KEY, handle_has_key);
-		server.add_handler(METHOD_GET_VALUE, handle_get_value);
-		server.add_handler(METHOD_SET_VALUE, handle_set_value);
-		server.add_handler(METHOD_UNSET, handle_unset);
-		server.add_handler(METHOD_SET_DEFAULT_VALUE, handle_set_default_value);
+		server.add_handler(METHOD_ADD_LISTENER, "(ssu)", handle_add_listener);
+		server.add_handler(METHOD_REMOVE_LISTENER, "(ss)", handle_remove_listener);
+		server.add_handler(METHOD_HAS_KEY, "(ss)", handle_has_key);
+		server.add_handler(METHOD_GET_VALUE, "(ss)", handle_get_value);
+		server.add_handler(METHOD_SET_VALUE, "(ssmv)", handle_set_value);
+		server.add_handler(METHOD_UNSET, "(ss)", handle_unset);
+		server.add_handler(METHOD_SET_DEFAULT_VALUE, "(ssmv)", handle_set_default_value);
 	}
 	
 	public void add_provider(string name, KeyValueStorage storage)
@@ -116,7 +116,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_add_listener(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ssu)");
 		string provider_name = null;
 		string listener_name = null;
 		uint32 timeout = 15;
@@ -126,7 +125,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_remove_listener(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string provider_name = null;
 		string listener_name = null;
 		data.get("(ss)", &provider_name, &listener_name);
@@ -135,7 +133,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_has_key(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
 		string key = null;
 		data.get("(ss)", &name, &key);
@@ -144,7 +141,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_get_value(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
 		string key = null;
 		data.get("(ss)", &name, &key);
@@ -153,7 +149,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_set_value(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ssmv)");
 		string name = null;
 		string key = null;
 		Variant? value = null;
@@ -164,7 +159,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_unset(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ss)");
 		string name = null;
 		string key = null;
 		data.get("(ss)", &name, &key);
@@ -174,7 +168,6 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_set_default_value(GLib.Object source, Variant? data) throws MessageError
 	{
-		Ipc.MessageServer.check_type_str(data, "(ssmv)");
 		string name = null;
 		string key = null;
 		Variant? value = null;

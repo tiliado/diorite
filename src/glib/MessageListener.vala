@@ -39,6 +39,8 @@ public errordomain MessageError
 	NOT_READY;
 }
 
+public const string TYPE_STRING_ANY = "#ANY#";
+
 public interface MessageListener : GLib.Object
 {
 	public static Variant? echo_handler(GLib.Object source, Variant? request) throws MessageError
@@ -46,7 +48,29 @@ public interface MessageListener : GLib.Object
 		return request;
 	}
 	
-	public abstract void add_handler(string message_name, owned MessageHandler handler);
+	public static void check_type_string(Variant? data, string? type_string) throws MessageError
+	{
+		if (type_string != null && type_string == TYPE_STRING_ANY)
+			return;
+		
+		if (data == null && type_string != null)
+			throw new MessageError.INVALID_ARGUMENTS("Invalid data type null, expected '%s'.", type_string);
+		
+		if (data != null)
+		{
+			unowned string data_type_string = data.get_type_string();
+			
+			if (type_string == null)
+				throw new MessageError.INVALID_ARGUMENTS(
+					"Invalid data type '%s', expected null.", data_type_string);
+			
+			if (!data.check_format_string(type_string, false))
+				throw new MessageError.INVALID_ARGUMENTS(
+					"Invalid data type '%s', expected '%s'.", data_type_string, type_string);
+		}
+	}
+	
+	public abstract void add_handler(string message_name, string? type_string, owned MessageHandler handler);
 	
 	public abstract bool remove_handler(string message_name);
 }
@@ -54,14 +78,17 @@ public interface MessageListener : GLib.Object
 public class HandlerAdaptor
 {
 	private MessageHandler handler;
+	private string? type_string;
 	
-	public HandlerAdaptor(owned MessageHandler handler)
+	public HandlerAdaptor(owned MessageHandler handler, string? type_string)
 	{
 		this.handler = (owned) handler;
+		this.type_string = type_string;
 	}
 	
 	public void handle(GLib.Object source, Variant? params,  out Variant? response) throws MessageError
 	{
+		MessageListener.check_type_string(params, type_string);
 		response = handler(source, params);
 	}
 }
