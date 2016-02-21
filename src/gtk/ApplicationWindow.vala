@@ -29,7 +29,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 {
 	public Gtk.Grid top_grid {get; private set;}
 	public InfoBarStack info_bars {get; private set;}
-	private Gtk.HeaderBar header_bar;
+	public Gtk.HeaderBar header_bar {get; private set;}
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
 	private unowned Application app;
 	private Gtk.MenuButton menu_button = null;
