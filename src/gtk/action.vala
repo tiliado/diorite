@@ -44,6 +44,7 @@ public abstract class Action: GLib.Object
 	public string? icon {get; construct; default = null;}
 	public string? keybinding {get; set; default = null;}
 	public string name {get {return action.name;}}
+	public string full_name {owned get {return scope + "." + action.name;}}
 	public bool enabled
 	{
 		get {return action.enabled;}
