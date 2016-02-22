@@ -175,6 +175,21 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		header_bar.show_all();
 	}
 	
+	public Gtk.Button? get_toolbar_button(string action_name)
+	{
+		var action = app.actions.get_action(action_name);
+		return_val_if_fail(action != null, false);
+		var full_name = action.full_name;
+		var children = header_bar.get_children();
+		foreach (var child in children)
+		{
+			var button = child as Gtk.Button;
+			if (button != null && button.action_name == full_name)
+				return button;
+		}
+		return null;
+	}
+	
 	private bool toolbar_pack_start(string action)
 	{
 		return_val_if_fail(header_bar != null, false);
