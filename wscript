@@ -227,7 +227,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
-		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.c'),
+		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.c') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		uselib = uselib,
 		includes = ["src/glib"],
@@ -343,3 +343,14 @@ def post(ctx):
 
 def _glib_encode_version(major, minor):
 	return major << 16 | minor << 8
+
+from waflib.TaskGen import extension
+@extension('.vapi')
+def vapi_file(self, node):
+	try:
+		valatask = self.valatask
+	except AttributeError:
+		valatask = self.valatask = self.create_task('valac')
+		self.init_vala_task()
+
+	valatask.inputs.append(node)
