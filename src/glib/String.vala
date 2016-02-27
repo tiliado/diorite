@@ -84,4 +84,18 @@ public SList<string> array_to_slist(string[] array, bool strip=false)
 	return (owned) result;
 }
 
+
+	
+public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
+{
+	char* result = g_utf8_strchr((char*) str + start_index, len, c);
+	return result != null ? (int) (result - (char*) str) : -1;
+}
+
+public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
+{
+	char* result = g_utf8_strrchr((char*) str + start_index, len, c);
+	return result != null ? (int) (result - (char*) str) : -1;
+}
+
 } // namespace Diorite.String
