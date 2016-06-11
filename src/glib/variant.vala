@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -296,3 +296,15 @@ public string? variant_to_string(Variant? value, string? default=null)
 }
 
 } // namespace Diorite
+
+namespace Drt
+{
+
+public Variant? new_variant_string_or_null(string? str)
+{
+	if (str == null)
+		return null;
+	return new Variant.string(str);
+}
+
+} // namespace Drt
