@@ -35,6 +35,16 @@ public inline bool is_empty(string? str)
 	return str == null || str[0] == '\0';
 }
 
+/**
+ * Ensure string is not empty but either non-empty or null
+ * 
+ * @param str    original string
+ * @return original string if it isn't empty, null otherwise	
+ */
+public inline string? null_if_empty(string? str)
+{
+	return (str == null || str[0] == '\0') ? null : str;
+}
 
 /**	
  * Splits a string into a maximum of `max_tokens` pieces, using the given `delimiter` and ignoring
