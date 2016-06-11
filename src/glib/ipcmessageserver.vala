@@ -28,7 +28,7 @@ namespace Diorite.Ipc
 public class MessageServer: Server, MessageListener
 {
 	private HashTable<string, HandlerAdaptor?> handlers;
-	private static bool log_comunication;
+	protected static bool log_comunication;
 	private uint message_number = 0;
 	
 	public MessageServer(string name)
@@ -75,7 +75,7 @@ public class MessageServer: Server, MessageListener
 		return response;
 	}
 	
-	protected Variant? handle_message(string name, Variant? data) throws MessageError
+	protected virtual Variant? handle_message(string name, Variant? data) throws MessageError
 	{
 		Variant? response = null;
 		var adaptor = handlers[name];

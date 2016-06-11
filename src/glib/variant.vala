@@ -77,10 +77,10 @@ public Variant[] variant_to_array(Variant variant)
 	return result;
 }
 
-public HashTable<string, Variant> variant_to_hashtable(Variant variant)
+public HashTable<string, Variant> variant_to_hashtable(Variant? variant)
 {
 	var result = new HashTable<string, Variant>(str_hash, str_equal);
-	if (variant.is_of_type(VariantType.DICTIONARY))
+	if (variant != null && variant.is_of_type(VariantType.DICTIONARY))
 	{
 		var iter = variant.iterator();
 		Variant? val = null;
@@ -96,7 +96,7 @@ public HashTable<string, Variant> variant_to_hashtable(Variant variant)
 				result.insert(key, val);
 			}
 	}
-	else
+	else if (variant != null)
 	{
 		critical("Wrong type: %s %s", variant.get_type_string(), variant.print(true));
 	}
