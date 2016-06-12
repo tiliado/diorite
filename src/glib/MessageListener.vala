@@ -25,14 +25,14 @@
 namespace Diorite
 {
 
-public delegate Variant? MessageHandler(GLib.Object source, Variant? params) throws MessageError;
+public delegate Variant? MessageHandler(GLib.Object source, Variant? params) throws GLib.Error;
 
 public errordomain MessageError
 {
+	UNKNOWN,
 	REMOTE_ERROR,
 	UNSUPPORTED,
 	IOERROR,
-	UNKNOWN,
 	INVALID_RESPONSE,
 	INVALID_REQUEST,
 	INVALID_ARGUMENTS,
@@ -43,12 +43,12 @@ public const string TYPE_STRING_ANY = "#ANY#";
 
 public interface MessageListener : GLib.Object
 {
-	public static Variant? echo_handler(GLib.Object source, Variant? request) throws MessageError
+	public static Variant? echo_handler(GLib.Object source, Variant? request) throws GLib.Error
 	{
 		return request;
 	}
 	
-	public static void check_type_string(Variant? data, string? type_string) throws MessageError
+	public static void check_type_string(Variant? data, string? type_string) throws GLib.Error
 	{
 		if (type_string != null && type_string == TYPE_STRING_ANY)
 			return;
@@ -86,7 +86,7 @@ public class HandlerAdaptor
 		this.type_string = type_string;
 	}
 	
-	public void handle(GLib.Object source, Variant? params,  out Variant? response) throws MessageError
+	public void handle(GLib.Object source, Variant? params,  out Variant? response) throws GLib.Error
 	{
 		MessageListener.check_type_string(params, type_string);
 		response = handler(source, params);

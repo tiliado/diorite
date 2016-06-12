@@ -30,17 +30,30 @@ public class MessageServer: Server, MessageListener
 	private HashTable<string, HandlerAdaptor?> handlers;
 	protected static bool log_comunication;
 	private uint message_number = 0;
+	private GenericSet<void*> allowed_errors;
 	
 	public MessageServer(string name)
 	{
 		base(name);
 		handlers = new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
 		add_handler("echo", TYPE_STRING_ANY, MessageListener.echo_handler);
+		allowed_errors = new GenericSet<void*>(null, null);
+		allow_error_propagation(new MessageError.UNKNOWN("").domain);
 	}
 	
 	static construct
 	{
 		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_SERVER") == "yes";
+	}
+	
+	public void allow_error_propagation(Quark error_quark)
+	{
+		allowed_errors.add(((uint) error_quark).to_pointer());
+	}
+	
+	public bool is_error_allowed(Quark error_quark)
+	{
+		return allowed_errors.contains(((uint) error_quark).to_pointer());
 	}
 	
 	public void add_handler(string message_name, string? type_string, owned MessageHandler handler)
@@ -62,7 +75,7 @@ public class MessageServer: Server, MessageListener
 	/**
 	 * Convenience method to invoke message handler from server's process.
 	 */
-	public Variant? send_local_message(string name, Variant? data) throws MessageError
+	public Variant? send_local_message(string name, Variant? data) throws GLib.Error
 	{
 		if (log_comunication)
 			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
@@ -75,7 +88,7 @@ public class MessageServer: Server, MessageListener
 		return response;
 	}
 	
-	protected virtual Variant? handle_message(string name, Variant? data) throws MessageError
+	protected virtual Variant? handle_message(string name, Variant? data) throws GLib.Error
 	{
 		Variant? response = null;
 		var adaptor = handlers[name];
@@ -113,10 +126,11 @@ public class MessageServer: Server, MessageListener
 			response_params = handle_message(request_name, request_params);
 			response_name = RESPONSE_OK;
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			response_name = RESPONSE_ERROR;
-			response_params = serialize_error(e);
+			response_params = serialize_error(is_error_allowed(e.domain)
+				? e : new MessageError.UNKNOWN("Unknown error occurred (%s).", e.domain.to_string()));
 		}
 		
 		if (log_comunication)

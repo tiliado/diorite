@@ -205,7 +205,7 @@ public class KeyValueStorageServer: GLib.Object
 						warning("Invalid response to %s: %s", METHOD_CHANGED,
 							response == null ? "null" : response.print(false));
 				}
-				catch (MessageError e)
+				catch (GLib.Error e)
 				{
 					critical("%s client error: %s", METHOD_CHANGED, e.message);
 				}

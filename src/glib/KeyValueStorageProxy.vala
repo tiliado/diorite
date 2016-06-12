@@ -63,7 +63,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 			critical("Invalid response to %s: %s", method,
 				response == null ? "null" : response.print(false));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 		}
@@ -77,7 +77,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		{
 			return unbox_variant(client.provider.send_message(method, new Variant("(ss)", name, key)));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 			return null;
@@ -91,7 +91,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		{
 			client.provider.send_message(method, new Variant("(ssmv)", name, key, value));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 		}
@@ -104,7 +104,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		{
 			client.provider.send_message(method, new Variant("(ssmv)", name, key, value));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 		}
@@ -117,7 +117,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		{
 			client.provider.send_message(method, new Variant("(ss)", name, key));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 		}
@@ -146,7 +146,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 				warning("Invalid response to %s: %s", method,
 					response == null ? "null" : response.print(false));
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			critical("%s client error: %s", method, e.message);
 		}

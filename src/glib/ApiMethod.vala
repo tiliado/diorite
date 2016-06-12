@@ -33,7 +33,7 @@ public enum ApiFlags
 	WRITABLE
 }
 
-public delegate Variant? ApiHandler(ApiParams? params) throws Diorite.MessageError;
+public delegate Variant? ApiHandler(ApiParams? params) throws GLib.Error;
 
 public class ApiMethod
 {
@@ -52,7 +52,7 @@ public class ApiMethod
 		this.description = description;
 	}
 	
-	public void run_with_args_tuple(Variant? data, out Variant? response) throws Diorite.MessageError
+	public void run_with_args_tuple(Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{
@@ -83,7 +83,7 @@ public class ApiMethod
 		response = handler(new ApiParams(this, handler_params));
 	}
 	
-	public void run_with_args_dict(Variant? data, out Variant? response) throws Diorite.MessageError
+	public void run_with_args_dict(Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{

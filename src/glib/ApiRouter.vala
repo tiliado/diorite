@@ -130,7 +130,7 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 		return count > 0;
 	}
 	
-	protected override Variant? handle_message(string name, Variant? data) throws Diorite.MessageError
+	protected override Variant? handle_message(string name, Variant? data) throws GLib.Error
 	{
 		message("Handle message %s: %s", name, data == null ? "null" : data.print(false));
 		Variant? response = null;

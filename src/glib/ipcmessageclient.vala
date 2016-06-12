@@ -28,19 +28,33 @@ namespace Diorite.Ipc
 
 public class MessageClient: Client
 {
+	private GenericSet<void*> allowed_errors;
+	
 	public MessageClient(string name, uint timeout)
 	{
 		base(name, timeout);
+		allowed_errors = new GenericSet<void*>(null, null);
+		allow_error_propagation(new MessageError.UNKNOWN("").domain);
+	}
+	
+	public void allow_error_propagation(Quark error_quark)
+	{
+		allowed_errors.add(((uint) error_quark).to_pointer());
+	}
+	
+	public bool is_error_allowed(Quark error_quark)
+	{
+		return allowed_errors.contains(((uint) error_quark).to_pointer());
 	}
 	
 	/**
 	 * Convenience wrapper around send_message_async() that waits in main loop
 	 * and then returns result.
 	 */
-	public Variant? send_message(string name, Variant? params=null) throws MessageError
+	public Variant? send_message(string name, Variant? params=null) throws GLib.Error
 	{
 		var loop = new MainLoop();
-		MessageError? error = null;
+		GLib.Error? error = null;
 		Variant? result = null;
 		
 		send_message_async.begin(name, params, (o, res) =>
@@ -49,7 +63,7 @@ public class MessageClient: Client
 			{
 				result = send_message_async.end(res);
 			}
-			catch (MessageError e)
+			catch (GLib.Error e)
 			{
 				error = e;
 			}
@@ -65,7 +79,7 @@ public class MessageClient: Client
 		return result;
 	}
 	
-	public async Variant? send_message_async(string name, Variant? params=null) throws MessageError
+	public async Variant? send_message_async(string name, Variant? params=null) throws GLib.Error
 	{
 		var buffer = serialize_message(name, params);
 		var request = new ByteArray.take((owned) buffer);
@@ -92,13 +106,11 @@ public class MessageClient: Client
 					throw new MessageError.INVALID_RESPONSE("Server returned empty error.");
 				
 				var e = deserialize_error(response_params);
-				if (e is MessageError)
-				{
-					MessageError e2 = (MessageError) e;
-					throw e2;
-				}
-				
-				throw new MessageError.INVALID_RESPONSE("Server returned invalid error: %s", e.message);
+				if (e == null)
+					throw new MessageError.UNKNOWN("Server returned unknown error.");
+				if (!is_error_allowed(e.domain))
+					throw new MessageError.UNKNOWN("Server returned unknown error (%s).", e.domain.to_string());
+				throw e;
 			}
 			
 			throw new MessageError.INVALID_RESPONSE("Server returned invalid response status '%s'.", response_status);
@@ -128,7 +140,7 @@ public class MessageClient: Client
 			if (response != null && response.equal(message))
 				result = true;
 		}
-		catch (MessageError e)
+		catch (GLib.Error e)
 		{
 			var loop = new MainLoop();
 			var attempts = timeout / sleep;
@@ -144,7 +156,7 @@ public class MessageClient: Client
 						return false; // stop
 					}
 				}
-				catch (MessageError e)
+				catch (GLib.Error e)
 				{
 				}
 				
