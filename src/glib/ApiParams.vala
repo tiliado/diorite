@@ -108,6 +108,18 @@ public class ApiParams
 	}
 	
 	/**
+	 * Return Variant value and advance cursor.
+	 * 
+	 * Aborts on invalid time or out of bounds access.
+	 * 
+	 * @return Variant value.
+	 */
+	public Variant? pop_variant()
+	{
+		return next(typeof(VariantParam));
+	}
+	
+	/**
 	 * Return string[] value and advance cursor.
 	 * 
 	 * Aborts on invalid time or out of bounds access.
@@ -373,6 +385,52 @@ public class DictParam: ApiParam
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
 				path, name, type_string, value.get_type_string());
+		return value;
+	}
+}
+
+public class VariantParam: ApiParam
+{
+	/** 
+	 * Creates new parameter of type Variant.
+	 * 
+	 * The parameter name `name` is used in a key-value representation of parameters and in documentation.
+	 * 
+	 * The default value `default_value` is used at several circumstances: 
+	 * 
+	 *   * If `required` is set to `false` and the parameter hasn't been provided at all (e.g. in a key-value
+	 *     representation of parameters), the `default_value` is used instead.
+	 *   * If `nullable` is set to `false` and a null value is provided, it is replaced with the
+	 *     `default_value`.
+	 *   * However, if `nullable` is `false` and the `default_value` to be used is null, error is reported to
+	 *     the API caller.
+	 * 
+	 * @param name             Parameter name. 
+	 * @param required         If `true`, parameter must be always specified and error is reported to the API
+	 *                         caller otherwise.
+	 * @param nullable         If `true`, the parameter can have `null` value. Otherwise, error is reported to
+	 *                         the API caller if both the provided value and `default_value` are null.
+	 * @param default_value    The default value is used at several circumstances as described above.
+	 * @param description      Description of this parameter for API consumers.
+	 */
+	public VariantParam(string name, bool required, bool nullable,
+		Variant? default_value=null, string? description=null)
+	{
+		base(name, required, nullable, default_value, "*", description);
+	}
+	
+	public override Variant? get_value(string path, Variant? value) throws ApiError
+	{
+		if (value == null)
+		{
+			if (nullable)
+				return null;
+			if (default_value == null)
+				throw new ApiError.INVALID_PARAMS(
+					"Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+					path, name, type_string);
+			return default_value;
+		}
 		return value;
 	}
 }
