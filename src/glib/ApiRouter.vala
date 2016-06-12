@@ -25,6 +25,17 @@
 namespace Drt
 {
 
+public errordomain ApiError
+{
+	UNKNOWN,
+	INVALID_REQUEST,
+	INVALID_PARAMS,
+	PRIVATE_FLAG,
+	READABLE_FLAG,
+	WRITABLE_FLAG,
+	API_TOKEN_REQUIRED;
+}
+
 /**
  * ApiRouter provides advanced IPC API framework.
  * 
@@ -141,7 +152,7 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 		var path = name.substring(0, pos);
 		var spec = name.substring(pos + 2).split(",");
 		if (spec.length < 3)
-			throw new Diorite.MessageError.INVALID_REQUEST("Message format specification is incomplete: '%s'", name);
+			throw new ApiError.INVALID_REQUEST("Message format specification is incomplete: '%s'", name);
 		
 		var flags = spec[0];
 		var format = spec[1];
@@ -152,13 +163,13 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 			return list_methods(path, "/nuvola/", false, out response) ? response : base.handle_message(name, data);
 		
 		if ((method.flags & ApiFlags.PRIVATE) != 0 && !("p" in flags))
-			throw new Diorite.MessageError.INVALID_REQUEST("Message doesn't have private flag set: '%s'", name);
+			throw new ApiError.PRIVATE_FLAG("Message doesn't have private flag set: '%s'", name);
 		if ((method.flags & ApiFlags.READABLE) != 0 && !("r" in flags))
-			throw new Diorite.MessageError.INVALID_REQUEST("Message doesn't have readable flag set: '%s'", name);
+			throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
 		if ((method.flags & ApiFlags.WRITABLE) != 0 && !("w" in flags))
-			throw new Diorite.MessageError.INVALID_REQUEST("Message doesn't have writable flag set: '%s'", name);
+			throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
 		if ((method.flags & ApiFlags.PRIVATE) != 0 && (token == null || token != this.token))
-			throw new Diorite.MessageError.INVALID_REQUEST("Message doesn't have a valid token: '%s'", name);
+			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 		
 		switch (format)
 		{

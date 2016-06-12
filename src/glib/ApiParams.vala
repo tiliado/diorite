@@ -168,20 +168,20 @@ public abstract class ApiParam
 		this.description = description;
 	}
 	
-	public virtual Variant? get_value(string path, Variant? value) throws Diorite.MessageError
+	public virtual Variant? get_value(string path, Variant? value) throws ApiError
 	{
 		if (value == null)
 		{
 			if (nullable)
 				return null;
 			if (default_value == null)
-				throw new Diorite.MessageError.INVALID_ARGUMENTS(
+				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
 					path, name, type_string);
 			return default_value;
 		}
 		if (!value.is_of_type(new VariantType(type_string)))
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
+			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' has been provided.",
 				path, name, type_string, value.get_type_string());
 		return value;
@@ -293,14 +293,14 @@ public class StringArrayParam: ApiParam
 		base(name, required, true, default_value, "as", description);
 	}
 	
-	public override Variant? get_value(string path, Variant? value) throws Diorite.MessageError
+	public override Variant? get_value(string path, Variant? value) throws ApiError
 	{
 		if (value == null)
 		{
 			if (nullable)
 				return null;
 			if (default_value == null)
-				throw new Diorite.MessageError.INVALID_ARGUMENTS(
+				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
 					path, name, type_string);
 			return default_value;
@@ -310,7 +310,7 @@ public class StringArrayParam: ApiParam
 			return value;
 			
 		if (!value.is_of_type(new VariantType("av")))
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
+			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
 				path, name, type_string, value.get_type_string());
 		
@@ -322,7 +322,7 @@ public class StringArrayParam: ApiParam
 			if (child == null)
 				child = new Variant.string("");
 			if (!child.is_of_type(VariantType.STRING))
-				throw new Diorite.MessageError.INVALID_ARGUMENTS(
+				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the '%s' parameter of type '%s', but the child value of type '%s' have been provided.",
 					path, name, type_string, child.get_type_string());
 			builder.add_value(child);
@@ -356,21 +356,21 @@ public class DictParam: ApiParam
 		base(name, required, true, default_value, "a{smv}", description);
 	}
 	
-	public override Variant? get_value(string path, Variant? value) throws Diorite.MessageError
+	public override Variant? get_value(string path, Variant? value) throws ApiError
 	{
 		if (value == null)
 		{
 			if (nullable)
 				return null;
 			if (default_value == null)
-				throw new Diorite.MessageError.INVALID_ARGUMENTS(
+				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
 					path, name, type_string);
 			return default_value;
 		}
 		
 		if (!value.is_of_type(new VariantType(type_string)))
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
+			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
 				path, name, type_string, value.get_type_string());
 		return value;

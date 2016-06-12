@@ -35,6 +35,7 @@ public class MessageClient: Client
 		base(name, timeout);
 		allowed_errors = new GenericSet<void*>(null, null);
 		allow_error_propagation(new MessageError.UNKNOWN("").domain);
+		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
 	}
 	
 	public void allow_error_propagation(Quark error_quark)

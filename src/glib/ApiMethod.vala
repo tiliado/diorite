@@ -61,16 +61,16 @@ public class ApiMethod
 		}
 		
 		if (data == null)
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
-				"Method '%s' requires %d arguments but no arguments have been provided.",
+			throw new ApiError.INVALID_PARAMS(
+				"Method '%s' requires %d parameters but no parameters have been provided.",
 				path, params.length);
 		if (!data.get_type().is_subtype_of(VariantType.TUPLE))
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
-				"Method '%s' call expected a tuple of arguments, but type of '%s' received.",
+			throw new ApiError.INVALID_PARAMS(
+				"Method '%s' call expected a tuple of parameters, but type of '%s' received.",
 				path, data.get_type_string());
 		if (data.n_children() != params.length)
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
-				"Method '%s' requires %d arguments but %d arguments have been provided.",
+			throw new ApiError.INVALID_PARAMS(
+				"Method '%s' requires %d parameters but %d parameters have been provided.",
 				path, params.length, (int) data.n_children());
 				
 		Variant?[] handler_params = new Variant?[params.length];
@@ -92,8 +92,8 @@ public class ApiMethod
 		}
 		
 		if (data == null)
-			throw new Diorite.MessageError.INVALID_ARGUMENTS(
-				"Method '%s' requires %d arguments but no arguments have been provided.",
+			throw new ApiError.INVALID_PARAMS(
+				"Method '%s' requires %d parameters but no parameters have been provided.",
 				path, params.length);
 		if (data.get_type_string() != "(a{smv})")
 			Diorite.MessageListener.check_type_string(data, "a{smv}");
@@ -106,7 +106,7 @@ public class ApiMethod
 			
 			Variant? entry = dict.lookup_value(param.name, null);
 			if (entry == null && param.required)
-				throw new Diorite.MessageError.INVALID_ARGUMENTS(
+				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the '%s' parameter of type '%s', but it has been omitted.",
 					path, param.name, param.type_string);
 			

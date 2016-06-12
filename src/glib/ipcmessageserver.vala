@@ -39,6 +39,7 @@ public class MessageServer: Server, MessageListener
 		add_handler("echo", TYPE_STRING_ANY, MessageListener.echo_handler);
 		allowed_errors = new GenericSet<void*>(null, null);
 		allow_error_propagation(new MessageError.UNKNOWN("").domain);
+		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
 	}
 	
 	static construct
