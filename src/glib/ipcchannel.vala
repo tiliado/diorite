@@ -24,10 +24,10 @@
 
 #if LINUX
 
-namespace Diorite
+namespace Drt
 {
 
-public class DuplexChannel
+public abstract class DuplexChannel
 {
 	private static const int MESSAGE_BUFSIZE = 512;
 	public string name {get; private set;}
@@ -41,101 +41,103 @@ public class DuplexChannel
 		this.input = input;
 	}
 	
-	public async void write_bytes_async(ByteArray bytes) throws IOError
+	public async void write_bytes_async(ByteArray bytes) throws Diorite.IOError
 	{
 		if (bytes.len > get_max_message_size())
-			throw new IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
+			throw new Diorite.IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
 		
-		uint32 size = bytes.len;
+		uint8* data_ptr;
+		unowned uint8[] data_buf;
+		uint32 data_size;
+		uint32 bytes_written;
+		
+		bytes_written = 0;
 		uint8[] size_buffer = new uint8[sizeof(uint32)];
-		uint32_to_bytes(ref size_buffer, size);
-		bytes.prepend(size_buffer);
-		
-		uint8* data = bytes.data;
-		var total_size = bytes.len;
-		ulong bytes_written_total = 0;
-		ulong bytes_written;
+		Diorite.uint32_to_bytes(ref size_buffer, (uint32) bytes.len);
+		data_ptr = size_buffer;
+		data_size = size_buffer.length;
 		do
 		{
 			try
 			{
-				unowned uint8[] buffer = (uint8[]) (data + bytes_written_total);
-				buffer.length = int.min(MESSAGE_BUFSIZE, (int)(total_size - bytes_written_total));
-				var result = yield output.write_async(buffer);
-				bytes_written = (ulong) result;
+				data_buf = (uint8[]) (data_ptr + bytes_written);
+				data_buf.length = (int)(data_size - bytes_written);
+				bytes_written += (uint) yield output.write_async(data_buf);
 			}
 			catch (GLib.IOError e)
 			{
-				throw new IOError.WRITE("Failed write to socket '%s': %s", name, e.message);
+				if (!(e is GLib.IOError.WOULD_BLOCK || e is GLib.IOError.BUSY || e is GLib.IOError.PENDING))
+					throw new Diorite.IOError.READ("Failed to write header. %s", e.message);
+				Idle.add(write_bytes_async.callback);
+				yield;
 			}
-			bytes_written_total += bytes_written;
 		}
-		while (bytes_written_total < total_size);
-	}
-	
-	public async void read_bytes_async(out ByteArray bytes, uint timeout=0, owned Cancellable? cancellable=null) throws IOError
-	{
-		bytes = new ByteArray();
-		uint cancel_id = 0;
-		if (timeout > 0)
-		{
-			if (cancellable == null)
-				cancellable = new Cancellable();
-			cancel_id = Timeout.add(timeout, () =>
-			{
-				cancel_id = 0;
-				cancellable.cancel();
-				return false;
-			});
-		}
+		while (bytes_written < data_size);
 		
-		try
+		bytes_written = 0;
+		data_ptr = bytes.data;
+		data_size = bytes.len;
+		do
 		{
-			uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
-			unowned uint8[] buffer = real_buffer;
-			var bytes_to_read = (int) sizeof(uint32);
-			uint64 message_size = 0;
 			try
 			{
-				buffer.length = bytes_to_read;
-				var result = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
-				
-				if (result != bytes_to_read)
-					throw new IOError.READ("Failed to read message size.");
-				
-				uint32_from_bytes(buffer, out message_size);
+				data_buf = (uint8[]) (data_ptr + bytes_written);
+				data_buf.length =  (int)(data_size - bytes_written);
+				bytes_written += (uint) yield output.write_async(data_buf);
 			}
 			catch (GLib.IOError e)
 			{
-				throw new IOError.READ("Failed to read from socket. %s", e.message);
-			}
-			
-			if (message_size == 0)
-				throw new IOError.READ("Empty message received.");
-			
-			size_t bytes_read_total = 0;
-			size_t bytes_read;
-			while (bytes_read_total < message_size)
-			{
-				try
-				{
-					buffer.length = int.min((int)(message_size - bytes_read_total), MESSAGE_BUFSIZE);
-					bytes_read = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
-				}
-				catch (GLib.IOError e)
-				{
-					throw new IOError.READ("Failed to read from socket. %s", e.message);
-				}
-				
-				buffer.length = (int) bytes_read;
-				bytes.append(buffer);
-				bytes_read_total += bytes_read;
+				if (!(e is GLib.IOError.WOULD_BLOCK || e is GLib.IOError.BUSY || e is GLib.IOError.PENDING))
+					throw new Diorite.IOError.READ("Failed to write data. %s", e.message);
+				Idle.add(write_bytes_async.callback);
+				yield;
 			}
 		}
-		finally
+		while (bytes_written < data_size);
+	}
+	
+	public async void read_bytes_async(out ByteArray bytes, uint timeout=0, owned Cancellable? cancellable=null) throws Diorite.IOError
+	{
+		bytes = new ByteArray();
+		uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
+		unowned uint8[] buffer = real_buffer;
+		var bytes_to_read = (int) sizeof(uint32);
+		uint64 message_size = 0;
+		try
 		{
-			if (cancel_id != 0)
-				Source.remove(cancel_id);
+			buffer.length = bytes_to_read;
+			var result = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+			
+			if (result != bytes_to_read)
+				throw new Diorite.IOError.READ("Failed to read message size.");
+			
+			Diorite.uint32_from_bytes(buffer, out message_size);
+		}
+		catch (GLib.IOError e)
+		{
+			throw new Diorite.IOError.READ("Failed to read from socket. %s", e.message);
+		}
+		
+		if (message_size == 0)
+			throw new Diorite.IOError.READ("Empty message received.");
+		
+		size_t bytes_read_total = 0;
+		size_t bytes_read;
+		while (bytes_read_total < message_size)
+		{
+			try
+			{
+				buffer.length = int.min((int)(message_size - bytes_read_total), MESSAGE_BUFSIZE);
+				bytes_read = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+			}
+			catch (GLib.IOError e)
+			{
+				throw new Diorite.IOError.READ("Failed to read from socket. %s", e.message);
+			}
+			
+			buffer.length = (int) bytes_read;
+			bytes.append(buffer);
+			bytes_read_total += bytes_read;
 		}
 	}
 	
@@ -145,6 +147,6 @@ public class DuplexChannel
 	}
 }
 
-} // namespace Diorote
+} // namespace Drt
 
 #endif

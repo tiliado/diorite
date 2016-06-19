@@ -27,38 +27,46 @@
 namespace Diorite
 {
 
-public class SocketChannel : DuplexChannel
+public class SocketChannel : Drt.DuplexChannel
 {
 	public SocketConnection connection {get; private set;}
-	private uint io_condition_id;
+	public bool can_read {get; private set; default = false;}
+	public bool can_write {get; private set; default = false;}
+	private SocketSource socket_source;
 	
 	public SocketChannel(string name, SocketConnection connection)
 	{
 		base(name,  connection.input_stream, connection.output_stream);
 		this.connection = connection;
-		io_condition_id = Timeout.add(1, check_io_condition);
+		socket_source = connection.socket.create_source(IOCondition.IN|IOCondition.OUT);
+		socket_source.set_callback(on_socket_source);
+		check_io_condition();
 	}
 	
-	public bool can_read()
+	private void check_io_condition()
 	{
-		return Flags.is_set(connection.socket.condition_check(IOCondition.IN), IOCondition.IN);
+		var condition = connection.socket.condition_check(IOCondition.IN|IOCondition.OUT);
+		set_condition(condition);
+		socket_source.attach(MainContext.@default());
 	}
 	
-	public bool can_write()
+	private void set_condition(IOCondition condition)
 	{
-		return Flags.is_set(connection.socket.condition_check(IOCondition.OUT), IOCondition.OUT);
+		var read = Flags.is_set(condition, IOCondition.IN);
+		var write = Flags.is_set(condition, IOCondition.OUT);
+		if (can_read != read)
+			can_read = read;
+		if (can_write != write)
+			can_write = write;
 	}
 	
-	public signal void io_condition(IOCondition condition);
-	
-	
-	private bool check_io_condition()
+	private bool on_socket_source(Socket socket, IOCondition condition)
 	{
-		io_condition(connection.socket.condition_check(IOCondition.IN|IOCondition.OUT));
-		return true;
+		set_condition(condition);
+		return false;
 	}
 }
 
-} // namespace Diorote
+} // namespace Diorite
 
 #endif
