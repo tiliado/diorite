@@ -214,7 +214,22 @@ public void uint32_to_bytes(ref uint8[] buffer, uint32 data, uint offset=0)
 	var size = sizeof(uint32);
 	assert(buffer.length >= offset + size);
 	for (var i = 0; i < size; i ++)
-		buffer[offset + i] = (uint8)((data >> ((3 - i) * 8)) & 0xFF);
+		buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
+}
+
+/**
+ * Converts int32 value to bytes
+ * 
+ * @param buffer    buffer of size at least `sizeof(int32)` where the result will be stored
+ * @param data      int32 value to convert
+ * @param offset    offset of the buffer where the result will be stored
+ */
+public void int32_to_bytes(ref uint8[] buffer, int32 data, uint offset=0)
+{
+	var size = sizeof(int32);
+	assert(buffer.length >= offset + size);
+	for (var i = 0; i < size; i ++)
+		buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
 }
 
 /**
@@ -230,7 +245,23 @@ public void uint32_from_bytes(uint8[] buffer, out uint32 data, uint offset=0)
 	assert(buffer.length >= offset + size);
 	data = 0;
 	for (var i = 0; i < size; i ++)
-		data += buffer[offset + i] * (1 << (3 - i) * 8);
+		data += buffer[offset + i] * (1 << ((uint32)size - 1 - i) * 8);
+}
+
+/**
+ * Converts bytes to int32 value
+ * 
+ * @param buffer    buffer that contains the int32 value
+ * @param data      where the int32 value will be stored
+ * @param offset    offset of the buffer where the int32 value is located
+ */
+public void int32_from_bytes(uint8[] buffer, out int32 data, uint offset=0)
+{
+	var size = sizeof(int32);
+	assert(buffer.length >= offset + size);
+	data = 0;
+	for (var i = 0; i < size; i ++)
+		data += buffer[offset + i] * (1 << ((int32)size - 1 - i) * 8);
 }
 
 } // namespace Diorite
