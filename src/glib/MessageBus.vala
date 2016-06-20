@@ -81,7 +81,7 @@ public class MessageBus: GLib.Object, Diorite.MessageListener
 	{
 		if (log_comunication)
 			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_message(name, data);
+		var response = router.handle_message(this, name, data);
 		if (log_comunication)
 			debug("Local response: %s", response != null ? response.print(false) : "NULL");
 		return response;

@@ -26,14 +26,12 @@ namespace Diorite
 
 public class KeyValueStorageClient: GLib.Object
 {
-	public Diorite.Ipc.MessageClient provider {get; construct;}
-	public Diorite.Ipc.MessageServer listener {get; construct;}
+	public Drt.MessageChannel channel {get; construct;}
 	
-	public KeyValueStorageClient(Diorite.Ipc.MessageClient provider,
-		Diorite.Ipc.MessageServer listener)
+	public KeyValueStorageClient(Drt.MessageChannel channel)
 	{
-		GLib.Object(provider: provider, listener: listener);
-		listener.add_handler("KeyValueStorageServer.changed", "(ssmv)", handle_changed);
+		GLib.Object(channel: channel);
+		channel.add_handler("KeyValueStorageServer.changed", "(ssmv)", handle_changed);
 	}
 	
 	public signal void changed(string provider_name, string key, Variant? old_value);

@@ -31,7 +31,7 @@ public interface MessageRouter : GLib.Object
 	
 	public abstract bool remove_handler(string message_name);
 	
-	public abstract Variant? handle_message(string name, Variant? data) throws GLib.Error;
+	public abstract Variant? handle_message(GLib.Object source, string name, Variant? data) throws GLib.Error;
 	
 }
 
@@ -53,7 +53,7 @@ public class HandlerRouter: GLib.Object, MessageRouter
 	 * @return response data
 	 * @throw error on failure
 	 */
-	public virtual Variant? handle_message(string name, Variant? data) throws GLib.Error
+	public virtual Variant? handle_message(GLib.Object source, string name, Variant? data) throws GLib.Error
 	{
 		if (handlers == null)
 			throw new Diorite.MessageError.UNSUPPORTED("This message channel doesn't support requests.");
@@ -63,7 +63,7 @@ public class HandlerRouter: GLib.Object, MessageRouter
 		if (adaptor == null)
 			throw new Diorite.MessageError.UNSUPPORTED("No handler for message '%s'", name);
 	
-		adaptor.handle(this, data, out response);
+		adaptor.handle(source, data, out response);
 		return response;
 	}
 	

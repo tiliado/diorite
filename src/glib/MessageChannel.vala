@@ -510,7 +510,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 	{
 		try 
 		{
-			response = router.handle_message(name, params);
+			response = router.handle_message(this, name, params);
 			status = Diorite.Ipc.RESPONSE_OK;
 		}
 		catch (GLib.Error e)

@@ -36,11 +36,11 @@ public class KeyValueStorageServer: GLib.Object
 	internal static const string METHOD_SET_DEFAULT_VALUE = "KeyValueStorageServer.set_default_value";
 	internal static const string METHOD_CHANGED = "KeyValueStorageServer.changed";
 	
-	public Ipc.MessageServer server {get; construct;}
+	public Drt.MessageBus server {get; construct;}
 	private HashTable<string, Provider?> providers;
 	
 	
-	public KeyValueStorageServer(Ipc.MessageServer server)
+	public KeyValueStorageServer(Drt.MessageBus server)
 	{
 		GLib.Object(server: server);
 		providers = new HashTable<string, Provider?>(str_hash, str_equal);
@@ -63,7 +63,7 @@ public class KeyValueStorageServer: GLib.Object
 		providers.remove(name);
 	}
 	
-	public bool add_listener(string provider_name, Ipc.MessageClient listener)
+	public bool add_listener(string provider_name, Drt.MessageChannel listener)
 	{
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
@@ -73,35 +73,13 @@ public class KeyValueStorageServer: GLib.Object
 		return true;
 	}
 	
-	public bool add_listener_by_name(string provider_name, string listener_name, uint timeout)
-	{
-		return add_listener(provider_name, new Ipc.MessageClient(listener_name, timeout));
-	}
-	
-	public bool remove_listener(string provider_name, Ipc.MessageClient listener)
+	public bool remove_listener(string provider_name, Drt.MessageChannel listener)
 	{
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
 			return false;
 		
 		provider.listeners.remove(listener);
-		return true;
-	}
-	
-	public bool remove_listener_by_name(string provider_name, string listener_name)
-	{
-		unowned Provider? provider = providers[provider_name];
-		if (provider == null)
-			return false;
-		
-		foreach (unowned Ipc.MessageClient listener in provider.listeners)
-		{
-			if (listener.name == listener_name)
-			{
-				provider.listeners.remove(listener);
-				break;
-			}
-		}
 		return true;
 	}
 	
@@ -116,19 +94,23 @@ public class KeyValueStorageServer: GLib.Object
 	
 	private Variant? handle_add_listener(GLib.Object source, Variant? data) throws MessageError
 	{
+		var channel = source as Drt.MessageChannel;
+		return_val_if_fail(channel != null, new Variant.boolean(false));
 		string provider_name = null;
 		string listener_name = null;
 		uint32 timeout = 15;
 		data.get("(ssu)", &provider_name, &listener_name, &timeout);
-		return new Variant.boolean(add_listener_by_name(provider_name, listener_name, (uint) timeout));
+		return new Variant.boolean(add_listener(provider_name, channel));
 	}
 	
 	private Variant? handle_remove_listener(GLib.Object source, Variant? data) throws MessageError
 	{
+		var channel = source as Drt.MessageChannel;
+		return_val_if_fail(channel != null, new Variant.boolean(false));
 		string provider_name = null;
 		string listener_name = null;
 		data.get("(ss)", &provider_name, &listener_name);
-		return new Variant.boolean(remove_listener_by_name(provider_name, listener_name));
+		return new Variant.boolean(remove_listener(provider_name, channel));
 	}
 	
 	private Variant? handle_has_key(GLib.Object source, Variant? data) throws MessageError
@@ -181,7 +163,7 @@ public class KeyValueStorageServer: GLib.Object
 	{
 		public unowned string name;
 		public KeyValueStorage storage;
-		public SList<Ipc.MessageClient> listeners;
+		public SList<Drt.MessageChannel> listeners;
 		
 		public Provider(string name, KeyValueStorage storage)
 		{
