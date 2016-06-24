@@ -45,19 +45,14 @@ public errordomain ApiError
  *   * Method as well as parameters can hold description which can be then shown to API consumers,
  *     e.g. command-line or HTTP/JSON interface.
  */
-public class ApiRouter: MessageBus, MessageRouter
+public class ApiRouter: HandlerRouter
 {
 	public string token {get; protected set;}
-	private HashTable<string, ApiMethod?> methods;
-	private HandlerRouter handler_router;
+	protected HashTable<string, ApiMethod?> methods;
 	
-	public ApiRouter(string name)
+	public ApiRouter()
 	{
-		var handler_router = new HandlerRouter(null);
-		base(name, handler_router);
-		this.handler_router = handler_router;
-		// FIXME: this is a hack
-		this.router = this;
+		base(null);
 		methods = new HashTable<string, ApiMethod?>(str_hash, str_equal);
 		token = Diorite.random_hex(256);
 	}
@@ -71,7 +66,7 @@ public class ApiRouter: MessageBus, MessageRouter
 	 * @param handler        Handler to be called upon successful execution.
 	 * @param params         Specification of parameters.
 	 */
-	public void add_method(string path, ApiFlags flags, string? description,
+	public virtual void add_method(string path, ApiFlags flags, string? description,
 		owned ApiHandler handler, ApiParam?[] params)
 	{
 		methods[path] = new ApiMethod(path, flags, params, (owned) handler, description);
@@ -83,7 +78,7 @@ public class ApiRouter: MessageBus, MessageRouter
 	 * @param path    The path of a method.
 	 * @return true if method has been found and removed.
 	 */
-	public bool remove_method(string path)
+	public virtual bool remove_method(string path)
 	{
 		return methods.remove(path);
 	}
@@ -146,13 +141,13 @@ public class ApiRouter: MessageBus, MessageRouter
 		return count > 0;
 	}
 	
-	public virtual Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
+	public override Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
 	{
 		message("Handle message %s: %s", name, data == null ? "null" : data.print(false));
 		Variant? response = null;
 		var pos = name.last_index_of("::");
 		if (pos < 0)
-			return handler_router.handle_message(conn, name, data);
+			return base.handle_message(conn, name, data);
 		
 		var path = name.substring(0, pos);
 		var spec = name.substring(pos + 2).split(",");
@@ -167,7 +162,7 @@ public class ApiRouter: MessageBus, MessageRouter
 		if (method == null)
 		{
 			var ok = list_methods(path, "/nuvola/", false, out response);
-			return  ok ? response : handler_router.handle_message(conn, name, data);
+			return  ok ? response : base.handle_message(conn, name, data);
 		}
 		
 		if ((method.flags & ApiFlags.PRIVATE) != 0 && !("p" in flags))
@@ -189,16 +184,6 @@ public class ApiRouter: MessageBus, MessageRouter
 			break;
 		}
 		return response;
-	}
-	
-	public override void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
-	{
-		handler_router.add_handler(message_name, type_string, (owned) handler);
-	}
-	
-	public override bool remove_handler(string message_name)
-	{
-		return handler_router.remove_handler(message_name);
 	}
 }
 
