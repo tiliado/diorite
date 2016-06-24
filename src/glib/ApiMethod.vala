@@ -52,7 +52,7 @@ public class ApiMethod
 		this.description = description;
 	}
 	
-	public void run_with_args_tuple(Variant? data, out Variant? response) throws GLib.Error
+	public void run_with_args_tuple(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{
@@ -83,7 +83,7 @@ public class ApiMethod
 		response = handler(new ApiParams(this, handler_params));
 	}
 	
-	public void run_with_args_dict(Variant? data, out Variant? response) throws GLib.Error
+	public void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{

@@ -23,24 +23,32 @@ if [ "$#" -lt 2 ]; then
 fi
 
 set -eu
-NAME="ipcclient"
+NAME="MessageBus2"
 CMD="$1"
 PLATFORM="$2"
 . conf.inc.sh 
+
+export DIORITE_LOG_MESSAGE_SERVER=yes
 
 build()
 {
 	dist
 	echo "*** $0 build ***"
 	mkdir -p ${OUT}
-	valac -d ${OUT} -b . --thread --save-temps -v \
-	-o ${NAME}${EXECSUFFIX} \
-	--vapidir $BUILD -X -I$BUILD -X -L$BUILD \
-	--vapidir ../vapi --pkg glib-2.0 --target-glib=2.32 \
-	--pkg=dioriteglib-${ABI} \
-	-X '-DG_LOG_DOMAIN="MyDiorite"' \
+	set -x
+	
+	valac -C -d ${OUT} -b . --thread --save-temps -v \
+	--vapidir $BUILD  --vapidir ../vapi \
+	--pkg gio-2.0 --pkg gtk+-3.0 --pkg glib-2.0 --target-glib=2.32 --pkg=dioriteglib-${ABI} --pkg dioritegtk-${ABI} \
 	${NAME}.vala
+	
+	$CC ${OUT}/${NAME}.c -o ${OUT}/${NAME}${EXECSUFFIX} \
+	$CFLAGS '-DG_LOG_DOMAIN="MyDiorite"' \
+	-I$BUILD -L$BUILD  "-L$(readlink -e "$BUILD")" -ldioriteglib-${ABI} -l dioritegtk-${ABI} \
+	$(pkg-config --cflags --libs gtk+-3.0 gio-2.0 glib-2.0 gobject-2.0 gthread-2.0)
 }
+
+
 
 run()
 {
@@ -49,6 +57,15 @@ run()
 	echo "*** $0 run ***"
 	set -x
 	${LAUNCHER} ${OUT}/${NAME}${EXECSUFFIX}
+}
+
+debug()
+{
+	build
+	dist
+	echo "*** $0 debug ***"
+	set -x
+	${DEBUGGER} ${OUT}/${NAME}${EXECSUFFIX}
 }
 
 $CMD

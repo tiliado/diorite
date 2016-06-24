@@ -45,14 +45,14 @@ public errordomain ApiError
  *   * Method as well as parameters can hold description which can be then shown to API consumers,
  *     e.g. command-line or HTTP/JSON interface.
  */
-public class ApiRouter: Diorite.Ipc.MessageServer
+public class ApiRouter: HandlerRouter
 {
 	public string token {get; protected set;}
-	private HashTable<string, ApiMethod?> methods;
+	protected HashTable<string, ApiMethod?> methods;
 	
-	public ApiRouter(string name)
+	public ApiRouter()
 	{
-		base(name);
+		base(null);
 		methods = new HashTable<string, ApiMethod?>(str_hash, str_equal);
 		token = Diorite.random_hex(256);
 	}
@@ -66,7 +66,7 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 	 * @param handler        Handler to be called upon successful execution.
 	 * @param params         Specification of parameters.
 	 */
-	public void add_method(string path, ApiFlags flags, string? description,
+	public virtual void add_method(string path, ApiFlags flags, string? description,
 		owned ApiHandler handler, ApiParam?[] params)
 	{
 		methods[path] = new ApiMethod(path, flags, params, (owned) handler, description);
@@ -78,7 +78,7 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 	 * @param path    The path of a method.
 	 * @return true if method has been found and removed.
 	 */
-	public bool remove_method(string path)
+	public virtual bool remove_method(string path)
 	{
 		return methods.remove(path);
 	}
@@ -141,13 +141,13 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 		return count > 0;
 	}
 	
-	protected override Variant? handle_message(string name, Variant? data) throws GLib.Error
+	public override Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
 	{
 		message("Handle message %s: %s", name, data == null ? "null" : data.print(false));
 		Variant? response = null;
 		var pos = name.last_index_of("::");
 		if (pos < 0)
-			return base.handle_message(name, data);
+			return base.handle_message(conn, name, data);
 		
 		var path = name.substring(0, pos);
 		var spec = name.substring(pos + 2).split(",");
@@ -160,7 +160,10 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 		
 		var method = methods[path];
 		if (method == null)
-			return list_methods(path, "/nuvola/", false, out response) ? response : base.handle_message(name, data);
+		{
+			var ok = list_methods(path, "/nuvola/", false, out response);
+			return  ok ? response : base.handle_message(conn, name, data);
+		}
 		
 		if ((method.flags & ApiFlags.PRIVATE) != 0 && !("p" in flags))
 			throw new ApiError.PRIVATE_FLAG("Message doesn't have private flag set: '%s'", name);
@@ -174,10 +177,10 @@ public class ApiRouter: Diorite.Ipc.MessageServer
 		switch (format)
 		{
 		case "dict":
-			method.run_with_args_dict(data, out response);
+			method.run_with_args_dict(conn, data, out response);
 			break;
 		default:
-			method.run_with_args_tuple(data, out response);
+			method.run_with_args_tuple(conn, data, out response);
 			break;
 		}
 		return response;

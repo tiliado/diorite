@@ -57,7 +57,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
 		try
 		{
-			var response = client.provider.send_message(method, new Variant("(ss)", name, key));
+			var response = client.channel.send_message(method, new Variant("(ss)", name, key));
 			if (response.is_of_type(VariantType.BOOLEAN))
 				return response.get_boolean();
 			critical("Invalid response to %s: %s", method,
@@ -75,7 +75,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
 		try
 		{
-			return unbox_variant(client.provider.send_message(method, new Variant("(ss)", name, key)));
+			return unbox_variant(client.channel.send_message(method, new Variant("(ss)", name, key)));
 		}
 		catch (GLib.Error e)
 		{
@@ -89,7 +89,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
 		try
 		{
-			client.provider.send_message(method, new Variant("(ssmv)", name, key, value));
+			client.channel.send_message(method, new Variant("(ssmv)", name, key, value));
 		}
 		catch (GLib.Error e)
 		{
@@ -102,7 +102,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
 		try
 		{
-			client.provider.send_message(method, new Variant("(ssmv)", name, key, value));
+			client.channel.send_message(method, new Variant("(ssmv)", name, key, value));
 		}
 		catch (GLib.Error e)
 		{
@@ -115,7 +115,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_UNSET;
 		try
 		{
-			client.provider.send_message(method, new Variant("(ss)", name, key));
+			client.channel.send_message(method, new Variant("(ss)", name, key));
 		}
 		catch (GLib.Error e)
 		{
@@ -130,17 +130,17 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		if (state)
 		{
 			method = KeyValueStorageServer.METHOD_ADD_LISTENER;
-			payload = new Variant("(ssu)", name, client.listener.name, timeout);
+			payload = new Variant("(ssu)", name, "<undefined>", timeout);
 		}
 		else
 		{
 			method = KeyValueStorageServer.METHOD_REMOVE_LISTENER;
-			payload = new Variant("(ss)", name, client.listener.name);
+			payload = new Variant("(ss)", name, "<undefined>");
 		}
 		
 		try
 		{
-			var response = client.provider.send_message(method, payload);
+			var response = client.channel.send_message(method, payload);
 			if (response == null || ! response.is_of_type(VariantType.BOOLEAN)
 			|| !response.get_boolean())
 				warning("Invalid response to %s: %s", method,

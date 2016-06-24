@@ -22,10 +22,25 @@ int counter;
 void main(string[] args)
 {
 	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
-	var server = new Diorite.Ipc.Server("test");
+	var server = new Drt.MessageBus("test2", null);
 	try
 	{
-		server.start_service();
+		server.start();
+	}
+	catch (Diorite.IOError e)
+	{
+		error("Failed to start service %s", e.message);
+	}
+	
+	try
+	{
+		var conn = server.connect_channel("test");
+		counter = 0;
+		Timeout.add_seconds(1, () => 
+		{
+			conn.send_message("echo", "Hello2! %d".printf(++counter));
+			return true;
+		});
 	}
 	catch (Diorite.IOError e)
 	{
@@ -33,11 +48,5 @@ void main(string[] args)
 	}
 	
 	var loop = new MainLoop();
-	counter = 0;
-	Timeout.add_seconds(1, () => 
-	{
-		message("Counter demonstrates socket communication is non-blocking: %d", ++counter);
-		return true;
-	});
 	loop.run();
 }
