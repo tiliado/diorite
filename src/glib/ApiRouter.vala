@@ -67,7 +67,7 @@ public class ApiRouter: HandlerRouter
 	 * @param params         Specification of parameters.
 	 */
 	public virtual void add_method(string path, ApiFlags flags, string? description,
-		owned ApiHandler handler, ApiParam?[] params)
+		owned ApiHandler handler, ApiParam[]? params)
 	{
 		methods[path] = new ApiMethod(path, flags, params, (owned) handler, description);
 	}

@@ -39,11 +39,11 @@ public class ApiMethod
 {
 	public string path {get; protected set;}
 	public ApiFlags flags {get; protected set;}
-	public ApiParam?[] params {get; protected set;}
+	public ApiParam[]? params {get; protected set;}
 	public string description {get; protected set;}
 	private ApiHandler handler;
 	
-	public ApiMethod(string path, ApiFlags flags, ApiParam?[] params, owned ApiHandler handler, string? description)
+	public ApiMethod(string path, ApiFlags flags, ApiParam[]? params, owned ApiHandler handler, string? description)
 	{
 		this.path = path;
 		this.flags = flags;
