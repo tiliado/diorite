@@ -33,7 +33,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 	static const bool RESPONSE = true;
 	
 	public uint id {get; construct;}
-	public Diorite.SocketChannel channel {get; construct;}
+	public Drt.DuplexChannel channel {get; construct;}
 	public bool pending {get; private set; default = false;}
 	public bool closed {get; protected set; default = false;}
 	public string name {get{return channel.name;}}
@@ -70,7 +70,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		}
 	}
 	
-	public MessageChannel(uint id, Diorite.SocketChannel channel, MessageRouter? router)
+	public MessageChannel(uint id, Drt.DuplexChannel channel, MessageRouter? router)
 	{
 		GLib.Object(id: id, channel: channel, router: router ?? new HandlerRouter(null));
 	}
@@ -85,7 +85,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		allow_error_propagation(new Diorite.MessageError.UNKNOWN("").domain);
 		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
 		
-		channel.connection.bind_property(
+		channel.bind_property(
 			"closed", this, "closed", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
 		start_receiving();
 	}
@@ -126,7 +126,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		var result = true;
 		try
 		{
-			channel.connection.close();
+			channel.close();
 		}
 		catch (GLib.IOError e)
 		{
@@ -256,7 +256,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 	
 	protected void check_closed()
 	{
-		warning(@"Is connected $(channel.connection.is_connected()), closed $(channel.connection.closed)");
+//~ 		warning(@"Is connected $(channel.connection.is_connected()), closed $(channel.connection.closed)");
 	}
 	
 	/**

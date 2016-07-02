@@ -41,6 +41,13 @@ public class SocketChannel : Drt.DuplexChannel
 		socket_source = connection.socket.create_source(IOCondition.IN|IOCondition.OUT);
 		socket_source.set_callback(on_socket_source);
 		check_io_condition();
+		connection.bind_property(
+			"closed", this, "closed", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
+	}
+	
+	public override void close() throws GLib.IOError
+	{
+		connection.close();
 	}
 	
 	private void check_io_condition()

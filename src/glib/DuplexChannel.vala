@@ -27,10 +27,11 @@
 namespace Drt
 {
 
-public abstract class DuplexChannel
+public abstract class DuplexChannel: GLib.Object
 {
 	private static const int MESSAGE_BUFSIZE = 512;
 	public string name {get; private set;}
+	public bool closed {get; private set; default = false;}
 	public InputStream input {get; private set;}
 	public OutputStream output {get; private set;}
 	
@@ -140,6 +141,8 @@ public abstract class DuplexChannel
 			bytes_read_total += bytes_read;
 		}
 	}
+	
+	public abstract void close() throws GLib.IOError;
 	
 	public static size_t get_max_message_size()
 	{
