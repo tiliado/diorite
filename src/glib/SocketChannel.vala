@@ -34,9 +34,9 @@ public class SocketChannel : Drt.DuplexChannel
 	public bool can_write {get; private set; default = false;}
 	private SocketSource socket_source;
 	
-	public SocketChannel(string name, SocketConnection connection)
+	public SocketChannel(uint id, string name, SocketConnection connection)
 	{
-		base(name,  connection.input_stream, connection.output_stream);
+		base(id, name, connection.input_stream, connection.output_stream);
 		this.connection = connection;
 		socket_source = connection.socket.create_source(IOCondition.IN|IOCondition.OUT);
 		socket_source.set_callback(on_socket_source);

@@ -134,7 +134,7 @@ public class MessageBus: GLib.Object, Diorite.MessageListener
 	private bool on_incoming(SocketConnection connection, GLib.Object? source_object)
 	{
 		var id = get_next_client_id();
-		var channel = new MessageChannel(id, new Diorite.SocketChannel(path, connection), router);
+		var channel = new MessageChannel(id, new Diorite.SocketChannel(id, path, connection), router);
 		clients[id.to_pointer()] = channel;
 		channel.notify["closed"].connect_after(on_channel_closed);
 		incoming(channel);
