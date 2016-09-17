@@ -77,7 +77,9 @@ Diorite recognizes several environment variables for debugging:
   * `DIORITE_GUI_MODE` - set to `unity`, `gnome`, `xfce` or `default` to simulate look of
     a application window (menu bar, header bar, app menu, etc.) in different environment.
   
-  * `DIORITE_LOG_MESSAGE_SERVER` - if `yes` IPC Message server communication will be logged
+  * `DIORITE_LOG_MESSAGE_CHANNEL` - if `yes` MessageChannel communication will be logged
+  * `DIORITE_LOG_DUPLEX_CHANNEL` - if `yes` DuplexChannel communication will be logged
+  * `DIORITE_LOG_API_ROUTER` - if `yes` ApiRouter communication will be logged
   
   * `DIORITE_LOGGER_FATAL_STRING` - abort program when message matching the fatal
     [string pattern](https://developer.gnome.org/glib/stable/glib-Glob-style-pattern-matching.html) is logged.

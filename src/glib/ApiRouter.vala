@@ -47,8 +47,14 @@ public errordomain ApiError
  */
 public class ApiRouter: HandlerRouter
 {
+	private static bool log_comunication;
 	public string token {get; protected set;}
 	protected HashTable<string, ApiMethod?> methods;
+	
+	static construct
+	{
+		log_comunication = Environment.get_variable("DIORITE_LOG_API_ROUTER") == "yes";
+	}
 	
 	public ApiRouter()
 	{
@@ -143,7 +149,9 @@ public class ApiRouter: HandlerRouter
 	
 	public override Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
 	{
-		message("Handle message %s: %s", name, data == null ? "null" : data.print(false));
+		if (log_comunication)
+			debug("Handle message %s: %s", name, data == null ? "null" : data.print(false));
+		
 		Variant? response = null;
 		var pos = name.last_index_of("::");
 		if (pos < 0)

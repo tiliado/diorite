@@ -39,7 +39,7 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 	
 	static construct
 	{
-		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_SERVER") == "yes";
+		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_CHANNEL") == "yes";
 	}
 	
 	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout=500) throws Diorite.IOError
