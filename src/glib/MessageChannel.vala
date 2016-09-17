@@ -70,11 +70,14 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		allow_error_propagation(new Diorite.MessageError.UNKNOWN("").domain);
 		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
 		
-		channel.bind_property(
-			"closed", this, "closed", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
-		
+		channel.notify["closed"].connect_after(on_channel_closed);
 		channel.incoming_request.connect(on_incoming_request);
 		channel.start_receiving();
+	}
+	
+	~MessageChannel()
+	{
+		channel.notify["closed"].disconnect(on_channel_closed);
 	}
 	
 	public void allow_error_propagation(Quark error_quark)
@@ -200,7 +203,14 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		handle_request(name, params, out status, out response);
 		buffer = Diorite.serialize_message(status, response, 0);
 		var payload = new ByteArray.take((owned) buffer);
-		channel.send_response(id, payload);
+		try
+		{
+			channel.send_response(id, payload);
+		}
+		catch (GLib.Error e)
+		{
+			warning("Failed to send response: %s", e.message);
+		}
 	}
 	
 		
@@ -243,6 +253,12 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 	public bool remove_handler(string message_name)
 	{
 		return router.remove_handler(message_name);
+	}
+	
+	private void on_channel_closed(GLib.Object o, ParamSpec p)
+	{
+		if (closed != channel.closed)
+			closed = channel.closed;
 	}
 }
 

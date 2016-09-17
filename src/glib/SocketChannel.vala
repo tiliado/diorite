@@ -41,12 +41,17 @@ public class SocketChannel : Drt.DuplexChannel
 		socket_source = connection.socket.create_source(IOCondition.IN|IOCondition.OUT);
 		socket_source.set_callback(on_socket_source);
 		check_io_condition();
-		connection.bind_property(
-			"closed", this, "closed", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
+		connection.notify["closed"].connect_after(on_connection_closed);
+	}
+	
+	~SocketChannel()
+	{
+		connection.notify["closed"].disconnect(on_connection_closed);
 	}
 	
 	public override void close() throws GLib.IOError
 	{
+		closed = true;
 		connection.close();
 	}
 	
@@ -71,6 +76,12 @@ public class SocketChannel : Drt.DuplexChannel
 	{
 		set_condition(condition);
 		return false;
+	}
+	
+	private void on_connection_closed(GLib.Object o, ParamSpec p)
+	{
+		if (closed != connection.closed)
+			closed = connection.closed;
 	}
 }
 
