@@ -27,23 +27,25 @@ namespace Drt
 
 public class BluetoothConnection: GLib.Object, GLib.FileDescriptorBased
 {
+	public string device {get; private set;}
 	public int fd {get; private set;}
 	public OutputStream output {get; private set;}
 	public InputStream input {get; private set;}
 	private GLib.Socket socket;
 	
-	public BluetoothConnection(GLib.Socket socket)
+	public BluetoothConnection(GLib.Socket socket, string device)
 	{
 		base();
+		this.device = device;
 		this.socket = socket;
 		this.fd = socket.fd;
 		output = new UnixOutputStream(fd, true);
 		input = new UnixInputStream(fd, true);
 	}
 	
-	public BluetoothConnection.from_fd(int fd) throws GLib.Error
+	public BluetoothConnection.from_fd(int fd, string device) throws GLib.Error
 	{
-		this(new Socket.from_fd(fd));
+		this(new Socket.from_fd(fd), device);
 	}
 	
 	~BluetoothConnection()

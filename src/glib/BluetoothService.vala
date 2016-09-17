@@ -125,12 +125,17 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 	
 	public void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error
 	{
-		debug("New bluetooth connection from %s (%d).", device, fd.fd);
+		var parts = device.split("/");
+		var address = parts.length == 5
+			? "%s/%s".printf(parts[3], parts[4].substring(4).replace("_", ":")) : device;
+		debug("New bluetooth connection from %s (%d).", address, fd.fd);
 		var device_sockets = sockets[device];
 		if (device_sockets == null)
 			sockets[device] = device_sockets = new Diorite.SingleList<GLib.Socket>();
 		device_sockets.prepend(fd);
-		var connection = new BluetoothConnection(fd);
+		var connection = new BluetoothConnection(fd, address);
+		uint8[] byte = {1};
+		connection.output.write(byte);
 		service.incoming(connection);
 	}
 	
