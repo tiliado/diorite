@@ -40,16 +40,29 @@ public class ApiChannel: MessageChannel
 		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), null, api_token);
 	}
 	
-	public Variant? call_sync(string method, string spec, Variant? params, bool secure=false) throws GLib.Error
+	private string create_full_method_name(string name, string spec)
 	{
-		var name = method + "::prw,tuple," + (api_token ?? "");
-		return send_message(name, params);
+		return "%s::prw,%s,%s".printf(name, spec, api_token);
+	}
+	
+	public Variant? call_sync(string method, Variant? params) throws GLib.Error
+	{
+		return send_message(create_full_method_name(method, "tuple"), params);
 	}
 	
 	public async Variant? call(string method, Variant? params) throws GLib.Error
 	{
-		var name = method + "::prw,tuple," + (api_token ?? "");
-		return yield send_message_async(name, params);
+		return yield send_message_async(create_full_method_name(method, "tuple"), params);
+	}
+	
+	public Variant? call_with_dict_sync(string method, Variant? params) throws GLib.Error
+	{
+		return send_message(create_full_method_name(method, "dict"), params);
+	}
+	
+	public async Variant? call_with_dict(string method, Variant? params) throws GLib.Error
+	{
+		return yield send_message_async(create_full_method_name(method, "dict"), params);
 	}
 }
 
