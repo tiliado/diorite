@@ -171,7 +171,8 @@ public bool hex_to_bin(string hex, out uint8[] result, char separator='\0')
              case 'd': j = 13; break;
              case 'e': j = 14; break;
              case 'f': j = 15; break;
-             default: return_val_if_reached(false);
+             default: 
+				return false;
 		}
 		
 		if (i % 2 == 0)

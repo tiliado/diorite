@@ -42,7 +42,7 @@ public class ApiChannel: MessageChannel
 	
 	private string create_full_method_name(string name, string spec)
 	{
-		return "%s::prw,%s,%s".printf(name, spec, api_token);
+		return "%s::prw,%s,%s".printf(name, spec, api_token ?? "");
 	}
 	
 	public Variant? call_sync(string method, Variant? params) throws GLib.Error
