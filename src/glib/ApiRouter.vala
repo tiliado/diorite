@@ -48,7 +48,16 @@ public errordomain ApiError
 public class ApiRouter: MessageRouter
 {
 	private static bool log_comunication;
-	public string token {get; protected set;}
+	public string hex_token
+	{
+		owned get
+		{
+			string result;
+			Diorite.bin_to_hex(token, out result);
+			return result;
+		}
+	}
+	protected uint8[] token;
 	protected HashTable<string, ApiMethod?> methods;
 	
 	static construct
@@ -60,7 +69,7 @@ public class ApiRouter: MessageRouter
 	{
 		base(null);
 		methods = new HashTable<string, ApiMethod?>(str_hash, str_equal);
-		token = Diorite.random_hex(256);
+		Diorite.random_bin(256, out token);
 	}
 	
 	/**
@@ -169,8 +178,13 @@ public class ApiRouter: MessageRouter
 		
 		var flags = spec[0];
 		var format = spec[1];
-		var token = Diorite.String.null_if_empty(spec[2]);
 		
+		var hex_token = Diorite.String.null_if_empty(spec[2]);
+		uint8[] token;
+		if (hex_token != null)
+			Diorite.hex_to_bin(hex_token, out token);
+		else
+			token = {};
 		var method = methods[path];
 		if (method == null)
 		{
@@ -184,7 +198,7 @@ public class ApiRouter: MessageRouter
 			throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
 		if ((method.flags & ApiFlags.WRITABLE) != 0 && !("w" in flags))
 			throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
-		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && (token == null || token != this.token))
+		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && !Diorite.uint8v_equal(this.token, token))
 			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 		
 		switch (format)

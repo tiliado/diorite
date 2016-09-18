@@ -49,4 +49,24 @@ public string random_hex(int n_bits)
 	return size == n_bytes ? result : result.substring(0, n_bytes * 2);
 }
 
+/**
+ * Generate random binary data as a hexadecimal string.
+ * 
+ * @param n_bits    Number of random bits. Will be rounded up to the nearest byte.
+ * @return Random binary data.
+ */
+public void random_bin(int n_bits, out uint8[] result)
+{
+	var n_bytes = n_bits / 8;
+	if (n_bytes * 8 < n_bits)
+		n_bytes++;    // Round up to the nearest byte
+	var n_32bits = n_bytes / 4;
+	if (n_32bits * 4 < n_bytes)
+		n_32bits++;    // Round up to the whole uint32
+	var size = n_32bits * 4;
+	result = new uint8[size];
+	for (uint offset = 0; offset + 4 <= size; offset += 4)
+		uint32_to_bytes(ref result, GLib.Random.next_int(), offset);
+}
+
 } // namespace Diorite
