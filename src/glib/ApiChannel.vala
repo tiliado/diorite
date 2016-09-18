@@ -25,46 +25,32 @@
 namespace Drt
 {
 
-public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.MessageListener
+public class ApiChannel: MessageChannel
 {
-	protected static bool log_comunication;
+	public ApiRouter api_router {get{ return router as ApiRouter; }}
+	public string? api_token {private get; set; default = null;}
 	
-	static construct
+	public ApiChannel(uint id, Drt.DuplexChannel channel, ApiRouter? router, string? api_token=null)
 	{
-		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_BUS") == "yes";
+		GLib.Object(id: id, channel: channel, router: router ?? new ApiRouter(), api_token: api_token);
 	}
 	
-	public MessageBus(string name, MessageRouter? router, uint timeout=5000)
+	public ApiChannel.from_name(uint id, string name, string? api_token=null, uint timeout=500) throws Diorite.IOError
 	{
-		base(name, router, timeout);
+		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), null, api_token);
 	}
 	
-	[Deprecated (replacement = "this.router.add_handler")]
-	public virtual void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
+	public Variant? call_sync(string method, string spec, Variant? params, bool secure=false) throws GLib.Error
 	{
-		router.add_handler(message_name, type_string, (owned) handler);
+		var name = method + "::prw,tuple," + (api_token ?? "");
+		return send_message(name, params);
 	}
 	
-	[Deprecated (replacement = "this.router.remove_handler")]
-	public virtual bool remove_handler(string message_name)
+	public async Variant? call(string method, Variant? params) throws GLib.Error
 	{
-		return router.remove_handler(message_name);
-	}
-	
-	/**
-	 * Convenience method to invoke message handler from server's process.
-	 */
-	public Variant? send_local_message(string name, Variant? data) throws GLib.Error
-	{
-		if (log_comunication)
-			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_message(this, name, data);
-		if (log_comunication)
-			debug("Local response: %s", response != null ? response.print(false) : "NULL");
-		return response;
+		var name = method + "::prw,tuple," + (api_token ?? "");
+		return yield send_message_async(name, params);
 	}
 }
 
-
-
-} // namespace Drt	
+} // namespace Drt

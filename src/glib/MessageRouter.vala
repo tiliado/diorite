@@ -25,21 +25,11 @@
 namespace Drt
 {
 
-public interface MessageRouter : GLib.Object
-{
-	public abstract void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler);
-	
-	public abstract bool remove_handler(string message_name);
-	
-	public abstract Variant? handle_message(GLib.Object source, string name, Variant? data) throws GLib.Error;
-	
-}
-
-public class HandlerRouter: GLib.Object, MessageRouter
+public class MessageRouter: GLib.Object
 {
 	protected HashTable<string, Diorite.HandlerAdaptor?>? handlers;
 	
-	public HandlerRouter(HashTable<string, Diorite.HandlerAdaptor?>? handlers)
+	public MessageRouter(HashTable<string, Diorite.HandlerAdaptor?>? handlers)
 	{
 		this.handlers = handlers != null ? handlers : new HashTable<string, Diorite.HandlerAdaptor?>(str_hash, str_equal);
 		add_handler("echo", Diorite.TYPE_STRING_ANY, Diorite.MessageListener.echo_handler);

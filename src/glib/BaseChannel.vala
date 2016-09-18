@@ -25,46 +25,13 @@
 namespace Drt
 {
 
-public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.MessageListener
+public abstract class BaseChannel: GLib.Object
 {
-	protected static bool log_comunication;
-	
-	static construct
-	{
-		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_BUS") == "yes";
-	}
-	
-	public MessageBus(string name, MessageRouter? router, uint timeout=5000)
-	{
-		base(name, router, timeout);
-	}
-	
-	[Deprecated (replacement = "this.router.add_handler")]
-	public virtual void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
-	{
-		router.add_handler(message_name, type_string, (owned) handler);
-	}
-	
-	[Deprecated (replacement = "this.router.remove_handler")]
-	public virtual bool remove_handler(string message_name)
-	{
-		return router.remove_handler(message_name);
-	}
-	
-	/**
-	 * Convenience method to invoke message handler from server's process.
-	 */
-	public Variant? send_local_message(string name, Variant? data) throws GLib.Error
-	{
-		if (log_comunication)
-			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_message(this, name, data);
-		if (log_comunication)
-			debug("Local response: %s", response != null ? response.print(false) : "NULL");
-		return response;
-	}
+	public uint id {get; construct;}
+	public Drt.DuplexChannel channel {get; construct;}
+	public bool pending {get; protected set; default = false;}
+	public bool closed {get; protected set; default = false;}
+	public string name {get{return channel.name;}}
 }
 
-
-
-} // namespace Drt	
+} // namespace Drt

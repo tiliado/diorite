@@ -25,27 +25,27 @@
 namespace Drt
 {
 
-public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.MessageListener
+public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 {
 	protected static bool log_comunication;
 	
 	static construct
 	{
-		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_BUS") == "yes";
+		log_comunication = Environment.get_variable("DIORITE_LOG_API_BUS_BUS") == "yes";
 	}
 	
-	public MessageBus(string name, MessageRouter? router, uint timeout=5000)
+	public ApiBus(string name, ApiRouter? router, uint timeout=5000)
 	{
 		base(name, router, timeout);
 	}
 	
-	[Deprecated (replacement = "this.router.add_handler")]
+	[Deprecated (replacement = "this.router.add_method")]
 	public virtual void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
 	{
 		router.add_handler(message_name, type_string, (owned) handler);
 	}
 	
-	[Deprecated (replacement = "this.router.remove_handler")]
+	[Deprecated (replacement = "this.router.remove_method")]
 	public virtual bool remove_handler(string message_name)
 	{
 		return router.remove_handler(message_name);
@@ -65,6 +65,4 @@ public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.Message
 	}
 }
 
-
-
-} // namespace Drt	
+} // namespace Drt

@@ -45,7 +45,7 @@ public errordomain ApiError
  *   * Method as well as parameters can hold description which can be then shown to API consumers,
  *     e.g. command-line or HTTP/JSON interface.
  */
-public class ApiRouter: HandlerRouter
+public class ApiRouter: MessageRouter
 {
 	private static bool log_comunication;
 	public string token {get; protected set;}
@@ -149,6 +149,11 @@ public class ApiRouter: HandlerRouter
 	
 	public override Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
 	{
+		return handle_message_internal(false, conn, name, data);
+	}
+	
+	private Variant? handle_message_internal(bool always_secure, GLib.Object conn, string name, Variant? data) throws GLib.Error
+	{
 		if (log_comunication)
 			debug("Handle message %s: %s", name, data == null ? "null" : data.print(false));
 		
@@ -179,7 +184,7 @@ public class ApiRouter: HandlerRouter
 			throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
 		if ((method.flags & ApiFlags.WRITABLE) != 0 && !("w" in flags))
 			throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
-		if ((method.flags & ApiFlags.PRIVATE) != 0 && (token == null || token != this.token))
+		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && (token == null || token != this.token))
 			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 		
 		switch (format)

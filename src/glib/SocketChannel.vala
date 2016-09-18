@@ -44,6 +44,23 @@ public class SocketChannel : Drt.DuplexChannel
 		connection.notify["closed"].connect_after(on_connection_closed);
 	}
 	
+	public SocketChannel.from_name(uint id, string name, uint timeou=500) throws Diorite.IOError
+	{
+		var path = Diorite.Ipc.create_path(name);
+		try
+		{
+			var address = new UnixSocketAddress(path);
+			var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
+			var connection = SocketConnection.factory_create_connection(socket);
+			connection.connect(address, null);
+			this(id, path, connection);
+		}
+		catch (GLib.Error e)
+		{
+			throw new Diorite.IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", path, e.message);
+		}
+	}
+	
 	~SocketChannel()
 	{
 		connection.notify["closed"].disconnect(on_connection_closed);

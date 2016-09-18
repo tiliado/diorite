@@ -25,13 +25,8 @@
 namespace Drt
 {
 
-public class MessageChannel: GLib.Object, Diorite.MessageListener
-{
-	public uint id {get; construct;}
-	public Drt.DuplexChannel channel {get; construct;}
-	public bool pending {get; private set; default = false;}
-	public bool closed {get; protected set; default = false;}
-	public string name {get{return channel.name;}}
+public class MessageChannel: BaseChannel, Diorite.MessageListener
+{	
 	public MessageRouter router {get; protected set;}
 	private static bool log_comunication;
 	private uint last_message_id = 0;
@@ -42,28 +37,16 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_CHANNEL") == "yes";
 	}
 	
-	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout=500) throws Diorite.IOError
-	{
-		var path = Diorite.Ipc.create_path(name);
-		try
-		{
-			var address = new UnixSocketAddress(path);
-			var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
-			var connection = SocketConnection.factory_create_connection(socket);
-			connection.connect(address, null);
-			this(id, new Diorite.SocketChannel(id, path, connection), router);
-		}
-		catch (GLib.Error e)
-		{
-			throw new Diorite.IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", path, e.message);
-		}
-	}
-	
 	public MessageChannel(uint id, Drt.DuplexChannel channel, MessageRouter? router)
 	{
-		GLib.Object(id: id, channel: channel, router: router ?? new HandlerRouter(null));
+		GLib.Object(id: id, channel: channel, router: router ?? new MessageRouter(null));
 	}
 	
+	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout=500) throws Diorite.IOError
+	{
+		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), router);
+	}
+
 	construct
 	{
 		allowed_errors = new GenericSet<void*>(null, null);
@@ -104,10 +87,6 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		}
 	}
 	
-	/**
-	 * Convenience wrapper around send_message_async() that waits in main loop
-	 * and then returns result.
-	 */
 	public Variant? send_message(string name, Variant? params=null) throws GLib.Error
 	{
 		var id = next_message_id();
@@ -245,11 +224,13 @@ public class MessageChannel: GLib.Object, Diorite.MessageListener
 		return true;
 	}	
 	
+	[Deprecated (replacement = "this.router.add_handler")]
 	public void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
 	{
 		router.add_handler(message_name, type_string, (owned) handler);
 	}
 	
+	[Deprecated (replacement = "this.router.remove_handler")]
 	public bool remove_handler(string message_name)
 	{
 		return router.remove_handler(message_name);
