@@ -161,6 +161,11 @@ public class ApiRouter: MessageRouter
 		return handle_message_internal(false, conn, name, data);
 	}
 	
+	public Variant? handle_local_call(GLib.Object conn, string method, string spec, Variant? data) throws GLib.Error
+	{
+		return handle_message_internal(true, conn, method + "::prw," + spec + ",", data);
+	}
+	
 	private Variant? handle_message_internal(bool always_secure, GLib.Object conn, string name, Variant? data) throws GLib.Error
 	{
 		if (log_comunication)

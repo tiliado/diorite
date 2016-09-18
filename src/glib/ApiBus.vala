@@ -63,6 +63,26 @@ public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 			debug("Local response: %s", response != null ? response.print(false) : "NULL");
 		return response;
 	}
+	
+	public Variant? call_local(string name, Variant? data) throws GLib.Error
+	{
+		if (log_comunication)
+			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
+		var response = router.handle_local_call(this, name, "tuple", data);
+		if (log_comunication)
+			debug("Local response: %s", response != null ? response.print(false) : "NULL");
+		return response;
+	}
+	
+	public Variant? call_local_with_dict(string name, Variant? data) throws GLib.Error
+	{
+		if (log_comunication)
+			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
+		var response = router.handle_local_call(this, name, "dict", data);
+		if (log_comunication)
+			debug("Local response: %s", response != null ? response.print(false) : "NULL");
+		return response;
+	}
 }
 
 } // namespace Drt
