@@ -307,4 +307,111 @@ public Variant? new_variant_string_or_null(string? str)
 	return new Variant.string(str);
 }
 
+/**
+ * Converts string array to Variant dictionary
+ * 
+ * The string array entries must follow this format: "[x:]key=value", where
+ * `key` is the dictionary key, `x` is the type specifier and `value` is the dictionary value.
+ * 
+ * The type specifiers are:
+ *   *  `d` - double
+ *   *  `b` - boolean
+ *   *  `s` - string
+ * 
+ * If the specifier is omitted, the default type is string.
+ * 
+ * @param args      array of `[x:]key=value` strings
+ * @param offset    the offset of the first param
+ * @return `null` if `args` is `null` or `offset` is invalid, Variant dict otherwise
+ */
+public Variant? strv_to_variant_dict(string[]? args, int offset=0)
+{
+	if (args == null || offset < 0 || offset >= args.length)
+		return null;
+	
+	var builder = new VariantBuilder(new VariantType("a{smv}"));
+	for (var i = offset; i < args.length; i++)
+	{
+		var arg = args[i];
+		var arg_parts = arg.split("=", 2);
+		unowned string? key = arg_parts[0];
+		unowned string? value = arg_parts.length == 2 ? arg_parts[1] : null;
+		variant_dict_add_param(builder, key, value);
+	}
+	return builder.end();
+}
+
+/**
+ * Converts a HashTable with both string keys and values to Variant dictionary
+ * 
+ * The table keys must follow this format: "[x:]key", where `key` is the dictionary key and `x` is the type
+ * specifier:
+ * 
+ *   *  `d` - double
+ *   *  `b` - boolean
+ *   *  `s` - string
+ * 
+ * If the specifier is omitted, the default type is string.
+ * 
+ * @param args      hash table of `[x:]key` = `value` pairs
+ * @return `null` if `args` is `null`, Variant dict otherwise
+ */
+public Variant? str_table_to_variant_dict(HashTable<string, string>? args)
+{
+	if (args == null)
+		return null;
+	
+	var builder = new VariantBuilder(new VariantType("a{smv}"));
+	var iter = HashTableIter<string, string>(args);
+	unowned string key;
+	unowned string value;
+	while (iter.next(out key, out value))
+		variant_dict_add_param(builder, key, value);
+	return builder.end();
+}
+
+private void variant_dict_add_param(VariantBuilder dict_builder, string key, string value)
+{
+	string param_type;
+	string param_key;
+	Variant? param_value = null;
+	var parts = key.split(":", 2);
+	if (parts.length < 2)
+	{
+		param_type = "s";
+		param_key = key;
+	}
+	else
+	{
+		param_type = parts[0];
+		param_key = parts[1];
+	}
+		
+	if (value == null)
+	{
+		param_value = null;
+	}
+	else
+	{
+		switch (param_type)
+		{
+		case "d":
+			double d;
+			if (double.try_parse(value, out d))
+				param_value = new Variant.double(d);
+			break;
+		case "b":
+			bool b;
+			if (bool.try_parse(value, out b))
+				param_value = new Variant.boolean(b);
+			break;
+		case "s":
+		default:
+			param_value = new Variant.string(value);
+			break;
+		}
+	}
+	dict_builder.add("{smv}", param_key, param_value);
+}
+
 } // namespace Drt
