@@ -146,6 +146,25 @@ public class ApiParams
 	}
 	
 	/**
+	 * Return list of string values and advance cursor.
+	 * 
+	 * Aborts on invalid type or out of bounds access.
+	 * 
+	 * @return list of string values. May be empty.
+	 */
+	public SList<string>pop_str_list()
+	{
+		SList<string> list = null;
+		var array = next(typeof(StringArrayParam));
+		var iter = array.iterator();
+		unowned string str = null;
+		while (iter.next("s", &str))
+			list.prepend(str);
+		list.reverse();
+		return list;
+	}
+	
+	/**
 	 * Return dictionary and advance cursor.
 	 * 
 	 * Aborts on invalid time or out of bounds access.
