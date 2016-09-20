@@ -36,11 +36,11 @@ public class KeyValueStorageServer: GLib.Object
 	internal static const string METHOD_SET_DEFAULT_VALUE = "KeyValueStorageServer.set_default_value";
 	internal static const string METHOD_CHANGED = "KeyValueStorageServer.changed";
 	
-	public Drt.MessageBus server {get; construct;}
+	public Drt.ApiBus server {get; construct;}
 	private HashTable<string, Provider?> providers;
 	
 	
-	public KeyValueStorageServer(Drt.MessageBus server)
+	public KeyValueStorageServer(Drt.ApiBus server)
 	{
 		GLib.Object(server: server);
 		providers = new HashTable<string, Provider?>(str_hash, str_equal);
