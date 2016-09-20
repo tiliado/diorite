@@ -33,7 +33,7 @@ public enum ApiFlags
 	WRITABLE
 }
 
-public delegate Variant? ApiHandler(ApiParams? params) throws GLib.Error;
+public delegate Variant? ApiHandler(GLib.Object source, ApiParams? params) throws GLib.Error;
 
 public class ApiMethod
 {
@@ -56,7 +56,7 @@ public class ApiMethod
 	{
 		if (params == null || params.length == 0)
 		{
-			response = handler(null);
+			response = handler(conn, null);
 			return;
 		}
 		
@@ -80,14 +80,14 @@ public class ApiMethod
 			var child = Diorite.unbox_variant(data.get_child_value(i));
 			handler_params[i] = param.get_value(path, child);
 		}
-		response = handler(new ApiParams(this, handler_params));
+		response = handler(conn, new ApiParams(this, handler_params));
 	}
 	
 	public void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{
-			response = handler(null);
+			response = handler(conn, null);
 			return;
 		}
 		
@@ -114,7 +114,7 @@ public class ApiMethod
 				entry = param.default_value;
 			handler_params[i] = param.get_value(path, entry == null ? null : Diorite.unbox_variant(entry));
 		}
-		response = handler(new ApiParams(this, handler_params));
+		response = handler(conn, new ApiParams(this, handler_params));
 	}
 }
 
