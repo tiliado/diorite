@@ -160,10 +160,11 @@ public class ApiRouter: MessageRouter
 	{
 		return handle_message_internal(false, conn, name, data);
 	}
-	
-	public Variant? handle_local_call(GLib.Object conn, string method, string spec, Variant? data) throws GLib.Error
+		
+	public Variant? handle_local_call(GLib.Object conn, string method, bool allow_private, string flags, string data_format, Variant? data) throws GLib.Error
 	{
-		return handle_message_internal(true, conn, method + "::prw," + spec + ",", data);
+		var full_name = "%s::%s%s,%s,".printf(method, allow_private ? "p" : "", flags, data_format);
+		return handle_message_internal(allow_private, conn, full_name, data);
 	}
 	
 	private Variant? handle_message_internal(bool always_secure, GLib.Object conn, string name, Variant? data) throws GLib.Error

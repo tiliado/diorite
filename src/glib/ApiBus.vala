@@ -66,19 +66,19 @@ public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 	
 	public Variant? call_local(string name, Variant? data) throws GLib.Error
 	{
-		if (log_comunication)
-			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_local_call(this, name, "tuple", data);
-		if (log_comunication)
-			debug("Local response: %s", response != null ? response.print(false) : "NULL");
-		return response;
+		return call_local_sync_full(name, true, "rw", "tuple",  data);
 	}
 	
 	public Variant? call_local_with_dict(string name, Variant? data) throws GLib.Error
 	{
+		return call_local_sync_full(name, true, "rw", "dict",  data);
+	}
+	
+	public Variant? call_local_sync_full(string name, bool allow_private, string flags, string data_format, Variant? data) throws GLib.Error
+	{
 		if (log_comunication)
 			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_local_call(this, name, "dict", data);
+		var response = router.handle_local_call(this, name, allow_private, flags, data_format, data);
 		if (log_comunication)
 			debug("Local response: %s", response != null ? response.print(false) : "NULL");
 		return response;

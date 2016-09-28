@@ -40,29 +40,37 @@ public class ApiChannel: MessageChannel
 		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), null, api_token);
 	}
 	
-	private string create_full_method_name(string name, string spec)
+	private string create_full_method_name(string name, bool allow_private, string flags, string params_format)
 	{
-		return "%s::prw,%s,%s".printf(name, spec, api_token ?? "");
+		return "%s::%s%s,%s,%s".printf(
+			name, allow_private ? "p" : "",
+			flags, params_format,
+			allow_private && api_token != null ? api_token : "");
 	}
 	
 	public Variant? call_sync(string method, Variant? params) throws GLib.Error
 	{
-		return send_message(create_full_method_name(method, "tuple"), params);
+		return send_message(create_full_method_name(method, true, "rw", "tuple"), params);
 	}
 	
 	public async Variant? call(string method, Variant? params) throws GLib.Error
 	{
-		return yield send_message_async(create_full_method_name(method, "tuple"), params);
+		return yield send_message_async(create_full_method_name(method, true, "rw", "tuple"), params);
 	}
 	
 	public Variant? call_with_dict_sync(string method, Variant? params) throws GLib.Error
 	{
-		return send_message(create_full_method_name(method, "dict"), params);
+		return send_message(create_full_method_name(method, true, "rw", "dict"), params);
 	}
 	
 	public async Variant? call_with_dict(string method, Variant? params) throws GLib.Error
 	{
-		return yield send_message_async(create_full_method_name(method, "dict"), params);
+		return yield send_message_async(create_full_method_name(method, true, "rw", "dict"), params);
+	}
+	
+	public async Variant? call_full(string method, bool allow_private, string flags, string params_format, Variant? params) throws GLib.Error
+	{
+		return yield send_message_async(create_full_method_name(method, allow_private, flags, params_format), params);
 	}
 }
 
