@@ -194,6 +194,19 @@ def configure(ctx):
 	ctx.define('GDK_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GTK_TUPLE))
 	ctx.define('GDK_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GTK_TUPLE))
 	
+	VERSIONS = VERSION.split("+")
+	if len(VERSIONS) == 2:
+		VERSION_SUFFIX = "stable"
+	else:
+		VERSION_SUFFIX = VERSIONS[1]
+	VERSIONS = tuple(int(i) for i in VERSIONS[0].split("."))
+	ctx.define("DRT_VERSION", VERSION)
+	ctx.define("DRT_REVISION", long_id)
+	ctx.define("DRT_VERSION_MAJOR", VERSIONS[0])
+	ctx.define("DRT_VERSION_MINOR", VERSIONS[1])
+	ctx.define("DRT_VERSION_BUGFIX", VERSIONS[2])
+	ctx.define("DRT_VERSION_SUFFIX", VERSION_SUFFIX)
+	
 	if PLATFORM == LINUX:
 		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', TARGET_GLIB)
 	elif PLATFORM == WIN:
