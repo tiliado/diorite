@@ -33,6 +33,7 @@ public errordomain ApiError
 	PRIVATE_FLAG,
 	READABLE_FLAG,
 	WRITABLE_FLAG,
+	SUBSCRIBE_FLAG,
 	API_TOKEN_REQUIRED;
 }
 
@@ -58,7 +59,7 @@ public class ApiRouter: MessageRouter
 		}
 	}
 	protected uint8[] token;
-	protected HashTable<string, ApiMethod?> methods;
+	protected HashTable<string, ApiCallable?> methods;
 	
 	static construct
 	{
@@ -68,8 +69,21 @@ public class ApiRouter: MessageRouter
 	public ApiRouter()
 	{
 		base(null);
-		methods = new HashTable<string, ApiMethod?>(str_hash, str_equal);
+		methods = new HashTable<string, ApiCallable?>(str_hash, str_equal);
 		Diorite.random_bin(256, out token);
+	}
+
+	public signal void notification(string name, string? detail, Variant? params);
+	
+	public async bool emit(string name, string? detail=null, Variant? data=null)
+	{
+		var notification = methods[name] as ApiNotification;
+		if (notification == null)
+		{
+			warning("Notification '%s' not found.", name);
+			return false;
+		}
+		return yield notification.emit(detail, data);
 	}
 	
 	/**
@@ -88,12 +102,35 @@ public class ApiRouter: MessageRouter
 	}
 	
 	/**
+	 * Add a new notification
+	 * 
+	 * @param path           Path of the notification.
+	 * @param flags          Notification call flags.
+	 * @param description    Description of the notification for API consumers.
+	 */
+	public virtual void add_notification(string path, ApiFlags flags, string? description)
+	{
+		methods[path] = new ApiNotification(path, flags, description);
+	}
+	
+	/**
 	 * Remove previously registered method.
 	 * 
 	 * @param path    The path of a method.
 	 * @return true if method has been found and removed.
 	 */
 	public virtual bool remove_method(string path)
+	{
+		return methods.remove(path);
+	}
+	
+	/**
+	 * Remove previously registered notification.
+	 * 
+	 * @param path    The path of a notification.
+	 * @return true if notification has been found and removed.
+	 */
+	public virtual bool remove_notification(string path)
 	{
 		return methods.remove(path);
 	}
@@ -111,18 +148,18 @@ public class ApiRouter: MessageRouter
 			if (!path.has_prefix(prefix))
 				continue;
 			
-			var method = methods[path];
+			var callable = methods[path];
 			var flags = "";
-			if ((method.flags & ApiFlags.PRIVATE) != 0)
+			if ((callable.flags & ApiFlags.PRIVATE) != 0)
 			{
 				if (!list_private)
 					continue;
 				flags += "p";
 			}
 
-			if ((method.flags & ApiFlags.READABLE) != 0)
+			if ((callable.flags & ApiFlags.READABLE) != 0)
 				flags += "r";
-			if ((method.flags & ApiFlags.WRITABLE) != 0)
+			if ((callable.flags & ApiFlags.WRITABLE) != 0)
 				flags += "w";
 			
 			if (strip != null && path.has_prefix(strip))
@@ -130,21 +167,46 @@ public class ApiRouter: MessageRouter
 				
 			builder.open(new VariantType("a{smv}"));
 			var params = new VariantBuilder(new VariantType("aa{smv}"));
-			foreach (var param in method.params)
+			var method = callable as ApiMethod;
+			if (method != null)
 			{
+				builder.add("{smv}", "type", new Variant.string("method"));
+				foreach (var param in method.params)
+				{
+					params.open(new VariantType("a{smv}"));
+					params.add("{smv}", "name", new Variant.string(param.name));
+					params.add("{smv}", "type", new Variant.string(param.type_string));
+					params.add("{smv}", "description", new_variant_string_or_null(param.description));
+					params.add("{smv}", "required", new Variant.boolean(param.required));
+					params.add("{smv}", "nullable", new Variant.boolean(param.nullable));
+					params.add("{smv}", "default_value", param.default_value);
+					params.close();
+				}
+			}
+			var notification = callable as ApiNotification;
+			if (notification != null)
+			{
+				builder.add("{smv}", "type", new Variant.string("notification"));
 				params.open(new VariantType("a{smv}"));
-				params.add("{smv}", "name", new Variant.string(param.name));
-				params.add("{smv}", "type", new Variant.string(param.type_string));
-				params.add("{smv}", "description", new_variant_string_or_null(param.description));
-				params.add("{smv}", "required", new Variant.boolean(param.required));
-				params.add("{smv}", "nullable", new Variant.boolean(param.nullable));
-				params.add("{smv}", "default_value", param.default_value);
+				params.add("{smv}", "name", new Variant.string("subscribe"));
+				params.add("{smv}", "type", new Variant.string("b"));
+				params.add("{smv}", "description", "true to subscribe, false to unsubscribe");
+				params.add("{smv}", "required", new Variant.boolean(true));
+				params.add("{smv}", "nullable", new Variant.boolean(false));
+				params.add("{smv}", "default_value", null);
+				params.close();
+				params.open(new VariantType("a{smv}"));
+				params.add("{smv}", "name", new Variant.string("detail"));
+				params.add("{smv}", "type", new Variant.string("s"));
+				params.add("{smv}", "description", "Subscription detail");
+				params.add("{smv}", "required", new Variant.boolean(false));
+				params.add("{smv}", "nullable", new Variant.boolean(true));
+				params.add("{smv}", "default_value", null);
 				params.close();
 			}
-				
 			builder.add("{smv}", "path", new Variant.string(path));
 			builder.add("{smv}", "flags", new Variant.string(flags));
-			builder.add("{smv}", "description", new_variant_string_or_null(method.description));
+			builder.add("{smv}", "description", new_variant_string_or_null(callable.description));
 			builder.add("{smv}", "params", params.end());
 			builder.close();
 		}
@@ -177,7 +239,15 @@ public class ApiRouter: MessageRouter
 		if (pos < 0)
 			return base.handle_message(conn, name, data);
 		
-		var path = name.substring(0, pos);
+		int offset = 0;
+		var notification = false;
+		if (name.has_prefix("n:"))
+		{
+			notification = true;
+			offset = 2;
+		}
+		
+		var path = name.substring(offset, pos - offset);
 		var spec = name.substring(pos + 2).split(",");
 		if (spec.length < 3)
 			throw new ApiError.INVALID_REQUEST("Message format specification is incomplete: '%s'", name);
@@ -191,6 +261,13 @@ public class ApiRouter: MessageRouter
 			Diorite.hex_to_bin(hex_token, out token);
 		else
 			token = {};
+		
+		if (notification)
+		{
+			this.notification(path, null, data);
+			return null;
+		}
+		
 		var method = methods[path];
 		if (method == null)
 		{
@@ -204,6 +281,8 @@ public class ApiRouter: MessageRouter
 			throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
 		if ((method.flags & ApiFlags.WRITABLE) != 0 && !("w" in flags))
 			throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
+		if ((method.flags & ApiFlags.SUBSCRIBE) != 0 && !("s" in flags))
+			throw new ApiError.SUBSCRIBE_FLAG("Message doesn't have subscribe flag set: '%s'", name);
 		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && !Diorite.uint8v_equal(this.token, token))
 			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 		

@@ -30,17 +30,15 @@ public enum ApiFlags
 {
 	PRIVATE,
 	READABLE,
-	WRITABLE
+	WRITABLE,
+	SUBSCRIBE;
 }
 
 public delegate Variant? ApiHandler(GLib.Object source, ApiParams? params) throws GLib.Error;
 
-public class ApiMethod
+public class ApiMethod : ApiCallable
 {
-	public string path {get; protected set;}
-	public ApiFlags flags {get; protected set;}
 	public ApiParam[]? params {get; protected set;}
-	public string description {get; protected set;}
 	private ApiHandler handler;
 	
 	public ApiMethod(string path, ApiFlags flags, ApiParam[]? params, owned ApiHandler handler, string? description)
@@ -52,7 +50,7 @@ public class ApiMethod
 		this.description = description;
 	}
 	
-	public void run_with_args_tuple(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
+	public override void run_with_args_tuple(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{
@@ -83,7 +81,7 @@ public class ApiMethod
 		response = handler(conn, new ApiParams(this, handler_params));
 	}
 	
-	public void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
+	public override void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
 	{
 		if (params == null || params.length == 0)
 		{
