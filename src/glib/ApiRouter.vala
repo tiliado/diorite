@@ -73,7 +73,7 @@ public class ApiRouter: MessageRouter
 		Diorite.random_bin(256, out token);
 	}
 
-	public signal void notification(string name, string? detail, Variant? params);
+	public signal void notification(GLib.Object source, string name, string? detail, Variant? params);
 	
 	public async bool emit(string name, string? detail=null, Variant? data=null)
 	{
@@ -264,7 +264,7 @@ public class ApiRouter: MessageRouter
 		
 		if (notification)
 		{
-			this.notification(path, null, data);
+			this.notification(conn, path, null, data);
 			return null;
 		}
 		

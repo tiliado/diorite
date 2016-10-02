@@ -132,7 +132,7 @@ public class ApiNotification : ApiCallable
 			var bus = conn as ApiBus;
 			if (bus != null)
 			{
-				(bus.router as ApiRouter).notification(path, detail, data);
+				(bus.router as ApiRouter).notification(bus, path, detail, data);
 			}
 			else
 			{
