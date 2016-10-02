@@ -267,6 +267,12 @@ public class SingleList<G>
 		}
 	}
 	
+	public void clear()
+	{
+		first_node = null;
+		length = 0;
+	}
+	
 	internal class Node<G>
 	{
 		public G value;
