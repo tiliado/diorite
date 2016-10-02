@@ -154,7 +154,7 @@ public class ApiNotification : ApiCallable
 	{
 		bool subscribe = true;
 		string? detail = null;
-		parse_tuple_params(path, data, out subscribe, out detail);
+		parse_dict_params(path, data, out subscribe, out detail);
 		response = this.subscribe(conn, subscribe, detail);
 	}
 }
