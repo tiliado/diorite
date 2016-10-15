@@ -190,7 +190,7 @@ public class ApiRouter: MessageRouter
 				params.open(new VariantType("a{smv}"));
 				params.add("{smv}", "name", new Variant.string("subscribe"));
 				params.add("{smv}", "type", new Variant.string("b"));
-				params.add("{smv}", "description", "true to subscribe, false to unsubscribe");
+				params.add("{smv}", "description", new Variant.string("true to subscribe, false to unsubscribe"));
 				params.add("{smv}", "required", new Variant.boolean(true));
 				params.add("{smv}", "nullable", new Variant.boolean(false));
 				params.add("{smv}", "default_value", null);
@@ -198,7 +198,7 @@ public class ApiRouter: MessageRouter
 				params.open(new VariantType("a{smv}"));
 				params.add("{smv}", "name", new Variant.string("detail"));
 				params.add("{smv}", "type", new Variant.string("s"));
-				params.add("{smv}", "description", "Subscription detail");
+				params.add("{smv}", "description", new Variant.string("Subscription detail"));
 				params.add("{smv}", "required", new Variant.boolean(false));
 				params.add("{smv}", "nullable", new Variant.boolean(true));
 				params.add("{smv}", "default_value", null);
