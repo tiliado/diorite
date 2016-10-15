@@ -217,7 +217,8 @@ public abstract class DuplexChannel: GLib.Object
 		{
 			payload = outgoing_requests.take(id.to_pointer(), out found);
 		}
-		assert(found);
+		if (!found)
+			throw new GLib.IOError.NOT_FOUND("Response with id %u has not been found.", id);
 		if (payload.error != null)
 			throw payload.error;
 		return payload.data;
