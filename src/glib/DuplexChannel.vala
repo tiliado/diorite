@@ -35,10 +35,12 @@ public abstract class DuplexChannel: GLib.Object
 	private static const uint32 MAX_ID = (uint32) ~(1 << 31);
 	private static const int MESSAGE_BUFSIZE = 512;
 	private static bool log_comunication;
+	private static bool timeout_fatal;
 	public uint id {get; private set;}
 	public string name {get; private set;}
 	public bool receiving {get; private set; default = false;}
 	public bool closed {get; protected set; default = false;}
+	public uint timeout {get; set;}
 	public InputStream input {get; private set;}
 	public OutputStream output {get; private set;}
 	private HashTable<void*, Payload?> incoming_requests;
@@ -50,12 +52,13 @@ public abstract class DuplexChannel: GLib.Object
 	private bool processing_pending = false;
 	
 	
-	public DuplexChannel(uint id, string name, InputStream input, OutputStream output)
+	public DuplexChannel(uint id, string name, InputStream input, OutputStream output, uint timeout)
 	{
 		this.id = id;
 		this.name = name;
 		this.output = output;
 		this.input = input;
+		this.timeout = timeout;
 	}
 	
 	construct
@@ -70,6 +73,7 @@ public abstract class DuplexChannel: GLib.Object
 	static construct
 	{
 		log_comunication = Environment.get_variable("DIORITE_LOG_DUPLEX_CHANNEL") == "yes";
+		timeout_fatal = Environment.get_variable("DIORITE_DUPLEX_CHANNEL_FATAL_TIMEOUT") == "yes";
 	}
 	
 	/**
@@ -198,6 +202,7 @@ public abstract class DuplexChannel: GLib.Object
 		{
 			outgoing_queue.push_tail(payload);
 		}
+		payload.timeout_id = Timeout.add(uint.max(100, timeout), () => {request_timed_out(payload.id); return false;});
 		start_sending();
 		return payload.id;
 	}
@@ -429,6 +434,11 @@ public abstract class DuplexChannel: GLib.Object
 			payload.data = data;
 			payload.error = null;
 		}
+		if (payload.timeout_id != 0)
+		{
+			Source.remove(payload.timeout_id);
+			payload.timeout_id = 0;
+		}
 		Idle.add(payload.idle_callback);
 	}
 	
@@ -647,6 +657,24 @@ public abstract class DuplexChannel: GLib.Object
 		outgoing_requests.for_each((key, payload) => { process_response(payload, null, error_closed); });
 	}
 	
+	protected void request_timed_out(uint id)
+	{
+		bool found;
+		Payload? payload;
+		lock (outgoing_requests)
+		{
+			payload = outgoing_requests.take(id.to_pointer(), out found);
+		}
+		if (found)
+		{
+			payload.timeout_id = 0;
+			var msg = "Channel (%u) Request (%u) timed out.".printf(this.id, id);
+			process_response(payload, null, new GLib.IOError.TIMED_OUT(msg));
+			if (timeout_fatal)
+				error(msg);
+		}
+	}
+	
 	private void on_closed_changed(GLib.Object o, ParamSpec p)
 	{
 		if (closed)
@@ -668,6 +696,7 @@ public abstract class DuplexChannel: GLib.Object
 		public ByteArray? data = null;
 		public GLib.Error? error = null;
 		public RequestCallback? callback = null;
+		public uint timeout_id = 0;
 		
 		public Payload(uint id, bool direction, owned ByteArray? data, owned RequestCallback? callback)
 		{

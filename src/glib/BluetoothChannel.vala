@@ -29,9 +29,9 @@ public class BluetoothChannel : Drt.DuplexChannel
 {
 	public BluetoothConnection connection {get; private set;}
 	
-	public BluetoothChannel(uint id, string name, BluetoothConnection connection)
+	public BluetoothChannel(uint id, string name, BluetoothConnection connection, uint timeout)
 	{
-		base(id, name, connection.input, connection.output);
+		base(id, name, connection.input, connection.output, timeout);
 		this.connection = connection;
 	}
 	

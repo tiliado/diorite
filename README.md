@@ -81,6 +81,7 @@ Diorite recognizes several environment variables for debugging:
   * `DIORITE_LOG_DUPLEX_CHANNEL` - if `yes` DuplexChannel communication will be logged
   * `DIORITE_LOG_API_ROUTER` - if `yes` ApiRouter communication will be logged
   
+  * `DIORITE_DUPLEX_CHANNEL_FATAL_TIMEOUT` - if `yes`, DuplexChannel timeout will abort
   * `DIORITE_LOGGER_FATAL_STRING` - abort program when message matching the fatal
     [string pattern](https://developer.gnome.org/glib/stable/glib-Glob-style-pattern-matching.html) is logged.
 
