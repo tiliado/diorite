@@ -108,6 +108,18 @@ public class ApiParams
 	}
 	
 	/**
+	 * Return int value and advance cursor.
+	 * 
+	 * Aborts on invalid time or out of bounds access.
+	 * 
+	 * @return int value.
+	 */
+	public int pop_int()
+	{
+		return (int) next(typeof(IntParam)).get_int32();
+	}
+	
+	/**
 	 * Return Variant value and advance cursor.
 	 * 
 	 * Aborts on invalid time or out of bounds access.
@@ -309,6 +321,30 @@ public class DoubleParam: ApiParam
 		Variant? default_value=null, string? description=null)
 	{
 		base(name, required, false, default_value, "d", description);
+	}
+}
+
+public class IntParam: ApiParam
+{
+	/** 
+	 * Creates new parameter of type int.
+	 * 
+	 * The parameter name `name` is used in a key-value representation of parameters and in documentation.
+	 * 
+	 * If `required` is set to `false` and the parameter hasn't been provided at all (e.g. in a key-value
+	 * representation of parameters), the `default_value` is used instead. However, if the `default_value`
+	 * to be used is null, error is reported to the API caller.
+	 * 
+	 * @param name             Parameter name. 
+	 * @param required         If `true`, parameter must be always specified and error is reported to the API
+	 *                         caller otherwise.
+	 * @param default_value    The default value is used at several circumstances as described above.
+	 * @param description      Description of this parameter for API consumers.
+	 */
+	public IntParam(string name, bool required,
+		Variant? default_value=null, string? description=null)
+	{
+		base(name, required, false, default_value, "i", description);
 	}
 }
 
