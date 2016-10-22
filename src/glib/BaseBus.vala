@@ -36,7 +36,7 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 	protected HashTable<void*, BaseChannel?> clients = null;
 	uint last_client_id = 0;
 	
-	public BaseBus(string name, GLib.Object router, uint timeout=5000)
+	public BaseBus(string name, GLib.Object router, uint timeout)
 	{
 		this.name = name;
 		this.timeout = timeout;
@@ -51,7 +51,7 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 		service.start();
 	}
 	
-	public ChannelType connect_channel(string name, uint timeout=500) throws Diorite.IOError
+	public ChannelType connect_channel(string name, uint timeout) throws Diorite.IOError
 	{
 		var id = get_next_client_id();
 		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
@@ -108,7 +108,7 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 	{
 		var id = get_next_client_id();
 		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
-				id: id, channel: new Diorite.SocketChannel(id, path, connection), router: router);
+				id: id, channel: new Diorite.SocketChannel(id, path, connection, timeout), router: router);
 		clients[id.to_pointer()] = channel;
 		channel.notify["closed"].connect_after(on_channel_closed);
 		incoming((ChannelType) channel);

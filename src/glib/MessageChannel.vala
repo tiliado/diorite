@@ -42,7 +42,7 @@ public class MessageChannel: BaseChannel, Diorite.MessageListener
 		GLib.Object(id: id, channel: channel, router: router ?? new MessageRouter(null));
 	}
 	
-	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout=500) throws Diorite.IOError
+	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout) throws Diorite.IOError
 	{
 		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), router);
 	}

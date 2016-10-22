@@ -34,7 +34,7 @@ public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 		log_comunication = Environment.get_variable("DIORITE_LOG_API_BUS_BUS") == "yes";
 	}
 	
-	public ApiBus(string name, ApiRouter? router, uint timeout=5000)
+	public ApiBus(string name, ApiRouter? router, uint timeout)
 	{
 		base(name, router, timeout);
 	}

@@ -34,7 +34,7 @@ public class SocketChannel : Drt.DuplexChannel
 	public bool can_write {get; private set; default = false;}
 	private SocketSource socket_source;
 	
-	public SocketChannel(uint id, string name, SocketConnection connection, uint timeout=500)
+	public SocketChannel(uint id, string name, SocketConnection connection, uint timeout)
 	{
 		base(id, name, connection.input_stream, connection.output_stream, timeout);
 		this.connection = connection;
@@ -44,7 +44,7 @@ public class SocketChannel : Drt.DuplexChannel
 		connection.notify["closed"].connect_after(on_connection_closed);
 	}
 	
-	public SocketChannel.from_name(uint id, string name, uint timeout=500) throws Diorite.IOError
+	public SocketChannel.from_name(uint id, string name, uint timeout) throws Diorite.IOError
 	{
 		var path = Diorite.Ipc.create_path(name);
 		try

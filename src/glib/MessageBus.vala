@@ -34,7 +34,7 @@ public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.Message
 		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_BUS") == "yes";
 	}
 	
-	public MessageBus(string name, MessageRouter? router, uint timeout=5000)
+	public MessageBus(string name, MessageRouter? router, uint timeout)
 	{
 		base(name, router, timeout);
 	}
