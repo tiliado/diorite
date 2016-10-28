@@ -75,7 +75,7 @@ public class ApiRouter: MessageRouter
 
 	public signal void notification(GLib.Object source, string name, string? detail, Variant? params);
 	
-	public async bool emit(string name, string? detail=null, Variant? data=null)
+	public bool emit(string name, string? detail=null, Variant? data=null)
 	{
 		var notification = methods[name] as ApiNotification;
 		if (notification == null)
@@ -83,7 +83,12 @@ public class ApiRouter: MessageRouter
 			warning("Notification '%s' not found.", name);
 			return false;
 		}
-		return yield notification.emit(detail, data);
+		Idle.add(() =>
+		{
+			notification.emit.begin(detail, data , (o, res) => {notification.emit.end(res);});
+			return false;
+		});
+		return true;
 	}
 	
 	/**
