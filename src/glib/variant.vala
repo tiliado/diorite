@@ -277,6 +277,22 @@ public int variant_to_int(Variant? value)
 }
 
 /**
+ * Converts any Variant value to uint.
+ * 
+ * @param value    value to convert
+ * @return actual uint value if the value is of type uint, zero otherwise
+ */
+public uint variant_to_uint(Variant? value)
+{
+	var unboxed = unbox_variant(value);
+	if (unboxed != null && unboxed.is_of_type(VariantType.UINT32))
+		return (uint) unboxed.get_uint32();
+	if (unboxed != null && unboxed.is_of_type(VariantType.UINT64))
+		return (uint) unboxed.get_uint64();
+	return 0;
+}
+
+/**
  * Converts any Variant value to double.
  * 
  * @param value    value to convert
