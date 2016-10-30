@@ -26,27 +26,31 @@ namespace Diorite
 
 public class KeyValueStorageClient: GLib.Object
 {
-	public Drt.MessageChannel channel {get; construct;}
+	public Drt.ApiChannel channel {get; construct;}
 	
-	public KeyValueStorageClient(Drt.MessageChannel channel)
+	public KeyValueStorageClient(Drt.ApiChannel channel)
 	{
 		GLib.Object(channel: channel);
-		channel.add_handler("KeyValueStorageServer.changed", "(ssmv)", handle_changed);
+		channel.api_router.add_method("/diorite/keyvaluestorageserver/changed", Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_changed, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+			new Drt.VariantParam("old_value", true, true),
+		});
 	}
 	
 	public signal void changed(string provider_name, string key, Variant? old_value);
 	
-	public KeyValueStorage get_proxy(string provider_name, uint32 timeout)
+	public KeyValueStorage get_proxy(string provider_name)
 	{
-		return new KeyValueStorageProxy(this, provider_name, timeout);
+		return new KeyValueStorageProxy(this, provider_name);
 	}
 	
-	private Variant? handle_changed(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_changed(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string provider_name = null;
-		string key = null;
-		Variant? old_value = null;
-		data.get("(ssmv)", &provider_name, &key, &old_value);
+		var provider_name = params.pop_string();
+		var key = params.pop_string();
+		var old_value = params.pop_variant();
 		changed(provider_name, key, old_value);
 		return new Variant.boolean(true);
 	}

@@ -27,30 +27,58 @@ namespace Diorite
 
 public class KeyValueStorageServer: GLib.Object
 {
-	internal static const string METHOD_ADD_LISTENER = "KeyValueStorageServer.add_listener";
-	internal static const string METHOD_REMOVE_LISTENER = "KeyValueStorageServer.remove_listener";
-	internal static const string METHOD_HAS_KEY = "KeyValueStorageServer.has_key";
-	internal static const string METHOD_GET_VALUE = "KeyValueStorageServer.get_value";
-	internal static const string METHOD_SET_VALUE = "KeyValueStorageServer.set_value";
-	internal static const string METHOD_UNSET = "KeyValueStorageServer.unset";
-	internal static const string METHOD_SET_DEFAULT_VALUE = "KeyValueStorageServer.set_default_value";
-	internal static const string METHOD_CHANGED = "KeyValueStorageServer.changed";
+	internal static const string METHOD_ADD_LISTENER = "/diorite/keyvaluestorageserver/add_listener";
+	internal static const string METHOD_REMOVE_LISTENER = "/diorite/keyvaluestorageserver/remove_listener";
+	internal static const string METHOD_HAS_KEY = "/diorite/keyvaluestorageserver/has_key";
+	internal static const string METHOD_GET_VALUE = "/diorite/keyvaluestorageserver/get_value";
+	internal static const string METHOD_SET_VALUE = "/diorite/keyvaluestorageserver/set_value";
+	internal static const string METHOD_UNSET = "/diorite/keyvaluestorageserver/unset";
+	internal static const string METHOD_SET_DEFAULT_VALUE = "/diorite/keyvaluestorageserver/set_default_value";
+	internal static const string METHOD_CHANGED = "/diorite/keyvaluestorageserver/changed";
 	
-	public Drt.ApiBus server {get; construct;}
+	public Drt.ApiRouter router {get; construct;}
 	private HashTable<string, Provider?> providers;
 	
 	
-	public KeyValueStorageServer(Drt.ApiBus server)
+	public KeyValueStorageServer(Drt.ApiRouter router)
 	{
-		GLib.Object(server: server);
+		GLib.Object(router: router);
 		providers = new HashTable<string, Provider?>(str_hash, str_equal);
-		server.add_handler(METHOD_ADD_LISTENER, "(ssu)", handle_add_listener);
-		server.add_handler(METHOD_REMOVE_LISTENER, "(ss)", handle_remove_listener);
-		server.add_handler(METHOD_HAS_KEY, "(ss)", handle_has_key);
-		server.add_handler(METHOD_GET_VALUE, "(ss)", handle_get_value);
-		server.add_handler(METHOD_SET_VALUE, "(ssmv)", handle_set_value);
-		server.add_handler(METHOD_UNSET, "(ss)", handle_unset);
-		server.add_handler(METHOD_SET_DEFAULT_VALUE, "(ssmv)", handle_set_default_value);
+		router.add_method(METHOD_ADD_LISTENER, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_add_listener, {
+			new Drt.StringParam("provider", true, false),
+		});
+		router.add_method(METHOD_REMOVE_LISTENER, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_remove_listener, {
+			new Drt.StringParam("provider", true, false),
+		});
+		router.add_method(METHOD_HAS_KEY, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.READABLE,
+			null, handle_has_key, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+		});
+		router.add_method(METHOD_GET_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.READABLE,
+			null, handle_get_value, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+		});
+		router.add_method(METHOD_SET_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_set_value, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+			new Drt.VariantParam("value", true, true),
+		});
+		router.add_method(METHOD_UNSET, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_unset, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+		});
+		router.add_method(METHOD_SET_DEFAULT_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+			null, handle_set_default_value, {
+			new Drt.StringParam("provider", true, false),
+			new Drt.StringParam("key", true, false),
+			new Drt.VariantParam("value", true, true),
+		});
 	}
 	
 	public void add_provider(string name, KeyValueStorage storage)
@@ -92,68 +120,58 @@ public class KeyValueStorageServer: GLib.Object
 		return provider;
 	}
 	
-	private Variant? handle_add_listener(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_add_listener(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		var channel = source as Drt.MessageChannel;
+		var channel = source as Drt.ApiChannel;
 		return_val_if_fail(channel != null, new Variant.boolean(false));
-		string provider_name = null;
-		string listener_name = null;
-		uint32 timeout = 15;
-		data.get("(ssu)", &provider_name, &listener_name, &timeout);
+		var provider_name = params.pop_string();
 		return new Variant.boolean(add_listener(provider_name, channel));
 	}
 	
-	private Variant? handle_remove_listener(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_remove_listener(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		var channel = source as Drt.MessageChannel;
+		var channel = source as Drt.ApiChannel;
 		return_val_if_fail(channel != null, new Variant.boolean(false));
-		string provider_name = null;
-		string listener_name = null;
-		data.get("(ss)", &provider_name, &listener_name);
+		var provider_name = params.pop_string();
 		return new Variant.boolean(remove_listener(provider_name, channel));
 	}
 	
-	private Variant? handle_has_key(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_has_key(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string name = null;
-		string key = null;
-		data.get("(ss)", &name, &key);
+		var name = params.pop_string();
+		var key = params.pop_string();
 		return new Variant.boolean(get_provider(name).storage.has_key(key));
 	}
 	
-	private Variant? handle_get_value(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_get_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string name = null;
-		string key = null;
-		data.get("(ss)", &name, &key);
+		var name = params.pop_string();
+		var key = params.pop_string();
 		return get_provider(name).storage.get_value(key);
 	}
 	
-	private Variant? handle_set_value(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_set_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string name = null;
-		string key = null;
-		Variant? value = null;
-		data.get("(ssmv)", &name, &key, &value);
+		var name = params.pop_string();
+		var key = params.pop_string();
+		var value = params.pop_variant();
 		get_provider(name).storage.set_value(key, value);
 		return null;
 	}
 	
-	private Variant? handle_unset(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_unset(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string name = null;
-		string key = null;
-		data.get("(ss)", &name, &key);
+		var name = params.pop_string();
+		var key = params.pop_string();
 		get_provider(name).storage.unset(key);
 		return null;
 	}
 	
-	private Variant? handle_set_default_value(GLib.Object source, Variant? data) throws MessageError
+	private Variant? handle_set_default_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
 	{
-		string name = null;
-		string key = null;
-		Variant? value = null;
-		data.get("(ssmv)", &name, &key, &value);
+		var name = params.pop_string();
+		var key = params.pop_string();
+		var value = params.pop_variant();
 		get_provider(name).storage.set_default_value(key, value);
 		return null;
 	}

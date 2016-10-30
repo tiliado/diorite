@@ -29,13 +29,11 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 	public SingleList<PropertyBinding> property_bindings {get; protected set;}
 	public KeyValueStorageClient client {get; construct;}
 	public string name {get; construct;}
-	private uint32 timeout;
 	
-	public KeyValueStorageProxy(KeyValueStorageClient client, string name, uint32 timeout)
+	public KeyValueStorageProxy(KeyValueStorageClient client, string name)
 	{
 		GLib.Object(name: name, client: client);
 		property_bindings = new SingleList<PropertyBinding>();
-		this.timeout = timeout;
 		client.changed.connect(on_changed);
 		toggle_listener(true);
 	}
@@ -57,7 +55,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
 		try
 		{
-			var response = client.channel.send_message(method, new Variant("(ss)", name, key));
+			var response = client.channel.call_sync(method, new Variant("(ss)", name, key));
 			if (response.is_of_type(VariantType.BOOLEAN))
 				return response.get_boolean();
 			critical("Invalid response to %s: %s", method,
@@ -75,7 +73,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
 		try
 		{
-			return unbox_variant(client.channel.send_message(method, new Variant("(ss)", name, key)));
+			return unbox_variant(client.channel.call_sync(method, new Variant("(ss)", name, key)));
 		}
 		catch (GLib.Error e)
 		{
@@ -89,7 +87,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
 		try
 		{
-			client.channel.send_message(method, new Variant("(ssmv)", name, key, value));
+			client.channel.call_sync(method, new Variant("(ssmv)", name, key, value));
 		}
 		catch (GLib.Error e)
 		{
@@ -102,7 +100,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
 		try
 		{
-			client.channel.send_message(method, new Variant("(ssmv)", name, key, value));
+			client.channel.call_sync(method, new Variant("(ssmv)", name, key, value));
 		}
 		catch (GLib.Error e)
 		{
@@ -115,7 +113,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		var method = KeyValueStorageServer.METHOD_UNSET;
 		try
 		{
-			client.channel.send_message(method, new Variant("(ss)", name, key));
+			client.channel.call_sync(method, new Variant("(ss)", name, key));
 		}
 		catch (GLib.Error e)
 		{
@@ -130,17 +128,17 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		if (state)
 		{
 			method = KeyValueStorageServer.METHOD_ADD_LISTENER;
-			payload = new Variant("(ssu)", name, "<undefined>", timeout);
+			payload = new Variant("(s)", name);
 		}
 		else
 		{
 			method = KeyValueStorageServer.METHOD_REMOVE_LISTENER;
-			payload = new Variant("(ss)", name, "<undefined>");
+			payload = new Variant("(s)", name);
 		}
 		
 		try
 		{
-			var response = client.channel.send_message(method, payload);
+			var response = client.channel.call_sync(method, payload);
 			if (response == null || ! response.is_of_type(VariantType.BOOLEAN)
 			|| !response.get_boolean())
 				warning("Invalid response to %s: %s", method,
