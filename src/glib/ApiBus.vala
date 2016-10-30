@@ -51,19 +51,6 @@ public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 		return router.remove_handler(message_name);
 	}
 	
-	/**
-	 * Convenience method to invoke message handler from server's process.
-	 */
-	public Variant? send_local_message(string name, Variant? data) throws GLib.Error
-	{
-		if (log_comunication)
-			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_message(this, name, data);
-		if (log_comunication)
-			debug("Local response: %s", response != null ? response.print(false) : "NULL");
-		return response;
-	}
-	
 	public Variant? call_local(string name, Variant? data) throws GLib.Error
 	{
 		return call_local_sync_full(name, true, "rw", "tuple",  data);
