@@ -25,7 +25,7 @@
 namespace Drt
 {
 
-public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.MessageListener
+public class MessageBus: BaseBus<MessageChannel, MessageRouter>
 {
 	protected static bool log_comunication;
 	
@@ -37,18 +37,6 @@ public class MessageBus: BaseBus<MessageChannel, MessageRouter>, Diorite.Message
 	public MessageBus(string name, MessageRouter? router, uint timeout)
 	{
 		base(name, router, timeout);
-	}
-	
-	[Deprecated (replacement = "this.router.add_handler")]
-	public virtual void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
-	{
-		router.add_handler(message_name, type_string, (owned) handler);
-	}
-	
-	[Deprecated (replacement = "this.router.remove_handler")]
-	public virtual bool remove_handler(string message_name)
-	{
-		return router.remove_handler(message_name);
 	}
 	
 	/**

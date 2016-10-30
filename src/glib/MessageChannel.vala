@@ -25,7 +25,7 @@
 namespace Drt
 {
 
-public class MessageChannel: BaseChannel, Diorite.MessageListener
+public class MessageChannel: BaseChannel
 {	
 	public MessageRouter router {get; protected set;}
 	private static bool log_comunication;
@@ -223,18 +223,6 @@ public class MessageChannel: BaseChannel, Diorite.MessageListener
 		}
 		return true;
 	}	
-	
-	[Deprecated (replacement = "this.router.add_handler")]
-	public void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
-	{
-		router.add_handler(message_name, type_string, (owned) handler);
-	}
-	
-	[Deprecated (replacement = "this.router.remove_handler")]
-	public bool remove_handler(string message_name)
-	{
-		return router.remove_handler(message_name);
-	}
 	
 	private void on_channel_closed(GLib.Object o, ParamSpec p)
 	{

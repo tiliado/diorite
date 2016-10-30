@@ -41,7 +41,7 @@ public errordomain MessageError
 
 public const string TYPE_STRING_ANY = "#ANY#";
 
-public interface MessageListener : GLib.Object
+namespace MessageListener
 {
 	public static Variant? echo_handler(GLib.Object source, Variant? request) throws GLib.Error
 	{
@@ -69,10 +69,6 @@ public interface MessageListener : GLib.Object
 					"Invalid data type '%s', expected '%s'.", data_type_string, type_string);
 		}
 	}
-	
-	public abstract void add_handler(string message_name, string? type_string, owned MessageHandler handler);
-	
-	public abstract bool remove_handler(string message_name);
 }
 
 public class HandlerAdaptor
