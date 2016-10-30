@@ -72,6 +72,11 @@ public class ApiChannel: MessageChannel
 	{
 		return yield send_message_async(create_full_method_name(method, allow_private, flags, params_format), params);
 	}
+	
+	public Variant? call_full_sync(string method, bool allow_private, string flags, string params_format, Variant? params) throws GLib.Error
+	{
+		return send_message(create_full_method_name(method, allow_private, flags, params_format), params);
+	}
 }
 
 } // namespace Drt
