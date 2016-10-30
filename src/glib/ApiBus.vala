@@ -25,7 +25,7 @@
 namespace Drt
 {
 
-public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
+public class ApiBus: BaseBus<ApiChannel, ApiRouter>
 {
 	protected static bool log_comunication;
 	
@@ -37,18 +37,6 @@ public class ApiBus: BaseBus<ApiChannel, ApiRouter>, Diorite.MessageListener
 	public ApiBus(string name, ApiRouter? router, uint timeout)
 	{
 		base(name, router, timeout);
-	}
-	
-	[Deprecated (replacement = "this.router.add_method")]
-	public virtual void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
-	{
-		router.add_handler(message_name, type_string, (owned) handler);
-	}
-	
-	[Deprecated (replacement = "this.router.remove_method")]
-	public virtual bool remove_handler(string message_name)
-	{
-		return router.remove_handler(message_name);
 	}
 	
 	public Variant? call_local(string name, Variant? data) throws GLib.Error
