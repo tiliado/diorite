@@ -95,12 +95,12 @@ public class BluetoothService
 private class BluetoothProfile1 : GLib.Object, BluezProfile1
 {
 	private weak BluetoothService service;
-	private HashTable<ObjectPath, Diorite.SingleList<GLib.Socket>> sockets;
+	private HashTable<ObjectPath, Drt.Lst<GLib.Socket>> sockets;
 	
 	public BluetoothProfile1(BluetoothService service)
 	{
 		this.service = service;
-		sockets = new HashTable<ObjectPath, Diorite.SingleList<GLib.Socket>>(str_hash, str_equal);
+		sockets = new HashTable<ObjectPath, Drt.Lst<GLib.Socket>>(str_hash, str_equal);
 	}
 	
 	~BluetoothProfile1()
@@ -131,7 +131,7 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 		debug("New bluetooth connection from %s (%d).", address, fd.fd);
 		var device_sockets = sockets[device];
 		if (device_sockets == null)
-			sockets[device] = device_sockets = new Diorite.SingleList<GLib.Socket>();
+			sockets[device] = device_sockets = new Drt.Lst<GLib.Socket>();
 		device_sockets.prepend(fd);
 		var connection = new BluetoothConnection(fd, address);
 		uint8[] byte = {1};

@@ -27,7 +27,7 @@ namespace Diorite
 
 public interface KeyValueStorage: GLib.Object
 {
-	public abstract SingleList<PropertyBinding> property_bindings {get; protected set;}
+	public abstract Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	
 	public signal void changed(string key, Variant? old_value);
 	

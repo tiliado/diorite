@@ -22,16 +22,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class SingleList<G>
+public class Lst<G>
 {
 	private Node<G>? first_node;
 	public int length {get; private set;}
 	private EqualFunc<G> equal_func;
 	
-	public SingleList(EqualFunc<G>? equal_func=null)
+	public Lst(EqualFunc<G>? equal_func=null)
 	{
 		this.equal_func = equal_func ?? direct_equal;
 		first_node = null;

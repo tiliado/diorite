@@ -29,14 +29,14 @@ public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
 
 public class ActionsRegistry : GLib.Object
 {
-	private HashTable<string, SingleList<Action?>> groups;
+	private HashTable<string, Drt.Lst<Action?>> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
 	
 	public ActionsRegistry(Gtk.Application app)
 	{
 		this.app = app;
-		groups = new HashTable<string, SingleList<Action?>>(str_hash, str_equal); 
+		groups = new HashTable<string, Drt.Lst<Action?>>(str_hash, str_equal); 
 		actions = new HashTable<string, Action?>(str_hash, str_equal); 
 	}
 	
@@ -56,7 +56,7 @@ public class ActionsRegistry : GLib.Object
 		var group = groups.get(group_name);
 		if (group == null)
 		{
-			group = new SingleList<Action>();
+			group = new Drt.Lst<Action>();
 			groups.insert((owned) group_name, group);
 		}
 		if (prepend)

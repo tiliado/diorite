@@ -64,7 +64,7 @@ namespace Diorite.System
 		File directory, int io_priority=Priority.DEFAULT, Cancellable? cancellable = null) throws GLib.Error
 	{
 		
-		SingleList<File> dirs = new SingleList<File>();
+		Drt.Lst<File> dirs = new Drt.Lst<File>();
 		dirs.prepend(directory);
 		File? dir;
 		while ((dir = dirs[0]) != null)

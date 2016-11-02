@@ -26,14 +26,14 @@ namespace Diorite
 
 public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 {
-	public SingleList<PropertyBinding> property_bindings {get; protected set;}
+	public Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	public KeyValueStorageClient client {get; construct;}
 	public string name {get; construct;}
 	
 	public KeyValueStorageProxy(KeyValueStorageClient client, string name)
 	{
 		GLib.Object(name: name, client: client);
-		property_bindings = new SingleList<PropertyBinding>();
+		property_bindings = new Drt.Lst<PropertyBinding>();
 		client.changed.connect(on_changed);
 		toggle_listener(true);
 	}
