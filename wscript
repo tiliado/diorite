@@ -195,7 +195,7 @@ def configure(ctx):
 	ctx.define('GDK_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GTK_TUPLE))
 	
 	VERSIONS = VERSION.split("+")
-	if len(VERSIONS) == 2:
+	if len(VERSIONS) == 1:
 		VERSION_SUFFIX = "stable"
 	else:
 		VERSION_SUFFIX = VERSIONS[1]
