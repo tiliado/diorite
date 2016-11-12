@@ -176,4 +176,32 @@ namespace Diorite.System
 				warning("Skipped: %s", source_item.get_path());
 		}
 	}
+	
+	/**
+	 * Recursive resolve symlink
+	 * 
+	 * @param file           The file to be resolved if it is a symlink.
+	 * @param cancellable    Cancellable object
+	 * @return Resolved file object if the original was symlink, the original file otherwise.
+	 */
+	public async File resolve_symlink(File file, Cancellable? cancellable)
+	{
+		File result = file;
+		try
+		{
+			var info = yield file.query_info_async(
+				"standard::*", FileQueryInfoFlags.NOFOLLOW_SYMLINKS, Priority.DEFAULT, cancellable);
+			if (info.get_file_type() == FileType.SYMBOLIC_LINK)
+			{
+				var target = info.get_symlink_target();
+				result = target[0] == '/' ? File.new_for_path(target) : file.get_parent().get_child(target);
+				return yield resolve_symlink(result, cancellable);
+			}
+		}
+		catch (GLib.Error e)
+		{
+			return result;
+		}
+		return result;
+	}
 }
