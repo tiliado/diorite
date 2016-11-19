@@ -55,7 +55,7 @@ public class MessageChannel: BaseChannel
 		
 		channel.notify["closed"].connect_after(on_channel_closed);
 		channel.incoming_request.connect(on_incoming_request);
-		channel.start_receiving();
+		channel.start();
 	}
 	
 	~MessageChannel()

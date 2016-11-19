@@ -38,18 +38,15 @@ public abstract class DuplexChannel: GLib.Object
 	private static bool timeout_fatal;
 	public uint id {get; private set;}
 	public string name {get; private set;}
-	public bool receiving {get; private set; default = false;}
 	public bool closed {get; protected set; default = false;}
 	public uint timeout {get; set;}
 	public InputStream input {get; private set;}
 	public OutputStream output {get; private set;}
-	private HashTable<void*, Payload?> incoming_requests;
 	private HashTable<void*, Payload?> outgoing_requests;
-	private Queue<Payload> incoming_queue;
-	private Queue<Payload> outgoing_queue;
+	private AsyncQueue<Payload?> outgoing_queue;
 	private uint last_payload_id = 0;
-	private bool send_pending = false;
-	private bool processing_pending = false;
+	private Thread<void*>? writer_thread = null;
+	private Thread<void*>? reader_thread = null;
 	
 	
 	public DuplexChannel(uint id, string name, InputStream input, OutputStream output, uint timeout)
@@ -63,10 +60,8 @@ public abstract class DuplexChannel: GLib.Object
 	
 	construct
 	{
-		incoming_requests = new HashTable<void*, Payload?>(direct_hash, direct_equal);
 		outgoing_requests = new HashTable<void*, Payload?>(direct_hash, direct_equal);
-		incoming_queue = new Queue<Payload>();
-		outgoing_queue = new Queue<Payload>();
+		outgoing_queue = new AsyncQueue<Payload?>();
 		notify["closed"].connect_after(on_closed_changed);
 	}	
 	
@@ -75,22 +70,16 @@ public abstract class DuplexChannel: GLib.Object
 		log_comunication = Environment.get_variable("DIORITE_LOG_DUPLEX_CHANNEL") == "yes";
 		timeout_fatal = Environment.get_variable("DIORITE_DUPLEX_CHANNEL_FATAL_TIMEOUT") == "yes";
 	}
-	
+		
 	/**
-	 * Start asynchronous loop to receive messages
-	 * 
-	 * @return `true` on success, `false` is the channel has already started receiving (the `receiving`
-	 * property is `true`) or has been closed (the `closed` property is `true`).
+	 * Start sending and receiving messages.
 	 */
-	public bool start_receiving()
+	public void start()
 	{
-		if (!receiving && check_not_closed())
-		{
-			receiving = true;
-			receive_payloads.begin(on_receive_payloads_done);
-			return true;
-		}
-		return false;
+		if (reader_thread == null)
+			reader_thread = new Thread<void*>("Ch%u".printf(this.id), reader_thread_func);
+		if (writer_thread == null)
+			writer_thread = new Thread<void*>("Ch%u".printf(this.id), writer_thread_func);
 	}
 	
 	/**
@@ -135,11 +124,7 @@ public abstract class DuplexChannel: GLib.Object
 	{
 		check_not_closed_or_error();
 		var payload = new Payload(id, RESPONSE, data, null);
-		lock (outgoing_queue)
-		{
-			outgoing_queue.push_tail(payload);
-		}
-		start_sending();
+		outgoing_queue.push(payload);
 	}
 	
 	public virtual void close() throws GLib.IOError
@@ -198,12 +183,9 @@ public abstract class DuplexChannel: GLib.Object
 				outgoing_requests[id.to_pointer()] = payload;
 			}
 		}
-		lock (outgoing_queue)
-		{
-			outgoing_queue.push_tail(payload);
-		}
+		
 		payload.timeout_id = Timeout.add(uint.max(100, timeout), () => {request_timed_out(payload.id); return false;});
-		start_sending();
+		outgoing_queue.push(payload);
 		return payload.id;
 	}
 	
@@ -253,51 +235,25 @@ public abstract class DuplexChannel: GLib.Object
 		if (!check_not_closed())
 			throw new GLib.IOError.CLOSED("The channel has already been closed");
 	}
-	
-	/**
-	 * Start asynchronous sending of queued outgoing messages.
-	 */
-	private void start_sending()
+		
+	private void* writer_thread_func()
 	{
-		if (check_not_closed())
+		while (check_not_closed())
 		{
-			lock (send_pending)
-			{
-				if (send_pending)
-					return;
-				send_pending = true;
-			}
-			send_payloads.begin(on_send_payloads_done);
-		}
-	}
-	
-	/**
-	 * Asynchronous loop sending queued outgoing messages.
-	 */
-	private async void send_payloads()
-	{
-		while (true)
-		{
-			if (!check_not_closed())
-				break;
-			
-			Payload? payload = null;
-			lock (outgoing_queue)
-			{
-				payload = outgoing_queue.pop_head();
-			}
+			if (log_comunication)
+				debug("Channel(%u): Waiting for payload", this.id);
+			Payload? payload = outgoing_queue.pop();
 			if (payload == null)
 				break;
-				
+			
 			if (log_comunication)
 				debug("Channel(%u) %s(%u): Send",
 					this.id, payload.direction == REQUEST ? "Request": "Response", payload.id);
-		
-		
+			
 			GLib.Error? error = null;
 			try
 			{
-				yield write_data_async(payload.direction, payload.id, payload.data);
+				write_data_sync(payload.direction, payload.id, payload.data);
 			}
 			catch (Diorite.IOError e)
 			{
@@ -311,34 +267,16 @@ public abstract class DuplexChannel: GLib.Object
 				if (error != null)
 					process_response(payload, null, error);
 			}
-			else // RESPONSE
-			{
-				lock (incoming_requests)
-				{
-					incoming_requests.remove(payload.id.to_pointer());
-				}
-			}
 		}
+		return null;
 	}
 	
 	/**
-	 * Callback when sending of queued outgoing messages has been finished.
+	 * Loop receiving incoming requests or responses.
 	 */
-	private void on_send_payloads_done(GLib.Object? o, AsyncResult result)
+	private void* reader_thread_func()
 	{
-		send_payloads.end(result);
-		lock (send_pending)
-		{
-			send_pending = false;
-		}
-	}
-	
-	/**
-	 * Asynchronous loop receiving incoming requests or responses.
-	 */
-	private async void receive_payloads()
-	{
-		while (!closed)
+		while (check_not_closed())
 		{
 			try
 			{
@@ -346,7 +284,7 @@ public abstract class DuplexChannel: GLib.Object
 				bool direction;
 				uint id;
 				ByteArray data = null;
-				yield read_data_async(out direction, out id, out data, 0, null); // throws GLib.Error
+				read_data_sync(out direction, out id, out data, 0, null); // throws GLib.Error
 				
 				if (log_comunication)
 					debug("Channel(%u) %s(%u): Received",
@@ -356,15 +294,7 @@ public abstract class DuplexChannel: GLib.Object
 				{
 					
 					payload = new Payload(id, direction, data, null);
-					lock (incoming_requests)
-					{
-						incoming_requests[id.to_pointer()] = payload;
-					}
-					lock (incoming_queue)
-					{
-						incoming_queue.push_tail(payload);
-					}
-					start_processing_requests();
+					process_request(payload);
 				}
 				else // RESPONSE
 				{
@@ -404,18 +334,11 @@ public abstract class DuplexChannel: GLib.Object
 				break;
 			}
 		}
+		return null;
 	}
 	
 	/**
-	 * Callback when receiving messages has been finished.
-	 */
-	private void on_receive_payloads_done(GLib.Object? o, AsyncResult result)
-	{
-		receive_payloads.end(result);
-	}
-	
-	/**
-	 * Process response to request and call its callback
+	 * Process response to request and call its callback in the main thread.
 	 * 
 	 * @param msg      request message
 	 * @param label    response label
@@ -443,50 +366,13 @@ public abstract class DuplexChannel: GLib.Object
 	}
 	
 	/**
-	 * Start asynchronous loop to process incoming requests
+	 * Process incoming request in the main thread.
+	 * 
+	 * @param payload    Request payload.
 	 */
-	private void start_processing_requests()
+	private void process_request(Payload payload)
 	{
-		lock (processing_pending)
-		{
-			if (processing_pending)
-				return;
-			processing_pending = true;
-		}
-		process_requests.begin(on_process_requests_done);
-	}
-	
-	/**
-	 * Asynchronous loop processing incoming requests.
-	 */
-	private async void process_requests()
-	{
-		while (true)
-		{
-			Idle.add(process_requests.callback);
-			yield;
-			Payload? payload = null;
-			lock (incoming_queue)
-			{
-				payload = incoming_queue.pop_head();
-			}
-			if (payload == null)
-				break;
-			
-			incoming_request(payload.id, (owned) payload.data);
-		}
-	}
-	
-	/**
-	 * Callback when processing incoming requests has been finished.
-	 */
-	private void on_process_requests_done(GLib.Object? o, AsyncResult result)
-	{
-		process_requests.end(result);
-		lock (processing_pending)
-		{
-			processing_pending = false;
-		}
+		Idle.add(() => {incoming_request(payload.id, (owned) payload.data); return false;});
 	}
 	
 	/**
@@ -521,7 +407,7 @@ public abstract class DuplexChannel: GLib.Object
 		Diorite.uint32_to_bytes(ref buffer, size, (uint)(offset + sizeof(uint32)));
 	}
 	
-	protected async void write_data_async(bool direction, uint32 id, ByteArray? data) throws Diorite.IOError
+	protected void write_data_sync(bool direction, uint32 id, ByteArray? data) throws Diorite.IOError
 	{
 		if (data.len > get_max_message_size())
 			throw new Diorite.IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
@@ -541,14 +427,11 @@ public abstract class DuplexChannel: GLib.Object
 			{
 				data_buf = (uint8[]) (data_ptr + bytes_written);
 				data_buf.length = (int)(data_size - bytes_written);
-				bytes_written += (uint) yield output.write_async(data_buf);
+				bytes_written += (uint) output.write(data_buf);
 			}
 			catch (GLib.IOError e)
 			{
-				if (!(e is GLib.IOError.WOULD_BLOCK || e is GLib.IOError.BUSY || e is GLib.IOError.PENDING))
-					throw new Diorite.IOError.READ("Failed to write header. %s", e.message);
-				Idle.add(write_data_async.callback);
-				yield;
+				throw new Diorite.IOError.READ("Failed to write header. %s", e.message);
 			}
 		}
 		while (bytes_written < data_size);
@@ -562,20 +445,17 @@ public abstract class DuplexChannel: GLib.Object
 			{
 				data_buf = (uint8[]) (data_ptr + bytes_written);
 				data_buf.length =  (int)(data_size - bytes_written);
-				bytes_written += (uint) yield output.write_async(data_buf);
+				bytes_written += (uint) output.write(data_buf);
 			}
 			catch (GLib.IOError e)
 			{
-				if (!(e is GLib.IOError.WOULD_BLOCK || e is GLib.IOError.BUSY || e is GLib.IOError.PENDING))
-					throw new Diorite.IOError.READ("Failed to write data. %s", e.message);
-				Idle.add(write_data_async.callback);
-				yield;
+				throw new Diorite.IOError.READ("Failed to write data. %s", e.message);
 			}
 		}
 		while (bytes_written < data_size);
 	}
 	
-	protected async void read_data_async(out bool direction, out uint32 id, out ByteArray data, uint timeout=0, owned Cancellable? cancellable=null) throws GLib.Error
+	protected void read_data_sync(out bool direction, out uint32 id, out ByteArray data, uint timeout=0, owned Cancellable? cancellable=null) throws GLib.Error
 	{
 		data = new ByteArray();
 		uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
@@ -590,7 +470,7 @@ public abstract class DuplexChannel: GLib.Object
 			{
 				buffer = (uint8[]) (((uint8*) real_buffer) + bytes_read_total);
 				buffer.length = (int)(bytes_to_read - bytes_read_total);
-				bytes_read = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+				bytes_read = input.read(buffer, cancellable);
 			}
 			catch (GLib.IOError e)
 			{
@@ -624,7 +504,7 @@ public abstract class DuplexChannel: GLib.Object
 			try
 			{
 				buffer.length = int.min((int)(message_size - bytes_read_total), MESSAGE_BUFSIZE);
-				bytes_read = yield input.read_async(buffer, GLib.Priority.DEFAULT, cancellable);
+				bytes_read = input.read(buffer, cancellable);
 			}
 			catch (GLib.IOError e)
 			{
@@ -650,7 +530,6 @@ public abstract class DuplexChannel: GLib.Object
 	protected void clean_up_after_closed()
 	{
 		closed = true;
-		receiving = false;
 		debug("Channel (%u) has been closed.", id); 
 		var error_closed = new GLib.IOError.CLOSED("The channel has just been closed.");
 		// N.B. Callbacks will clear the outgoing_requests hash table
