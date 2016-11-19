@@ -91,7 +91,7 @@ public class KeyValueStorageServer: GLib.Object
 		providers.remove(name);
 	}
 	
-	public bool add_listener(string provider_name, Drt.MessageChannel listener)
+	public bool add_listener(string provider_name, Drt.ApiChannel listener)
 	{
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
@@ -101,7 +101,7 @@ public class KeyValueStorageServer: GLib.Object
 		return true;
 	}
 	
-	public bool remove_listener(string provider_name, Drt.MessageChannel listener)
+	public bool remove_listener(string provider_name, Drt.ApiChannel listener)
 	{
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
@@ -181,7 +181,7 @@ public class KeyValueStorageServer: GLib.Object
 	{
 		public unowned string name;
 		public KeyValueStorage storage;
-		public SList<Drt.MessageChannel> listeners;
+		public SList<Drt.ApiChannel> listeners;
 		
 		public Provider(string name, KeyValueStorage storage)
 		{
@@ -197,7 +197,7 @@ public class KeyValueStorageServer: GLib.Object
 			{
 				try
 				{
-					var response = listener.send_message(METHOD_CHANGED,
+					var response = listener.call_sync(METHOD_CHANGED,
 						new Variant("(ssmv)", name, key, old_value));
 					if (response == null
 					|| !response.is_of_type(VariantType.BOOLEAN)
