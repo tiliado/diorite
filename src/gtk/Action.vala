@@ -79,10 +79,12 @@ public abstract class Action: GLib.Object
 	
 	protected void on_action_activated(Variant? parameter)
 	{
-		if (enabled)
-			activated(parameter);
-		else
+		if (!enabled)
 			warning("Cannot activate action '%s', because it is disabled.", name);
+		else if (parameter == null && this is ToggleAction)
+			activate(!this.state.get_boolean());
+		else if (parameter == null || !parameter.equal(this.state))
+			activated(parameter);
 	}
 }
 
@@ -111,7 +113,9 @@ public class ToggleAction : Action
 	
 	public override void activate(Variant? parameter)
 	{
-		if (parameter != null && state != null && parameter.equal(state))
+		if (parameter == null)
+			base.activate(!this.state.get_boolean());
+		else if (parameter != null && state != null && parameter.equal(state))
 			debug("Toggle action '%s' not activated because of the same state '%s'.", name, parameter.print(false));
 		else
 			base.activate(parameter);
