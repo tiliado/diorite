@@ -207,6 +207,9 @@ public class MessageChannel: BaseChannel
 	 */
 	protected virtual bool handle_request(string name, Variant? params, out string status, out Variant? response)
 	{
+		if (log_comunication)
+			debug("Channel(%u) Handle request: %s => %s",
+				channel.id, name, params != null ? params.print(false) : "null");
 		try 
 		{
 			response = router.handle_message(this, name, params);
