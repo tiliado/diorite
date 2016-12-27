@@ -35,6 +35,7 @@ public class Logger
 	private static unowned FileStream output;
 	private static bool colorful;
 	private static string? hint;
+	private static DateTime? time_ref;
 	private static PatternSpec? fatal_string;
 	
 	public static const int COLOR_FOREGROUND = 30;
@@ -54,7 +55,7 @@ public class Logger
 	 * @param output           output to write logger messages to (e. g. sys.stderr)
 	 * @param display_level    lowest log level to log
 	 */
-	public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, string? hint=null)
+	public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
 	{
 		Logger.output = output;
 		Logger.display_level = display_level;
@@ -74,6 +75,8 @@ public class Logger
 			// For subprocesses (they might have redirected output)
 			Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
 		}
+		
+		time_ref = time ? new DateTime.now_local() : null;
 		
 		var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
 		if (fatal_string != null && fatal_string[0] != '\0')
@@ -233,6 +236,36 @@ public class Logger
 			
 		lock (output)
 		{
+			if (time_ref != null)
+			{
+				var now = new DateTime.now_local();
+				TimeSpan diff;
+				lock (time_ref)
+				{
+					diff = now.difference(time_ref);
+					time_ref = now;
+				}
+				name += " Δ";
+				var hours = diff / TimeSpan.HOUR;
+				if (hours > 0)
+				{
+					diff -= hours * TimeSpan.HOUR;
+					name += "%dh".printf((int) hours);
+				}
+				var minutes = diff / TimeSpan.MINUTE;
+				if (minutes  > 0)
+				{
+					diff -= minutes * TimeSpan.MINUTE;
+					name += "%02dm".printf((int) minutes);
+				}
+				var seconds = diff / TimeSpan.SECOND;
+				if (seconds  > 0)
+				{
+					diff -= seconds * TimeSpan.SECOND;
+					name += "%02ds".printf((int) seconds);
+				}
+				name += "%06dus".printf((int) diff);
+			}
 			if (Logger.colorful && color >= 0)
 				output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
 			else
