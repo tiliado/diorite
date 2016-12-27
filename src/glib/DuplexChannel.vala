@@ -535,7 +535,10 @@ public abstract class DuplexChannel: GLib.Object
 		debug("Channel (%u) has been closed.", id); 
 		var error_closed = new GLib.IOError.CLOSED("The channel has just been closed.");
 		// N.B. Callbacks will clear the outgoing_requests hash table
-		outgoing_requests.for_each((key, payload) => { process_response(payload, null, error_closed); });
+		lock (outgoing_requests)
+		{
+			outgoing_requests.for_each((key, payload) => { process_response(payload, null, error_closed); });
+		}
 	}
 	
 	protected void request_timed_out(uint id)
