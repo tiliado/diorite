@@ -157,6 +157,12 @@ public class ActionsRegistry : GLib.Object
 	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		var menu = new Menu();
+		append_to_menu(menu, actions, use_mnemonic, use_icons);
+		return menu;
+	}
+	
+	public void append_to_menu(Menu menu, string[] actions, bool use_mnemonic=true, bool use_icons=true)
+	{
 		foreach (var full_name in actions)
 		{
 			// TODO: Support separators in build_menu()
@@ -169,7 +175,6 @@ public class ActionsRegistry : GLib.Object
 			else
 				warning("Action '%s' not found in registry.", full_name);
 		}
-		return menu;
 	}
 	
 	public bool find_and_parse_action(string full_name, out string? detailed_name, out Action? action, out RadioOption? option)
