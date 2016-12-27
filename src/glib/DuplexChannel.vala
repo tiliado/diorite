@@ -241,7 +241,7 @@ public abstract class DuplexChannel: GLib.Object
 		while (check_not_closed())
 		{
 			if (log_comunication)
-				debug("Channel(%u): Waiting for payload", this.id);
+				debug("Channel(%u) Writer: Waiting for payload", this.id);
 			Payload? payload = outgoing_queue.pop();
 			if (payload == null)
 				break;
@@ -280,6 +280,8 @@ public abstract class DuplexChannel: GLib.Object
 		{
 			try
 			{
+				if (log_comunication)
+					debug("Channel(%u) Reader: Waiting for payload", this.id);
 				Payload? payload = null;
 				bool direction;
 				uint id;
