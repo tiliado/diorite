@@ -63,6 +63,7 @@ public abstract class DuplexChannel: GLib.Object
 		outgoing_requests = new HashTable<void*, Payload?>(direct_hash, direct_equal);
 		outgoing_queue = new AsyncQueue<Payload?>();
 		notify["closed"].connect_after(on_closed_changed);
+		Timeout.add_seconds(10, check_reader_writer_started_cb);
 	}	
 	
 	static construct
@@ -71,6 +72,17 @@ public abstract class DuplexChannel: GLib.Object
 		timeout_fatal = Environment.get_variable("DIORITE_DUPLEX_CHANNEL_FATAL_TIMEOUT") == "yes";
 	}
 		
+	private bool check_reader_writer_started_cb()
+	{
+		if (reader_thread == null || writer_thread == null)
+		{
+			critical(
+				"Channel(%u): You have forgotten to call the start() method. It has been called for you now.",
+				id); 
+			start();
+		}
+		return false;
+	}
 	/**
 	 * Start sending and receiving messages.
 	 */
