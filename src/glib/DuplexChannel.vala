@@ -47,7 +47,7 @@ public abstract class DuplexChannel: GLib.Object
 	private uint last_payload_id = 0;
 	private Thread<void*>? writer_thread = null;
 	private Thread<void*>? reader_thread = null;
-	
+	private MainContext? handler_ctx = null;
 	
 	public DuplexChannel(uint id, string name, InputStream input, OutputStream output, uint timeout)
 	{
@@ -88,6 +88,8 @@ public abstract class DuplexChannel: GLib.Object
 	 */
 	public void start()
 	{
+		if (handler_ctx == null)
+			handler_ctx = MainContext.ref_thread_default();
 		if (reader_thread == null)
 			reader_thread = new Thread<void*>("Ch%u".printf(this.id), reader_thread_func);
 		if (writer_thread == null)
@@ -104,8 +106,9 @@ public abstract class DuplexChannel: GLib.Object
 	public ByteArray? send_request(ByteArray? data=null) throws GLib.Error
 	{
 		check_not_closed_or_error();
-		var loop = new MainLoop();
-		var id = queue_request(data, loop.quit);
+		var ctx = MainContext.ref_thread_default();
+		var loop = new MainLoop(ctx);
+		var id = queue_request(data, loop.quit, ctx);
 		loop.run();
 		return get_response(id);
 	}
@@ -120,8 +123,11 @@ public abstract class DuplexChannel: GLib.Object
 	public async ByteArray? send_request_async(ByteArray? data=null) throws GLib.Error
 	{
 		check_not_closed_or_error();
-		var id = queue_request(data, (RequestCallback) send_request_async.callback);
+		var ctx = MainContext.ref_thread_default();
+		assert(ctx.is_owner() && 1 > 0);
+		var id = queue_request(data, (RequestCallback) send_request_async.callback, ctx);
 		yield;
+		assert(ctx.is_owner() && 1 > 0);
 		return get_response(id);
 	}
 	
@@ -135,7 +141,7 @@ public abstract class DuplexChannel: GLib.Object
 	public void send_response(uint id, ByteArray? data) throws GLib.Error
 	{
 		check_not_closed_or_error();
-		var payload = new Payload(id, RESPONSE, data, null);
+		var payload = new Payload(this, id, RESPONSE, data, null, null);
 		outgoing_queue.push(payload);
 	}
 	
@@ -174,7 +180,7 @@ public abstract class DuplexChannel: GLib.Object
 	 */
 	public signal void incoming_request(uint id, owned ByteArray? data);
 	
-	private uint queue_request(ByteArray? data, owned RequestCallback callback)
+	private uint queue_request(ByteArray? data, owned RequestCallback callback, MainContext ctx)
 	{
 		Payload payload;
 		lock (last_payload_id)
@@ -191,7 +197,7 @@ public abstract class DuplexChannel: GLib.Object
 				}
 				while (outgoing_requests.contains(id.to_pointer()));
 				last_payload_id = id;
-				payload = new Payload(id, REQUEST, data, (owned) callback);
+				payload = new Payload(this, id, REQUEST, data, (owned) callback, ctx);
 				outgoing_requests[id.to_pointer()] = payload;
 			}
 		}
@@ -288,6 +294,7 @@ public abstract class DuplexChannel: GLib.Object
 	 */
 	private void* reader_thread_func()
 	{
+		assert(handler_ctx != null);
 		while (check_not_closed())
 		{
 			try
@@ -296,7 +303,7 @@ public abstract class DuplexChannel: GLib.Object
 					debug("Channel(%u) Reader: Waiting for payload", this.id);
 				Payload? payload = null;
 				bool direction;
-				uint id;
+				uint id = 0;
 				ByteArray data = null;
 				read_data_sync(out direction, out id, out data, 0, null); // throws GLib.Error
 				
@@ -306,8 +313,7 @@ public abstract class DuplexChannel: GLib.Object
 				
 				if (direction == REQUEST)
 				{
-					
-					payload = new Payload(id, direction, data, null);
+					payload = new Payload(this, id, direction, data, null, handler_ctx);
 					process_request(payload);
 				}
 				else // RESPONSE
@@ -376,7 +382,7 @@ public abstract class DuplexChannel: GLib.Object
 			Source.remove(payload.timeout_id);
 			payload.timeout_id = 0;
 		}
-		Idle.add(payload.idle_callback);
+		payload.invoke_callback();
 	}
 	
 	/**
@@ -386,7 +392,7 @@ public abstract class DuplexChannel: GLib.Object
 	 */
 	private void process_request(Payload payload)
 	{
-		Idle.add(() => {incoming_request(payload.id, (owned) payload.data); return false;});
+		payload.emit_incoming_request();
 	}
 	
 	/**
@@ -565,9 +571,9 @@ public abstract class DuplexChannel: GLib.Object
 		{
 			payload.timeout_id = 0;
 			var msg = "Channel (%u) Request (%u) timed out.".printf(this.id, id);
-			process_response(payload, null, new GLib.IOError.TIMED_OUT(msg));
 			if (timeout_fatal)
 				error(msg);
+			process_response(payload, null, new GLib.IOError.TIMED_OUT(msg));
 		}
 	}
 	
@@ -591,19 +597,45 @@ public abstract class DuplexChannel: GLib.Object
 		public bool direction;
 		public ByteArray? data = null;
 		public GLib.Error? error = null;
-		public RequestCallback? callback = null;
+		private RequestCallback? callback = null;
 		public uint timeout_id = 0;
+		private MainContext? ctx;
+		private DuplexChannel channel;
 		
-		public Payload(uint id, bool direction, owned ByteArray? data, owned RequestCallback? callback)
+		public Payload(DuplexChannel channel, uint id, bool direction, owned ByteArray? data, owned RequestCallback? callback, MainContext? ctx)
 		{
+			this.channel = channel;
 			this.id = id;
 			this.direction = direction;
 			this.data = (owned) data;
 			this.callback = (owned) callback;
+			this.ctx = ctx;
+			assert(callback == null || ctx != null);
 		}
 		
-		public bool idle_callback()
+		public void invoke_callback()
 		{
+			assert(this.callback != null);
+			ctx.invoke_full(Priority.HIGH, idle_callback);
+		}
+		
+		public void emit_incoming_request()
+		{
+			assert(ctx != null);
+			ctx.invoke_full(Priority.HIGH, emit_incoming_request_cb);
+		}
+		
+		private bool emit_incoming_request_cb()
+		{
+			if (log_comunication)
+				debug("Emit incoming request %u", id);
+			channel.incoming_request(id, (owned) data);
+			return false;
+		}
+		
+		private bool idle_callback()
+		{
+			assert(ctx.is_owner());
 			this.callback();
 			return false;
 		}

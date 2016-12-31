@@ -178,7 +178,7 @@ public class MessageChannel: BaseChannel
 			warning("Server sent invalid request. Cannot deserialize message.");
 			return;
 		}
-		
+		warning("on incoming request %u %s", id, name);
 		handle_request(name, params, out status, out response);
 		buffer = Diorite.serialize_message(status, response, 0);
 		var payload = new ByteArray.take((owned) buffer);
