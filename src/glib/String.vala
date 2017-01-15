@@ -108,4 +108,21 @@ public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_
 	return result != null ? (int) (result - (char*) str) : -1;
 }
 
+public string? unmask(uint8[] data)
+{
+	var length = data.length;
+	if (length < 2)
+		return null;
+	var shift = data[0];
+	var result = new uint8[length];
+	for (var i = 1; i < length; i++)
+	{
+		if (shift > data[i])
+			return null;
+		result[i - 1] = data[i] - shift;
+	}
+	result[length] = 0;
+	return (string) result;
+}
+
 } // namespace Diorite.String
