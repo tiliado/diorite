@@ -18,7 +18,7 @@
  * 
  * Tests are under public domain because they might contain useful sample code.
  */
-
+#if FIXME
 namespace Diorite
 {
 
@@ -68,3 +68,4 @@ public class KeyValueProxyTest: KeyValueStorageTest
 }
 
 } // namespace Nuvola
+#endif
