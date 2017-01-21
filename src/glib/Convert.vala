@@ -126,13 +126,15 @@ public bool hex_to_bin(string hex, out uint8[] result, char separator='\0')
 	{
 		// "aa:bb:cc" -> 8 chars, 3 bytes 
 		size++;
-		return_val_if_fail(size % 3 == 0, false);
+		if (size % 3 != 0)
+			return false;
 		size /= 3;
 	}
 	else
 	{
 		// "aabbcc" -> 6 chars, 3 bytes
-		return_val_if_fail(size % 2 == 0, false);
+		if (size % 2 != 0)
+			return false;
 		size /= 2;
 	}
 	
