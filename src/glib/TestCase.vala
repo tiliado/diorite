@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -59,7 +59,8 @@ public abstract class TestCase: GLib.Object
 	
 	construct
 	{
-		stdout.puts("----------------------------8<----------------------------\n");
+		if (GLib.Test.verbose())
+			stdout.puts("----------------------------8<----------------------------\n");
 		Test.log_set_fatal_handler(log_fatal_func);
 	}
 	
@@ -408,14 +409,15 @@ public abstract class TestCase: GLib.Object
 	{
 		if (!Test.quiet())
 		{
-			if (format != "")
+			if (format != "" && (Test.verbose() || !result))
 				stdout.vprintf(format, args);
 			
-			if (result)
-				stdout.puts(" PASS");
-			else
+			if (!result)
 				stdout.puts(" FAIL");
-			stdout.putc('\n');
+			else if (Test.verbose())
+				stdout.puts(" PASS");
+			if (Test.verbose())
+				stdout.putc('\n');
 		}
 	}
 	
@@ -430,9 +432,12 @@ public abstract class TestCase: GLib.Object
 	{
 		if (!Test.quiet())
 		{
-			stdout.printf(("[%s] %d run, %d passed, %d failed\n%s"),
-			failed > 0 ? "FAIL" : "PASS", passed + failed, passed, failed,
-			"----------------------------8<----------------------------\n");
+			stdout.printf(("[%s] %d run, %d passed, %d failed"),
+			failed > 0 ? "FAIL" : "PASS", passed + failed, passed, failed);
+			if (GLib.Test.verbose())
+				stdout.puts("\n----------------------------8<----------------------------\n");
+			else
+				stdout.puts(" ");
 		}
 	}
 	
