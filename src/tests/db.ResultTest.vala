@@ -314,9 +314,9 @@ public class ResultTest: Diorite.TestCase
 			expect_str_equals("30", result.fetch_string(2), "age");
 			expect_str_equals("1.72", result.fetch_string(3), "height");
 			expect_str_equals("\x07\x06\x05\x04\x03\x02\x01", result.fetch_string(4), "blob");
-			expect_str_match(
+			expect_warning_message("DioriteDB",
 				"*Result may be truncated. Original blob size was 15, but string size is 7.*",
-				last_fatal_log_message, "blob warning");
+				"blob warning");
 			expect_str_equals("1", result.fetch_string(5), "alive");
 			expect_str_equals(null, result.fetch_string(6), "extra");
 			

@@ -54,20 +54,13 @@ public abstract class TestCase: GLib.Object
 
 	public int passed = 0;
 	public int failed = 0;
-	public string? last_fatal_log_message = null;
-	
-	public virtual bool log_fatal_func(string? log_domain, LogLevelFlags log_levels, string message)
-	{
-		last_fatal_log_message = message;
-		return false;
-	}
+	private SList<LogMessage> log_messages = null;
 	private bool first_result = true;
 	
 	construct
 	{
 		if (GLib.Test.verbose())
 			stdout.puts("----------------------------8<----------------------------\n");
-		Test.log_set_fatal_handler(log_fatal_func);
 	}
 	
 	/**
@@ -75,6 +68,10 @@ public abstract class TestCase: GLib.Object
 	 */
 	public virtual void set_up()
 	{
+		first_result = true;
+		Test.log_set_fatal_handler(log_fatal_func);
+		log_messages = null;
+		GLib.Log.set_default_handler(log_handler);
 	}
 	
 	/**
@@ -82,6 +79,8 @@ public abstract class TestCase: GLib.Object
 	 */
 	public virtual void tear_down()
 	{
+		check_log_messages();
+		log_messages = null;
 	}
 	
 	/**
@@ -566,6 +565,87 @@ public abstract class TestCase: GLib.Object
 		}
 		
 		return result;
+	}
+	
+	public virtual bool log_fatal_func(string? log_domain, LogLevelFlags log_levels, string message)
+	{
+		return false;
+	}
+	
+	private void log_handler(string? domain, LogLevelFlags level, string text)
+	{
+		log_messages.append(new LogMessage(domain, level, text));
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_critical_message(string? domain, string text_pattern, string format, ...)
+	{
+		return expect_log_message_va(domain, LogLevelFlags.LEVEL_CRITICAL, text_pattern, format, va_list());
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_warning_message(string? domain, string text_pattern, string format, ...)
+	{
+		return expect_log_message_va(domain, LogLevelFlags.LEVEL_WARNING, text_pattern, format, va_list());
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_log_message(string? domain, LogLevelFlags level, string text_pattern, string format, ...)
+	{
+		return expect_log_message_va(domain, level, text_pattern, format, va_list());
+	}
+	
+	private bool expect_log_message_va(string? domain, LogLevelFlags level, string text_pattern, string format, va_list args)
+	{
+		var result = false;	
+		if (log_messages != null)
+		{
+			foreach (unowned LogMessage msg in log_messages)
+			{
+				if ((msg.level & level) == 0 || msg.domain != domain)
+					continue;
+				if (PatternSpec.match_simple(text_pattern, msg.text))
+				{
+					result = true;
+					log_messages.remove(msg);
+				}
+				break;
+			}
+		}
+		process(result, format, args);
+		if (!result && !Test.quiet())
+			stdout.printf("\t Expected exception '%s' '%s' not found.\n", domain, text_pattern);
+		return result;
+	}
+	
+	private void check_log_messages()
+	{
+		foreach (unowned LogMessage msg in log_messages)
+		{
+			if ((msg.level & LogLevelFlags.LEVEL_ERROR) != 0)
+				expectation_failed("Uncaught error log message: %s %s", msg.domain, msg.text);
+			else if ((msg.level & LogLevelFlags.LEVEL_WARNING) != 0)
+				expectation_failed("Uncaught warning log message: %s %s", msg.domain, msg.text);
+			else if ((msg.level & LogLevelFlags.LEVEL_CRITICAL) != 0)
+				expectation_failed("Uncaught critical log message: %s %s", msg.domain, msg.text);
+		}
+	}
+	
+	private class LogMessage
+	{
+		public string? domain;
+		public LogLevelFlags level;
+		public string text;
+		
+		public LogMessage(string? domain, LogLevelFlags level, string text)
+		{
+			this.text = text;
+			this.level = level;
+			this.domain = domain;
+		}
 	}
 }
 
