@@ -61,6 +61,7 @@ public abstract class TestCase: GLib.Object
 		last_fatal_log_message = message;
 		return false;
 	}
+	private bool first_result = true;
 	
 	construct
 	{
@@ -415,14 +416,19 @@ public abstract class TestCase: GLib.Object
 		if (!Test.quiet())
 		{
 			if (format != "" && (Test.verbose() || !result))
+			{
+				if (first_result)
+				{
+					stdout.putc('\n');
+					first_result = false;
+				}
 				stdout.vprintf(format, args);
+			}
 			
 			if (!result)
-				stdout.puts(" FAIL");
+				stdout.puts(" FAIL\n");
 			else if (Test.verbose())
-				stdout.puts(" PASS");
-			if (Test.verbose())
-				stdout.putc('\n');
+				stdout.puts(" PASS\n");
 		}
 	}
 	
