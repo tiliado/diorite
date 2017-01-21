@@ -20,8 +20,7 @@ Status: Private beta
 Dependencies
 ------------
 
-  - Python 2 or 3 to run ./waf
-  - Python 3 to run ./testgen.py
+  - Python 3 and the pyparsing module
   - glib-2.0 >= 2.40
   - ghread-2.0 >= 2.40
   - gio-2.0 >= 2.40
