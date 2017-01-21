@@ -329,7 +329,8 @@ class TestParser:
 					full_name = klass.name + "." + method.name
 					path = "/" + full_name.replace(".", "/")
 					if not name.startswith("test_"):
-						info("The method %s has been ignored because it lacks the 'test_' prefix." % name)
+						if name not in ("set_up", "tear_down"):
+							info("The method %s has been ignored because it lacks the 'test_' prefix." % name)
 					elif method.abstract:
 						info("The method %s has been ignored because it is abstract." % name)
 					elif method.access != "public":
