@@ -218,6 +218,8 @@ def build(ctx):
 	DIORITE_GLIB = "{}glib-{}".format(APPNAME, SERIES)
 	DIORITE_GTK = "{}gtk-{}".format(APPNAME, SERIES)
 	DIORITE_DB = "{}db-{}".format(APPNAME, SERIES)
+	DIORITE_TESTS = "{}tests-{}".format(APPNAME, SERIES)
+	RUN_DIORITE_TESTS = "run-{}".format(DIORITE_TESTS)
 	packages = 'posix glib-2.0 gio-2.0'
 	uselib = 'GLIB GTHREAD'
 	vala_defines = ctx.env.VALA_DEFINES
@@ -233,6 +235,7 @@ def build(ctx):
 		DIORITE_GLIB_LIBNAME = DIORITE_GLIB
 		DIORITE_GTK_LIBNAME = DIORITE_GTK
 		DIORITE_DB_LIBNAME = DIORITE_DB
+		DIORITE_TESTS_LIBNAME = DIORITE_DB
 		PC_CFLAGS=""
 		uselib += " UNIXGIO"
 		packages += " gio-unix-2.0"
@@ -277,6 +280,38 @@ def build(ctx):
 			cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
 			vapi_dirs = ['vapi'],
 			vala_target_glib = TARGET_GLIB,
+		)
+		
+		ctx(features = "c cshlib",
+			target = DIORITE_TESTS,
+			name = DIORITE_TESTS,
+			source = ctx.path.ant_glob('src/tests/*.vala') + ctx.path.ant_glob('src/tests/*.c'),
+			packages = " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0 gio-2.0 glib-2.0",
+			uselib = "GTK+ GDK X11 GDKX11 GIO GLIB",
+			use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB],
+			includes = ["src/tests"],
+			vala_defines = vala_defines,
+			cflags = ['-DG_LOG_DOMAIN="DioriteTests"'],
+			vapi_dirs = ['vapi'],
+			vala_target_glib = TARGET_GLIB,
+			install_path = None,
+			install_binding = False
+		)
+		ctx(
+			rule='../testgen.py -i ${SRC} -o ${TGT}',
+			source=ctx.path.find_or_declare('%s.vapi' % DIORITE_TESTS),
+			target=ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS))
+		ctx.program(
+			target = RUN_DIORITE_TESTS,
+			source = [ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)],
+			packages = "gio-2.0 glib-2.0",
+			uselib = "GIO GLIB",
+			use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB, DIORITE_TESTS],
+			vala_defines = vala_defines,
+			defines = ['G_LOG_DOMAIN="DioriteTests"'],
+			vapi_dirs = ['vapi'],
+			vala_target_glib = TARGET_GLIB,
+			install_path = None
 		)
 	
 	ctx(features = 'subst',
