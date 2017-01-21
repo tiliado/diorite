@@ -324,21 +324,35 @@ class TestParser:
 			elif not self.is_subclass(klass, "Diorite.TestCase"):
 				info("The class %s has been ignored because it is not a Diorite.TestCase subclass." % klass.name)
 			else:
-				for method in klass.methods:
-					name = method.name
-					full_name = klass.name + "." + method.name
-					path = "/" + full_name.replace(".", "/")
-					if not name.startswith("test_"):
-						if name not in ("set_up", "tear_down"):
-							info("The method %s has been ignored because it lacks the 'test_' prefix." % name)
-					elif method.abstract:
-						info("The method %s has been ignored because it is abstract." % name)
-					elif method.access != "public":
-						info("The method %s has been ignored because it is not public." % name)
-					elif method.rtype != "void":
-						info("The method %s has been ignored because it returns a value." % name)
-					else:
-						yield (path, klass.name, name, method.async, method.throws)
+				methods_found = set()
+				base_path = "/" + klass.name.replace(".", "/") + "/"
+				for method in self.find_test_methods(klass, methods_found):
+					path = base_path + method.name					
+					yield (path, klass.name, method.name, method.async, method.throws)
+	
+	def find_test_methods(self, klass, methods_found):
+		for method in klass.methods:
+			name = method.name
+			if name in methods_found:
+				pass
+			elif not name.startswith("test_"):
+				if name not in ("set_up", "tear_down"):
+					info("The method %s has been ignored because it lacks the 'test_' prefix." % name)
+			elif method.abstract:
+				info("The method %s has been ignored because it is abstract." % name)
+			elif method.access != "public":
+				info("The method %s has been ignored because it is not public." % name)
+			elif method.rtype != "void":
+				info("The method %s has been ignored because it returns a value." % name)
+			else:
+				methods_found.add(method.name)
+				yield method
+		try:
+			parent = self.classes[klass.parent]
+		except KeyError:
+			pass
+		else:
+			yield from self.find_test_methods(parent, methods_found)
 					
 
 class TestGenerator:
