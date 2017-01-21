@@ -24,7 +24,7 @@ namespace Diorite
 
 public class ConvertTest: Diorite.TestCase
 {
-	public void test_int64_to_bin()
+	public void test_int64_to_bin() throws Diorite.TestError
 	{
 		var rand = new Rand();
 		int64 val;
@@ -49,7 +49,7 @@ public class ConvertTest: Diorite.TestCase
 		}
 	}
 	
-	public void test_bin_to_hex()
+	public void test_bin_to_hex() throws Diorite.TestError
 	{
 		string[] values = {"01", "aa", "bb", "cc", "aabbcc", "deadbeef"};
 		var rand = new Rand();
@@ -91,7 +91,7 @@ public class ConvertTest: Diorite.TestCase
 			assert(!hex_to_bin(invalid, out data, ':'), "invalid '%s'", invalid);
 	}
 	
-	public void test_int64_to_hex()
+	public void test_int64_to_hex() throws Diorite.TestError
 	{
 		var rand = new Rand();
 		int64 val;

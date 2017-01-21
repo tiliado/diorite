@@ -45,7 +45,7 @@ public class ObjectSpecTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			assert_not_reached("%s", e.message);
+			warning("%s", e.message);
 		}
 		delete_db_file();
 	}

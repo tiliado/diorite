@@ -46,7 +46,7 @@ public class DatabaseTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			assert_not_reached("%s", e.message);
+			warning("%s", e.message);
 		}
 		delete_db_file();
 	}
@@ -66,7 +66,7 @@ public class DatabaseTest: Diorite.TestCase
 		}
 	}
 	
-	public void test_open_close()
+	public void test_open_close() throws Diorite.TestError
 	{
 		assert(!db_file.query_exists(), "");
 		try
@@ -81,7 +81,7 @@ public class DatabaseTest: Diorite.TestCase
 		assert(db_file.query_exists(), "");
 	}
 	
-	public void test_exec()
+	public void test_exec() throws Diorite.TestError
 	{
 		try
 		{

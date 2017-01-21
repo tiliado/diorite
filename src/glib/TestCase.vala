@@ -28,6 +28,11 @@ namespace Diorite
 [CCode(has_target=false)]
 public delegate bool EqualData(void* data1, void* data2);
 
+public errordomain TestError
+{
+	FAIL;
+}
+
 /**
  * Base class for test cases.
  */
@@ -87,10 +92,10 @@ public abstract class TestCase: GLib.Object
 	 */
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert(bool expression, string format, ...)
+	protected void assert(bool expression, string format, ...) throws TestError
 	{
 		if (!process(expression, format, va_list()))
-			failure();
+			abort_test();
 	}
 	
 	/**
@@ -101,10 +106,10 @@ public abstract class TestCase: GLib.Object
 	 */
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert_not_reached(string format, ...)
+	protected void assert_not_reached(string format, ...) throws TestError
 	{
 		process(false, format, va_list());
-		failure();
+		abort_test();
 	}
 	
 	/**
@@ -342,10 +347,10 @@ public abstract class TestCase: GLib.Object
 	 */
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...)
+	protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) throws TestError
 	{
 		if (!process_value_equal(expected, actual, format, va_list()))
-			failure();
+			abort_test();
 	}
 	
 	private bool process_value_equal(GLib.Value? expected, GLib.Value? actual, string format, va_list args)
@@ -371,10 +376,10 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
-	protected void fail(string format="", ...)
+	protected void fail(string format="", ...) throws TestError
 	{
 		process(false, format, va_list());
-		failure();
+		abort_test();
 	}
 	
 	[Diagnostics]
@@ -421,11 +426,15 @@ public abstract class TestCase: GLib.Object
 		}
 	}
 	
-	private void failure()
+	private void abort_test() throws TestError
 	{
-		tear_down();
-		summary();
-		Process.abort();
+		 throw new TestError.FAIL("Test failed");
+	}
+	
+	public void exception(GLib.Error e)
+	{
+		if (!(e is TestError))
+			expectation_failed("Uncaught exception: %s %d %s", e.domain.to_string(), e.code, e.message);
 	}
 	
 	public void summary()
@@ -457,18 +466,18 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert_str_match(string pattern, string data, string format, ...)
+	protected void assert_str_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(true, pattern, data, format, va_list()))
-			failure();
+			abort_test();
 	}
 	
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert_str_not_match(string pattern, string data, string format, ...)
+	protected void assert_str_not_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(false, pattern, data, format, va_list()))
-			failure();
+			abort_test();
 	}
 	
 	private bool process_str_match(bool expected, string pattern, string data, string format, va_list args)
@@ -481,10 +490,10 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
-	protected void assert_array<T>(T[] expected, T[] found, EqualData eq, string format, ...)
+	protected void assert_array<T>(T[] expected, T[] found, EqualData eq, string format, ...) throws TestError
 	{
 		if(!process_array<T>(expected, found, eq, format, va_list()))
-			failure();
+			abort_test();
 	}
 	
 	[Diagnostics]

@@ -51,7 +51,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expectation_failed("%s", e.message);
+			error("%s", e.message);
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			assert_not_reached("%s", e.message);
+			error("%s", e.message);
 		}
 		delete_db_file();
 	}
