@@ -33,6 +33,8 @@ public errordomain TestError
 	FAIL;
 }
 
+public delegate void TestCallback() throws GLib.Error;
+
 /**
  * Base class for test cases.
  */
@@ -440,6 +442,51 @@ public abstract class TestCase: GLib.Object
 	{
 		if (!(e is TestError))
 			expectation_failed("Uncaught exception: %s %d %s", e.domain.to_string(), e.code, e.message);
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_no_error(TestCallback func, string format, ...)
+	{
+		string? err = null;
+		try
+		{
+			func();
+		}
+		catch (GLib.Error e)
+		{
+			err = "\tUnexpected error: %s %d %s\n".printf(e.domain.to_string(), e.code, e.message);
+		}
+		var result = process(err == null, format, va_list());
+		if (!result && !Test.quiet())
+			stdout.puts(err);
+		return result;
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_error(TestCallback func, string message_pattern, string format, ...)
+	{
+		var result = false;
+		string? err = null;
+		try
+		{
+			func();
+		}
+		catch (GLib.Error e)
+		{
+			result = PatternSpec.match_simple(message_pattern, e.message);
+			err = e.message;
+		}
+		process(result, format, va_list());
+		if (!result && !Test.quiet())
+		{
+			stdout.printf("An exception was expected: %s\n", message_pattern);
+			if (err != null)
+				stdout.printf("Other exception has been thrown: %s\n", err);
+			
+		}
+		return result;
 	}
 	
 	public void summary()
