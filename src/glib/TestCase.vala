@@ -560,14 +560,14 @@ public abstract class TestCase: GLib.Object
 	[PrintFormat]
 	protected bool expect_null<T>(T? val, string format, ...)
 	{
-		return process(val == null, "val is null; " + format, va_list());
+		return process(val == null, "assertion val is null failed; " + format, va_list());
 	}
 	
 	[Diagnostics]
 	[PrintFormat]
 	protected bool expect_not_null<T>(T? val, string format, ...)
 	{
-		return process(val != null, "val is not null; " + format, va_list());
+		return process(val != null, "assertion val is not null failed; " + format, va_list());
 	}
 	
 	public void summary()
