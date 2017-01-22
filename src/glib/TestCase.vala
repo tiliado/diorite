@@ -724,7 +724,7 @@ public abstract class TestCase: GLib.Object
 		}
 		process(result, format, args);
 		if (!result && !Test.quiet())
-			stdout.printf("\t Expected exception '%s' '%s' not found.\n", domain, text_pattern);
+			stdout.printf("\t Expected log message '%s' '%s' not found.\n", domain, text_pattern);
 		return result;
 	}
 	
