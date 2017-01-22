@@ -491,6 +491,27 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
+	protected bool expect_type<T>(void* object, string format, ...)
+	{
+		string? type_found = null;
+		var expected_type = typeof(T);
+		var result = false;
+		if (object != null)
+		{
+			var object_type = Type.from_instance(object);
+			type_found = object_type.name();
+			result = (object_type == expected_type || object_type.is_a(expected_type));
+		}
+		process(result, format, va_list());
+		if (!result && !Test.quiet())
+		{
+			stdout.printf("A type %s expected but %s found.\n", expected_type.name(), type_found);
+		}
+		return result;
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
 	protected bool expect_enum<T>(T expected, T found, string format, ...)
 	{
 		var expected_type = typeof(T);
