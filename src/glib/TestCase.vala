@@ -489,6 +489,52 @@ public abstract class TestCase: GLib.Object
 		return result;
 	}
 	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_enum<T>(T expected, T found, string format, ...)
+	{
+		var expected_type = typeof(T);
+		var enum_name = expected_type.name();
+		var result = false;
+		string? err = null;
+		unowned EnumClass enum_class = expected_type.is_enum() ? (EnumClass) expected_type.class_ref() : null;
+		if (enum_class == null)
+		{
+			err = enum_name + "is not an enumeration.\n";
+		}
+		else
+		{
+			var expected_member = enum_class.get_value((int) expected);
+			if (expected_member == null)
+			{
+				err = "The value expected (%d) is not a member of the %s enumeration.\n".printf(
+					(int) expected, enum_name);
+			}
+			else
+			{
+				var member_found = enum_class.get_value((int) found);
+				if (member_found == null)
+				{
+					err = "The value found (%d) is not a member of the %s enumeration.\n".printf(
+						(int) found, enum_name);
+				}
+				else if ((int) found != (int) expected)
+				{
+					err = "Expected the enum value %s (%d) but the value %s (%d) found.\n".printf(
+						expected_member.value_name, (int) expected, member_found.value_name, (int) found);
+				}
+				else
+				{
+					result = true;
+				}
+			}
+		}
+		process(result, format, va_list());
+		if (!result && err != null && !Test.quiet())
+			stdout.puts(err);
+		return result;
+	}
+	
 	public void summary()
 	{
 		if (!Test.quiet())
