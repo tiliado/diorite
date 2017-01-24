@@ -507,10 +507,21 @@ public abstract class TestCase: GLib.Object
 	
 	[Diagnostics]
 	[PrintFormat]
-	protected bool expect_type<T>(void* object, string format, ...)
+	protected bool expect_type(Type expected_type, void* object, string format, ...)
+	{
+		return expect_type_internal(expected_type, object, format, va_list());
+	}
+	
+	[Diagnostics]
+	[PrintFormat]
+	protected bool expect_type_of<T>(void* object, string format, ...)
+	{
+		return expect_type_internal(typeof(T), object, format, va_list());
+	}
+	
+	protected bool expect_type_internal(Type expected_type, void* object, string format, va_list args)
 	{
 		string? type_found = null;
-		var expected_type = typeof(T);
 		var result = false;
 		if (object != null)
 		{
@@ -518,7 +529,7 @@ public abstract class TestCase: GLib.Object
 			type_found = object_type.name();
 			result = (object_type == expected_type || object_type.is_a(expected_type));
 		}
-		process(result, format, va_list());
+		process(result, format, args);
 		if (!result && !Test.quiet())
 		{
 			stdout.printf("A type %s expected but %s found.\n", expected_type.name(), type_found);
