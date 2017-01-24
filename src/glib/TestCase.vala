@@ -30,7 +30,8 @@ public delegate bool EqualData(void* data1, void* data2);
 
 public errordomain TestError
 {
-	FAIL;
+	FAIL,
+	NOT_IMPLEMENTED;
 }
 
 public delegate void TestCallback() throws GLib.Error;
@@ -454,10 +455,23 @@ public abstract class TestCase: GLib.Object
 		 throw new TestError.FAIL("Test failed");
 	}
 	
+	protected void not_imlemented() throws TestError
+	{
+		 throw new TestError.NOT_IMPLEMENTED("Test not implemented.");
+	}
+	
 	public void exception(GLib.Error e)
 	{
-		if (!(e is TestError))
+		if (e is TestError.NOT_IMPLEMENTED)
+		{
+			if (!Test.quiet())
+				stdout.puts("Test not implemented. ");
+			Test.fail();
+		}	
+		else if (!(e is TestError.FAIL))
+		{
 			expectation_failed("Uncaught exception: %s %d %s", e.domain.to_string(), e.code, e.message);
+		}
 	}
 	
 	[Diagnostics]
@@ -602,7 +616,7 @@ public abstract class TestCase: GLib.Object
 		if (!Test.quiet())
 		{
 			stdout.printf(("[%s] %d run, %d passed, %d failed"),
-			failed > 0 ? "FAIL" : "PASS", passed + failed, passed, failed);
+			failed > 0 ? "FAIL" : (passed > 0 ? "PASS" : "N/A"), passed + failed, passed, failed);
 			if (GLib.Test.verbose())
 				stdout.puts("\n----------------------------8<----------------------------\n");
 			else
