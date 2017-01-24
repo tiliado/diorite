@@ -187,6 +187,22 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	/**
+	 * Assertion
+	 * 
+	 * Test is terminated when the assertionfails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintFormat]
+	protected void assert_uint_equals(uint expected, uint value, string format, ...) throws TestError
+	{
+		if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list()))
+			abort_test();
+	}
+	
+	/**
 	 * Expectation
 	 * 
 	 * Test is not terminated when expectation fails.
