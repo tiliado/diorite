@@ -54,6 +54,16 @@ public abstract class TestCase: GLib.Object
 	{
 		return *((int*)data1) == *((int*)data2);
 	}
+	
+	public static bool double_eq(void* data1, void* data2)
+	{
+		return *((double*)data1) == *((double*)data2);
+	}
+	
+	public static bool bool_eq(void* data1, void* data2)
+	{
+		return *((bool*)data1) == *((bool*)data2);
+	}
 
 	public int passed = 0;
 	public int failed = 0;
