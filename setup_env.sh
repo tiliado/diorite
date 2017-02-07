@@ -11,6 +11,5 @@ export CC CFLAGS PKG_CONFIG_PATH PATH LD_LIBRARY_PATH
 
 alias configure="python3 ./waf configure --with-experimental-api"
 alias rebuild="python3 ./waf distclean configure build --with-experimental-api"
-alias fedora_configure="python3 ./waf configure --libdir /usr/local/lib64"
-alias fedora_rebuild="python3 ./waf distclean configure build --libdir /usr/local/lib64"
+alias waf="python3 ./waf -v "
 alias update="python3 ./waf && sudo python3 ./waf install"
