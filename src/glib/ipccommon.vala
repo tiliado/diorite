@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -28,8 +28,6 @@ namespace Diorite.Ipc
 public const uint PIPE_BUFSIZE = 4096;
 public const int MESSAGE_BUFSIZE = 512;
 private const string PIPE_FORMAT = "\\\\.\\pipe\\libdiorite.%s(%s)";
-#else
-private const string SOCKET_FORMAT = "libdiorite.%s(%s)";
 #endif
 
 public const string RESPONSE_OK = "OK";
@@ -41,7 +39,18 @@ private string create_path(string name)
 	#if WIN
 	return PIPE_FORMAT.printf(name, user);
 	#else
-	return Path.build_filename(Environment.get_tmp_dir(), SOCKET_FORMAT.printf(name, user));
+	var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "libdiorite", "sockets");
+	try
+	{
+		File.new_for_path(dir_path).make_directory_with_parents();
+	}
+	catch (GLib.Error e)
+	{
+		if (!(e is GLib.IOError.EXISTS))
+			critical("Failed to create directory '%s'. %s", dir_path, e.message);
+	}
+	return Path.build_filename(dir_path, name);
 	#endif
 }
+
 } // namespace Diorote
