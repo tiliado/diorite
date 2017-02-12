@@ -233,6 +233,98 @@ public class JsonBuilder
 	}
 	
 	/**
+	 * Add a new member to an object.
+	 * 
+	 * @param node    the node to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set(string member_name, JsonNode node)
+	{
+		set_member(member_name);
+		try_add(node);
+		return this;
+	}
+	
+	/**
+	 * Add a new boolean value member to an object.
+	 * 
+	 * @param member_name    the name of a member to add
+	 * @param bool_value     the boolean value to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_bool(string member_name, bool bool_value)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@bool(bool_value));
+	}
+	
+	/**
+	 * Add a new integer value member to an object.
+	 * 
+	 * @param member_name    the name of a member to add
+	 * @param int_value      the integer value to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_int(string member_name, int int_value)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@int(int_value));
+	}	
+	
+	/**
+	 * Add a new double value member to an object.
+	 * 
+	 * @param member_name     the name of a member to add
+	 * @param double_value    the double value to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_double(string member_name, double double_value)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@double(double_value));
+	}	
+	
+	/**
+	 * Add a new string value member to an object.
+	 * 
+	 * @param member_name     the name of a member to add
+	 * @param string_value    the string value to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_string(string member_name, string string_value)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@string(string_value));
+	}
+	
+	/**
+	 * Add a new formatted string value member to an object.
+	 * 
+	 * @param member_name    the name of a member to add
+	 * @param format         the format string of the value to add
+	 * @param ...            Printf parameters
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	[PrintFormat]
+	public unowned JsonBuilder set_printf(string member_name, string format, ...)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@string(format.vprintf(va_list())));
+	}
+	
+	/**
+	 * Add `null` value member to an object.
+	 * 
+	 * @param member_name    the name of a member to add
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_null(string member_name)
+	{
+		set_member(member_name);
+		return add(new JsonValue.@null());
+	}
+	
+	/**
 	 * Reset the builder to the initial state
 	 */
 	public void reset()
