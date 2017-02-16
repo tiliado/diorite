@@ -213,7 +213,7 @@ public class JsonBuilder
 	 * @param ...       Printf parameters
 	 * @return this JsonBuilder object for easier chaining
 	 */
-	[PrintFormat]
+	[PrintfFormat]
 	public unowned JsonBuilder add_printf(string format, ...)
 	{
 		return add(new JsonValue.@string(format.vprintf(va_list())));
@@ -305,7 +305,7 @@ public class JsonBuilder
 	 * @param ...            Printf parameters
 	 * @return this JsonBuilder object for easier chaining
 	 */
-	[PrintFormat]
+	[PrintfFormat]
 	public unowned JsonBuilder set_printf(string member_name, string format, ...)
 	{
 		set_member(member_name);

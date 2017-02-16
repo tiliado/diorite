@@ -320,7 +320,7 @@ public class JsonArrayTest: Diorite.TestCase
 				break;
 			case "array":
 				if (expect_type_of<JsonArray>(node, "array[%s]", key))
-					expect_true(node.is_array(), "array[%s] is %s", i, results[i]);
+					expect_true(node.is_array(), "array[%s] is %s", key, results[i]);
 				break;
 			case "object":
 				if (expect_type_of<JsonObject>(node, "array[%s]", key))

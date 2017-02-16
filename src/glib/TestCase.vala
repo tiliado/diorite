@@ -104,7 +104,7 @@ public abstract class TestCase: GLib.Object
 	 * @param expression    expression expected to be true
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert(bool expression, string format, ...) throws TestError
 	{
 		if (!process(expression, format, va_list()))
@@ -118,7 +118,7 @@ public abstract class TestCase: GLib.Object
 	 * 
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_not_reached(string format, ...) throws TestError
 	{
 		process(false, format, va_list());
@@ -133,7 +133,7 @@ public abstract class TestCase: GLib.Object
 	 * @param expression    expression expected to be true
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect(bool expression, string format, ...)
 	{
 		return process(expression, format, va_list());
@@ -147,7 +147,7 @@ public abstract class TestCase: GLib.Object
 	 * @param expression    expression expected to be true
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_true(bool expression, string format, ...)
 	{
 		return process(expression, format, va_list());
@@ -161,7 +161,7 @@ public abstract class TestCase: GLib.Object
 	 * @param expression    expression expected to be false
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_false(bool expression, string format, ...)
 	{
 		return process(!expression, format, va_list());
@@ -176,7 +176,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_int_equals(int expected, int value, string format, ...)
 	{
 		return process(expected == value, "%s: %d == %d".printf(format, expected, value), va_list());
@@ -191,7 +191,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_uint_equals(uint expected, uint value, string format, ...)
 	{
 		return process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list());
@@ -206,7 +206,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_uint_equals(uint expected, uint value, string format, ...) throws TestError
 	{
 		if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list()))
@@ -222,7 +222,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_int64_equals(int64 expected, int64 value, string format, ...)
 	{
 		return process(expected == value, "%s: %s == %s".printf(
@@ -238,7 +238,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_double_equals(double expected, double value, string format, ...)
 	{
 		return process(expected == value, "%s: %s == %s".printf(
@@ -254,7 +254,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_str_equals(string? expected, string? value, string format, ...)
 	{
 		var result = process(expected == value, format, va_list());
@@ -272,7 +272,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_str_not_equal(string? expected, string? value, string format, ...)
 	{
 		var result = process(expected != value, format, va_list());
@@ -290,7 +290,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_blob_equal(uint8[]? expected, uint8[]? value, string format, ...)
 	{
 		return process_bytes_equal(
@@ -308,7 +308,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, ...)
 	{
 		return process_bytes_equal(expected, value, format, va_list());
@@ -324,7 +324,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_byte_array_equal(GLib.ByteArray? expected, GLib.ByteArray? value, string format, ...)
 	{
 		return process_bytes_equal(
@@ -360,7 +360,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...)
 	{
 		return process_value_equal(expected, actual, format, va_list());
@@ -375,7 +375,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) throws TestError
 	{
 		if (!process_value_equal(expected, actual, format, va_list()))
@@ -397,14 +397,14 @@ public abstract class TestCase: GLib.Object
 	 * Test is not terminated.
 	 */
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expectation_failed(string format, ...)
 	{
 		return process(false, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void fail(string format="", ...) throws TestError
 	{
 		process(false, format, va_list());
@@ -412,7 +412,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void message(string format, ...)
 	{
 		if (!Test.quiet())
@@ -485,7 +485,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_no_error(TestCallback func, string format, ...)
 	{
 		string? err = null;
@@ -504,7 +504,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_error(TestCallback func, string message_pattern, string format, ...)
 	{
 		var result = false;
@@ -530,14 +530,14 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_type(Type expected_type, void* object, string format, ...)
 	{
 		return expect_type_internal(expected_type, object, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_type_of<T>(void* object, string format, ...)
 	{
 		return expect_type_internal(typeof(T), object, format, va_list());
@@ -562,7 +562,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_enum<T>(T expected, T found, string format, ...)
 	{
 		var expected_type = typeof(T);
@@ -608,14 +608,14 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_null<T>(T? val, string format, ...)
 	{
 		return process(val == null, "assertion val is null failed; " + format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_not_null<T>(T? val, string format, ...)
 	{
 		return process(val != null, "assertion val is not null failed; " + format, va_list());
@@ -635,21 +635,21 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_str_match(string pattern, string data, string format, ...)
 	{
 		return process_str_match(true, pattern, data, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_str_not_match(string pattern, string data, string format, ...)
 	{
 		return process_str_match(false, pattern, data, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_str_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(true, pattern, data, format, va_list()))
@@ -657,7 +657,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_str_not_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(false, pattern, data, format, va_list()))
@@ -673,7 +673,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected void assert_array<T>(T[] expected, T[] found, EqualData eq, string format, ...) throws TestError
 	{
 		if(!process_array<T>(expected, found, eq, format, va_list()))
@@ -681,7 +681,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_array<T>(T[] expected, T[] found, EqualData eq, string format, ...)
 	{
 		return process_array<T>(expected, found, eq, format, va_list());
@@ -757,21 +757,21 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_critical_message(string? domain, string text_pattern, string format, ...)
 	{
 		return expect_log_message_va(domain, LogLevelFlags.LEVEL_CRITICAL, text_pattern, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_warning_message(string? domain, string text_pattern, string format, ...)
 	{
 		return expect_log_message_va(domain, LogLevelFlags.LEVEL_WARNING, text_pattern, format, va_list());
 	}
 	
 	[Diagnostics]
-	[PrintFormat]
+	[PrintfFormat]
 	protected bool expect_log_message(string? domain, LogLevelFlags level, string text_pattern, string format, ...)
 	{
 		return expect_log_message_va(domain, level, text_pattern, format, va_list());

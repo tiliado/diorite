@@ -347,7 +347,7 @@ public class QueryTest: Diorite.TestCase
 				}
 				catch (GLib.Error e)
 				{
-					expectation_failed("value %d; %s", value, e.message);
+					expectation_failed("value %d; %s", (int) value, e.message);
 				}
 				try
 				{
@@ -355,7 +355,7 @@ public class QueryTest: Diorite.TestCase
 				}
 				catch (GLib.Error e)
 				{
-					expectation_failed("value %d; %s", value, e.message);
+					expectation_failed("value %d; %s", (int) value, e.message);
 				}
 			}
 			
