@@ -119,11 +119,7 @@ public class RichTextView: Gtk.TextView
 			{
 				unowned Gdk.Color? color = null;
 				style_get("link-color", out color);
-				if (!prop.value_type.is_a(typeof(Gdk.Color)))
-					warning("Style property link-color is not a Gdk.Color, but %s", prop.value_type.name());
-				else if (color == null) // See tiliado/nuvolaplayer#197
-					warning("Style property link-color is a Gdk.Color, but null");
-				else
+				if (!prop.value_type.is_a(typeof(Gdk.Color)) && color != null) // See tiliado/nuvolaplayer#197
 					link_color = {color.red / 65535.0, color.green / 65535.0, color.blue / 65535.0, 1.0};
 			}
 		}
