@@ -38,16 +38,16 @@ public class Logger
 	private static DateTime? time_ref;
 	private static PatternSpec? fatal_string;
 	
-	public static const int COLOR_FOREGROUND = 30;
-	public static const int COLOR_BACKGROUND = 40;
-	public static const int COLOR_BLACK = 0;
-	public static const int COLOR_RED = 1;
-	public static const int COLOR_GREEN = 2;
-	public static const int COLOR_YELLOW = 3;
-	public static const int COLOR_BLUE = 4;
-	public static const int COLOR_MAGENTA = 5;
-	public static const int COLOR_CYAN = 6;
-	public static const int COLOR_WHITE = 7;
+	public const int COLOR_FOREGROUND = 30;
+	public const int COLOR_BACKGROUND = 40;
+	public const int COLOR_BLACK = 0;
+	public const int COLOR_RED = 1;
+	public const int COLOR_GREEN = 2;
+	public const int COLOR_YELLOW = 3;
+	public const int COLOR_BLUE = 4;
+	public const int COLOR_MAGENTA = 5;
+	public const int COLOR_CYAN = 6;
+	public const int COLOR_WHITE = 7;
 	
 	/**
 	 * Initializes new logger for GLib

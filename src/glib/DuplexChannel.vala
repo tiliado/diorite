@@ -29,11 +29,11 @@ namespace Drt
 
 public abstract class DuplexChannel: GLib.Object
 {
-	private static const bool REQUEST = false;
-	private static const bool RESPONSE = true;
-	private static const uint32 HEADER_MASK = (uint32) (1 << 31);
-	private static const uint32 MAX_ID = (uint32) ~(1 << 31);
-	private static const int MESSAGE_BUFSIZE = 512;
+	private const bool REQUEST = false;
+	private const bool RESPONSE = true;
+	private const uint32 HEADER_MASK = (uint32) (1 << 31);
+	private const uint32 MAX_ID = (uint32) ~(1 << 31);
+	private const int MESSAGE_BUFSIZE = 512;
 	private static bool log_comunication;
 	private static bool timeout_fatal;
 	public uint id {get; private set;}

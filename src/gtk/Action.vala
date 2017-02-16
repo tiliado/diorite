@@ -30,9 +30,9 @@ public delegate void ActionCallbackWithParam(Variant parameter);
 
 public abstract class Action: GLib.Object
 {
-	public static const string SCOPE_NONE = "none";
-	public static const string SCOPE_APP = "app";
-	public static const string SCOPE_WIN = "win";
+	public const string SCOPE_NONE = "none";
+	public const string SCOPE_APP = "app";
+	public const string SCOPE_WIN = "win";
 	
 	protected GLib.SimpleAction action;
 	protected ActionCallback? callback;

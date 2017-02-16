@@ -22,7 +22,7 @@
 namespace Dioritedb
 {
 
-private static const string TABLE_USERS_SQL = """
+private const string TABLE_USERS_SQL = """
 CREATE TABLE DioritedbUser(
 	id INTEGER PRIMARY KEY ASC,
 	name TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE DioritedbUser(
 	extra BLOB
 )""";
 
-private static const string TABLE_USERS_NAME = "DioritedbUser";
+private const string TABLE_USERS_NAME = "DioritedbUser";
 
 private class User : GLib.Object
 {

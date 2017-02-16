@@ -64,53 +64,53 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Name of a Gtk.TextTag for tag <h1>.
 	 */
-	public static const string TEXT_TAG_HEADING1 = "h1";
+	public const string TEXT_TAG_HEADING1 = "h1";
 	/**
 	 * Name of a Gtk.TextTag for tag <h2>.
 	 */
-	public static const string TEXT_TAG_HEADING2 = "h2";
+	public const string TEXT_TAG_HEADING2 = "h2";
 	/**
 	 * Name of a Gtk.TextTag for tag <h3>.
 	 */
-	public static const string TEXT_TAG_HEADING3 = "h3";
+	public const string TEXT_TAG_HEADING3 = "h3";
 	/**
 	 * Name of a Gtk.TextTag for tag <p>.
 	 */
-	public static const string TEXT_TAG_PARAGRAPH = "p";
+	public const string TEXT_TAG_PARAGRAPH = "p";
 	/**
 	 * Name of a Gtk.TextTag for tag <b>.
 	 */
-	public static const string TEXT_TAG_BOLD = "b";
+	public const string TEXT_TAG_BOLD = "b";
 	/**
 	 * Name of a Gtk.TextTag for tag <i>.
 	 */
-	public static const string TEXT_TAG_ITALIC = "i";
+	public const string TEXT_TAG_ITALIC = "i";
 	/**
 	 * Name of a Gtk.TextTag for tag <dl>.
 	 */
-	public static const string TEXT_TAG_DEFINITION_LIST = "dl";
+	public const string TEXT_TAG_DEFINITION_LIST = "dl";
 	/**
 	 * Name of a Gtk.TextTag for tag <dt>.
 	 */
-	public static const string TEXT_TAG_DEFINED_TERM = "dt";
+	public const string TEXT_TAG_DEFINED_TERM = "dt";
 	/**
 	 * Name of a Gtk.TextTag for tag <dd>.
 	 */
-	public static const string TEXT_TAG_DEFINITION = "dd";
+	public const string TEXT_TAG_DEFINITION = "dd";
 	/**
 	 * Name of a Gtk.TextTag for tag <ul>.
 	 */
-	public static const string TEXT_TAG_UNORDERED_LIST = "ul";
+	public const string TEXT_TAG_UNORDERED_LIST = "ul";
 	/**
 	 * Name of a Gtk.TextTag for tag <li>.
 	 */
-	public static const string TEXT_TAG_LIST_ITEM = "li";
+	public const string TEXT_TAG_LIST_ITEM = "li";
 	/**
 	 * Name of a hashtable key for path of images.
 	 * 
 	 * var path = pixbuf.get_data<string?>(IMAGE_PATH);
 	 */
-	public static const string IMAGE_PATH = "path";
+	public const string IMAGE_PATH = "path";
 	
 	private Gdk.RGBA? _link_color = null;
 	[Description(nick = "Link color", blurb = "Foreground color for links.")]
@@ -131,23 +131,23 @@ public class RichTextBuffer: Gtk.TextBuffer
 	public ImageLocator? image_locator {get; owned set;}
 	
 	/* Input tags supported by parser */
-	private static const string INPUT_TAG_HEADING1 = "h1";
-	private static const string INPUT_TAG_HEADING2 = "h2";
-	private static const string INPUT_TAG_HEADING3 = "h3";
-	private static const string INPUT_TAG_PARA = "p";
-	private static const string INPUT_TAG_LINE_BREAK = "br";
-	private static const string INPUT_TAG_BOLD = "b";
-	private static const string INPUT_TAG_STRONG = "strong";
-	private static const string INPUT_TAG_ITALIC = "i";
-	private static const string INPUT_TAG_EM = "em";
-	private static const string INPUT_TAG_LINK = "a";
-	private static const string LINK_TARGET = "href";
-	private static const string INPUT_TAG_DL = "dl";
-	private static const string INPUT_TAG_DT = "dt";
-	private static const string INPUT_TAG_DD = "dd";
-	private static const string INPUT_TAG_IMAGE = "img";
-	private static const string INPUT_TAG_UL = "ul";
-	private static const string INPUT_TAG_LI = "li";
+	private const string INPUT_TAG_HEADING1 = "h1";
+	private const string INPUT_TAG_HEADING2 = "h2";
+	private const string INPUT_TAG_HEADING3 = "h3";
+	private const string INPUT_TAG_PARA = "p";
+	private const string INPUT_TAG_LINE_BREAK = "br";
+	private const string INPUT_TAG_BOLD = "b";
+	private const string INPUT_TAG_STRONG = "strong";
+	private const string INPUT_TAG_ITALIC = "i";
+	private const string INPUT_TAG_EM = "em";
+	private const string INPUT_TAG_LINK = "a";
+	private const string LINK_TARGET = "href";
+	private const string INPUT_TAG_DL = "dl";
+	private const string INPUT_TAG_DT = "dt";
+	private const string INPUT_TAG_DD = "dd";
+	private const string INPUT_TAG_IMAGE = "img";
+	private const string INPUT_TAG_UL = "ul";
+	private const string INPUT_TAG_LI = "li";
 	private const MarkupParser parser = {start_tag, end_tag, element_text, null, null};
 	private Regex strip_spaces;
 	private bool insert_new_line = false;

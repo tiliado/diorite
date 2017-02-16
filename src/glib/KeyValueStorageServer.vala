@@ -27,14 +27,14 @@ namespace Diorite
 
 public class KeyValueStorageServer: GLib.Object
 {
-	internal static const string METHOD_ADD_LISTENER = "/diorite/keyvaluestorageserver/add_listener";
-	internal static const string METHOD_REMOVE_LISTENER = "/diorite/keyvaluestorageserver/remove_listener";
-	internal static const string METHOD_HAS_KEY = "/diorite/keyvaluestorageserver/has_key";
-	internal static const string METHOD_GET_VALUE = "/diorite/keyvaluestorageserver/get_value";
-	internal static const string METHOD_SET_VALUE = "/diorite/keyvaluestorageserver/set_value";
-	internal static const string METHOD_UNSET = "/diorite/keyvaluestorageserver/unset";
-	internal static const string METHOD_SET_DEFAULT_VALUE = "/diorite/keyvaluestorageserver/set_default_value";
-	internal static const string METHOD_CHANGED = "/diorite/keyvaluestorageserver/changed";
+	internal const string METHOD_ADD_LISTENER = "/diorite/keyvaluestorageserver/add_listener";
+	internal const string METHOD_REMOVE_LISTENER = "/diorite/keyvaluestorageserver/remove_listener";
+	internal const string METHOD_HAS_KEY = "/diorite/keyvaluestorageserver/has_key";
+	internal const string METHOD_GET_VALUE = "/diorite/keyvaluestorageserver/get_value";
+	internal const string METHOD_SET_VALUE = "/diorite/keyvaluestorageserver/set_value";
+	internal const string METHOD_UNSET = "/diorite/keyvaluestorageserver/unset";
+	internal const string METHOD_SET_DEFAULT_VALUE = "/diorite/keyvaluestorageserver/set_default_value";
+	internal const string METHOD_CHANGED = "/diorite/keyvaluestorageserver/changed";
 	
 	public Drt.ApiRouter router {get; construct;}
 	private HashTable<string, Provider?> providers;
