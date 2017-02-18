@@ -1,6 +1,11 @@
 Diorite Changelog
 =================
 
+Release 0.2.2 - February 18, 2017
+---------------------------------
+
+  * Add Add System.resolve_symlink function. 
+
 Release 0.2.1 - January 23, 2016
 --------------------------------
 

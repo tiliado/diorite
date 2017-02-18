@@ -1,4 +1,4 @@
-Diorite Library 0.2.1
+Diorite Library 0.2.2
 =====================
 
 ![Diorite stone](diorite.jpg)
