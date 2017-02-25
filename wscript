@@ -29,7 +29,7 @@ out = 'build'
 
 # Application name and version
 APPNAME = "diorite"
-VERSION = "0.3.1+"
+VERSION = "0.3.2+"
 SERIES = VERSION.rsplit(".", 1)[0]
 
 TARGET_GLIB_TUPLE = (2, 40)
@@ -41,22 +41,18 @@ import subprocess
 try:
 	try:
 		# Read revision info from file revision-info created by ./waf dist
-		timestamp, short_id, long_id = open("upstream-revision", "r").read().split(" ", 2)
+		with open("version-info.txt", "rt") as f:
+			__, revision_id = f.read().strip().split("-", 1)
 	except Exception as e:
 		# Read revision info from current branch
-		output = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%ct %h %H"], stdout=subprocess.PIPE).communicate()[0]
-		timestamp, short_id, long_id = output.decode("utf-8").split(" ", 2)
-	
-	from datetime import datetime
-	timestamp = datetime.utcfromtimestamp(int(timestamp))
+		output = subprocess.Popen(["git", "describe", "--tags", "--long"], stdout=subprocess.PIPE).communicate()[0]
+		__, revision_id = output.decode("utf-8").strip().split("-", 1)
+	revision_id = revision_id.replace("-", ".")
 except Exception as e:
-	timestamp, short_id, long_id = None, "fuzzy", "fuzzy"
+	revision_id = "snapshot"
 
 if VERSION[-1] == "+":
-	if timestamp:
-		VERSION += "{}.{}".format(timestamp.strftime("%Y%m%d%H%M"), short_id)
-	else:
-		VERSION = VERSION[:-1]
+	VERSION += revision_id
 
 import sys
 from waflib.Configure import conf
@@ -130,8 +126,8 @@ def configure(ctx):
 		sys.exit(1)
 	
 	ctx.msg("Version", VERSION, "GREEN")
-	if long_id != "fuzzy":
-		ctx.msg("Upstream revision", long_id, "GREEN")
+	if revision_id != "snapshot":
+		ctx.msg("Upstream revision", revision_id, "GREEN")
 	else:
 		ctx.msg("Upstream revision", "unknown (unsupported build)", "RED")
 	
@@ -200,7 +196,7 @@ def configure(ctx):
 		VERSION_SUFFIX = VERSIONS[1]
 	VERSIONS = tuple(int(i) for i in VERSIONS[0].split("."))
 	ctx.define("DRT_VERSION", VERSION)
-	ctx.define("DRT_REVISION", long_id)
+	ctx.define("DRT_REVISION", revision_id)
 	ctx.define("DRT_VERSION_MAJOR", VERSIONS[0])
 	ctx.define("DRT_VERSION_MINOR", VERSIONS[1])
 	ctx.define("DRT_VERSION_BUGFIX", VERSIONS[2])
@@ -373,11 +369,11 @@ def build(ctx):
 def dist(ctx):
 	ctx.algo = "tar.gz"
 	ctx.excl = '.git .gitignore build/* **/.waf* **/*~ **/*.swp **/.lock* **/*.pyc'
-	ctx.exec_command("git log -n 1 --pretty='format:%ct %h %H' > upstream-revision")
+	ctx.exec_command("git describe --tags --long > version-info.txt")
 	
 	def archive():
 		ctx._archive()
-		node = ctx.path.find_node("upstream-revision")
+		node = ctx.path.find_node("version-info.txt")
 		if node:
 			node.delete()
 	ctx._archive = ctx.archive
