@@ -45,7 +45,7 @@ try:
 	except Exception as e:
 		# Read revision info from current branch
 		output = subprocess.Popen(["git", "log", "-n", "1", "--pretty=format:%ct %h %H"], stdout=subprocess.PIPE).communicate()[0]
-		timestamp, short_id, long_id = output.split(" ", 2)
+		timestamp, short_id, long_id = output.decode("utf-8").split(" ", 2)
 	
 	from datetime import datetime
 	timestamp = datetime.utcfromtimestamp(int(timestamp))
