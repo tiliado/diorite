@@ -59,19 +59,18 @@ public abstract class Application : Gtk.Application
 	private XfceSessionManager? xfce_session = null;
 	#endif
 	
-	public Application(string app_uid, string app_name, string desktop_name, string app_id,
-	  GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
+	public Application(string uid, string name, GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
 	{
-		Object(application_id: app_uid, flags: flags);
-		this.app_name = app_name;
-		this.desktop_name = desktop_name;
-		this.app_id = app_id;
+		Object(application_id: uid, flags: flags);
+		this.app_name = name;
+		this.desktop_name = uid + ".desktop";
+		this.app_id = uid;
 		actions = new ActionsRegistry(this);
 		#if LINUX
-		prctl(15, app_id, 0, 0, 0);
+		prctl(15, uid, 0, 0, 0);
 		#endif
-		GLib.Environment.set_prgname(app_id);
-		GLib.Environment.set_application_name(app_name);
+		GLib.Environment.set_prgname(uid);
+		GLib.Environment.set_application_name(name);
 	}
 	
 	public virtual signal void fatal_error(string title, string message)
