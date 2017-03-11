@@ -60,6 +60,15 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 		return (ChannelType) channel;
 	}
 	
+	public ChannelType connect_channel_socket(Socket socket, uint timeout) throws Diorite.IOError
+	{
+		var id = get_next_client_id();
+		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
+			id: id, channel: new Diorite.SocketChannel.from_socket(id, socket, timeout), router: base_router);
+		clients[id.to_pointer()] = channel;
+		return (ChannelType) channel;
+	}
+	
 	public signal void incoming(ChannelType channel);
 	
 	private void create_service() throws Diorite.IOError
