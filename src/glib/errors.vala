@@ -32,7 +32,8 @@ public errordomain Error
 	NOT_SUPPORTED,
 	NOT_IMPLEMENTED,
 	IOERROR,
-	NOT_FOUND;
+	NOT_FOUND,
+	ACCESS_DENIED;
 }
 
 public errordomain IOError
