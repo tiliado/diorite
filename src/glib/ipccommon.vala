@@ -29,7 +29,7 @@ public const string RESPONSE_ERROR = "ERROR";
 
 private string create_path(string name)
 {
-	var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "libdiorite", "sockets");
+	var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
 	try
 	{
 		File.new_for_path(dir_path).make_directory_with_parents();
