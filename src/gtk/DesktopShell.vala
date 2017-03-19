@@ -31,9 +31,13 @@ public abstract class DesktopShell: GLib.Object
 	public bool shows_app_menu {get; protected set; default = false;}
 	public bool shows_menu_bar {get; protected set; default = false;}
 	public bool client_side_decorations {get; protected set; default = false;}
+	#if !FLATPAK
 	public string? wm_name {get; protected set; default = null;}
 	public string? wm_name_exact {get; protected set; default = null;}
 	public string? wm_version {get; protected set; default = null;}
+	#else
+	public bool dialogs_use_header {get; protected set; default = false;}
+	#endif
 	
 	public static DesktopShell get_default()
 	{
@@ -47,6 +51,7 @@ public abstract class DesktopShell: GLib.Object
 		DesktopShell.default_shell = default_shell;
 	}
 	
+	#if !FLATPAK
 	protected Gdk.X11.Window? inspect_window_manager()
 	{
 		var net_wm_check_window = X11.get_net_wm_check_window();
@@ -67,17 +72,25 @@ public abstract class DesktopShell: GLib.Object
 		}
 		return net_wm_check_window;
 	}
+	#endif
 }
 
 private class DefaultDesktopShell: DesktopShell
 {
 	public DefaultDesktopShell()
 	{
-		inspect_window_manager();
+		
 		var gs = Gtk.Settings.get_default();
 		shows_app_menu = gs.gtk_shell_shows_app_menu;
 		shows_menu_bar = gs.gtk_shell_shows_menubar;
-		
+		#if FLATPAK
+		dialogs_use_header = gs.gtk_dialogs_use_header;
+		client_side_decorations = shows_app_menu && !shows_menu_bar || dialogs_use_header;
+		debug(
+			"Shell: CSD %d, appmenu %d, menubar %d, dialog header %d", (int) client_side_decorations,
+			(int) shows_app_menu, (int) shows_menu_bar, (int) dialogs_use_header);
+		#else
+		inspect_window_manager();
 		switch (wm_name)
 		{
 		case "gnome shell":
@@ -96,6 +109,7 @@ private class DefaultDesktopShell: DesktopShell
 		debug(
 			"Shell: %s %s, CSD %d, appmenu %d, menubar %d", wm_name, wm_version,
 			(int) client_side_decorations, (int) shows_app_menu, (int) shows_menu_bar);
+		#endif
 	}
 }
 
@@ -104,12 +118,18 @@ private class GnomeDesktopShell: DesktopShell
 {
 	public GnomeDesktopShell()
 	{
-		inspect_window_manager();
+		
 		var gs = Gtk.Settings.get_default();
 		shows_app_menu = gs.gtk_shell_shows_app_menu = true;
 		shows_menu_bar = gs.gtk_shell_shows_menubar = false;
 		client_side_decorations = true;
+		#if FLATPAK
+		dialogs_use_header = gs.gtk_dialogs_use_header = true;
+		debug("Shell GNOME: CSD %s", client_side_decorations ? "on" : "off");
+		#else
+		inspect_window_manager();
 		debug("Shell (GNOME): %s %s, CSD %s", wm_name, wm_version, client_side_decorations ? "on" : "off");
+		#endif
 	}
 }
 
@@ -118,12 +138,17 @@ private class UnityDesktopShell: DesktopShell
 {
 	public UnityDesktopShell()
 	{
-		inspect_window_manager();
 		var gs = Gtk.Settings.get_default();
 		shows_app_menu = gs.gtk_shell_shows_app_menu = true;
 		shows_menu_bar = gs.gtk_shell_shows_menubar = true;
 		client_side_decorations = false;
+		#if FLATPAK
+		dialogs_use_header = gs.gtk_dialogs_use_header = false;
+		debug("Shell Unity: CSD %s", client_side_decorations ? "on" : "off");
+		#else
+		inspect_window_manager();
 		debug("Shell (Unity): %s %s, CSD %s", wm_name, wm_version, client_side_decorations ? "on" : "off");
+		#endif
 	}
 }
 
@@ -132,12 +157,17 @@ private class XfceDesktopShell: DesktopShell
 {
 	public XfceDesktopShell()
 	{
-		inspect_window_manager();
 		var gs = Gtk.Settings.get_default();
 		shows_app_menu = gs.gtk_shell_shows_app_menu = false;
 		shows_menu_bar = gs.gtk_shell_shows_menubar = false;
 		client_side_decorations = false;
+		#if FLATPAK
+		dialogs_use_header = gs.gtk_dialogs_use_header = false;
+		debug("Shell XFCE: CSD %s", client_side_decorations ? "on" : "off");
+		#else
+		inspect_window_manager();
 		debug("Shell (XFCE): %s %s, CSD %s", wm_name, wm_version, client_side_decorations ? "on" : "off");
+		#endif
 	}
 }
 
