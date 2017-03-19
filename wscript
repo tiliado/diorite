@@ -112,6 +112,7 @@ def options(ctx):
 	ctx.load('compiler_c vala')
 	ctx.add_option('--noopt', action='store_true', default=False, dest='noopt', help="Turn off compiler optimizations")
 	ctx.add_option('--debug', action='store_true', default=True, dest='debug', help="Turn on debugging symbols")
+	ctx.add_option('--flatpak', action='store_true', default=False, dest='flatpak', help="Enable Flatpak tweaks.")
 	ctx.add_option('--no-debug', action='store_false', dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--no-ldconfig', action='store_false', default=True, dest='ldconfig', help="Don't run ldconfig after installation")
 	ctx.add_option('--platform', default=_PLATFORM, help="Target platform")
@@ -137,6 +138,11 @@ def configure(ctx):
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
 	ctx.load('compiler_c vala')
+	
+	# Flatpak build
+	ctx.env.FLATPAK = ctx.options.flatpak
+	if ctx.env.FLATPAK:
+		ctx.vala_def("FLATPAK")
 	
 	# Enable experimental API
 	ctx.env.EXPERIMENTAL = ctx.options.experimental
