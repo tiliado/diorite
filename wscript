@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+# Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met: 
@@ -29,7 +29,7 @@ out = 'build'
 
 # Application name and version
 APPNAME = "diorite"
-VERSION = "0.3.2+"
+VERSION = "0.3.3"
 SERIES = VERSION.rsplit(".", 1)[0]
 
 TARGET_GLIB_TUPLE = (2, 40)
@@ -51,8 +51,7 @@ try:
 except Exception as e:
 	revision_id = "snapshot"
 
-if VERSION[-1] == "+":
-	VERSION += revision_id
+VERSION += "+" + revision_id
 
 import sys
 from waflib.Configure import conf
