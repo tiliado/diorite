@@ -35,4 +35,36 @@ public bool const_time_byte_equal(uint8[] a, uint8[] b)
 	return diff == 0;
 }
 
+public Array<int?> wrap_intv(int[] array)
+{
+	var result = new Array<int?>();
+	foreach (var value in array)
+		result.append_val(value);
+	return result;
+}
+
+public Array<double?> wrap_doublev(double[] array)
+{
+	var result = new Array<double?>();
+	foreach (var value in array)
+		result.append_val(value);
+	return result;
+}
+	
+public Array<bool?> wrap_boolv(bool[] array)
+{
+	var result = new Array<bool?>();
+	foreach (var value in array)
+		result.append_val(value);
+	return result;
+}
+
+public Array<string?> wrap_strv(string?[] array)
+{
+	var result = new Array<string?>();
+	foreach (var value in array)
+		result.append_val(value);
+	return result;
+}
+
 } // namespace Drt.Utils

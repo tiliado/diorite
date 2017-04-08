@@ -43,10 +43,8 @@ public abstract class TestCase: GLib.Object
 {	
 	public static bool str_eq(void* data1, void* data2)
 	{
-		uint8* p1 = *((uint8**) data1);
-		uint8* p2 = *((uint8**) data2);
-		unowned string str1 = (string) p1;
-		unowned string str2 = (string) p2;
+		unowned string str1 = (string) data1;
+		unowned string str2 = (string) data2;
 		return str_equal(str1, str2);
 	}
 	
@@ -104,7 +102,7 @@ public abstract class TestCase: GLib.Object
 	 * @param expression    expression expected to be true
 	 */
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert(bool expression, string format, ...) throws TestError
 	{
 		if (!process(expression, format, va_list()))
@@ -118,7 +116,7 @@ public abstract class TestCase: GLib.Object
 	 * 
 	 */
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert_not_reached(string format, ...) throws TestError
 	{
 		process(false, format, va_list());
@@ -206,7 +204,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert_uint_equals(uint expected, uint value, string format, ...) throws TestError
 	{
 		if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list()))
@@ -375,7 +373,7 @@ public abstract class TestCase: GLib.Object
 	 * @param value       real value
 	 */
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) throws TestError
 	{
 		if (!process_value_equal(expected, actual, format, va_list()))
@@ -404,7 +402,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void fail(string format="", ...) throws TestError
 	{
 		process(false, format, va_list());
@@ -649,7 +647,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert_str_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(true, pattern, data, format, va_list()))
@@ -657,7 +655,7 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintfFormat]
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
 	protected void assert_str_not_match(string pattern, string data, string format, ...) throws TestError
 	{
 		if (!process_str_match(false, pattern, data, format, va_list()))
@@ -673,23 +671,23 @@ public abstract class TestCase: GLib.Object
 	}
 	
 	[Diagnostics]
-	[PrintfFormat]
-	protected void assert_array<T>(T[] expected, T[] found, EqualData eq, string format, ...) throws TestError
+	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+	protected void assert_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, ...) throws TestError
 	{
-		if(!process_array<T>(expected, found, eq, format, va_list()))
+		if(!process_array(expected, found, eq, format, va_list()))
 			abort_test();
 	}
 	
 	[Diagnostics]
 	[PrintfFormat]
-	protected bool expect_array<T>(T[] expected, T[] found, EqualData eq, string format, ...)
+	protected bool expect_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, ...)
 	{
 		return process_array<T>(expected, found, eq, format, va_list());
 	}
 	
-	protected bool process_array<T>(T[] expected, T[] found, EqualData eq, string format, va_list args)
+	protected bool process_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, va_list args)
 	{
-		var limit = int.max(expected.length, found.length);
+		var limit = uint.max(expected.length, found.length);
 		var result = true;
 		if (expected.length != found.length)
 		{
@@ -698,7 +696,7 @@ public abstract class TestCase: GLib.Object
 				
 			result = false;
 			if (!Test.quiet())
-				stdout.printf("\tLength mismatch: %d != %d\n", expected.length, found.length);
+				stdout.printf("\tLength mismatch: %u != %u\n", expected.length, found.length);
 		}
 		
 		for (var i = 0; i < limit; i++)
@@ -721,7 +719,7 @@ public abstract class TestCase: GLib.Object
 				if (!Test.quiet())
 					stdout.printf("\tMissing element (%d)\n", i);
 			}
-			else if (!eq(&expected[i], &found[i]))
+			else if (!eq(expected.data[i], found.data[i]))
 			{
 				if (result)
 					print_result(false, format, args);

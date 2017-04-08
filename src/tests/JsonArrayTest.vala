@@ -19,6 +19,8 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
+using Drt.Utils;
+
 namespace Drt
 {
 
@@ -700,18 +702,18 @@ public class JsonArrayTest: Diorite.TestCase
 		bool[] empty = {};
 		bool[] result;
 		expect_false(array.as_bool_array(out result), "not bool array");
-		expect_array<bool>(empty, result, bool_eq, "array eq");
+		expect_array(wrap_boolv(empty), wrap_boolv(result), bool_eq, "array eq");
 		
 		expect_true(new JsonArray().as_bool_array(out result), "empty bool array");
-		expect_array<bool>(empty, result, bool_eq, "array eq");
+		expect_array(wrap_boolv(empty), wrap_boolv(result), bool_eq, "array eq");
 		
 		array = JsonParser.load_array("[true, false, null]");
 		expect_false(array.as_bool_array(out result), "not bool array");
-		expect_array<bool>(empty, result, bool_eq, "array eq");
+		expect_array(wrap_boolv(empty), wrap_boolv(result), bool_eq, "array eq");
 		
 		array = JsonParser.load_array("[true, false, true]");
 		expect_true(array.as_bool_array(out result), "bool array");
-		expect_array<bool>(new bool[]{true, false, true}, result, bool_eq, "array eq");
+		expect_array(wrap_boolv({true, false, true}), wrap_boolv(result), bool_eq, "array eq");
 	}
 	
 	public void test_as_int_array() throws GLib.Error
@@ -720,18 +722,18 @@ public class JsonArrayTest: Diorite.TestCase
 		int[] empty = {};
 		int[] result;
 		expect_false(array.as_int_array(out result), "not int array");
-		expect_array<int>(empty, result, int_eq, "array eq");
+		expect_array(wrap_intv(empty), wrap_intv(result), int_eq, "array eq");
 		
 		expect_true(new JsonArray().as_int_array(out result), "empty int array");
-		expect_array<int>(empty, result, int_eq, "array eq");
+		expect_array(wrap_intv(empty), wrap_intv(result), int_eq, "array eq");
 		
 		array = JsonParser.load_array("[0, 1, null]");
 		expect_false(array.as_int_array(out result), "not int array");
-		expect_array<int>(empty, result, int_eq, "array eq");
+		expect_array(wrap_intv(empty), wrap_intv(result), int_eq, "array eq");
 		
 		array = JsonParser.load_array("[0, 10, -5]");
 		expect_true(array.as_int_array(out result), "int array");
-		expect_array<int>(new int[]{0, 10, -5}, result, bool_eq, "array eq");
+		expect_array(wrap_intv({0, 10, -5}), wrap_intv(result), int_eq, "array eq");
 	}
 	
 	public void test_as_double_array() throws GLib.Error
@@ -740,18 +742,18 @@ public class JsonArrayTest: Diorite.TestCase
 		double[] empty = {};
 		double[] result;
 		expect_false(array.as_double_array(out result), "not double array");
-		expect_array<double>(empty, result, double_eq, "array eq");
+		expect_array(wrap_doublev(empty), wrap_doublev(result), double_eq, "array eq");
 		
 		expect_true(new JsonArray().as_double_array(out result), "empty double array");
-		expect_array<double>(empty, result, double_eq, "array eq");
+		expect_array(wrap_doublev(empty), wrap_doublev(result), double_eq, "array eq");
 		
 		array = JsonParser.load_array("[0.5, 1.3, null]");
 		expect_false(array.as_double_array(out result), "not double array");
-		expect_array<double>(empty, result, double_eq, "array eq");
+		expect_array(wrap_doublev(empty), wrap_doublev(result), double_eq, "array eq");
 		
 		array = JsonParser.load_array("[0.5, 10.8, -5.7]");
 		expect_true(array.as_double_array(out result), "double array");
-		expect_array<double>(new double[]{0.5, 10.8, -5.7}, result, double_eq, "array eq");
+		expect_array(wrap_doublev({0.5, 10.8, -5.7}), wrap_doublev(result), double_eq, "array eq");
 	}
 	
 	public void test_as_string_array() throws GLib.Error
@@ -760,18 +762,18 @@ public class JsonArrayTest: Diorite.TestCase
 		string[] empty = {};
 		string[] result;
 		expect_false(array.as_string_array(out result), "not string array");
-		expect_array<string>(empty, result, str_eq, "array eq");
+		expect_array(wrap_strv(empty), wrap_strv(result), str_eq, "array eq");
 		
 		expect_true(new JsonArray().as_string_array(out result), "empty string array");
-		expect_array<string>(empty, result, str_eq, "array eq");
+		expect_array(wrap_strv(empty), wrap_strv(result), str_eq, "array eq");
 		
 		array = JsonParser.load_array("[\"\", \"str\", null]");
 		expect_false(array.as_string_array(out result), "not string array");
-		expect_array<string>(empty, result, str_eq, "array eq");
+		expect_array(wrap_strv(empty), wrap_strv(result), str_eq, "array eq");
 		
 		array = JsonParser.load_array("[\"\", \"str\", \"line1\\nline2\"]");
 		expect_true(array.as_string_array(out result), "string array");
-		expect_array<string>(new string[]{"", "str", "line1\nline2"}, result, str_eq, "array eq");
+		expect_array(wrap_strv({"", "str", "line1\nline2"}), wrap_strv(result), str_eq, "array eq");
 	}
 	
 	public void test_to_string() throws GLib.Error
