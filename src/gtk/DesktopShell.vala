@@ -105,15 +105,18 @@ private class DefaultDesktopShell: DesktopShell
 {
 	public DefaultDesktopShell()
 	{
-		
 		var gs = Gtk.Settings.get_default();
 		shows_app_menu = gs.gtk_shell_shows_app_menu;
 		shows_menu_bar = gs.gtk_shell_shows_menubar;
 		#if FLATPAK
 		dialogs_use_header = gs.gtk_dialogs_use_header;
 		client_side_decorations = shows_app_menu && !shows_menu_bar || dialogs_use_header;
+		if (!client_side_decorations)
+			client_side_decorations = have_shell("pantheon");
+			
 		debug(
-			"Shell: CSD %d, appmenu %d, menubar %d, dialog header %d", (int) client_side_decorations,
+			"Shell %s: CSD %d, appmenu %d, menubar %d, dialog header %d",
+			Environment.get_variable("XDG_CURRENT_DESKTOP"), (int) client_side_decorations,
 			(int) shows_app_menu, (int) shows_menu_bar, (int) dialogs_use_header);
 		#else
 		inspect_window_manager();
