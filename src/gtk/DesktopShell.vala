@@ -28,6 +28,7 @@ namespace Diorite
 public abstract class DesktopShell: GLib.Object
 {
 	private static DesktopShell? default_shell = null;
+	private static GenericSet<string> shells = null;
 	public bool shows_app_menu {get; protected set; default = false;}
 	public bool shows_menu_bar {get; protected set; default = false;}
 	public bool client_side_decorations {get; protected set; default = false;}
@@ -44,6 +45,31 @@ public abstract class DesktopShell: GLib.Object
 		if (DesktopShell.default_shell == null)
 			DesktopShell.default_shell = new DefaultDesktopShell();
 		return DesktopShell.default_shell;
+	}
+	
+	private static void gather_shell_info()
+	{
+		if (shells == null)
+		{
+			shells = new GenericSet<string>(str_hash, str_equal);
+			foreach  (var variable in new string[]{"XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"})
+			{
+				var shell = Environment.get_variable(variable);
+				debug("Shell: %s = %s", variable, shell);
+				if (shell != null)
+				{
+					var parts = Diorite.String.split_strip(shell.down(), ":");
+					foreach (var part in parts)
+						shells.add(part);
+				}
+			}
+		}
+	}
+	
+	public static bool have_shell(string name)
+	{
+		gather_shell_info();
+		return name.down() in shells;
 	}
 	
 	internal static void set_default(DesktopShell? default_shell)
