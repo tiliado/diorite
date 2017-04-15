@@ -40,6 +40,27 @@ public class Actions : GLib.Object
 		actions = new HashTable<string, Action?>(str_hash, str_equal); 
 	}
 	
+	public static GLib.Menu copy_menu_model(GLib.MenuModel model)
+	{
+		var menu = new Menu();
+		append_from_menu_model(menu, model);
+		return menu;
+	}
+	
+	public static int replace_from_menu_model(GLib.Menu menu, GLib.MenuModel model)
+	{
+		menu.remove_all();
+		return append_from_menu_model(menu, model);
+	}
+	
+	public static int append_from_menu_model(GLib.Menu menu, GLib.MenuModel model)
+	{
+		var size = model.get_n_items();
+		for (var i = 0; i < size; i++)
+			menu.append_item(new MenuItem.from_model(model, i));
+		return size;
+	}
+	
 	public signal void action_added(Action action);
 	public signal void action_removed(Action action);
 	public signal void action_changed(Action action, ParamSpec p);
