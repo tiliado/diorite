@@ -27,13 +27,13 @@ namespace Diorite
 
 public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
 
-public class ActionsRegistry : GLib.Object
+public class Actions : GLib.Object
 {
 	private HashTable<string, Drt.Lst<Action?>> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
 	
-	public ActionsRegistry(Gtk.Application app)
+	public Actions(Gtk.Application app)
 	{
 		this.app = app;
 		groups = new HashTable<string, Drt.Lst<Action?>>(str_hash, str_equal); 
@@ -183,7 +183,7 @@ public class ActionsRegistry : GLib.Object
 		action = null;
 		option = null;
 		int option_index = -1;
-		string name = ActionsRegistry.parse_full_name(full_name, out option_index);
+		string name = Actions.parse_full_name(full_name, out option_index);
 		action = this.actions.get(name);
 		if (action == null)
 			return false;

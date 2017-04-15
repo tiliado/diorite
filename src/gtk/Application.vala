@@ -53,7 +53,7 @@ public abstract class Application : Gtk.Application
 	public string app_name {get; protected set;}
 	public string icon {get; protected set; default = "";}
 	public string version {get; protected set; default = "";}
-	public ActionsRegistry? actions {get; private set; default = null;}
+	public Actions? actions {get; private set; default = null;}
 	public DesktopShell? shell {get; private set; default = null;} 
 	#if LINUX
 	private XfceSessionManager? xfce_session = null;
@@ -65,7 +65,7 @@ public abstract class Application : Gtk.Application
 		this.app_name = name;
 		this.desktop_name = uid + ".desktop";
 		this.app_id = uid;
-		actions = new ActionsRegistry(this);
+		actions = new Actions(this);
 		#if LINUX
 		prctl(15, uid, 0, 0, 0);
 		#endif
