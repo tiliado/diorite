@@ -152,7 +152,8 @@ def configure(ctx):
 		ctx.check_vala(min_version=(0,22,1))
 	
 	# Don't be quiet
-	ctx.env.VALAFLAGS.remove("--quiet")
+	if "--quiet" in ctx.env.VALAFLAGS:
+		ctx.env.VALAFLAGS.remove("--quiet")
 	ctx.env.append_value("VALAFLAGS", "-v")
 	
 	# enable threading
