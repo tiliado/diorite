@@ -26,10 +26,8 @@ private const string G_LOG_DOMAIN="DioriteGtk";
 namespace Diorite
 {
 	
-#if LINUX
 [CCode (cheader_filename = "sys/prctl.h", cname = "prctl")]
 extern int prctl (int option, string arg2, ulong arg3, ulong arg4, ulong arg5);
-#endif
 
 public errordomain AppError
 {
@@ -39,11 +37,9 @@ public errordomain AppError
 	UNABLE_TO_ACTIVATE
 }
 
-#if LINUX
 private const int XFCE_SESSION_END = 4;
 private const string XFCE_SESSION_SERVICE_NAME = "org.xfce.SessionManager";
 private const string XFCE_SESSION_SERVICE_OBJECT = "/org/xfce/SessionManager";
-#endif
 
 public abstract class Application : Gtk.Application
 {
@@ -55,9 +51,7 @@ public abstract class Application : Gtk.Application
 	public string version {get; protected set; default = "";}
 	public Actions? actions {get; private set; default = null;}
 	public DesktopShell? shell {get; private set; default = null;} 
-	#if LINUX
 	private XfceSessionManager? xfce_session = null;
-	#endif
 	
 	public Application(string uid, string name, GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
 	{
@@ -66,9 +60,7 @@ public abstract class Application : Gtk.Application
 		this.desktop_name = uid + ".desktop";
 		this.app_id = uid;
 		actions = new Actions(this);
-		#if LINUX
 		prctl(15, uid, 0, 0, 0);
-		#endif
 		GLib.Environment.set_prgname(uid);
 		GLib.Environment.set_application_name(name);
 	}
@@ -142,20 +134,13 @@ public abstract class Application : Gtk.Application
 	public override void startup()
 	{
 		/* Set program name */
-		
 		Gdk.set_program_class(app_id); // must be set after Gtk.init()!
-		
 		instance = this;
-		
-		#if LINUX
 		Posix.signal(Posix.SIGINT, terminate_handler);
 		Posix.signal(Posix.SIGTERM, terminate_handler);
 		Posix.signal(Posix.SIGHUP, terminate_handler);
 		Bus.watch_name(BusType.SESSION, XFCE_SESSION_SERVICE_NAME,
 		BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
-		#else
-		// TODO: How about signal handling on Windows?
-		#endif
 		base.startup();
 		
 		/* Use this enviroment variable only for debugging purposes */
@@ -185,7 +170,6 @@ public abstract class Application : Gtk.Application
 		shell = DesktopShell.get_default();
 	}
 	
-	#if LINUX
 	private static void terminate_handler(int sig_num)
 	{
 		debug("Caught signal %d, exiting ...", sig_num);
@@ -230,15 +214,12 @@ public abstract class Application : Gtk.Application
 			quit();
 		}
 	}
-	#endif
 }
 
 } // namespace Diorite
 
-#if LINUX
 [DBus(name = "org.xfce.Session.Manager")]
 private interface XfceSessionManager : Object
 {
 	public signal void state_changed(uint32 old_value, uint32 new_value);
 }
-#endif

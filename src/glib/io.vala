@@ -25,34 +25,6 @@
 namespace Diorite
 {
 
-public GLib.InputStream? input_stream_from_pipe(int fd)
-{
-	if (fd < 0)
-		return null;
-	
-	#if LINUX
-	return new UnixInputStream(fd, true);
-	#elif WIN
-	return new Win32InputStream((void*) fd, true);
-	#else
-	UNSUPPORTED PLATFORM!
-	#endif
-}
-
-public GLib.OutputStream? output_stream_from_pipe(int fd)
-{
-	if (fd < 0)
-		return null;
-	
-	#if LINUX
-	return new UnixOutputStream(fd, true);
-	#elif WIN
-	return new Win32OutputStream((void*) fd, true);
-	#else
-	UNSUPPORTED PLATFORM!
-	#endif
-}
-
 public static SocketService create_socket_service(string path) throws IOError
 {
 	Posix.unlink(path);

@@ -22,8 +22,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if LINUX
-
 namespace Diorite
 {
 
@@ -123,5 +121,3 @@ public class SocketChannel : Drt.DuplexChannel
 }
 
 } // namespace Diorite
-
-#endif

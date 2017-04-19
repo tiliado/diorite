@@ -87,11 +87,7 @@ public class Logger
 	
 	public static bool colors_supported()
 	{
-		#if LINUX
-			return Posix.isatty(output.fileno());
-		#else
-			return false;
-		#endif
+		return Posix.isatty(output.fileno());
 	}
 	
 	/**
