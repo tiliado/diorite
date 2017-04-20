@@ -3,28 +3,23 @@ Diorite Library 0.3.x
 
 ![Diorite stone](diorite.jpg)
 
-Diorite is a a grey to dark-grey intermediate intrusive igneous rock. Diorite library is a utility
-and widget library for Nuvola Player project based on GLib, GIO and GTK.
+ * Diorite is a a grey to dark-grey intermediate intrusive igneous rock.
+ * Diorite library is a private utility and widget library for Nuvola Apps project based on GLib, GIO and GTK.
+ * Diorite code is rolling as stones from a hill. There are no stable releases since 0.3.0 but only blessed
+   snapshots because users expect that version numbers increase from time to time.
+ * The only upstream supported version is the latest git master commit, anything older is for archaeologists.
 
 *Photo by Michael C. Rygel via Wikimedia Commons, [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)*
-
-Status: Private beta
---------------------
-
-  - No API & ABI stability
-  - Dependencies are not frozen
-  - No test case
-  - No documentation
-  - Not suitable for your project
 
 Dependencies
 ------------
 
   - Python 3 and the pyparsing module
-  - glib-2.0 >= 2.40
-  - ghread-2.0 >= 2.40
-  - gio-2.0 >= 2.40
-  - gtk+-3.0 >= 3.10
+  - glib-2.0 >= 2.42
+  - gio-2.0 >= 2.42
+  - gtk+-3.0 >= 3.22
+  - sqlite >= 3.7
+  - x11
 
 Build
 -----
@@ -45,7 +40,7 @@ Uninstall
 Usage
 -----
 
-Because Diorite Library doesn't have any API nor ABI stability guarantee yet,
+Because Diorite Library doesn't have any API nor ABI stability guarantee,
 it uses 0.x version suffix in library name to make multiple versions co-installable:
 
   * pkg-config files: ``dioriteglib-0.x.pc`` and ``dioritegtk-0.x.pc``

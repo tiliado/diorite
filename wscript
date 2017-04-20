@@ -22,60 +22,46 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Top of source tree
-top = '.'
-# Build directory
-out = 'build'
+# Metadata #
+#==========#
 
-# Application name and version
+top = '.'
+out = 'build'
 APPNAME = "diorite"
 VERSION = "0.3.3"
+
+MIN_VALA = "0.34.0"
+MIN_GLIB = "2.42.1"
+MIN_GTK = "3.22.0"
+
+# Extras #
+#========#
+
+from waflib.Errors import ConfigurationError
+from waflib import Utils
+from waflib.TaskGen import extension
+
+
+TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
 SERIES = VERSION.rsplit(".", 1)[0]
+VERSIONS = tuple(int(i) for i in VERSION.split("."))
+REVISION_SNAPSHOT = "snapshot"
 
-TARGET_GLIB_TUPLE = (2, 40)
-TARGET_GLIB = '{}.{}'.format(*TARGET_GLIB_TUPLE)
-TARGET_GTK_TUPLE = (3, 10)
-TARGET_GTK = '{}.{}'.format(*TARGET_GTK_TUPLE)
 
-import subprocess
-try:
+def get_revision_id():
+	import subprocess
 	try:
-		# Read revision info from file revision-info created by ./waf dist
-		with open("version-info.txt", "rt") as f:
-			__, revision_id = f.read().strip().split("-", 1)
-	except Exception as e:
-		# Read revision info from current branch
 		output = subprocess.Popen(["git", "describe", "--tags", "--long"], stdout=subprocess.PIPE).communicate()[0]
 		__, revision_id = output.decode("utf-8").strip().split("-", 1)
-	revision_id = revision_id.replace("-", ".")
-except Exception as e:
-	revision_id = "snapshot"
+		revision_id = revision_id.replace("-", ".")
+	except Exception as e:
+		revision_id = REVISION_SNAPSHOT
+	return revision_id
 
-VERSION += "+" + revision_id
+def glib_encode_version(version):
+	major, minor, _ = tuple(int(i) for i in version.split("."))
+	return major << 16 | minor << 8
 
-import sys
-from waflib.Configure import conf
-from waflib.Errors import ConfigurationError
-from waflib.Context import WAFVERSION
-from waflib import Utils
-
-WAF_VERSION = tuple(int(i) for i in WAFVERSION.split("."))
-REQUIRED_VERSION = (1, 7, 14) 
-if WAF_VERSION < REQUIRED_VERSION:
-	print("Too old waflib %s < %s. Use waf binary distributed with the source code!" % (WAF_VERSION, REQUIRED_VERSION))
-	sys.exit(1)
-
-LINUX = "LINUX"
-WIN = "WIN"
-
-if sys.platform.startswith("linux"):
-	_PLATFORM = LINUX
-elif sys.platform.startswith("win"):
-	_PLATFORM = WIN
-else:
-	_PLATFORM = sys.platform.upper()
-
-@conf
 def vala_def(ctx, vala_definition):
 	"""Appends a Vala definition"""
 	if not hasattr(ctx.env, "VALA_DEFINES"):
@@ -86,14 +72,14 @@ def vala_def(ctx, vala_definition):
 	else:
 		ctx.env.VALA_DEFINES.append(vala_definition)
 
-@conf
-def check_dep(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=None, define=None):
+
+def pkgconfig(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=None, define=None):
 	"""Wrapper for ctx.check_cfg."""
 	result = True
 	try:
 		res = ctx.check_cfg(package=pkg, uselib_store=uselib, atleast_version=version, mandatory=True, args = '--cflags --libs')
 		if vala_def:
-			ctx.vala_def(vala_def)
+			vala_def(ctx, vala_def)
 		if define:
 			for key, value in define.iteritems():
 				ctx.define(key, value)
@@ -106,147 +92,91 @@ def check_dep(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=No
 			ctx.env[store] = result
 	return res
 
-# Add extra options to ./waf command
+
+@extension('.vapi')
+def vapi_file(self, node):
+	try:
+		valatask = self.valatask
+	except AttributeError:
+		valatask = self.valatask = self.create_task('valac')
+		self.init_vala_task()
+	valatask.inputs.append(node)
+
+
+# Actions #
+#=========#
+
 def options(ctx):
 	ctx.load('compiler_c vala')
 	ctx.add_option('--noopt', action='store_true', default=False, dest='noopt', help="Turn off compiler optimizations")
-	ctx.add_option('--debug', action='store_true', default=True, dest='debug', help="Turn on debugging symbols")
 	ctx.add_option('--flatpak', action='store_true', default=False, dest='flatpak', help="Enable Flatpak tweaks.")
-	ctx.add_option('--no-debug', action='store_false', dest='debug', help="Turn off debugging symbols")
-	ctx.add_option('--no-ldconfig', action='store_false', default=True, dest='ldconfig', help="Don't run ldconfig after installation")
-	ctx.add_option('--platform', default=_PLATFORM, help="Target platform")
-	ctx.add_option('--with-experimental-api', action='store_true', default=False, dest='experimental', help="Include experimental API.")
-
-# Configure build process
-def configure(ctx):
+	ctx.add_option('--nodebug', action='store_false', default=True, dest='debug', help="Turn off debugging symbols")
 	
-	ctx.env.PLATFORM = PLATFORM = ctx.options.platform.upper()
-	if PLATFORM not in (WIN, LINUX):
-		print("Unsupported platform %s. Please try to talk to devs to consider support of your platform." % sys.platform)
-		sys.exit(1)
+def configure(ctx):
+	ctx.env.REVISION_ID = get_revision_id()
 	
 	ctx.msg("Version", VERSION, "GREEN")
-	if revision_id != "snapshot":
-		ctx.msg("Upstream revision", revision_id, "GREEN")
+	if ctx.env.REVISION_ID != REVISION_SNAPSHOT:
+		ctx.msg("Upstream revision", ctx.env.REVISION_ID, "GREEN")
 	else:
-		ctx.msg("Upstream revision", "unknown (unsupported build)", "RED")
-	
-	ctx.define(PLATFORM, 1)
-	ctx.env.VALA_DEFINES = [PLATFORM]
-	ctx.msg('Target platform', PLATFORM, "GREEN")
+		ctx.msg("Upstream revision", "unknown", "RED")
 	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
 	
-	ctx.load('compiler_c vala')
-	
-	# Flatpak build
+	ctx.env.append_unique("VALAFLAGS", "-v")
+	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
 	ctx.env.FLATPAK = ctx.options.flatpak
 	if ctx.env.FLATPAK:
-		ctx.vala_def("FLATPAK")
-	
-	# Enable experimental API
-	ctx.env.EXPERIMENTAL = ctx.options.experimental
-	if ctx.env.EXPERIMENTAL:
-		ctx.vala_def("EXPERIMENTAL")
-		ctx.check_vala(min_version=(0,26,1))
-	else:
-		ctx.check_vala(min_version=(0,22,1))
-	
-	# Don't be quiet
-	ctx.env.VALAFLAGS.remove("--quiet")
-	ctx.env.append_value("VALAFLAGS", "-v")
-	
-	# enable threading
-	ctx.env.append_value("VALAFLAGS", "--thread")
-	
-	# Turn compiler optimizations on/off
-	if ctx.options.noopt:
-		ctx.msg('Compiler optimizations', "OFF?!", "RED")
-		ctx.env.append_unique('CFLAGS', '-O0')
-	else:
+		vala_def(ctx, "FLATPAK")
+	if not ctx.options.noopt:
 		ctx.env.append_unique('CFLAGS', '-O2')
-		ctx.msg('Compiler optimizations', "ON", "GREEN")
-	
-	# Include debugging symbols
 	if ctx.options.debug:
-		#~ ctx.env.append_unique('VALAFLAGS', '-g')
-		if PLATFORM == LINUX:
-			ctx.env.append_unique('CFLAGS', '-g3')
-		elif PLATFORM == WIN:
-			ctx.env.append_unique('CFLAGS', ['-g', '-gdwarf-2'])
+		ctx.env.append_unique('VALAFLAGS', '-g')
+		ctx.env.append_unique('CFLAGS', '-g3')
+		
+	ctx.load('compiler_c vala')
+	ctx.check_vala(min_version=tuple(int(i) for i in MIN_VALA.split(".")))
+	pkgconfig(ctx, 'glib-2.0', 'GLIB', MIN_GLIB)
+	pkgconfig(ctx, 'gthread-2.0', 'GTHREAD', MIN_GLIB)
+	pkgconfig(ctx, 'gio-2.0', 'GIO', MIN_GLIB)
+	pkgconfig(ctx, 'gio-unix-2.0', 'UNIXGIO', MIN_GLIB)
+	pkgconfig(ctx, 'gtk+-3.0', 'GTK+', MIN_GTK)
+	pkgconfig(ctx, 'gdk-3.0', 'GDK', MIN_GTK)
+	pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
+	pkgconfig(ctx, 'x11', 'X11', "0")
+	pkgconfig(ctx, 'sqlite3', 'SQLITE', "3.7")
 	
-	# Anti-underlinking and anti-overlinking linker flags.
-	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
-	
-	# Check dependencies
-	ctx.check_dep('glib-2.0', 'GLIB', TARGET_GLIB)
-	ctx.check_dep('gthread-2.0', 'GTHREAD', TARGET_GLIB)
-	ctx.check_dep('gio-2.0', 'GIO', TARGET_GLIB)
-	ctx.check_dep('gtk+-3.0', 'GTK+', TARGET_GTK)
-	ctx.check_dep('gdk-3.0', 'GDK', TARGET_GTK)
-	ctx.check_dep('gdk-x11-3.0', 'GDKX11', TARGET_GTK)
-	ctx.check_dep('x11', 'X11', "0")
-	
-	if ctx.env.EXPERIMENTAL:
-		ctx.check_dep('sqlite3', 'SQLITE', "3.7")
-	
-	ctx.define('GLIB_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GLIB_TUPLE))
-	ctx.define('GLIB_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GLIB_TUPLE))
-	ctx.define('GDK_VERSION_MAX_ALLOWED', _glib_encode_version(*TARGET_GTK_TUPLE))
-	ctx.define('GDK_VERSION_MIN_REQUIRED', _glib_encode_version(*TARGET_GTK_TUPLE))
-	
-	VERSIONS = VERSION.split("+")
-	if len(VERSIONS) == 1:
-		VERSION_SUFFIX = "stable"
-	else:
-		VERSION_SUFFIX = VERSIONS[1]
-	VERSIONS = tuple(int(i) for i in VERSIONS[0].split("."))
-	ctx.define("DRT_VERSION", VERSION)
-	ctx.define("DRT_REVISION", revision_id)
+	ctx.define("DRT_VERSION", VERSION + "+" + ctx.env.REVISION_ID)
+	ctx.define("DRT_REVISION", ctx.env.REVISION_ID)
 	ctx.define("DRT_VERSION_MAJOR", VERSIONS[0])
 	ctx.define("DRT_VERSION_MINOR", VERSIONS[1])
 	ctx.define("DRT_VERSION_BUGFIX", VERSIONS[2])
-	ctx.define("DRT_VERSION_SUFFIX", VERSION_SUFFIX)
+	ctx.define("DRT_VERSION_SUFFIX", ctx.env.REVISION_ID)
 	
-	if PLATFORM == LINUX:
-		ctx.check_dep('gio-unix-2.0', 'UNIXGIO', TARGET_GLIB)
-	elif PLATFORM == WIN:
-		ctx.check_dep('gio-windows-2.0', 'WINGIO', TARGET_GLIB)
+	ctx.define('GLIB_VERSION_MAX_ALLOWED', glib_encode_version(MIN_GLIB))
+	ctx.define('GLIB_VERSION_MIN_REQUIRED', glib_encode_version(MIN_GLIB))
+	ctx.define('GDK_VERSION_MAX_ALLOWED', glib_encode_version(MIN_GTK))
+	ctx.define('GDK_VERSION_MIN_REQUIRED', glib_encode_version(MIN_GTK))
 
 def build(ctx):
 	#~ print ctx.env
-	PLATFORM = ctx.env.PLATFORM
+	PC_CFLAGS = ""
 	DIORITE_GLIB = "{}glib-{}".format(APPNAME, SERIES)
 	DIORITE_GTK = "{}gtk-{}".format(APPNAME, SERIES)
 	DIORITE_DB = "{}db-{}".format(APPNAME, SERIES)
 	DIORITE_TESTS = "{}tests-{}".format(APPNAME, SERIES)
 	RUN_DIORITE_TESTS = "run-{}".format(DIORITE_TESTS)
-	packages = 'posix glib-2.0 gio-2.0'
-	uselib = 'GLIB GTHREAD'
+	packages = 'posix glib-2.0 gio-2.0 gio-unix-2.0'
+	packages_gtk = packages + " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0"
+	uselib = 'GLIB GIO UNIXGIO'
+	uselib_gtk = uselib + " GTK+ GDK X11 GDKX11"
 	vala_defines = ctx.env.VALA_DEFINES
-	
-	if PLATFORM == WIN:
-		DIORITE_GLIB_LIBNAME = "dioriteglib-" + API_VERSION.split(".")[0]
-		DIORITE_GTK_LIBNAME = "dioritegtk-" + API_VERSION.split(".")[0]
-		DIORITE_DB_LIBNAME = "dioritedb-" + API_VERSION.split(".")[0]
-		PC_CFLAGS="-mms-bitfields"
-		uselib += " WINGIO"
-		packages += " gio-windows-2.0 win32"
-	else:
-		DIORITE_GLIB_LIBNAME = DIORITE_GLIB
-		DIORITE_GTK_LIBNAME = DIORITE_GTK
-		DIORITE_DB_LIBNAME = DIORITE_DB
-		DIORITE_TESTS_LIBNAME = DIORITE_DB
-		PC_CFLAGS=""
-		uselib += " UNIXGIO"
-		packages += " gio-unix-2.0"
 	
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
-		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.c') + ctx.path.ant_glob('src/glib/*.vapi'),
+		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		uselib = uselib,
-		includes = ["src/glib"],
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGlib"'],
 		vapi_dirs = ['vapi'],
@@ -256,63 +186,62 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
-		source = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.c'),
-		packages = " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0 gio-2.0 glib-2.0",
-		uselib = "GTK+ GDK X11 GDKX11 GIO GLIB",
+		source = ctx.path.ant_glob('src/gtk/*.vala'),
+		packages = packages_gtk,
+		uselib = uselib_gtk,
 		use = [DIORITE_GLIB],
-		includes = ["src/gtk"],
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGtk"'],
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
 	)
 	
-	if ctx.env.EXPERIMENTAL:
-		ctx(features = "c cshlib",
-			target = DIORITE_DB,
-			name = DIORITE_DB,
-			source = ctx.path.ant_glob('src/db/*.vala') + ctx.path.ant_glob('src/db/*.c'),
-			packages = packages + " sqlite3",
-			uselib = uselib + " SQLITE",
-			use = [DIORITE_GLIB],
-			includes = ["src/db"],
-			vala_defines = vala_defines,
-			cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
-			vapi_dirs = ['vapi'],
-			vala_target_glib = TARGET_GLIB,
-		)
-		
-		ctx(features = "c cshlib",
-			target = DIORITE_TESTS,
-			name = DIORITE_TESTS,
-			source = ctx.path.ant_glob('src/tests/*.vala') + ctx.path.ant_glob('src/tests/*.c'),
-			packages = " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0 gio-2.0 glib-2.0",
-			uselib = "GTK+ GDK X11 GDKX11 GIO GLIB",
-			use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB],
-			includes = ["src/tests"],
-			vala_defines = vala_defines,
-			cflags = ['-DG_LOG_DOMAIN="DioriteTests"'],
-			vapi_dirs = ['vapi'],
-			vala_target_glib = TARGET_GLIB,
-			install_path = None,
-			install_binding = False
-		)
-		ctx(
-			rule='../testgen.py -i ${SRC} -o ${TGT}',
-			source=ctx.path.find_or_declare('%s.vapi' % DIORITE_TESTS),
-			target=ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS))
-		ctx.program(
-			target = RUN_DIORITE_TESTS,
-			source = [ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)],
-			packages = "gio-2.0 glib-2.0",
-			uselib = "GIO GLIB",
-			use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB, DIORITE_TESTS],
-			vala_defines = vala_defines,
-			defines = ['G_LOG_DOMAIN="DioriteTests"'],
-			vapi_dirs = ['vapi'],
-			vala_target_glib = TARGET_GLIB,
-			install_path = None
-		)
+	ctx(features = "c cshlib",
+		target = DIORITE_DB,
+		name = DIORITE_DB,
+		source = ctx.path.ant_glob('src/db/*.vala'),
+		packages = packages + " sqlite3",
+		uselib = uselib + " SQLITE",
+		use = [DIORITE_GLIB],
+		vala_defines = vala_defines,
+		cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+	)
+	
+	ctx(features = "c cshlib",
+		target = DIORITE_TESTS,
+		name = DIORITE_TESTS,
+		source = ctx.path.ant_glob('src/tests/*.vala'),
+		packages = packages_gtk,
+		uselib = uselib_gtk,
+		use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB],
+		vala_defines = vala_defines,
+		cflags = ['-DG_LOG_DOMAIN="DioriteTests"'],
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+		install_path = None,
+		install_binding = False
+	)
+	
+	ctx(
+		rule='../testgen.py -i ${SRC} -o ${TGT}',
+		source=ctx.path.find_or_declare('%s.vapi' % DIORITE_TESTS),
+		target=ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)
+	)
+	
+	ctx.program(
+		target = RUN_DIORITE_TESTS,
+		source = [ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)],
+		packages = packages,
+		uselib = uselib,
+		use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB, DIORITE_TESTS],
+		vala_defines = vala_defines,
+		defines = ['G_LOG_DOMAIN="DioriteTests"'],
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+		install_path = None
+	)
 	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
@@ -324,9 +253,9 @@ def build(ctx):
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
 		PC_CFLAGS=PC_CFLAGS,
-		LIBNAME=DIORITE_GLIB_LIBNAME,
+		LIBNAME=DIORITE_GLIB,
 		SERIES=SERIES,
-		)
+	)
 	
 	ctx(features = 'subst',
 		source='src/dioritegtk.pc.in',
@@ -338,12 +267,11 @@ def build(ctx):
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
 		PC_CFLAGS=PC_CFLAGS,
-		LIBNAME=DIORITE_GTK_LIBNAME,
+		LIBNAME=DIORITE_GTK,
 		DIORITE_GLIB=DIORITE_GLIB,
-		)
+	)
 	
-	if ctx.env.EXPERIMENTAL:
-		ctx(features = 'subst',
+	ctx(features = 'subst',
 		source='src/dioritedb.pc.in',
 		target='{}db-{}.pc'.format(APPNAME, SERIES),
 		install_path='${LIBDIR}/pkgconfig',
@@ -353,52 +281,8 @@ def build(ctx):
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
 		PC_CFLAGS=PC_CFLAGS,
-		LIBNAME=DIORITE_DB_LIBNAME,
+		LIBNAME=DIORITE_DB,
 		DIORITE_GLIB=DIORITE_GLIB,
-		)
-		
-	if PLATFORM == WIN :
-		ctx.program(
-		target = "dioriteinterrupthelper",
-		source = ['src/helpers/interrupthelper.vala'],
-		use = [DIORITE_GLIB],
-		packages = 'glib-2.0 win32',
-		uselib = 'GLIB',
-		vapi_dirs = ['vapi'],
-		vala_target_glib = TARGET_GLIB,
-		)
+	)
 	
 	ctx.install_as('${BINDIR}/diorite-testgen-' + SERIES, 'testgen.py', chmod=Utils.O755)
-	ctx.add_post_fun(post)
-
-def dist(ctx):
-	ctx.algo = "tar.gz"
-	ctx.excl = '.git .gitignore build/* **/.waf* **/*~ **/*.swp **/.lock* **/*.pyc'
-	ctx.exec_command("git describe --tags --long > version-info.txt")
-	
-	def archive():
-		ctx._archive()
-		node = ctx.path.find_node("version-info.txt")
-		if node:
-			node.delete()
-	ctx._archive = ctx.archive
-	ctx.archive = archive
-
-def post(ctx):
-	if ctx.cmd in ('install', 'uninstall'):
-		if ctx.env.PLATFORM == LINUX and ctx.options.ldconfig:
-			ctx.exec_command('/sbin/ldconfig') 
-
-def _glib_encode_version(major, minor):
-	return major << 16 | minor << 8
-
-from waflib.TaskGen import extension
-@extension('.vapi')
-def vapi_file(self, node):
-	try:
-		valatask = self.valatask
-	except AttributeError:
-		valatask = self.valatask = self.create_task('valac')
-		self.init_vala_task()
-
-	valatask.inputs.append(node)

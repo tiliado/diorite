@@ -9,12 +9,12 @@ CFLAGS="$CFLAGS -I$PWD/build -L$PWD/build"
 CC="gcc"
 export CC CFLAGS PKG_CONFIG_PATH PATH LD_LIBRARY_PATH
 
-alias configure="python3 ./waf configure --with-experimental-api --flatpak"
+alias configure="python3 ./waf configure --flatpak"
 alias waf="python3 ./waf -v "
 alias update="python3 ./waf && sudo python3 ./waf install"
 
 rebuild()
 {
-	python3 ./waf distclean configure build --with-experimental-api --flatpak "$@" \
+	python3 ./waf distclean configure build --flatpak "$@" \
 	&& build/run-dioritetests-0.3
 }
