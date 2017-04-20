@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -32,6 +32,7 @@ public abstract class DesktopShell: GLib.Object
 	public bool shows_app_menu {get; protected set; default = false;}
 	public bool shows_menu_bar {get; protected set; default = false;}
 	public bool client_side_decorations {get; protected set; default = false;}
+	public GLib.MenuModel? app_menu {get{return _app_menu;}}
 	#if !FLATPAK
 	public string? wm_name {get; protected set; default = null;}
 	public string? wm_name_exact {get; protected set; default = null;}
@@ -39,6 +40,7 @@ public abstract class DesktopShell: GLib.Object
 	#else
 	public bool dialogs_use_header {get; protected set; default = false;}
 	#endif
+	private GLib.Menu _app_menu = null;
 	
 	public static DesktopShell get_default()
 	{
@@ -76,6 +78,16 @@ public abstract class DesktopShell: GLib.Object
 	{
 		DesktopShell.default_shell = default_shell;
 	}
+	
+	public void set_app_menu_from_model(GLib.MenuModel model)
+	{
+		if (_app_menu == null)
+			_app_menu = new Menu();
+		Actions.replace_from_menu_model(_app_menu, model);
+		app_menu_changed();
+	}
+	
+	public signal void app_menu_changed();
 	
 	#if !FLATPAK
 	protected Gdk.X11.Window? inspect_window_manager()

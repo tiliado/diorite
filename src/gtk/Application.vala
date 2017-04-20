@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -52,6 +52,8 @@ public abstract class Application : Gtk.Application
 	public Actions? actions {get; private set; default = null;}
 	public DesktopShell? shell {get; private set; default = null;} 
 	private XfceSessionManager? xfce_session = null;
+	private Menu? menubar_app_submenu = null;
+	private Menu? default_menubar = null;
 	
 	public Application(string uid, string name, GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
 	{
@@ -168,6 +170,29 @@ public abstract class Application : Gtk.Application
 		}
 		
 		shell = DesktopShell.get_default();
+		shell.app_menu_changed.connect(on_app_menu_changed);
+		set_menubar(reset_menubar());
+	}
+	
+	public void set_app_menu_items(string[] items)
+	{
+		shell.set_app_menu_from_model(actions.build_menu(items, true, false));
+	}
+	
+	public Menu reset_menubar()
+	{
+		if (default_menubar == null)
+			default_menubar = new Menu();
+		else
+			default_menubar.remove_all();
+		menubar_app_submenu = null;
+		var unity = shell.shows_app_menu && shell.shows_menu_bar;
+		if (!unity && shell.app_menu != null)
+		{
+			menubar_app_submenu = Actions.copy_menu_model(shell.app_menu);
+			default_menubar.append_submenu("_App", menubar_app_submenu);
+		}
+		return default_menubar;
 	}
 	
 	private static void terminate_handler(int sig_num)
@@ -192,6 +217,21 @@ public abstract class Application : Gtk.Application
 			warning("Unable to get proxy for Xfce session: %s", e.message);
 			xfce_session = null;
 		}
+	}
+	
+	private void on_app_menu_changed(DesktopShell shell)
+	{
+		if (shell.shows_app_menu && app_menu != shell.app_menu)
+		{
+			if (app_menu != null)
+				warning("An attempt to overwrite app menu.");
+			else if (get_windows() != null)
+				warning("Cannot set an app menu because an app window has been already created.");
+			else
+				set_app_menu(shell.app_menu);
+		}
+		if (menubar_app_submenu != null && shell.app_menu != null)
+			Actions.replace_from_menu_model(menubar_app_submenu, shell.app_menu);
 	}
 	
 	/**

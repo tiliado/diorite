@@ -22,10 +22,11 @@
 public class MyApp : Diorite.Application
 {
 	private Diorite.ApplicationWindow? main_window = null;
+	private bool toggled = false;
 	
 	public MyApp()
 	{
-		base("cz.fenryxo.MyApp", "My App", "myapp.desktop", "myapp");
+		base("cz.fenryxo.MyApp", "My App");
 		icon = "gedit";
 		version = "0.1";
 	}
@@ -39,27 +40,28 @@ public class MyApp : Diorite.Application
 	
 	private void start()
 	{
+		append_actions();
+		set_app_menu_items(Actions.app_menu1);
+		
+		var menubar = reset_menubar();
+		menubar.append_submenu("_Go", actions.build_menu({Actions.GO_HOME, Actions.GO_RELOAD, Actions.GO_BACK, Actions.GO_FORWARD}, true, false));
+		menubar.append_submenu("_View", actions.build_menu({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR}, true, false));
+		
 		main_window = new Diorite.ApplicationWindow(this, true);
 		main_window.set_default_size(400, 400);
 		main_window.set_title("My App Window");
-		append_actions();
-		
-		var app_menu = actions.build_menu({
-			Actions.FORMAT_SUPPORT, Actions.DONATE,
-			Actions.PREFERENCES, Actions.HELP, Actions.ABOUT, Actions.QUIT}, true, false);
-		set_app_menu(app_menu);
-		
 		main_window.create_toolbar({Actions.GO_BACK, Actions.GO_FORWARD, Actions.GO_RELOAD, Actions.GO_HOME, " ", Actions.DONATE});
-		main_window.create_menu_button({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR});
-		
-		var menubar = new Menu();
-		menubar.append_submenu("_Go", actions.build_menu({Actions.GO_HOME, Actions.GO_RELOAD, Actions.GO_BACK, Actions.GO_FORWARD}, true, false));
-		menubar.append_submenu("_View", actions.build_menu({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR}, true, false));
-		set_menubar(menubar);
-		
-		
-		
+		main_window.set_menu_button_items({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR});
 		main_window.show_all();
+		Timeout.add_seconds(5, toggle_app_menu);
+	}
+	
+	private bool toggle_app_menu()
+	{
+		toggled = !toggled;
+		set_app_menu_items(toggled ? Actions.app_menu2 : Actions.app_menu1);
+		message(@"Toggled: $toggled");
+		return true;
 	}
 	
 	private void append_actions()
@@ -110,6 +112,13 @@ namespace Actions
 	public const string ZOOM_OUT = "zoom-out";
 	public const string ZOOM_RESET = "zoom-reset";
 	public const string QUIT = "quit";
+	public const string[] app_menu1 = {
+			Actions.FORMAT_SUPPORT, Actions.DONATE,
+			Actions.PREFERENCES, Actions.HELP, Actions.ABOUT, Actions.QUIT};
+	public const string[] app_menu2 = {
+			Actions.PREFERENCES, Actions.HELP,
+			Actions.FORMAT_SUPPORT, Actions.DONATE,
+			Actions.ABOUT, Actions.QUIT};
 }
 
 int main(string[] args)

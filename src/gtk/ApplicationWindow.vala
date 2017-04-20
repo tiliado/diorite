@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -33,6 +33,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
 	private unowned Application app;
 	private Gtk.MenuButton menu_button = null;
+	private string[]? menu_button_items = null;
 	
 	public ApplicationWindow(Application app, bool collapsible_header_bar)
 	{
@@ -91,24 +92,33 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		{
 			top_grid.attach_next_to(header_bar, null, Gtk.PositionType.TOP, 1, 1);
 		}
+		
+		menu_button = new Gtk.MenuButton();
+		var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
+			Gtk.IconSize.SMALL_TOOLBAR);
+		menu_button.image = image;
+		menu_button.valign = Gtk.Align.CENTER;
+		menu_button.vexpand = false;
+		menu_button.no_show_all = true;
+		update_menu_button();
+		app.shell.app_menu_changed.connect(on_app_menu_changed);
 	}
 	
-	public void create_menu_button(string[] items)
+	~ApplicationWindow()
 	{
-		if (menu_button == null)
-		{
-			menu_button = new Gtk.MenuButton();
-			var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
-				Gtk.IconSize.SMALL_TOOLBAR);
-			menu_button.image = image;
-			menu_button.valign = Gtk.Align.CENTER;
-			menu_button.vexpand = false;
-			menu_button.no_show_all = true;
-		}
-		
+		app.shell.app_menu_changed.disconnect(on_app_menu_changed);
+	}
+	
+	public void set_menu_button_items(string[]? items)
+	{
+		menu_button_items = items;
+		update_menu_button();
+	}
+	
+	private void update_menu_button()
+	{
 		var actions = app.actions;
-		var menu = actions.build_menu(items, false, false);
-		
+		var menu = menu_button_items != null ? actions.build_menu(menu_button_items, false, false) : new Menu();
 		if (header_bar_revealer != null)
 		{
 			var toggle_toolbar_action = "toggle-toolbar";
@@ -124,18 +134,20 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 				warning("Failed to create %s item.", toggle_toolbar_action);
 		}
 		
-		var app_menu = app.app_menu;
+		var app_menu = app.shell.app_menu;
 		if (app_menu != null && (!app.shell.shows_app_menu || app.shell.shows_menu_bar))
 			menu.append_section(null, Actions.copy_menu_model(app_menu));
 		menu_button.menu_model = menu;
 		menu_button.visible = menu.get_n_items() > 0;
 	}
 	
+	private void on_app_menu_changed(DesktopShell shell)
+	{
+		update_menu_button();
+	}
+	
 	public void create_toolbar(string[] items)
 	{
-		if (menu_button == null)
-			create_menu_button({});
-		
 		var children = header_bar.get_children();
 		foreach (var child in children)
 			header_bar.remove(child);
