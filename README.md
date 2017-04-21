@@ -21,16 +21,32 @@ Dependencies
   - sqlite >= 3.7
   - x11
 
+
+Waf
+---
+
+Diorite uses [waf build system](https://waf.io). You are supposed to use the waf binary bundled with
+Diorite's source code. The build script `wscript` may not be compatible with other versions. If you manage
+to port wscript to a newer stable waf release, you may provide us with patches to be merged once we decide
+to update our waf binary. Meantime, you can carry them downstream.
+
+To find out what build parameters can be set run ./waf --help 
+
 Build
 -----
 
-    $ ./waf configure
+    $ ./waf configure [--prefix=...] [--libdir=...] [--noopt] [--nodebug]
     $ ./waf build
+
+Test
+----
+
+    LD_LIBRARY_PATH=./build ./build/run-dioritetests-0.3
 
 Install
 -------
 
-    # ./waf install
+    # ./waf install [--destdir=...]
     
 Uninstall
 ---------
