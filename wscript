@@ -93,16 +93,6 @@ def pkgconfig(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=No
 	return res
 
 
-@extension('.vapi')
-def vapi_file(self, node):
-	try:
-		valatask = self.valatask
-	except AttributeError:
-		valatask = self.valatask = self.create_task('valac')
-		self.init_vala_task()
-	valatask.inputs.append(node)
-
-
 # Actions #
 #=========#
 
