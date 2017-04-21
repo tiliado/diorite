@@ -33,7 +33,7 @@ DESTDIR ?= /
 all:
 	python3 ./waf build -vv
 install:
-	python3 ./waf install --no-ldconfig --destdir="$(DESTDIR)"
+	python3 ./waf install --destdir="$(DESTDIR)"
 .NOTPARALLEL:
 """
 
