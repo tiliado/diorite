@@ -39,7 +39,6 @@ MIN_GTK = "3.22.0"
 
 from waflib.Errors import ConfigurationError
 from waflib import Utils
-from waflib.TaskGen import extension
 
 
 TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
