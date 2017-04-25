@@ -55,9 +55,10 @@ public abstract class Application : Gtk.Application
 	private Menu? menubar_app_submenu = null;
 	private Menu? default_menubar = null;
 	
-	public Application(string uid, string name, GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
+	public Application(string uid, string name, string? dbus_name = null,
+		GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE)
 	{
-		Object(application_id: uid, flags: flags);
+		Object(application_id: dbus_name ?? uid, flags: flags);
 		this.app_name = name;
 		this.desktop_name = uid + ".desktop";
 		this.app_id = uid;
