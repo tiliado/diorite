@@ -111,8 +111,9 @@ public class RequirementParser
      * @return the result of the expression evaluation.
      * @throws ConditionalExpressionError on failure
      */
-    public bool eval(string requirements) throws RequirementError
+    public bool eval(string requirements, out string? failed_requirements) throws RequirementError
     {
+        failed_requirements = null;
         len = requirements.length;
         data = requirements;
         pos = 0;
@@ -120,7 +121,7 @@ public class RequirementParser
         error_pos = -1;
         error_object = null;
         reset();
-        var result = parse_all();
+        var result = parse_all(ref failed_requirements);
         if (is_error_set())
             throw error_object;
         else
@@ -303,7 +304,7 @@ public class RequirementParser
         return false;
     }
     
-    private bool parse_all()
+    private bool parse_all(ref string? failed_requirements)
     {
         Toks tok = Toks.NONE;
         string? val;
@@ -317,7 +318,7 @@ public class RequirementParser
 			case Toks.SEMICOLON:
 				continue;
 			case Toks.IDENT:
-				result = parse_rule(pos, val) && result;
+				result = parse_rule(pos, val, ref failed_requirements) && result;
 				break;
 			default:
 				wrong_token(pos, tok, "One of SPACE, SEMICOLON, IDENT tokens");
@@ -330,7 +331,7 @@ public class RequirementParser
             return wrong_token(pos, tok, "EOF token");
     }
     
-    private bool parse_rule(int pos, string ident)
+    private bool parse_rule(int pos, string ident, ref string? failed_requirements)
     {
         Toks tok = Toks.NONE;
         string? params;
@@ -342,16 +343,26 @@ public class RequirementParser
 				params = params.substring(1, len - 2);
 			else
 				params = null;
-            return parse_call(pos, ident, params);
+            return parse_call(pos, ident, params, ref failed_requirements);
         }
-        return parse_call(pos, ident, null);
+        return parse_call(pos, ident, null, ref failed_requirements);
     }
     
-    private bool parse_call(int pos, string ident, string? params)
+    private bool parse_call(int pos, string ident, string? params, ref string? failed_requirements)
     {
         if (is_error_set())
             return false;
-        return call(pos, ident, params);
+          
+        var result = call(pos, ident, params);
+        if (!result)
+        {
+			if (failed_requirements == null)
+				failed_requirements = "";
+			else
+				failed_requirements += " ";
+			failed_requirements += "%s[%s]".printf(ident, params ?? "");
+		}
+		return result;
     }
     
     private enum Toks
