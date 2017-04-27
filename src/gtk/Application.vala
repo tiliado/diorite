@@ -68,23 +68,23 @@ public abstract class Application : Gtk.Application
 		GLib.Environment.set_application_name(name);
 	}
 	
-	public virtual signal void fatal_error(string title, string message)
+	public virtual signal void fatal_error(string title, string message, bool markup=false)
 	{
 		critical("%s. %s", title, message);
 		quit();
 	}
 	
-	public virtual signal void show_error(string title, string message)
+	public virtual signal void show_error(string title, string message, bool markup=false)
 	{
 		warning("%s. %s", title, message);
 	}
 	
-	public virtual signal void show_warning(string title, string message)
+	public virtual signal void show_warning(string title, string message, bool markup=false)
 	{
 		warning("%s. %s", title, message);
 	}
 	
-	public virtual signal void show_info(string title, string message)
+	public virtual signal void show_info(string title, string message, bool markup=false)
 	{
 		GLib.message("%s. %s", title, message);
 	}
