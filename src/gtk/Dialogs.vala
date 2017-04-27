@@ -35,14 +35,16 @@ public class ErrorDialog : Gtk.MessageDialog
 	 * 
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
+	 * @param use_markup true if message uses Pango markup
 	 */
-	public ErrorDialog(string title, string message)
+	public ErrorDialog(string title, string message, bool use_markup=false)
 	{
 		Object(
 			title: "",
 			modal: true,
 			message_type: Gtk.MessageType.ERROR,
-			buttons: Gtk.ButtonsType.OK
+			buttons: Gtk.ButtonsType.OK,
+			secondary_use_markup: use_markup
 		);
 		this.text = title;
 		this.secondary_text = message;
@@ -65,14 +67,16 @@ public class ConfirmDialog : Gtk.MessageDialog
 	 * 
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
+	 * @param use_markup true if message uses Pango markup
 	 */
-	public ConfirmDialog(string title, string message)
+	public ConfirmDialog(string title, string message, bool use_markup=false)
 	{
 		Object(
 			title: "",
 			modal: true,
 			message_type: Gtk.MessageType.QUESTION,
-			buttons: Gtk.ButtonsType.YES_NO
+			buttons: Gtk.ButtonsType.YES_NO,
+			secondary_use_markup: use_markup
 		);
 		this.text = title;
 		this.secondary_text = message;
@@ -95,14 +99,16 @@ public class InfoDialog : Gtk.MessageDialog
 	 * 
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
+	 * @param use_markup true if message uses Pango markup
 	 */
-	public InfoDialog(string title, string message)
+	public InfoDialog(string title, string message, bool use_markup=false)
 	{
 		Object(
 			title: "",
 			modal: true,
 			message_type: Gtk.MessageType.INFO,
-			buttons: Gtk.ButtonsType.OK
+			buttons: Gtk.ButtonsType.OK,
+			secondary_use_markup: use_markup
 		);
 		this.text = title;
 		this.secondary_text = message;
