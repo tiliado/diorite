@@ -152,31 +152,26 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		foreach (var child in children)
 			header_bar.remove(child);
 		
-		for (var i = 0; i < items.length; i++)
+		if (items.length == 0)
 		{
-			if (items[i] == " ")
+			header_bar.pack_end(menu_button);
+		}
+		else
+		{
+			for (var i = 0; i < items.length; i++)
 			{
-				/* GTK+ < 3.11.?? seems to have reversed ordering in HeaderBar.pack_end() */
-				if (get_gtk_version() >= 31100)
+				if (items[i] == " ")
 				{
 					header_bar.pack_end(menu_button);
 					for (var j = items.length - 1; j > i; j--)
 						toolbar_pack_end(items[j]);
+					break;
 				}
-				else
-				{
-					for (var j = i + 1; j < items.length; j++)
-						toolbar_pack_end(items[j]);
+				toolbar_pack_start(items[i]);
+				if (i == items.length - 1)
 					header_bar.pack_end(menu_button);
-				}
-				break;
 			}
-			
-			toolbar_pack_start(items[i]);
-			if (i == items.length - 1)
-				header_bar.pack_end(menu_button);
 		}
-		
 		header_bar.show_all();
 	}
 	
