@@ -37,9 +37,11 @@ MIN_GTK = "3.22.0"
 # Extras #
 #========#
 
+import sys
+assert sys.version_info >= (3, 4, 0), "Run waf with Python >= 3.4"
+
 from waflib.Errors import ConfigurationError
 from waflib import Utils
-
 
 TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
 SERIES = VERSION.rsplit(".", 1)[0]
