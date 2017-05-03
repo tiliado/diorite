@@ -25,6 +25,15 @@
 namespace Diorite
 {
 
+public bool variant_equal(Variant? a, Variant? b)
+{
+	if (a == null && b == null)
+		return true;
+	if (a == null || b == null)
+		return false;
+	return a.equal(b);
+}
+
 public string[] variant_to_strv(Variant variant)
 {
 	string[] result;
