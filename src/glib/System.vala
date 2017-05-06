@@ -60,6 +60,25 @@ namespace Diorite.System
 		file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
 	}
 	
+	/**
+	 * Make directory with parents, ignore if it exists.
+	 * 
+	 * @param directory    the directory to create
+	 * @throws GLib.Error on failure but not if it already exists.
+	 */
+	public void make_dirs(GLib.File directory) throws GLib.Error
+	{
+		try
+		{
+			directory.make_directory_with_parents();
+		}
+		catch (GLib.Error e)
+		{
+			if (!(e is GLib.IOError.EXISTS))
+				throw e;
+		}
+	}
+	
 	public async void make_directory_with_parents_async(
 		File directory, int io_priority=Priority.DEFAULT, Cancellable? cancellable = null) throws GLib.Error
 	{
