@@ -116,6 +116,26 @@ public class Storage: GLib.Object
 	}
 	
 	/**
+	 * Returns the default path of cache subdir with given name, create it if it doesn't exist.
+	 * 
+	 * @param path    Subdirectory path.
+	 * @return cache subdirectory
+	 */
+	public File create_cache_subdir(string path)
+	{
+		var dir = user_cache_dir.get_child(path);
+		try
+		{
+			System.make_dirs(dir);
+		}
+		catch (GLib.Error e)
+		{
+			warning("Failed to create directory '%s'. %s", dir.get_path(), e.message);
+		}
+		return dir;
+	}
+	
+	/**
 	 * Returns the default path of data dir/file with given name
 	 * 
 	 * @param path
@@ -124,6 +144,26 @@ public class Storage: GLib.Object
 	public File get_data_path(string path)
 	{
 		return user_data_dir.get_child(path);
+	}
+	
+	/**
+	 * Returns the default path of data subdir with given name, create it if it doesn't exist.
+	 * 
+	 * @param path    Subdirectory path.
+	 * @return data subdirectory
+	 */
+	public File create_data_subdir(string path)
+	{
+		var dir = user_data_dir.get_child(path);
+		try
+		{
+			System.make_dirs(dir);
+		}
+		catch (GLib.Error e)
+		{
+			warning("Failed to create directory '%s'. %s", dir.get_path(), e.message);
+		}
+		return dir;
 	}
 	
 	/**
