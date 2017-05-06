@@ -127,8 +127,11 @@ public class Storage: GLib.Object
 	}
 	
 	/**
-	 * Looks for a file in data directories. User's data directory has a precedence
-	 * over system data directories.
+	 * Looks for a file in data directories.
+	 * 
+	 * User's data directory has a precedence over system data directories.
+	 * 
+	 * See also require_data_file().
 	 * 
 	 * @param name name of the file
 	 * @return file instance or null if no file has been found
@@ -145,6 +148,29 @@ public class Storage: GLib.Object
 				return f;
 		}
 		return null;
+	}
+	
+	/**
+	 * Looks for a required file in data directories.
+	 * 
+	 * User's data directory has a precedence over system data directories.
+	 * If the required data file is not found, application aborts with an error message.
+	 * 
+	 * See also get_data_file().
+	 * 
+	 * @param name name of the file
+	 * @return file instance, never null
+	 */
+	public File require_data_file(string name)
+	{
+		var data_file = get_data_file(name);
+		if (data_file != null)
+			return data_file;
+		
+		var paths = user_data_dir.get_path();
+		foreach (File dir in data_dirs)
+			paths += ":" + dir.get_path();
+		error("Required data file '%s' not found in '%s'.", name, paths);
 	}
 }
 
