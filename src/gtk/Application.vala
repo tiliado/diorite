@@ -94,26 +94,26 @@ public abstract class Application : Gtk.Application
 	 */
 	public void show_uri(string uri, uint32 timestamp=Gdk.CURRENT_TIME)
 	{
+		var app_window = active_window as ApplicationWindow;
+		if (app_window == null)
+		{
+			unowned List<weak Gtk.Window> windows = get_windows();
+			foreach (var window in windows)
+			{
+				if (window is ApplicationWindow)
+				{
+					app_window = (ApplicationWindow) window;
+					break;
+				}
+			}
+		}
 		try
 		{
-			Gtk.show_uri(null, uri, timestamp);
+			Gtk.show_uri_on_window(app_window, uri, timestamp);
 		}
 		catch (GLib.Error e)
 		{
-			warning("Failed to show URI %s. %s", uri, e.message);
-			var app_window = active_window as ApplicationWindow;
-			if (app_window == null)
-			{
-				unowned List<weak Gtk.Window> windows = get_windows();
-				foreach (var window in windows)
-				{
-					if (window is ApplicationWindow)
-					{
-						app_window = (ApplicationWindow) window;
-						break;
-					}
-				}
-			}
+			warning("Failed to show URI %s. %s", uri, e.message);			
 			if (app_window != null)
 			{
 				var info_bar = new Gtk.InfoBar();
