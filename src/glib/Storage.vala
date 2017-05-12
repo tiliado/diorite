@@ -212,6 +212,21 @@ public class Storage: GLib.Object
 			paths += ":" + dir.get_path();
 		error("Required data file '%s' not found in '%s'.", name, paths);
 	}
+	
+	/**
+	 * Make sure a required file exists in any of data directories.
+	 * 
+	 * User's data directory has a precedence over system data directories.
+	 * If the required data file is not found, application aborts with an error message.
+	 * 
+	 * See also require_data_file().
+	 * 
+	 * @param name name of the file
+	 */
+	public void assert_data_file(string name)
+	{
+		require_data_file(name);
+	}
 }
 
 /**
