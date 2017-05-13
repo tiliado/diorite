@@ -94,7 +94,27 @@ public SList<string> array_to_slist(string[] array, bool strip=false)
 	return (owned) result;
 }
 
-
+/**
+ * Parse a string containing semicolon-separated set of items
+ * 
+ * @param dataset    semicolon-separated set of items
+ * @return a set data structurecontaining all unique items from data set
+ */
+public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercase)
+{
+	var result = new GenericSet<string>(str_hash, str_equal);
+	if (!is_empty(dataset))
+	{
+		var items = dataset.split(";");
+		foreach (var item in items)
+		{
+			item = item.strip();
+			if (item[0] != 0)
+				result.add(lowercase ? item.down() : item);
+		}
+	}
+	return result;
+}
 	
 public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
 {
