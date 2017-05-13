@@ -67,4 +67,34 @@ public Array<string?> wrap_strv(string?[] array)
 	return result;
 }
 
+/**
+ * Create string array from a single-linked list
+ * 
+ * @param list    List of strings
+ * @return    array of strings
+ */
+public string[] slist_to_strv(SList<string> list)
+{
+	var array = new string[list.length()];
+	var i = 0;
+	foreach (unowned string item in list)
+		array[i++] = item;
+	return array;
+}
+
+/**
+ * Create string array from a double-linked list
+ * 
+ * @param list    List of strings
+ * @return    array of strings
+ */
+public string[] list_to_strv(List<string> list)
+{
+	var array = new string[list.length()];
+	var i = 0;
+	foreach (unowned string item in list)
+		array[i++] = item;
+	return array;
+}
+
 } // namespace Drt.Utils
