@@ -30,7 +30,7 @@ namespace Drt
  */
 public class JsonArray: JsonNode
 {
-	/** The length of the array */
+	[Description(nick = "The length of the array", blurb = "The length of the array.")]
 	public uint length {get{return nodes.length;}}
 	private GLib.Array<JsonNode?> nodes;
 	
@@ -423,7 +423,7 @@ public class JsonArray: JsonNode
 	 * Returns content as a boolean array
 	 * 
 	 * @param result    the resulting boolean array
-	 * @return `true` if all array members are of type {@link ValueType.BOOLEAN} and thus `result` is valid,
+	 * @return `true` if all array members are of type {@link JsonValueType.BOOLEAN} and thus `result` is valid,
 	 *     `false` otherwise
 	 */
 	public bool as_bool_array(out bool[] result)
@@ -447,7 +447,7 @@ public class JsonArray: JsonNode
 	 * Returns content as an integer array
 	 * 
 	 * @param result    the resulting integer array
-	 * @return `true` if all array members are of type {@link ValueType.INTEGER} and thus `result` is valid,
+	 * @return `true` if all array members are of type {@link JsonValueType.INTEGER} and thus `result` is valid,
 	 *     `false` otherwise
 	 */
 	public bool as_int_array(out int[] result)
@@ -471,7 +471,7 @@ public class JsonArray: JsonNode
 	 * Returns content as a double array
 	 * 
 	 * @param result    the resulting double array
-	 * @return `true` if all array members are of type {@link ValueType.DOUBLE} and thus `result` is valid,
+	 * @return `true` if all array members are of type {@link JsonValueType.DOUBLE} and thus `result` is valid,
 	 *     `false` otherwise
 	 */
 	public bool as_double_array(out double[] result)
@@ -495,7 +495,7 @@ public class JsonArray: JsonNode
 	 * Returns content as a string array
 	 * 
 	 * @param result    the resulting string array
-	 * @return `true` if all array members are of type {@link ValueType.STRING} and thus `result` is valid,
+	 * @return `true` if all array members are of type {@link JsonValueType.STRING} and thus `result` is valid,
 	 *     `false` otherwise
 	 */
 	public bool as_string_array(out string[] result)

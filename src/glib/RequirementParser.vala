@@ -27,11 +27,17 @@ namespace Drt
 
 public errordomain RequirementError
 {
-    /** Failed to parse extension */
+    /**
+     * Failed to parse extension
+     */
     PARSE,
-    /** Invalid token found */
+    /**
+     * Invalid token found
+     */
     SYNTAX,
-    /** Failed to evaluate expression */
+    /**
+     * Failed to evaluate expression
+     */
     EVAL;
 }
 
@@ -45,13 +51,13 @@ public errordomain RequirementError
  
 public class RequirementParser
 {
-    /** Expresion */
+    [Description(nick = "Conditional expression", blurb = "A data string containing Requirement expression.")]
     public string? data  {get; private set;}
-    /** Actial position */
+    [Description(nick = "Position", blurb = "Current position inside Requirement expression string.")]
     public int pos {get; private set;}
-    /** Position of the first error */
+    [Description(nick = "The position of the first error", blurb = "The position of the first error inside Requirement expression string.")]
     public int error_pos {get; private set;}
-    /** Description of the first error */
+    [Description(nick = "The text of the first error", blurb = "The description of the first error.")]
     public string? error_text {get; private set;}
     private RequirementError? error_object;
     private int len;
@@ -84,8 +90,8 @@ public class RequirementParser
     /**
      * Print the parser expression with the given position marked.
      * 
-     * @param pos    The position to mark.
-     * @param len    The size of the mark.
+     * @param start    The position to mark.
+     * @param len      The size of the mark.
      * @return marked string 
      */
     public string mark_pos(int start, int len=1)
@@ -109,7 +115,7 @@ public class RequirementParser
      * 
      * @param requirements    The list of requirements  to parse and evaluate.
      * @return the result of the expression evaluation.
-     * @throws ConditionalExpressionError on failure
+     * @throws RequirementError on failure
      */
     public bool eval(string requirements, out string? failed_requirements) throws RequirementError
     {
@@ -141,14 +147,14 @@ public class RequirementParser
      * 
      * @param pos       the position of the identifier
      * @param ident     the name of the identifier
-     * @param params    the parameters
+     * @param parameters    the parameters
      * @return the result of the identifier call
      */
-    protected virtual bool call(int pos, string ident, string? params)
+    protected virtual bool call(int pos, string ident, string? parameters)
     {
-        if (params != null)
+        if (parameters != null)
             set_eval_error(pos, "Parameteres are not supported.");
-        return params == null && ident != "false";
+        return parameters == null && ident != "false";
     }
     
     /**
@@ -334,33 +340,33 @@ public class RequirementParser
     private bool parse_rule(int pos, string ident, ref string? failed_requirements)
     {
         Toks tok = Toks.NONE;
-        string? params;
-        if (peek(out tok, out params, null) && tok == Toks.PARAMS)
+        string? parameters;
+        if (peek(out tok, out parameters, null) && tok == Toks.PARAMS)
         {
             skip();
-            var len = params.length;
+            var len = parameters.length;
             if (len > 2)
-				params = params.substring(1, len - 2);
+				parameters = parameters.substring(1, len - 2);
 			else
-				params = null;
-            return parse_call(pos, ident, params, ref failed_requirements);
+				parameters = null;
+            return parse_call(pos, ident, parameters, ref failed_requirements);
         }
         return parse_call(pos, ident, null, ref failed_requirements);
     }
     
-    private bool parse_call(int pos, string ident, string? params, ref string? failed_requirements)
+    private bool parse_call(int pos, string ident, string? parameters, ref string? failed_requirements)
     {
         if (is_error_set())
             return false;
           
-        var result = call(pos, ident, params);
+        var result = call(pos, ident, parameters);
         if (!result)
         {
 			if (failed_requirements == null)
 				failed_requirements = "";
 			else
 				failed_requirements += " ";
-			failed_requirements += "%s[%s]".printf(ident, params ?? "");
+			failed_requirements += "%s[%s]".printf(ident, parameters ?? "");
 		}
 		return result;
     }

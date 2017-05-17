@@ -47,18 +47,18 @@ namespace Diorite
 	 * Serializes message to byte array at given offset.
 	 * 
 	 * @param name      message name
-	 * @param params    message parameters
+	 * @param parameters    message parameters
 	 * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
 	 * @return byte array with serialized message
 	 */
-	public uint8[] serialize_message(string name, Variant? params, uint offset=0)
+	public uint8[] serialize_message(string name, Variant? parameters, uint offset=0)
 	{
-		string type_str = params != null ? params.get_type_string() : "";
+		string type_str = parameters != null ? parameters.get_type_string() : "";
 		uint variant_offset = (uint) (offset + name.length + 1 + type_str.length + 1);
 		if (variant_offset % SERIALIZE_ALIGN != 0)
 			variant_offset += SERIALIZE_ALIGN - (variant_offset % SERIALIZE_ALIGN);
 		
-		uint32 buffer_size = (uint32) (variant_offset + (params != null ? params.get_size() : 0));
+		uint32 buffer_size = (uint32) (variant_offset + (parameters != null ? parameters.get_size() : 0));
 		uint8[] buffer = new uint8[buffer_size];
 		uint8* p = buffer;
 			
@@ -70,8 +70,8 @@ namespace Diorite
 		Memory.copy(p + offset, (void*) type_str, size);
 		offset += size;
 		
-		if (params != null)
-			assert(serialize_variant(params, buffer, variant_offset));
+		if (parameters != null)
+			assert(serialize_variant(parameters, buffer, variant_offset));
 		return buffer;
 	}
 	
@@ -100,14 +100,14 @@ namespace Diorite
 	 * 
 	 * @param buffer    byte array to read data from, array will be freed asynchronously, see Variant.new_from_data
 	 * @param name      message name
-	 * @param params    message parameters
+	 * @param parameters    message parameters
 	 * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
 	 * @return true on success, false on failure (i. e. invalid data)
 	 */
-	public bool deserialize_message(owned uint8[] buffer, out string name, out Variant? params, uint offset=0)
+	public bool deserialize_message(owned uint8[] buffer, out string name, out Variant? parameters, uint offset=0) 
 	{
 		name = null;
-		params = null;
+		parameters = null;
 		uint32 limit = buffer.length - offset;
 		uint8* p = (uint8*)buffer + offset;
 		
@@ -133,8 +133,8 @@ namespace Diorite
 		
 		if (type_str != "")
 		{
-			params = deserialize_variant(type_str, (owned) buffer, offset);
-			return_val_if_fail(params != null, false);
+			parameters = deserialize_variant(type_str, (owned) buffer, offset);
+			return_val_if_fail(parameters != null, false);
 		}
 		
 		name = (owned) tmp_name;

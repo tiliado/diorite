@@ -168,9 +168,9 @@ public class PropertyBinding
 	 * 
 	 * Useful for chaining
 	 * 
-	 * ```
+	 * {{{
 	 * binding.set_default(true).update_property()
-	 * ```
+	 * }}}
 	 * 
 	 * @param default_value    default value to set
 	 * @return self

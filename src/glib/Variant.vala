@@ -325,15 +325,15 @@ public double variant_to_double(Variant? value)
  * Converts any Variant value to string.
  * 
  * @param value      value to convert
- * @param default    default value (usually null or empty string)
+ * @param default_val    default value (usually null or empty string)
  * @return actual string value if the value is of type string, default value otherwise
  */
-public string? variant_to_string(Variant? value, string? default=null)
+public string? variant_to_string(Variant? value, string? default_val=null)
 {
 	var unboxed = unbox_variant(value);
 	if (unboxed != null && unboxed.is_of_type(VariantType.STRING))
 		return unboxed.get_string();
-	return default;
+	return default_val;
 }
 
 } // namespace Diorite
@@ -355,6 +355,7 @@ public Variant? new_variant_string_or_null(string? str)
  * `key` is the dictionary key, `x` is the type specifier and `value` is the dictionary value.
  * 
  * The type specifiers are:
+ * 
  *   *  `d` - double
  *   *  `b` - boolean
  *   *  `s` - string

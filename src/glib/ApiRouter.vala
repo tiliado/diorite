@@ -73,7 +73,7 @@ public class ApiRouter: MessageRouter
 		Diorite.random_bin(256, out token);
 	}
 
-	public signal void notification(GLib.Object source, string name, string? detail, Variant? params);
+	public signal void notification(GLib.Object source, string name, string? detail, Variant? parameters);
 	
 	public bool emit(string name, string? detail=null, Variant? data=null)
 	{
@@ -98,12 +98,12 @@ public class ApiRouter: MessageRouter
 	 * @param flags          Method call flags.
 	 * @param description    Description of the method for API consumers.
 	 * @param handler        Handler to be called upon successful execution.
-	 * @param params         Specification of parameters.
+	 * @param parameters         Specification of parameters.
 	 */
 	public virtual void add_method(string path, ApiFlags flags, string? description,
-		owned ApiHandler handler, ApiParam[]? params)
+		owned ApiHandler handler, ApiParam[]? parameters)
 	{
-		methods[path] = new ApiMethod(path, flags, params, (owned) handler, description);
+		methods[path] = new ApiMethod(path, flags, parameters, (owned) handler, description);
 	}
 	
 	/**

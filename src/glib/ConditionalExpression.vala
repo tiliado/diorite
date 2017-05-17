@@ -27,11 +27,17 @@ namespace Drt
 
 public errordomain ConditionalExpressionError
 {
-    /** Failed to parse extension */
+    /**
+     * Failed to parse extension
+     */
     PARSE,
-    /** Invalid token found */
+    /**
+     * Invalid token found
+     */
     SYNTAX,
-    /** Failed to evaluate expression */
+    /**
+     * Failed to evaluate expression
+     */
     EVAL;
 }
 
@@ -44,22 +50,22 @@ public errordomain ConditionalExpressionError
  *  op := "and" | "or"
  *  expr :=  ["(" ] bool [op bool]* [")"]  
  *  bool := [not] call 
- *  call :=  ident [params]
+ *  call :=  ident [parameters]
  *  ident := "\\w"
- *  params := "\\[.*?\\]"
+ *  parameters := "\\[.*?\\]"
  * 
  * Example: "webkitgtk[2.15.3] and codec[mp3] and codec[h264] and mse" 
  */ 
  
 public class ConditionalExpression
 {
-    /** Expresion */
+    [Description(nick = "Conditional expression", blurb = "A data string containing conditional expression.")]
     public string? data  {get; private set;}
-    /** Actial position */
+    [Description(nick = "Position", blurb = "Current position inside conditional expression string.")]
     public int pos {get; private set;}
-    /** Position of the first error */
+    [Description(nick = "The position of the first error", blurb = "The position of the first error inside conditional expression string.")]
     public int error_pos {get; private set;}
-    /** Description of the first error */
+    [Description(nick = "The text of the first error", blurb = "The description of the first error.")]
     public string? error_text {get; private set;}
     private ConditionalExpressionError? error_object;
     private int len;
@@ -92,8 +98,8 @@ public class ConditionalExpression
     /**
      * Print the parser expression with the given position marked.
      * 
-     * @param pos    The position to mark.
-     * @param len    The size of the mark.
+     * @param start    The position to mark.
+     * @param len      The size of the mark.
      * @return marked string 
      */
     public string mark_pos(int start, int len=1)
@@ -148,14 +154,14 @@ public class ConditionalExpression
      * 
      * @param pos       the position of the identifier
      * @param ident     the name of the identifier
-     * @param params    the parameters
+     * @param parameters    the parameters
      * @return the result of the identifier call
      */
-    protected virtual bool call(int pos, string ident, string? params)
+    protected virtual bool call(int pos, string ident, string? parameters)
     {
-        if (params != null)
+        if (parameters != null)
             set_eval_error(pos, "Parameteres are not supported.");
-        return params == null && ident != "false";
+        return parameters == null && ident != "false";
     }
     
     /**
@@ -371,25 +377,25 @@ public class ConditionalExpression
     private bool parse_ident(int pos, string ident)
     {
         Toks tok = Toks.NONE;
-        string? params;
-        if (peek(out tok, out params, null) && tok == Toks.CALL)
+        string? parameters;
+        if (peek(out tok, out parameters, null) && tok == Toks.CALL)
         {
             skip();
-            var len = params.length;
+            var len = parameters.length;
             if (len > 2)
-				params = params.substring(1, len - 2);
+				parameters = parameters.substring(1, len - 2);
 			else
-				params = null;
-            return parse_call(pos, ident, params);
+				parameters = null;
+            return parse_call(pos, ident, parameters);
         }
         return parse_call(pos, ident, null);
     }
     
-    private bool parse_call(int pos, string ident, string? params)
+    private bool parse_call(int pos, string ident, string? parameters)
     {
         if (is_error_set())
             return false;
-        return call(pos, ident, params);
+        return call(pos, ident, parameters);
     }
     
     private bool parse_and(bool lvalue)

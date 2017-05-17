@@ -107,7 +107,7 @@ public class Storage: GLib.Object
 	/**
 	 * Returns the default path of cache file/directory with given name
 	 * 
-	 * @param path
+	 * @param path    The path relative to base cache directory.
 	 * @return default cache path
 	 */
 	public File get_cache_path(string path)
@@ -138,7 +138,7 @@ public class Storage: GLib.Object
 	/**
 	 * Returns the default path of data dir/file with given name
 	 * 
-	 * @param path
+	 * @param path    child file/dir path
 	 * @return default data path
 	 */
 	public File get_data_path(string path)

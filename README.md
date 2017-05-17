@@ -20,6 +20,7 @@ Dependencies
   - gtk+-3.0 >= 3.22
   - sqlite >= 3.7
   - x11
+  - valadoc >= 0.36 (or pass --novaladoc)
 
 
 Waf
@@ -35,7 +36,7 @@ To find out what build parameters can be set run ./waf --help
 Build
 -----
 
-    $ ./waf configure [--prefix=...] [--libdir=...] [--noopt] [--nodebug]
+    $ ./waf configure [--prefix=...] [--libdir=...] [--nodebug] [--novaladoc]
     $ ./waf build
 
 Test

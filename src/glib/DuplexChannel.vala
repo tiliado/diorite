@@ -99,7 +99,7 @@ public abstract class DuplexChannel: GLib.Object
 	 * 
 	 * @param data    The data to send.
 	 * @return The data received as a response.
-	 * @throw GLib.Error on failure.
+	 * @throws GLib.Error on failure.
 	 */
 	public ByteArray? send_request(ByteArray? data=null) throws GLib.Error
 	{
@@ -116,7 +116,7 @@ public abstract class DuplexChannel: GLib.Object
 	 * 
 	 * @param data    The data to send.
 	 * @return The data received as a response.
-	 * @throw GLib.Error on failure.
+	 * @throws GLib.Error on failure.
 	 */
 	public async ByteArray? send_request_async(ByteArray? data=null) throws GLib.Error
 	{

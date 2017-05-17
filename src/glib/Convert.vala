@@ -45,7 +45,7 @@ public void int64_to_bin(int64 val, out uint8[] result)
 /**
  * Converts byte array to int64 value
  * 
- * @param val       byte array to convert
+ * @param array     byte array to convert
  * @param result    converted value
  * @return          true on success, false on overflow
  */
@@ -109,7 +109,7 @@ public bool uint8v_equal(uint8[] array1, uint8[] array2)
 /**
  * Converts hexadecimal string to byte array
  * 
- * @param array        hexadecimal string to convert
+ * @param hex          hexadecimal string to convert
  * @param result       byte array
  * @param separator    separator of hexadecimal pairs ('\0' for none)
  * @return             true on success, false on failure (invalid input)
@@ -188,7 +188,7 @@ public bool hex_to_bin(string hex, out uint8[] result, char separator='\0')
 /**
  * Converts hexadecimal string to int64 value
  * 
- * @param array        hexadecimal string to convert
+ * @param hex          hexadecimal string to convert
  * @param result       converted value
  * @param separator    separator of hexadecimal pairs ('\0' for none)
  * @return             true on success, false on failure (invalid input, overflow)
@@ -204,7 +204,7 @@ public bool hex_to_int64(string hex, out int64 result, char separator='\0')
 /**
  * Converts int64 value to hexadecimal string.
  * 
- * @param array        value to convert
+ * @param val        value to convert
  * @param result       converted value
  * @param separator    separator of hexadecimal pairs ('\0' for none)
  */

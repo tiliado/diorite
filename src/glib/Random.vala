@@ -53,7 +53,7 @@ public string random_hex(int n_bits)
  * Generate random binary data as a hexadecimal string.
  * 
  * @param n_bits    Number of random bits. Will be rounded up to the nearest byte.
- * @return Random binary data.
+ * @param result    Random binary data.
  */
 public void random_bin(int n_bits, out uint8[] result)
 {

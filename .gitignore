@@ -3,3 +3,4 @@ build
 .lock*
 examples/build
 Makefile
+__pycache__

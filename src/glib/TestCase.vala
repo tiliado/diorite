@@ -355,7 +355,8 @@ public abstract class TestCase: GLib.Object
 	 * Test is not terminated when expectation fails.
 	 * 
 	 * @param expected    expected value
-	 * @param value       real value
+	 * @param actual      real value
+	 * @param format      format string
 	 */
 	[Diagnostics]
 	[PrintfFormat]
@@ -370,7 +371,8 @@ public abstract class TestCase: GLib.Object
 	 * Test is terminated when assertion fails.
 	 * 
 	 * @param expected    expected value
-	 * @param value       real value
+	 * @param actual      real value
+	 * @param format      format string
 	 */
 	[Diagnostics]
 	/* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */

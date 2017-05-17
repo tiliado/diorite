@@ -41,7 +41,7 @@ public class MessageRouter: GLib.Object
 	 * @param name    request name
 	 * @param data    request parameters
 	 * @return response data
-	 * @throw error on failure
+	 * @throws GLib.Error on failure
 	 */
 	public virtual Variant? handle_message(GLib.Object source, string name, Variant? data) throws GLib.Error
 	{

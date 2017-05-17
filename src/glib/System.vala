@@ -136,7 +136,7 @@ namespace Diorite.System
 	 * 
 	 * @param dir          directory
 	 * @param recursive    recursive removal
-	 * @throw              Error on failure
+	 * @throws              Error on failure
 	 */
 	public void purge_directory_content(File dir, bool recursive=false) throws GLib.Error
 	{

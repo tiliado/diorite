@@ -28,8 +28,8 @@ namespace Diorite
 /**
  * Function that returns real image path for uri.
  *
- * @param uri	image uri
- * @return		real image path
+ * @param uri    image uri
+ * @return real image path
  */
 public delegate string ImageLocator(string uri);
 
@@ -57,7 +57,6 @@ public delegate string ImageLocator(string uri);
  * 
  * Tag <a> is inserted as anonymous Diorite.SimpleDocLink, <img> is inserted as Gtk.Pixbuf.
  * Other tags are inserted as Gtk.TextTags with names TEXT_TAG_*.
- * 
  */
 public class RichTextBuffer: Gtk.TextBuffer
 {
@@ -171,7 +170,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Creates new Simple Document Buffer.
 	 * 
-	 * @param text_table	Custom text table.
+	 * @param tag_table    Custom text table.!
 	 */
 	public RichTextBuffer.with_table(Gtk.TextTagTable tag_table)
 	{
@@ -216,9 +215,9 @@ public class RichTextBuffer: Gtk.TextBuffer
 	 * 
 	 * The default handler inserts image with path retrieved by image_locator.
 	 * 
-	 * @param uri		image uri
-	 * @param width		image width
-	 * @param height	image height
+	 * @param uri       image uri
+	 * @param width     image width
+	 * @param height    image height
 	 */
 	public virtual signal void image_requested(string uri, int width, int height)
 	{
@@ -236,9 +235,9 @@ public class RichTextBuffer: Gtk.TextBuffer
 	 * information to create custom Gtk.TextTag and add it to tag stack via
 	 * append_tag_to_stack().
 	 * 
-	 * @param name			tag name
-	 * @param attr_names	names of attributes
-	 * @param attr_values	values of attributes
+	 * @param name           tag name
+	 * @param attr_names     names of attributes
+	 * @param attr_values    values of attributes
 	 */
 	public signal void unknown_tag_opened(string name, string[] attr_names, string[] attr_values);
 	
@@ -246,14 +245,14 @@ public class RichTextBuffer: Gtk.TextBuffer
 	 * Emitted when an unknown in-line tag is closed. You can use provided
 	 * information to close custom Gtk.TextTag via close_tag_from_stack().
 	 * 
-	 * @param name			tag name
+	 * @param name    tag name
 	 */
 	public signal void unknown_tag_closed(string name);
 	
 	/**
 	 * Loads document from file.
 	 * 
-	 * @param doc_file		document file to load
+	 * @param doc_file    document file to load
 	 * @throws MarkupError on failure
 	 */
 	public void load_from_file(File doc_file) throws MarkupError
@@ -265,7 +264,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Appends content of a document from file.
 	 * 
-	 * @param doc_file		document file to load
+	 * @param doc_file    document file to load
 	 * @throws MarkupError on failure
 	 */
 	public void append_from_file(File doc_file) throws MarkupError
@@ -285,7 +284,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Loads a document.
 	 * 
-	 * @param doc_text		Content of a document to load.
+	 * @param doc_text    Content of a document to load.
 	 * @throws MarkupError on failure
 	 */
 	public void load(string doc_text) throws MarkupError
@@ -297,7 +296,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Appends content of a document.
 	 * 
-	 * @param doc_text		Content of a document to load.
+	 * @param doc_text    Content of a document to load.
 	 * @throws MarkupError on failure
 	 */
 	public void append(string doc_text) throws MarkupError
@@ -501,8 +500,8 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Appends tag to a stack at current position.
 	 * 
-	 * @param name		tag name
-	 * @param text_tag	tag format
+	 * @param name        tag name
+	 * @param text_tag    tag format
 	 */
 	public void append_tag_to_stack(string name, Gtk.TextTag text_tag)
 	{
@@ -571,7 +570,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Closes tag from stack and applies its formating.
 	 * 
-	 * @param name		tag name
+	 * @param name    tag name
 	 * @throws MarkupError when name doesn't match nme of the last opened tag.
 	 */
 	public void close_tag_from_stack(string name) throws MarkupError
@@ -649,9 +648,9 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Inserts image at cursor
 	 * 
-	 * @param path		path to image file (missing image icon will be shown if path is null)
-	 * @param width		image width (-1 to use original width)
-	 * @param height	image height (-1 to use original height)
+	 * @param path      path to image file (missing image icon will be shown if path is null)
+	 * @param width     image width (-1 to use original width)
+	 * @param height    image height (-1 to use original height)
 	 */
 	public void insert_image_at_cursor(string? path, int width=-1, int height=-1)
 	{
@@ -691,7 +690,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	/**
 	 * Inserts pixbuf at cursor
 	 * 
-	 * @param pixbuf	pixbuf to insert
+	 * @param pixbuf    pixbuf to insert
 	 */
 	public void insert_pixbuf_at_cursor(Gdk.Pixbuf pixbuf)
 	{
@@ -727,7 +726,7 @@ public class RichTextLink: Gtk.TextTag
 	/**
 	 * Creates new link text tag.
 	 * 
-	 * @param uri	Target URI of the link
+	 * @param uri    Target URI of the link
 	 */
 	public RichTextLink(string uri)
 	{

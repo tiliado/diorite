@@ -87,29 +87,29 @@ public class MessageChannel: BaseChannel
 		}
 	}
 	
-	public Variant? send_message(string name, Variant? params=null) throws GLib.Error
+	public Variant? send_message(string name, Variant? parameters=null) throws GLib.Error
 	{
 		var id = next_message_id();
-		var request = prepare_request(id, name, params);
+		var request = prepare_request(id, name, parameters);
 		var response = channel.send_request(request);
 		return process_response(id, (owned) response);
 	}
 	
-	public async Variant? send_message_async(string name, Variant? params=null) throws GLib.Error
+	public async Variant? send_message_async(string name, Variant? parameters=null) throws GLib.Error
 	{
 		var id = next_message_id();
-		var request = prepare_request(id, name, params);
+		var request = prepare_request(id, name, parameters);
 		var response = yield channel.send_request_async(request);
 		return process_response(id, (owned) response);
 	}
 	
-	private ByteArray? prepare_request(uint id, string name, Variant? params)
+	private ByteArray? prepare_request(uint id, string name, Variant? parameters)
 	{
 		if (log_comunication)
 			debug("Channel(%u) Request #%u: %s => %s",
-				channel.id, id, name, params != null ? params.print(false) : "null");
+				channel.id, id, name, parameters != null ? parameters.print(false) : "null");
 			
-		var buffer = Diorite.serialize_message(name, params, 0);
+		var buffer = Diorite.serialize_message(name, parameters, 0);
 		var payload = new ByteArray.take((owned) buffer);
 		return payload;
 	}
@@ -119,23 +119,23 @@ public class MessageChannel: BaseChannel
 		var bytes = ByteArray.free_to_bytes((owned) data);
 		var buffer = Bytes.unref_to_data((owned) bytes);
 		string? label = null;
-		Variant? params = null;
-		if (!Diorite.deserialize_message((owned) buffer, out label, out params, 0))
+		Variant? parameters = null;
+		if (!Diorite.deserialize_message((owned) buffer, out label, out parameters, 0))
 			throw new Diorite.MessageError.INVALID_RESPONSE("Server returned invalid response. Cannot deserialize message.");
 		
 		if (log_comunication)
 			debug("Channel(%u) Response #%u: %s => %s",
-				channel.id, id, label, params != null ? params.print(false) : "null");
+				channel.id, id, label, parameters != null ? parameters.print(false) : "null");
 		
 		if (label == Diorite.Ipc.RESPONSE_OK)
-			return params;
+			return parameters;
 			
 		if (label == Diorite.Ipc.RESPONSE_ERROR)
 		{
-			if (params == null)
+			if (parameters == null)
 				throw new Diorite.MessageError.INVALID_RESPONSE("Server returned empty error.");
 				
-			var e = Diorite.deserialize_error(params);
+			var e = Diorite.deserialize_error(parameters);
 			if (e == null)
 				throw new Diorite.MessageError.UNKNOWN("Server returned unknown error.");
 			if (!is_error_allowed(e.domain))
@@ -167,18 +167,18 @@ public class MessageChannel: BaseChannel
 	private void on_incoming_request(uint id, owned ByteArray? data)
 	{
 		string? name = null;
-		Variant? params = null;
+		Variant? parameters = null;
 		string? status = null;
 		Variant? response = null;
 		
 		var bytes = ByteArray.free_to_bytes((owned) data);
 		var buffer = Bytes.unref_to_data((owned) bytes);
-		if (!Diorite.deserialize_message((owned) buffer, out name, out params, 0))
+		if (!Diorite.deserialize_message((owned) buffer, out name, out parameters, 0))
 		{
 			warning("Server sent invalid request. Cannot deserialize message.");
 			return;
 		}
-		handle_request(name, params, out status, out response);
+		handle_request(name, parameters, out status, out response);
 		buffer = Diorite.serialize_message(status, response, 0);
 		var payload = new ByteArray.take((owned) buffer);
 		try
@@ -197,21 +197,21 @@ public class MessageChannel: BaseChannel
 	 * 
 	 * This method is similar to `handle_message`, but it uses `status` and `response` to indicate
 	 * success/failure instead of throwing error.
-	 *  
+	 * 
 	 * @param name        request name
-	 * @param params      request parameters
+	 * @param parameters      request parameters
 	 * @param status      response status
 	 * @param response    response data
 	 * @return true if request has been handled successfully
 	 */
-	protected virtual bool handle_request(string name, Variant? params, out string status, out Variant? response)
+	protected virtual bool handle_request(string name, Variant? parameters, out string status, out Variant? response)
 	{
 		if (log_comunication)
 			debug("Channel(%u) Handle request: %s => %s",
-				channel.id, name, params != null ? params.print(false) : "null");
+				channel.id, name, parameters != null ? parameters.print(false) : "null");
 		try 
 		{
-			response = router.handle_message(this, name, params);
+			response = router.handle_message(this, name, parameters);
 			status = Diorite.Ipc.RESPONSE_OK;
 		}
 		catch (GLib.Error e)

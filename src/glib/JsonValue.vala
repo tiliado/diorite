@@ -30,15 +30,25 @@ namespace Drt
  */
 public enum JsonValueType
 {
-	/** The value is `null` */
+	/**
+	 * The value is `null`
+	 */
 	NULL,
-	/** The value is of type boolean */
+	/**
+	 * The value is of type boolean
+	 */
 	BOOLEAN,
-	/** The value is a string */
+	/**
+	 * The value is a string
+	 */
 	STRING,
-	/** The value is a number in integer format */
+	/**
+	 * The value is a number in integer format
+	 */
 	INTEGER,
-	/** The value is a number in floating point format */
+	/**
+	 * The value is a number in floating point format
+	 */
 	DOUBLE;
 }
 
@@ -62,7 +72,7 @@ public class JsonValue: JsonNode
 		return result;
 	}
 	
-	/** The type this instance holds. */
+	[Description(nick = "Value type", blurb = "The value type this instance holds.")]
 	public JsonValueType value_type {get; protected set; default = JsonValueType.NULL;}
 	private int int_value = 0;
 	private double double_value = 0.0;

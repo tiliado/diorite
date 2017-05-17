@@ -69,7 +69,7 @@ public class RichTextView: Gtk.TextView
 	 * Emitted when a link is clicked. The default handler opens the link
 	 * via link_opener field.
 	 * 
-	 * @param uri	target URI of the link
+	 * @param uri    target URI of the link
 	 */
 	public virtual signal void link_clicked(string uri)
 	{
@@ -82,7 +82,7 @@ public class RichTextView: Gtk.TextView
 	 * Emitted when an image is clicked. The default handler opens the image
 	 * via image_opener field.
 	 * 
-	 * @param path	path of the image
+	 * @param path    path of the image
 	 */
 	public virtual signal void image_clicked(string path)
 	{
@@ -157,10 +157,10 @@ public class RichTextView: Gtk.TextView
 	/**
 	 * Get link at given position
 	 * 
-	 * @param x		x coordinate
-	 * @param y		y coordinate
-	 * @param link	link when found
-	 * @return	true if a link has been found
+	 * @param x       x coordinate
+	 * @param y       y coordinate
+	 * @param link    link when found
+	 * @return true if a link has been found
 	 */
 	public bool get_link_at_pos(int x, int y, out unowned RichTextLink link)
 	{
@@ -182,10 +182,10 @@ public class RichTextView: Gtk.TextView
 	/**
 	 * Check whether position is inside iter area.
 	 * 
-	 * @param iter	iter
-	 * @param x		x coordinate
-	 * @param y		y coordinate
-	 * @return	true if (x, y) is inside area of iter
+	 * @param iter    iter
+	 * @param x       x coordinate
+	 * @param y       y coordinate
+	 * @return true if (x, y) is inside area of iter
 	 */
 	public bool is_in_iter_area(Gtk.TextIter iter, int x, int y)
 	{
@@ -198,8 +198,8 @@ public class RichTextView: Gtk.TextView
 	/**
 	 * Get pixbuf at given position.
 	 * 
-	 * @param x		coordinate x
-	 * @param y		coordinate y
+	 * @param x    coordinate x
+	 * @param y    coordinate y
 	 * @return pixbuf if found, null otherwise
 	 */
 	public Gdk.Pixbuf? get_pixbuf_at_pos(int x, int y)

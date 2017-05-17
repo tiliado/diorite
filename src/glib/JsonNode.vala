@@ -67,7 +67,7 @@ public abstract class JsonNode
 	 * if (node.is_null())
 	 *     stdout.puts("OMG! A null node!\n");
 	 * }}}
-	 *  
+	 * 
 	 * @return `true` if this node represents the JSON null value
 	 */
 	public bool is_null()
@@ -125,13 +125,13 @@ public abstract class JsonNode
 	
 	/**
 	 * Check whether this node represents a JSON string value.
-	 * 
+	 *
 	 * {{{
 	 * Drt.JsonNode node = get_node();
 	 * if (node.is_string())
 	 *     stdout.printf("String node: %s\n", ((Drt.JsonValue) node).get_string());
 	 * }}}
-	 *  
+	 *
 	 * @return `true` if this node represents a JSON string value.
 	 */
 	public bool is_string()

@@ -41,6 +41,7 @@ import sys
 assert sys.version_info >= (3, 4, 0), "Run waf with Python >= 3.4"
 
 from waflib.Errors import ConfigurationError
+from waflib.Configure import conf
 from waflib import Utils
 
 TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
@@ -94,6 +95,25 @@ def pkgconfig(ctx, pkg, uselib, version, mandatory=True, store=None, vala_def=No
 	return res
 
 
+@conf
+def valadoc(ctx, package_name, doclets="devhelp html", **kwargs):
+	if ctx.env.BUILD_VALADOC:
+		doclets = [s.strip() for s in doclets.split()]
+		taskgens = []
+		for doclet in doclets:
+			name = "valadoc-%s-%s" % (package_name, doclet)
+			taskgens.append(ctx(
+				features="valadoc",
+				doclet = doclet,
+				package_name = package_name,
+				name = name,
+				target = name,
+				output_dir = "doc/%s/%s" % (doclet, package_name),
+				add_deps = doclet == "devhelp",
+				skip = not ctx.options.buildvaladoc,
+				**kwargs))
+		return taskgens
+				
 # Actions #
 #=========#
 
@@ -102,6 +122,7 @@ def options(ctx):
 	ctx.add_option('--noopt', action='store_true', default=False, dest='noopt', help="Turn off compiler optimizations")
 	ctx.add_option('--flatpak', action='store_true', default=False, dest='flatpak', help="Enable Flatpak tweaks.")
 	ctx.add_option('--nodebug', action='store_false', default=True, dest='debug', help="Turn off debugging symbols")
+	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
 	
 def configure(ctx):
 	ctx.env.REVISION_ID = get_revision_id()
@@ -126,6 +147,11 @@ def configure(ctx):
 		
 	ctx.load('compiler_c vala')
 	ctx.check_vala(min_version=tuple(int(i) for i in MIN_VALA.split(".")))
+	
+	ctx.env.BUILD_VALADOC = ctx.options.buildvaladoc
+	if ctx.env.BUILD_VALADOC:
+		ctx.load('valadoc', tooldir='.')
+	
 	pkgconfig(ctx, 'glib-2.0', 'GLIB', MIN_GLIB)
 	pkgconfig(ctx, 'gthread-2.0', 'GTHREAD', MIN_GLIB)
 	pkgconfig(ctx, 'gio-2.0', 'GIO', MIN_GLIB)
@@ -173,6 +199,17 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
 	)
+	ctx.valadoc(
+		package_name = DIORITE_GLIB,
+		package_version = VERSION,
+		files = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
+		packages = packages,
+		vala_defines = vala_defines,
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+		force = True,
+		verbose=True
+	)
 	
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
@@ -186,6 +223,18 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
 	)
+	ctx.valadoc(
+		package_name = DIORITE_GTK,
+		package_version = VERSION,
+		files = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.vapi'),
+		use = [DIORITE_GLIB],
+		packages = packages_gtk,
+		vala_defines = vala_defines,
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+		force = True,
+		verbose=True
+	)
 	
 	ctx(features = "c cshlib",
 		target = DIORITE_DB,
@@ -198,6 +247,18 @@ def build(ctx):
 		cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
+	)
+	ctx.valadoc(
+		package_name = DIORITE_DB,
+		package_version = VERSION,
+		files = ctx.path.ant_glob('src/db/*.vala') + ctx.path.ant_glob('src/db/*.vapi'),
+		use = [DIORITE_GLIB],
+		packages = packages + " sqlite3",
+		vala_defines = vala_defines,
+		vapi_dirs = ['vapi'],
+		vala_target_glib = TARGET_GLIB,
+		force = True,
+		verbose=True
 	)
 	
 	ctx(features = "c cshlib",

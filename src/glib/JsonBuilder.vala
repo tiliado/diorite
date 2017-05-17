@@ -30,7 +30,7 @@ namespace Drt
  */
 public class JsonBuilder
 {
-	/** Root node*/
+	[Description(nick = "Root node", blurb = "The root node of a JSON data structure. Usually a {@link JsonObject} or {@link JsonArray}.")]
 	public JsonNode? root {get; private set; default = null;}
 	private JsonNode? cursor = null;
 	private JsonObject? object = null;

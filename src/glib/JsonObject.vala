@@ -357,10 +357,10 @@ public class JsonObject: JsonNode
 	/**
 	 * Returns the content of a member as a boolean array
 	 * 
-	 * @param name      the member name of the node to get
-	 * @param result    the resulting boolean array
+	 * @param name          the member name of the node to get
+	 * @param bool_array    the resulting boolean array
 	 * @return `true` if the node is {@link JsonArray} and all array members are of type
-	 *     {@link ValueType.BOOLEAN} and thus `result` is valid, `false` otherwise
+	 *     {@link JsonValueType.BOOLEAN} and thus `result` is valid, `false` otherwise
 	 */
 	public bool get_bool_array(string name, out bool[] bool_array)
 	{
@@ -376,10 +376,10 @@ public class JsonObject: JsonNode
 	/**
 	 * Returns the content of a member as an integer array
 	 * 
-	 * @param name      the member name of the node to get
-	 * @param result    the resulting integer array
+	 * @param name         the member name of the node to get
+	 * @param int_array    the resulting integer array
 	 * @return `true` if the node is {@link JsonArray} and all array members are of type
-	 *     {@link ValueType.INTEGER} and thus `result` is valid, `false` otherwise
+	 *     {@link JsonValueType.INTEGER} and thus `result` is valid, `false` otherwise
 	 */
 	public bool get_int_array(string name, out int[] int_array)
 	{
@@ -395,10 +395,10 @@ public class JsonObject: JsonNode
 	/**
 	 * Returns the content of a member as a double array
 	 * 
-	 * @param name      the member name of the node to get
-	 * @param result    the resulting double array
+	 * @param name            the member name of the node to get
+	 * @param double_array    the resulting double array
 	 * @return `true` if the node is {@link JsonArray} and all array members are of type
-	 *     {@link ValueType.DOUBLE} and thus `result` is valid, `false` otherwise
+	 *     {@link JsonValueType.DOUBLE} and thus `result` is valid, `false` otherwise
 	 */
 	public bool get_double_array(string name, out double[] double_array)
 	{
@@ -414,10 +414,10 @@ public class JsonObject: JsonNode
 	/**
 	 * Returns content of a member as a string array
 	 * 
-	 * @param name      the member name of the node to get
-	 * @param result    the resulting string array
+	 * @param name            the member name of the node to get
+	 * @param string_array    the resulting string array
 	 * @return `true` if the node is {@link JsonArray} and all array members are of type
-	 *     {@link ValueType.STRING} and thus `result` is valid, `false` otherwise
+	 *     {@link JsonValueType.STRING} and thus `result` is valid, `false` otherwise
 	 */
 	public bool get_string_array(string name, out string[] string_array)
 	{
