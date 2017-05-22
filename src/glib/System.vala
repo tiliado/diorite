@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -106,6 +106,26 @@ namespace Diorite.System
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Move existing source directory to a target destination if it doesn't exists
+	 * 
+	 * If the source directory doesn't exist or the target directory do exist, nothing happens.
+	 * Parent directories are created as necessary.
+	 * 
+	 * @param source_dir    source directory
+	 * @param target_dir    target directory
+	 * @throws GLib.Error on failure
+	 * @return `true` if the directory has been moved, `false` otherwise
+	 */
+	public bool move_dir_if_target_not_found(File source_dir, File target_dir) throws GLib.Error
+	{
+		if (source_dir.query_file_type(0, null) != FileType.DIRECTORY
+		|| target_dir.query_file_type(0, null) == FileType.DIRECTORY)
+			return false;
+		make_dirs(target_dir.get_parent());
+		return source_dir.move(target_dir, 0, null, null);
 	}
 	
 	/**
