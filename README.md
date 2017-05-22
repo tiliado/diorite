@@ -60,22 +60,22 @@ Usage
 Because Diorite Library doesn't have any API nor ABI stability guarantee,
 it uses 0.x version suffix in library name to make multiple versions co-installable:
 
-  * pkg-config files: ``dioriteglib-0.x.pc`` and ``dioritegtk-0.x.pc``
-  * header files: ``diorite-1.0/dioriteglib-0.x.h`` and ``diorite-1.0/dioritegtk-0.x.h``
-  * VAPI files: ``dioriteglib-0.x.{deps,vapi}`` and ``dioritegtk-0.x.{deps,vapi}``
-  * shared libraries: ``libdioriteglib-0.x.so`` and ``libdioritegtk-0.x.so``
+  * pkg-config files: ``dioriteglib0.x.pc`` and ``dioritegtk0.x.pc``
+  * header files: ``diorite-1.0/dioriteglib0.x.h`` and ``diorite-1.0/dioritegtk0.x.h``
+  * VAPI files: ``dioriteglib0.x.{deps,vapi}`` and ``dioritegtk0.x.{deps,vapi}``
+  * shared libraries: ``libdioriteglib0.x.so`` and ``libdioritegtk0.x.so``
 
 You probably want to use ``pkg-config``:
 
-    $ pkg-config --libs --cflags dioriteglib-0.1
+    $ pkg-config --libs --cflags dioriteglib0.3
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
-    -L/usr/local/lib -ldioriteglib-0.1
+    -L/usr/local/lib -ldioriteglib-0.3
     
-    $ pkg-config --libs --cflags dioritegtk-0.1
+    $ pkg-config --libs --cflags dioritegtk-0.3
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
-    -L/usr/local/lib -ldioritegtk-0.1
+    -L/usr/local/lib -ldioritegtk0.3
 
 Environment Variables
 ---------------------

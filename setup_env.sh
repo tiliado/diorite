@@ -16,5 +16,5 @@ alias update="python3 ./waf && sudo python3 ./waf install"
 rebuild()
 {
 	python3 ./waf distclean configure build "$@" \
-	&& build/run-dioritetests-0.3
+	&& build/run-dioritetests
 }

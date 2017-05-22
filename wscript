@@ -28,7 +28,8 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-VERSION = "0.3.4"
+NEW_VERSION_SCHEME = False
+VERSION = "0.3.4" if not NEW_VERSION_SCHEME else "4.4.0"
 
 MIN_VALA = "0.34.0"
 MIN_GLIB = "2.42.1"
@@ -45,20 +46,37 @@ from waflib.Configure import conf
 from waflib import Utils
 
 TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
-SERIES = VERSION.rsplit(".", 1)[0]
-VERSIONS = tuple(int(i) for i in VERSION.split("."))
 REVISION_SNAPSHOT = "snapshot"
 
 
-def get_revision_id():
+def get_git_version():
 	import subprocess
 	try:
 		output = subprocess.Popen(["git", "describe", "--tags", "--long"], stdout=subprocess.PIPE).communicate()[0]
-		__, revision_id = output.decode("utf-8").strip().split("-", 1)
-		revision_id = revision_id.replace("-", ".")
+		return output.decode("utf-8").strip().split("-")
 	except Exception as e:
-		revision_id = REVISION_SNAPSHOT
-	return revision_id
+		return VERSION, "0", REVISION_SNAPSHOT
+
+def add_version_info(ctx):
+	bare_version, n_commits, revision_id = get_git_version()
+	if revision_id != REVISION_SNAPSHOT:
+		revision_id = "{}-{}".format(n_commits, revision_id)
+	versions = list(int(i) for i in bare_version.split("."))
+	if NEW_VERSION_SCHEME:
+		versions[2] += int(n_commits)
+		
+	version = "{}.{}.{}".format(*versions)
+	if NEW_VERSION_SCHEME:
+		series = str(versions[0])
+	else:
+		series = "{}.{}".format(*versions)
+		version += "." + n_commits
+	
+	ctx.env.SERIES = series
+	ctx.env.VERSION = version
+	ctx.env.VERSIONS = versions
+	ctx.env.REVISION_ID = revision_id
+
 
 def glib_encode_version(version):
 	major, minor, _ = tuple(int(i) for i in version.split("."))
@@ -125,14 +143,14 @@ def options(ctx):
 	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
 	
 def configure(ctx):
-	ctx.env.REVISION_ID = get_revision_id()
+	add_version_info(ctx)
 	
-	ctx.msg("Version", VERSION, "GREEN")
+	ctx.msg("Version", ctx.env.VERSION, "GREEN")
 	if ctx.env.REVISION_ID != REVISION_SNAPSHOT:
-		ctx.msg("Upstream revision", ctx.env.REVISION_ID, "GREEN")
+		ctx.msg("Upstream revision", ctx.env.REVISION_ID, color="GREEN")
 	else:
-		ctx.msg("Upstream revision", "unknown", "RED")
-	ctx.msg('Install prefix', ctx.options.prefix, "GREEN")
+		ctx.msg("Upstream revision", "unknown", color="RED")
+	ctx.msg('Install prefix', ctx.options.prefix, color="GREEN")
 	
 	ctx.env.append_unique("VALAFLAGS", "-v")
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
@@ -162,11 +180,11 @@ def configure(ctx):
 	pkgconfig(ctx, 'x11', 'X11', "0")
 	pkgconfig(ctx, 'sqlite3', 'SQLITE', "3.7")
 	
-	ctx.define("DRT_VERSION", VERSION + "+" + ctx.env.REVISION_ID)
+	ctx.define("DRT_VERSION", ctx.env.VERSION)
 	ctx.define("DRT_REVISION", ctx.env.REVISION_ID)
-	ctx.define("DRT_VERSION_MAJOR", VERSIONS[0])
-	ctx.define("DRT_VERSION_MINOR", VERSIONS[1])
-	ctx.define("DRT_VERSION_BUGFIX", VERSIONS[2])
+	ctx.define("DRT_VERSION_MAJOR", ctx.env.VERSIONS[0])
+	ctx.define("DRT_VERSION_MINOR", ctx.env.VERSIONS[1])
+	ctx.define("DRT_VERSION_BUGFIX", ctx.env.VERSIONS[2])
 	ctx.define("DRT_VERSION_SUFFIX", ctx.env.REVISION_ID)
 	
 	ctx.define('GLIB_VERSION_MAX_ALLOWED', glib_encode_version(MIN_GLIB))
@@ -177,10 +195,10 @@ def configure(ctx):
 def build(ctx):
 	#~ print ctx.env
 	PC_CFLAGS = ""
-	DIORITE_GLIB = "{}glib-{}".format(APPNAME, SERIES)
-	DIORITE_GTK = "{}gtk-{}".format(APPNAME, SERIES)
-	DIORITE_DB = "{}db-{}".format(APPNAME, SERIES)
-	DIORITE_TESTS = "{}tests-{}".format(APPNAME, SERIES)
+	DIORITE_GLIB = "{}glib{}".format(APPNAME, ctx.env.SERIES)
+	DIORITE_GTK = "{}gtk{}".format(APPNAME, ctx.env.SERIES)
+	DIORITE_DB = "{}db{}".format(APPNAME, ctx.env.SERIES)
+	DIORITE_TESTS = "{}tests".format(APPNAME)
 	RUN_DIORITE_TESTS = "run-{}".format(DIORITE_TESTS)
 	packages = 'posix glib-2.0 gio-2.0 gio-unix-2.0'
 	packages_gtk = packages + " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0"
@@ -201,7 +219,7 @@ def build(ctx):
 	)
 	ctx.valadoc(
 		package_name = DIORITE_GLIB,
-		package_version = VERSION,
+		package_version = ctx.env.VERSION,
 		files = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		vala_defines = vala_defines,
@@ -225,7 +243,7 @@ def build(ctx):
 	)
 	ctx.valadoc(
 		package_name = DIORITE_GTK,
-		package_version = VERSION,
+		package_version = ctx.env.VERSION,
 		files = ctx.path.ant_glob('src/gtk/*.vala') + ctx.path.ant_glob('src/gtk/*.vapi'),
 		use = [DIORITE_GLIB],
 		packages = packages_gtk,
@@ -250,7 +268,7 @@ def build(ctx):
 	)
 	ctx.valadoc(
 		package_name = DIORITE_DB,
-		package_version = VERSION,
+		package_version = ctx.env.VERSION,
 		files = ctx.path.ant_glob('src/db/*.vala') + ctx.path.ant_glob('src/db/*.vapi'),
 		use = [DIORITE_GLIB],
 		packages = packages + " sqlite3",
@@ -297,23 +315,22 @@ def build(ctx):
 	
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
-		target='{}glib-{}.pc'.format(APPNAME, SERIES),
+		target='{}glib{}.pc'.format(APPNAME, ctx.env.SERIES),
 		install_path='${LIBDIR}/pkgconfig',
-		VERSION=VERSION,
+		VERSION=ctx.env.VERSION,
 		PREFIX=ctx.env.PREFIX,
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
 		APPNAME=APPNAME,
 		PC_CFLAGS=PC_CFLAGS,
 		LIBNAME=DIORITE_GLIB,
-		SERIES=SERIES,
 	)
 	
 	ctx(features = 'subst',
 		source='src/dioritegtk.pc.in',
-		target='{}gtk-{}.pc'.format(APPNAME, SERIES),
+		target='{}gtk{}.pc'.format(APPNAME, ctx.env.SERIES),
 		install_path='${LIBDIR}/pkgconfig',
-		VERSION=VERSION,
+		VERSION=ctx.env.VERSION,
 		PREFIX=ctx.env.PREFIX,
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
@@ -325,9 +342,9 @@ def build(ctx):
 	
 	ctx(features = 'subst',
 		source='src/dioritedb.pc.in',
-		target='{}db-{}.pc'.format(APPNAME, SERIES),
+		target='{}db{}.pc'.format(APPNAME, ctx.env.SERIES),
 		install_path='${LIBDIR}/pkgconfig',
-		VERSION=VERSION,
+		VERSION=ctx.env.VERSION,
 		PREFIX=ctx.env.PREFIX,
 		INCLUDEDIR = ctx.env.INCLUDEDIR,
 		LIBDIR = ctx.env.LIBDIR,
@@ -337,4 +354,4 @@ def build(ctx):
 		DIORITE_GLIB=DIORITE_GLIB,
 	)
 	
-	ctx.install_as('${BINDIR}/diorite-testgen-' + SERIES, 'testgen.py', chmod=Utils.O755)
+	ctx.install_as('${BINDIR}/diorite-testgen' + ctx.env.SERIES, 'testgen.py', chmod=Utils.O755)
