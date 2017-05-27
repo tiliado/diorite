@@ -28,7 +28,7 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-NEW_VERSION_SCHEME = False
+NEW_VERSION_SCHEME = True
 VERSION = "0.3.4" if not NEW_VERSION_SCHEME else "4.4.0"
 
 MIN_VALA = "0.34.0"

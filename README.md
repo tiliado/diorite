@@ -1,5 +1,5 @@
-Diorite Library 0.3.x
-=====================
+Diorite Library 4.x
+===================
 
 ![Diorite stone](diorite.jpg)
 
@@ -42,7 +42,7 @@ Build
 Test
 ----
 
-    LD_LIBRARY_PATH=./build ./build/run-dioritetests-0.3
+    LD_LIBRARY_PATH=./build ./build/run-dioritetests
 
 Install
 -------
@@ -58,24 +58,24 @@ Usage
 -----
 
 Because Diorite Library doesn't have any API nor ABI stability guarantee,
-it uses 0.x version suffix in library name to make multiple versions co-installable:
+it uses version suffix in library name to make multiple versions co-installable:
 
-  * pkg-config files: ``dioriteglib0.x.pc`` and ``dioritegtk0.x.pc``
-  * header files: ``diorite-1.0/dioriteglib0.x.h`` and ``diorite-1.0/dioritegtk0.x.h``
-  * VAPI files: ``dioriteglib0.x.{deps,vapi}`` and ``dioritegtk0.x.{deps,vapi}``
-  * shared libraries: ``libdioriteglib0.x.so`` and ``libdioritegtk0.x.so``
+  * pkg-config files: ``dioriteglib4.pc`` and ``dioritegtk4.pc``
+  * header files: ``diorite-1.0/dioriteglib4.h`` and ``diorite-1.0/dioritegtk4.h``
+  * VAPI files: ``dioriteglib4.{deps,vapi}`` and ``dioritegtk4.{deps,vapi}``
+  * shared libraries: ``libdioriteglib4.so`` and ``libdioritegtk4.so``
 
 You probably want to use ``pkg-config``:
 
-    $ pkg-config --libs --cflags dioriteglib0.3
+    $ pkg-config --libs --cflags dioriteglib4
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
-    -L/usr/local/lib -ldioriteglib-0.3
+    -L/usr/local/lib -ldioriteglib4
     
-    $ pkg-config --libs --cflags dioritegtk-0.3
+    $ pkg-config --libs --cflags dioritegtk4
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
-    -L/usr/local/lib -ldioritegtk0.3
+    -L/usr/local/lib -ldioritegtk4
 
 Environment Variables
 ---------------------

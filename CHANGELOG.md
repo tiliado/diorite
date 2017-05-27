@@ -1,6 +1,15 @@
 Diorite Changelog
 =================
 
+Release 4.4.0 - May 27th, 2017
+------------------------------
+
+  * Versioning scheme is synchronized with Nuvola Apps 4.4. Library names have been changed accordingly:
+    dioriteglib-0.3 → dioriteglib4 and dioritegtk-0.3 → dioritegtk4.
+  * Vala documentation is built by default. Requires valadoc >= 0.36 but can be disabled with --novaladoc
+    flag.
+  * Various utility functions were added. See git log for details.
+  
 Release 0.3.4 - April 30th, 2017
 --------------------------------
 
