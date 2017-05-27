@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -143,6 +143,26 @@ public string? unmask(uint8[] data)
 	}
 	result[length] = 0;
 	return (string) result;
+}
+
+/**
+ * Return the number of UTF-16 code points to store given string.
+ * 
+ * It corresponds to JavaScript's String.length.
+ * 
+ * @param str    a string
+ * @return a number of UTF-16 code points
+ */
+public int utf16_strlen(string? str)
+{
+	if (is_empty(str))
+		return 0;
+	int len = 0;
+	unichar c = 0;
+	int i = 0;
+	while (str.get_next_char(ref i, out c))
+		len += (uint) c <= 0xFFFF ? 1 : 2;
+	return len;
 }
 
 } // namespace Diorite.String
