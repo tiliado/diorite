@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -27,39 +27,55 @@ private extern const int SQLITE_TRANSIENT;
 namespace Dioritedb
 {
 
-public abstract class Query : GLib.Object
+/**
+ * Database query object
+ */
+public abstract class Query : GLib.Object, GLib.Initable
 {
 	public Connection connection {get; private set;}
 	internal Sqlite.Statement statement = null;
 	protected int n_parameters = 0;
 	protected bool executed = false;
+	private int statement_result;
 	
-	public Query(Connection connection, string sql) throws DatabaseError
+	/**
+	 * Create new database query
+	 * 
+	 * @param connection    corresponding database connection
+	 * @param sql           a SQL query, possibly with placeholders
+	 */
+	public Query(Connection connection, string sql)
 	{
-		init(connection, sql);
-	}
-	
-	protected Query.out_error(Connection connection, string sql, out DatabaseError? error)
-	{
-		error = null;
-		try
-		{
-			init(connection, sql);
-		}
-		catch (DatabaseError e)
-		{
-			error = e;
-		}
-	}
-	
-	private void init(Connection connection, string sql) throws DatabaseError
-	{
+		GLib.Object();
 		this.connection = connection;
-		throw_on_error(connection.db.prepare_v2(sql, sql.length, out statement), sql);
-		n_parameters = statement.bind_parameter_count();
+		this.statement_result = connection.db.prepare_v2(sql, sql.length, out statement);
 	}
 	
-	public void reset(bool clear_bindings=false) throws Error, DatabaseError
+	/**
+	 * Initialize query
+	 * 
+	 * @param  cancellable    Cancellable object
+	 * @return `true` on success, `false` otherwise
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
+	public bool init(Cancellable? cancellable=null) throws GLib.Error
+	{
+		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
+		throw_on_error(statement_result, statement.sql());
+		n_parameters = statement.bind_parameter_count();
+		return true;
+	}
+	
+	/**
+	 * Reset SQL query
+	 * 
+	 * Return the prepared statement to the initial state for further reuse.
+	 * 
+	 * @param clear_bindings    whether to clear bound values too
+	 * @throws DatabaseError when operation fails
+	 */
+	public void reset(bool clear_bindings=false) throws DatabaseError
 	{
 		throw_on_error(statement.reset());
 		if (clear_bindings)
@@ -71,6 +87,14 @@ public abstract class Query : GLib.Object
 		}
 	}
 	
+	/**
+	 * Bind value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when provided data type is not supported or operation fails
+	 */
 	public Query bind(int index, GLib.Value? value) throws DatabaseError
 	{
 		if (value == null)
@@ -102,6 +126,13 @@ public abstract class Query : GLib.Object
 		throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 	}
 	
+	/**
+	 * Bind null value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_null(int index) throws DatabaseError
 	{
 		check_index(index);
@@ -110,11 +141,27 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind boolean value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_bool(int index, bool value) throws DatabaseError
 	{
 		return bind_int(index, value ? 1 : 0);
 	}
 	
+	/**
+	 * Bind integer value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_int(int index, int value) throws DatabaseError
 	{
 		check_index(index);
@@ -123,6 +170,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind 64bit integer value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_int64(int index, int64 value) throws DatabaseError
 	{
 		check_index(index);
@@ -131,6 +186,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind string value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_string(int index, string? value) throws DatabaseError
 	{
 		if (value == null)
@@ -141,6 +204,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind double value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_double(int index, double value) throws DatabaseError
 	{
 		check_index(index);
@@ -149,6 +220,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind binary data value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_blob(int index, uint8[] value) throws DatabaseError
 	{
 		check_index(index);
@@ -158,6 +237,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind {@link GLib.Bytes} value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_bytes(int index, GLib.Bytes? value) throws DatabaseError
 	{
 		if (value == null)
@@ -169,6 +256,14 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Bind {@link GLib.ByteArray} value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public Query bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError
 	{
 		if (value == null)
@@ -180,6 +275,9 @@ public abstract class Query : GLib.Object
 		return this;
 	}
 	
+	/**
+	 * Throw error if the query has already been executed.
+	 */
 	protected void check_not_executed() throws DatabaseError
 	{
 		lock (executed)
@@ -189,6 +287,9 @@ public abstract class Query : GLib.Object
 		}
 	}
 	
+	/**
+	 * Throw error if the query has been already executed and set executed flag.
+	 */
 	protected void check_not_executed_and_set(bool executed) throws DatabaseError
 	{
 		lock (this.executed)
@@ -199,6 +300,9 @@ public abstract class Query : GLib.Object
 		}
 	}
 	
+	/**
+	 * Throw error if the index is out of bounds.
+	 */
 	protected int check_index(int index) throws DatabaseError
 	{
 		if (n_parameters == 0)
@@ -209,6 +313,9 @@ public abstract class Query : GLib.Object
 		return index;
 	}
 	
+	/**
+	 * Throw error if statement fails.
+	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
 		return Dioritedb.convert_error(connection.db, result, sql, statement);

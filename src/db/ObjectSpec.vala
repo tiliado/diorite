@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -25,6 +25,9 @@
 namespace Dioritedb
 {
 
+/**
+ * ORM object specification
+ */
 public class ObjectSpec
 {
 	public Type object_type {get; private set;}
@@ -32,6 +35,14 @@ public class ObjectSpec
 	public unowned ParamSpec primary_key {get; private set;}
 	public (unowned ParamSpec)[] properties {get; private set;}
 	
+	/**
+	 * Creates new ORM object specification
+	 * 
+	 * @param type           object type
+	 * @param primary_key    primary key of the corresponding database table
+	 * @param properties     properties to serialize into database
+	 * @throws DatabaseError if data type is invalid or primary key is not found
+	 */
 	public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError
 	{
 		if (!type.is_object())
@@ -43,6 +54,14 @@ public class ObjectSpec
 		this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
 	}
 	
+	/**
+	 * Creates new ORM object specification
+	 * 
+	 * @param type           object type
+	 * @param primary_key    primary key of the corresponding database table
+	 * @param properties     properties to serialize into database
+	 * @throws DatabaseError if data type is invalid or primary key is not found
+	 */
 	public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError
 	{
 		if (!type.is_object())

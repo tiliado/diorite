@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -25,11 +25,22 @@
 namespace Dioritedb
 {
 
-public class Connection: GLib.Object
+/**
+ * SQLite Database Connection
+ */
+public class Connection: GLib.Object, Queryable
 {
-	public unowned Database database {get; private set;}
+	public Database database {get; private set;}
 	internal Sqlite.Database db;
 	
+	/**
+	 * Create new database connection
+	 * 
+	 * @param database       Database to connect to
+	 * @param cancellable    Cancellable object
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public Connection(Database database, Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
@@ -38,18 +49,48 @@ public class Connection: GLib.Object
 			database.db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null));
 	}
 	
+	/**
+	 * Execute a sql query on database conection
+	 * 
+	 * @param sql            SQL query
+	 * @param cancellable    Cancellable object
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		throw_on_error(db.exec(sql, null, null), sql);
 	}
 	
+	/**
+	 * Create new raw data query
+	 * 
+	 * After query is created, primitive data types can be bound prior execution.
+	 * 
+	 * @param sql            SQL query
+	 * @param cancellable    Cancellable object
+	 * @return new query object for further modifications prior execution
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public RawQuery query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-		return new RawQuery(this, sql);
+		var query = new RawQuery(this, sql);
+		query.init();
+		return query;
 	}
 	
+	/**
+	 * Create new ORM query
+	 * 
+	 * @param sql_filter     SQL condidions for filtering of objects
+	 * @param cancellable    Cancellable object
+	 * @return new ORM query object
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public ObjectQuery<T> query_objects<T>(string? sql_filter=null, Cancellable? cancellable=null)
 		throws GLib.Error, DatabaseError
 	{
@@ -86,9 +127,20 @@ public class Connection: GLib.Object
 		if (sql_filter != null && sql_filter[0] != '\0')
 			sql.append(sql_filter);
 		
-		return new ObjectQuery<T>(this, sql.str);
+		var query = new ObjectQuery<T>(this, sql.str);
+		query.init();
+		return query;
 	}
 	
+	/**
+	 * Get a single ORM object
+	 * 
+	 * @param pk             value of primary key
+	 * @param cancellable    Cancellable object
+	 * @return new ORM object
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public T get_object<T>(GLib.Value pk, Cancellable? cancellable=null)
 		throws GLib.Error, DatabaseError
 	{
@@ -110,6 +162,9 @@ public class Connection: GLib.Object
 			.bind(1, pk).get_one(cancellable);
 	}
 	
+	/**
+	 * Throw error on SQLite failure.
+	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
 		return Dioritedb.convert_error(db, result, sql);

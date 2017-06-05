@@ -84,7 +84,7 @@ public class ResultTest: Diorite.TestCase
 		if (!db.opened)
 			db.open();
 		
-		return db.get_master_connection().query(sql);
+		return new Connection(db).query(sql);
 	}
 	
 	private Result select_data()  throws GLib.Error, DatabaseError

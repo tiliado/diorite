@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -25,6 +25,9 @@
 namespace Dioritedb
 {
 
+/**
+ * Result of database query
+ */
 public class Result : GLib.Object
 {
 	public Query query {get; private set;}
@@ -34,6 +37,11 @@ public class Result : GLib.Object
 	private HashTable<unowned string, int> column_indexes;
 	private (unowned string)[]? column_names;
 	
+	/**
+	 * Creates new database query result object
+	 * 
+	 * @param query    corresponding query
+	 */
 	public Result(Query query)
 	{
 		this.query = query;
@@ -42,6 +50,14 @@ public class Result : GLib.Object
 		column_names = null;
 	}
 	
+	/**
+	 * Proceed to the next record
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @return `true` if there is a next record, `false` if query data has been exhausted
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public bool next(Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
@@ -60,6 +76,12 @@ public class Result : GLib.Object
 		return !done;
 	}
 	
+	/**
+	 * Return column index by name
+	 * 
+	 * @param name    column name
+	 * @return the index of the column if it exists, `-1` otherwise 
+	 */
 	public int get_column_index(string name)
 	{
 		map_column_names();
@@ -69,6 +91,12 @@ public class Result : GLib.Object
 		return -1;
 	}
 	
+	/**
+	 * Get column name by index
+	 * 
+	 * @param index the index of a column
+	 * @return the name of the column if index is valid, `null` otherwise
+	 */
 	public unowned string? get_column_name(int index)
 	{
 		map_column_names();
@@ -77,6 +105,13 @@ public class Result : GLib.Object
 		return column_names[index];
 	}
 	
+	/**
+	 * Create ORM object from database record
+	 * 
+	 * @return object cotaining database data according to corresponding {@link ObjectSpec}
+	 * @throws DatabaseError if data type `T` is not supported or {@link ObjectSpec} is not found
+	 * @see Database.add_object_spec
+	 */
 	public T? create_object<T>() throws DatabaseError
 	{
 		var type = typeof(T);
@@ -90,7 +125,6 @@ public class Result : GLib.Object
 		Parameter[] parameters = {};
 		foreach (var property in object_spec.properties)
 		{
-			
 			var index = get_column_index(property.name);
 			if (index < 0)
 				throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
@@ -100,10 +134,15 @@ public class Result : GLib.Object
 				value = GLib.Value(property.value_type);
 			parameters += GLib.Parameter(){name = property.name, value = value};
 		}
-		
 		return (T) GLib.Object.newv(type, parameters);
 	}
 	
+	/**
+	 * Fill ORM object from database data
+	 * 
+	 * @param object    the object to fill with database data
+	 * @throws DatabaseError if corresponding {@link ObjectSpec} is not found
+	 */
 	public void fill_object(GLib.Object object) throws DatabaseError
 	{
 		var type = object.get_type();
@@ -126,7 +165,6 @@ public class Result : GLib.Object
 			{
 				object.set_property(property.name, value);
 			}
-				
 			else if ((property.flags & ParamFlags.READABLE) != 0)
 			{
 				var current_value = GLib.Value(property.value_type);
@@ -137,6 +175,14 @@ public class Result : GLib.Object
 		}
 	}
 	
+	/**
+	 * Fetch value from current database record
+	 * 
+	 * @param index    column index
+	 * @param type     value data type
+	 * @return the requested value
+	 * @throws DatabaseError if data type is not supported or index is invalid
+	 */
 	public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError
 	{
 		if (fetch_is_null(index))
@@ -168,35 +214,77 @@ public class Result : GLib.Object
 		return value;
 	}
 	
+	/**
+	 * Fetch null value from current database record
+	 * 
+	 * @param index    column index
+	 * @return true if value is null
+	 * @throws DatabaseError if index is invalid
+	 */
 	public bool fetch_is_null(int index) throws DatabaseError
 	{
 		check_index(index);
 		return statement.column_type(index) == Sqlite.NULL;
 	}
 	
+	/**
+	 * Fetch integer value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the integer value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public int fetch_int(int index) throws DatabaseError
 	{
 		check_index(index);
 		return statement.column_int(index);
 	}
 	
+	/**
+	 * Fetch 64bit integer value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the 64bit integer value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public int64 fetch_int64(int index) throws DatabaseError
 	{
 		check_index(index);
 		return statement.column_int64(index);
 	}
 	
+	/**
+	 * Fetch boolean value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the boolean value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public bool fetch_bool(int index) throws DatabaseError
 	{
 		return fetch_int(index) != 0;
 	}
 	
+	/**
+	 * Fetch double value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the double value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public double fetch_double(int index) throws DatabaseError
 	{
 		check_index(index);
 		return statement.column_double(index);
 	}
 	
+	/**
+	 * Fetch string value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the string value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public unowned string? fetch_string(int index) throws DatabaseError
 	{
 		check_index(index);
@@ -212,6 +300,13 @@ public class Result : GLib.Object
 		return result;
 	}
 	
+	/**
+	 * Fetch binary blob value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the binary blob value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public uint8[]? fetch_blob(int index) throws DatabaseError
 	{
 		check_index(index);
@@ -223,18 +318,38 @@ public class Result : GLib.Object
 		return blob; // dup array
 	}
 	
+	/**
+	 * Fetch GLib.Bytes value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the binary blob as GLib.Bytes value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public GLib.Bytes? fetch_bytes(int index) throws DatabaseError
 	{
 		var blob = fetch_blob(index);
 		return blob != null ? new GLib.Bytes.take((owned) blob) : null;
 	}
 	
+	/**
+	 * Fetch GLib.ByteArray value from current database record
+	 * 
+	 * @param index    column index
+	 * @return the binary blob as GLib.ByteArray value
+	 * @throws DatabaseError if index is invalid
+	 */
 	public GLib.ByteArray? fetch_byte_array(int index) throws DatabaseError
 	{
 		var blob = fetch_blob(index);
 		return blob != null ? new GLib.ByteArray.take((owned) blob) : null;
 	}
 	
+	/**
+	 * Check whether index is valid
+	 * 
+	 * @param index    column index
+	 * @throws DatabaseError if index is invalid
+	 */
 	protected void check_index(int index) throws DatabaseError
 	{
 		if (n_columns == 0)
@@ -244,11 +359,17 @@ public class Result : GLib.Object
 				"Index %d is not in range 0..%d. |%s|", index, n_columns - 1, statement.sql());
 	}
 	
+	/**
+	 * Throw an error on SQLite failure.
+	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
 		return Dioritedb.convert_error(query.connection.db, result, sql, statement);
 	}
 	
+	/**
+	 * Map column names to indexes and vice versa.
+	 */
 	private void map_column_names()
 	{
 		/*

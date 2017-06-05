@@ -38,7 +38,7 @@ public class ObjectQueryTest: Diorite.TestCase
 		try
 		{
 			db.open();
-			conn = db.get_master_connection();
+			conn = new Connection(db);
 			query(TABLE_USERS_SQL).exec();
 			query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
 				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
@@ -87,7 +87,7 @@ public class ObjectQueryTest: Diorite.TestCase
 	
 	private RawQuery? query(string sql) throws GLib.Error, DatabaseError
 	{
-		return db.get_master_connection().query(sql);
+		return conn.query(sql);
 	}
 	
 	public void test_get_cursor()

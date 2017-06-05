@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -40,6 +40,12 @@ public errordomain DatabaseError
 	TOO_MANY_RESULTS;
 }
 
+/**
+ * Check whether data type is supported
+ * 
+ * @param type    the type to check
+ * @return `true` if the given type is supported, `false` otherwise
+ */
 public bool is_type_supported(Type? type)
 {
 	return (
@@ -56,6 +62,13 @@ public bool is_type_supported(Type? type)
 	);
 }
 
+/**
+ * Create a list of property specifications of a given ObjectClass
+ * 
+ * @param class_spec    object class to retrieve property specifications from
+ * @param properties    properties to retrieve specification for or `null` to use all properties
+ * @return array of requested property specifications
+ */
 private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, string[]? properties = null)
 		throws DatabaseError
 {
@@ -77,7 +90,22 @@ private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, str
 	return properties_list;
 }
 
-// http://www.sqlite.org/rescode.html
+/**
+ * Convert SQLite error code to DatabaseError
+ * 
+ * SQLite error codes: [[http://www.sqlite.org/rescode.html]]
+ * 
+ * Parameters `db`, `sql` and `stm` are optional but add more information
+ * to the resulting error message.
+ * 
+ * @param db        database where the error occurred
+ * @param result    sqlite error code
+ * @param sql       executed sql query
+ * @param stm       sqlite statement
+ * @throws DatabaseError if result code corresponds to a failure
+ * @return `result` if it indicates success code
+ */
+
 private static int convert_error(Sqlite.Database? db, int result, string? sql=null,
 	Sqlite.Statement? stm = null) throws DatabaseError
 {
@@ -97,11 +125,18 @@ private static int convert_error(Sqlite.Database? db, int result, string? sql=nu
 }
 
 /**
- * Usage:
+ * Throw {@link GLib.IOError} if an operation has been cancelled.
+ * 
+ * Typical usage:
  * 
  * {{{
  * throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
  * }}}
+ * 
+ * @param cancellable    Cancellation object.
+ * @param method         Called method
+ * @param file           Source code file
+ * @param line           Source code line
  */
 public void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
 	throws IOError
@@ -110,10 +145,15 @@ public void throw_if_cancelled(Cancellable? cancellable, string? method=null, st
         throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
 }
 
-
-private inline string escape_sql_id(string sql)
+/**
+ * Escape SQL identifier
+ * 
+ * @param sql_id    SQL id to escape
+ * @return escaped id
+ */
+private inline string escape_sql_id(string sql_id)
 {
-	return sql.replace("\"", "\"\"");
+	return sql_id.replace("\"", "\"\"");
 }
 
 } // namespace Dioritedb

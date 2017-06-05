@@ -38,7 +38,7 @@ public class ConnectionTest: Diorite.TestCase
 		try
 		{
 			db.open();
-			conn = db.get_master_connection();
+			conn = new Connection(db);
 			conn.query(TABLE_USERS_SQL).exec();
 			conn.query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
 				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
@@ -51,7 +51,8 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			error("%s", e.message);
+			
+			warning("%s", e.message);
 		}
 	}
 	

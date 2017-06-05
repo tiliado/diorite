@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -25,23 +25,42 @@
 namespace Dioritedb
 {
 
+/**
+ * Cursor to browse set of ORM objects
+ */
 public class ObjectCursor<T>
 {
 	public uint counter {get; private set; default=0;}
 	private Cancellable? cancellable;
 	private Result result;
 	
+	/**
+	 * Creates new ObjectCursor
+	 * 
+	 * @param result         the result of ORM query
+	 * @param cancellable    Cancelable object
+	 */
 	public ObjectCursor(Result result, Cancellable? cancellable=null)
 	{
 		this.result = result;
 		this.cancellable = cancellable;
 	}
 	
+	/**
+	 * Return iterator.
+	 * 
+	 * @return `this` object
+	 */
 	public ObjectCursor<T> iterator()
 	{
 		return this;
 	}
 	
+	/**
+	 * Advance the cursor
+	 * 
+	 * @return `true` if there is still data
+	 */
 	public bool next() throws Error, DatabaseError
 	{
 		 if (result.next())
@@ -51,7 +70,12 @@ public class ObjectCursor<T>
 		 }
 		 return false;
 	}
-
+	
+	/**
+	 * Get object under cursor
+	 * 
+	 * @return current object
+	 */
 	public T get() throws Error, DatabaseError
 	{
 		return result.create_object<T>();

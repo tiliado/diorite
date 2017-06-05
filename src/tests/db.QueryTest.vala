@@ -80,7 +80,7 @@ public class QueryTest: Diorite.TestCase
 		if (!db.opened)
 			db.open();
 		
-		return db.get_master_connection().query(sql);
+		return new Connection(db).query(sql);
 	}
 	
 	public void test_exec_no_bind()

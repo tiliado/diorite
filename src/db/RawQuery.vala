@@ -25,16 +25,32 @@
 namespace Dioritedb
 {
 
+/**
+ * Raw query class.
+ * 
+ * Used for queries with bound primitive types.
+ */
 public class RawQuery : Query
 {
-	public RawQuery(Connection connection, string sql) throws DatabaseError
+	/**
+	 * Creates new RawQuery object.
+	 * 
+	 * @param connection    corresponding database connection
+	 * @param sql           a SQL query, possibly with placeholders
+	 */
+	public RawQuery(Connection connection, string sql)
 	{
-		DatabaseError caught_error;
-		base.out_error(connection, sql, out caught_error);
-		if (caught_error != null)
-			throw caught_error;
+		base(connection, sql);
 	}
 	
+	/**
+	 * Execute SQL query
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @return the result of the query
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
 	public Result exec(Cancellable? cancellable=null) throws Error, DatabaseError
 	{
 		check_not_executed_and_set(true);
@@ -44,7 +60,9 @@ public class RawQuery : Query
 	}
 	
 	/**
-	 * Usage:
+	 * Executes a select SQL query
+	 * 
+	 * Typical usage:
 	 * 
 	 * {{{
 	 * Result result = query.exec_select();
@@ -53,67 +71,151 @@ public class RawQuery : Query
 	 *        // process data
 	 * }
 	 * }}}
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @return the result of the query
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
 	 */
-	public Result exec_select(Cancellable? cancellable=null) throws Error, DatabaseError
+	public Result select(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		check_not_executed_and_set(true);
 		return new Result(this);
 	}
 	
+	/**
+	 * Bind value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when provided data type is not supported or operation fails
+	 */
 	public new RawQuery bind(int index, GLib.Value? value) throws DatabaseError
 	{
 		base.bind(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind null value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_null(int index) throws DatabaseError
 	{
 		base.bind_null(index);
 		return this;
 	}
 	
+	/**
+	 * Bind boolean value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_bool(int index, bool value) throws DatabaseError
 	{
 		base.bind_bool(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind integer value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_int(int index, int value) throws DatabaseError
 	{
 		base.bind_int(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind 64bit integer value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_int64(int index, int64 value) throws DatabaseError
 	{
 		base.bind_int64(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind string value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_string(int index, string? value) throws DatabaseError
 	{
 		base.bind_string(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind double value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_double(int index, double value) throws DatabaseError
 	{
 		base.bind_double(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind binary data value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_blob(int index, uint8[] value) throws DatabaseError
 	{
 		base.bind_blob(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind {@link GLib.Bytes} value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_bytes(int index, GLib.Bytes? value) throws DatabaseError
 	{
 		base.bind_bytes(index, value);
 		return this;
 	}
 	
+	/**
+	 * Bind {@link GLib.ByteArray} value to query
+	 * 
+	 * @param index    the index of the value placeholder in the SQL query
+	 * @param value    the value to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when operation fails
+	 */
 	public new RawQuery bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError
 	{
 		base.bind_byte_array(index, value);
