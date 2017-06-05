@@ -242,6 +242,8 @@ def build(ctx):
 		cflags = ['-DG_LOG_DOMAIN="DioriteGtk"'],
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
+		internal=True,
+		private=True,
 	)
 	ctx.valadoc(
 		package_name = DIORITE_GTK,
@@ -252,6 +254,8 @@ def build(ctx):
 		vala_defines = vala_defines,
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
+		internal=True,
+		private=True,
 		force = True,
 		verbose=True
 	)
@@ -277,6 +281,8 @@ def build(ctx):
 		vala_defines = vala_defines,
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
+		internal=True,
+		private=True,
 		force = True,
 		verbose=True
 	)
