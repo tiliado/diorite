@@ -271,6 +271,24 @@ public abstract class TestCase: GLib.Object
 	 */
 	[Diagnostics]
 	[PrintfFormat]
+	protected bool expect_type_equals(Type expected, Type value, string format, ...)
+	{
+		var result = process(expected == value, format, va_list());
+		if (!result && !Test.quiet())
+			stdout.printf("\t %s == %s failed.\n", expected.name(), value.name());
+		return result;
+	}
+	
+	/**
+	 * Expectation
+	 * 
+	 * Test is not terminated when expectation fails.
+	 * 
+	 * @param expected    expected value
+	 * @param value       real value
+	 */
+	[Diagnostics]
+	[PrintfFormat]
 	protected bool expect_str_not_equal(string? expected, string? value, string format, ...)
 	{
 		var result = process(expected != value, format, va_list());
