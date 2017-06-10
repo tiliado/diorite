@@ -165,4 +165,19 @@ public int utf16_strlen(string? str)
 	return len;
 }
 
+/**
+ * Create unowned string at the given offset
+ * 
+ * @param str       the parent string
+ * @param offset    starting offset
+ * @return unowned substring starting at given offset
+ */
+public unowned string offset(string str, int offset)
+{
+	assert(offset >= 0);
+	uint8* pointer = ((uint8*) str) + offset;
+	unowned string result = (string) pointer;
+	return result;
+}
+
 } // namespace Diorite.String
