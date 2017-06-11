@@ -30,61 +30,98 @@ namespace Dioritedb
 /**
  * Database query object
  */
-public abstract class Query : GLib.Object, GLib.Initable
+public class Query : GLib.Object
 {
 	public Connection connection {get; private set;}
-	internal Sqlite.Statement statement = null;
+	private Sqlite.Statement? statement = null;
 	protected int n_parameters = 0;
-	protected bool executed = false;
-	private int statement_result;
 	
 	/**
-	 * Create new database query
+	 * Create new database query wrapper
 	 * 
-	 * @param connection    corresponding database connection
-	 * @param sql           a SQL query, possibly with placeholders
+	 * @param connection      corresponding database connection
+	 * @param statement       corresponding sql query
 	 */
-	public Query(Connection connection, string sql)
+	public Query(Connection connection, owned Sqlite.Statement statement)
 	{
 		GLib.Object();
 		this.connection = connection;
-		this.statement_result = connection.db.prepare_v2(sql, sql.length, out statement);
+		this.statement = (owned) statement;
+		this.n_parameters = this.statement.bind_parameter_count();
 	}
 	
 	/**
-	 * Initialize query
+	 * Execute SQL query
 	 * 
-	 * @param  cancellable    Cancellable object
-	 * @return `true` on success, `false` otherwise
+	 * @param cancellable    Cancellable object
+	 * @return the result of the query
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public bool init(Cancellable? cancellable=null) throws GLib.Error
+	public Result exec(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
-		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-		throw_on_error(statement_result, statement.sql());
-		n_parameters = statement.bind_parameter_count();
-		return true;
+		var result = get_result();
+		result.next(cancellable);
+		return result;
 	}
 	
 	/**
-	 * Reset SQL query
+	 * Executes a select SQL query
 	 * 
-	 * Return the prepared statement to the initial state for further reuse.
+	 * Typical usage:
 	 * 
-	 * @param clear_bindings    whether to clear bound values too
+	 * {{{
+	 * Result result = query.select();
+	 * while (result.next())
+	 * {
+	 *        // process data
+	 * }
+	 * }}}
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @return the result of the query
+	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public void reset(bool clear_bindings=false) throws DatabaseError
+	public Result select(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
-		throw_on_error(statement.reset());
-		if (clear_bindings)
-			throw_on_error(statement.clear_bindings());
-		
-		lock (executed)
+		return get_result();
+	}
+	
+	/**
+	 * Get result of the query
+	 * 
+	 * The query is not executed until {@link Result.next} is called.
+	 * It is more convenient to call {@link exec} or {@link select} instead.
+	 * 
+	 * @return result wrapper
+	 * @throws DatabaseError if the query has already been executed
+	 */
+	public Result get_result() throws DatabaseError
+	{
+		check_not_executed();
+		var result = new Result(connection, (owned) statement);
+		statement = null;
+		return result;
+	}
+	
+	/**
+	 * Bind values to query
+	 * 
+	 * @param index     the index of the first value placeholder in the SQL query
+	 * @param values    the values to bind
+	 * @return `this` query object for easier chaining
+	 * @throws DatabaseError when provided data type is not supported or operation fails
+	 */
+	public Query bind_values(int index, SList<Value?> values) throws DatabaseError
+	{
+		var len = values.length();
+		for (var i = 0; i < len; i++)
 		{
-			executed = false;
+			bind(index + i, values.data);
+			values = values.next;
 		}
+		return this;
 	}
 	
 	/**
@@ -280,24 +317,8 @@ public abstract class Query : GLib.Object, GLib.Initable
 	 */
 	protected void check_not_executed() throws DatabaseError
 	{
-		lock (executed)
-		{
-			if (executed)
-				throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
-		}
-	}
-	
-	/**
-	 * Throw error if the query has been already executed and set executed flag.
-	 */
-	protected void check_not_executed_and_set(bool executed) throws DatabaseError
-	{
-		lock (this.executed)
-		{
-			if (this.executed)
-				throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
-			this.executed = executed;
-		}
+		if (statement == null)
+			throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
 	}
 	
 	/**
@@ -318,7 +339,9 @@ public abstract class Query : GLib.Object, GLib.Initable
 	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
-		return Dioritedb.convert_error(connection.db, result, sql, statement);
+		if (Dioritedb.is_sql_error(result))
+			throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
+		return result;
 	}
 }
 

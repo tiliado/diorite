@@ -25,6 +25,9 @@
 namespace Dioritedb
 {
 
+[CCode(cname="sqlite3_errstr")]
+private extern unowned string sqlite3_errstr(int errcode);
+
 /**
  * SQLite database object
  */
@@ -32,6 +35,7 @@ public class Database: GLib.Object, Queryable
 {
 	
 	public File db_file {get; construct;}
+	public OrmManager orm {get; construct;}
 	
 	private bool _opened = false;
 	public bool opened
@@ -53,17 +57,16 @@ public class Database: GLib.Object, Queryable
 	}
 	
 	private Connection? master_connection = null;
-	private HashTable<Type, ObjectSpec> object_specs;
 	
 	/**
 	 * Creates new database object
 	 * 
 	 * @param db_file    corresponding database file
+	 * @param orm        Object Relationship Mapping manager
 	 */
-	public Database (File db_file)
+	public Database (File db_file, OrmManager? orm=null)
 	{
-		GLib.Object(db_file: db_file);
-		object_specs = new HashTable<Type, ObjectSpec>(Diorite.Types.type_hash, Diorite.Types.type_equal);
+		GLib.Object(db_file: db_file, orm: orm ?? new OrmManager());
 	}
 	
 	/**
@@ -89,7 +92,7 @@ public class Database: GLib.Object, Queryable
 		if (db_file.query_exists(cancellable) && db_file.query_file_type(0, cancellable) != FileType.REGULAR)
 			throw new DatabaseError.IOERROR("'%s' exists, but is not a file.", db_file.get_path());
 		
-		master_connection = open_connection(cancellable, true);
+		master_connection = open_connection_internal(cancellable, true);
 		opened = true;
 	}
 	
@@ -133,24 +136,74 @@ public class Database: GLib.Object, Queryable
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public RawQuery query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		return get_master_connection().query(sql, cancellable);
 	}
 	
 	/**
-	 * Create new ORM query
+	 * Create new raw data query with values
 	 * 
-	 * @param sql_filter     SQL condidions for filtering of objects
+	 * After query is created, primitive data types can still be bound prior execution.
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @param sql            SQL query with {@link BindExpression} syntax
+	 * @param ...            Values to be bound
+	 * @return new query object for further modifications prior execution
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
+	public Query query_with_values(Cancellable? cancellable, string sql, ...)
+		throws GLib.Error, DatabaseError
+	{
+		return get_master_connection().query_with_values_va(cancellable, sql, va_list());
+	}
+	
+	/**
+	 * Create new raw data query with values
+	 * 
+	 * After query is created, primitive data types can still be bound prior execution.
+	 * 
+	 * @param cancellable    Cancellable object
+	 * @param sql            SQL query with {@link BindExpression} syntax
+	 * @param args           Values to be bound
+	 * @return new query object for further modifications prior execution
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
+	public Query query_with_values_va(Cancellable? cancellable, string sql, va_list args)
+		throws GLib.Error, DatabaseError
+	{
+		return get_master_connection().query_with_values_va(cancellable, sql, args);
+	}
+	
+	/**
+	 * Get ORM objects
+	 * 
 	 * @param cancellable    Cancellable object
 	 * @return new ORM query object
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public ObjectQuery<T> query_objects<T>(string? sql_filter=null, Cancellable? cancellable=null) 
+	public ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	{
+		return get_master_connection().get_objects<T>(cancellable);
+	}
+	
+	/**
+	 * Create new ORM query
+	 * 
+	 * @param sql_filter     SQL conditions for filtering of objects (with {@link BindExpression})
+	 * @param cancellable    Cancellable object
+	 * @param ...            Data to bind to the query placeholders
+	 * @return new ORM query object
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
+	public ObjectQuery<T> query_objects<T>(Cancellable? cancellable, string? sql_filter, ...) 
 		throws GLib.Error, DatabaseError
 	{
-		return get_master_connection().query_objects<T>(sql_filter, cancellable);
+		return get_master_connection().query_objects_va<T>(cancellable, sql_filter, va_list());
 	}
 	
 	/**
@@ -169,29 +222,19 @@ public class Database: GLib.Object, Queryable
 	}
 	
 	/**
-	 * Add ORM object specification
+	 * Return last error message
 	 * 
-	 * @param spec    ORM object specification
+	 * @return the last error message
 	 */
-	public void add_object_spec(ObjectSpec spec)
+	public unowned string? get_last_error_message()
 	{
-		lock (object_specs)
+		try
 		{
-			object_specs[spec.object_type] = spec;
+			return get_master_connection().get_last_error_message();
 		}
-	}
-	
-	/**
-	 * Retrieve ORM object specification for given type
-	 * 
-	 * @param type    {@link GLib.Object} type
-	 * @return ORM object spec or `null` if it is not found
-	 */
-	public ObjectSpec? get_object_spec(Type type)
-	{
-		lock (object_specs)
+		catch (DatabaseError e)
 		{
-			return object_specs[type];
+			return null;
 		}
 	}
 	
@@ -210,17 +253,35 @@ public class Database: GLib.Object, Queryable
 	/**
 	 * Open new database connection
 	 * @param cancellable    Cancellable object
+	 * @return new database connection
+	 * @throws GLib.IOError when the operation is cancelled
+	 * @throws DatabaseError when operation fails
+	 */
+	public Connection open_connection(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+	{
+		return open_connection_internal(cancellable, false);
+	}
+	
+	/**
+	 * Open new database connection
+	 * @param cancellable    Cancellable object
 	 * @param master         If the master connection is to be opened
 	 * @return new database connection
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	private Connection open_connection(Cancellable? cancellable=null, bool master=false) throws GLib.Error, DatabaseError
+	protected Connection open_connection_internal(Cancellable? cancellable, bool master) throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		if (!master)
 			throw_if_not_opened();
-		return new Connection(this, cancellable);
+			
+		Sqlite.Database db;
+		var result = Sqlite.Database.open_v2(
+			db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null);
+		if (Dioritedb.is_sql_error(result))
+			throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
+		return new Connection((owned) db, orm);
 	}
 	
 	/**

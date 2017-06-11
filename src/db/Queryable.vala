@@ -51,19 +51,18 @@ public interface Queryable: GLib.Object
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public abstract RawQuery query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+	public abstract Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+	
 	
 	/**
-	 * Create new ORM query
+	 * Get ORM objects
 	 * 
-	 * @param sql_filter     SQL condidions for filtering of objects
 	 * @param cancellable    Cancellable object
 	 * @return new ORM query object
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public abstract ObjectQuery<T> query_objects<T>(string? sql_filter=null, Cancellable? cancellable=null)
-		throws GLib.Error, DatabaseError;
+	public abstract ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
 	
 	/**
 	 * Get a single ORM object
@@ -75,6 +74,8 @@ public interface Queryable: GLib.Object
 	 * @throws DatabaseError when operation fails
 	 */
 	public abstract T get_object<T>(GLib.Value pk, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+	
+	public abstract unowned string? get_last_error_message();
 }
 
 } // namespace Dioritedb

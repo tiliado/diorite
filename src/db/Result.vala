@@ -30,22 +30,23 @@ namespace Dioritedb
  */
 public class Result : GLib.Object
 {
-	public Query query {get; private set;}
+	public Connection connection {get; private set;}
 	public int n_columns {get; private set; default = -1;}
 	public int counter {get; private set; default = 0;}
-	private unowned Sqlite.Statement statement;
+	private Sqlite.Statement statement;
 	private HashTable<unowned string, int> column_indexes;
 	private (unowned string)[]? column_names;
 	
 	/**
-	 * Creates new database query result object
+	 * Creates new database query result wrapper
 	 * 
-	 * @param query    corresponding query
+	 * @param connection    database conection
+	 * @param statement     prepared SQLite statement to execute
 	 */
-	public Result(Query query)
+	public Result(Connection connection, owned Sqlite.Statement statement)
 	{
-		this.query = query;
-		this.statement = query.statement;
+		this.connection = connection;
+		this.statement = (owned) statement;
 		column_indexes = new HashTable<unowned string, int>(str_hash, str_equal);
 		column_names = null;
 	}
@@ -58,7 +59,7 @@ public class Result : GLib.Object
 	 * @throws GLib.IOError when the operation is cancelled
 	 * @throws DatabaseError when operation fails
 	 */
-	public bool next(Cancellable? cancellable=null) throws Error, DatabaseError
+	public bool next(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		var done = throw_on_error(statement.step()) == Sqlite.DONE;
@@ -103,76 +104,6 @@ public class Result : GLib.Object
 		if (index < 0 || index >= n_columns)
 			return null;
 		return column_names[index];
-	}
-	
-	/**
-	 * Create ORM object from database record
-	 * 
-	 * @return object cotaining database data according to corresponding {@link ObjectSpec}
-	 * @throws DatabaseError if data type `T` is not supported or {@link ObjectSpec} is not found
-	 * @see Database.add_object_spec
-	 */
-	public T? create_object<T>() throws DatabaseError
-	{
-		var type = typeof(T);
-		if (!type.is_object())
-			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		
-		var object_spec = query.connection.database.get_object_spec(type);
-		if (object_spec == null)
-			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
-		
-		Parameter[] parameters = {};
-		foreach (var property in object_spec.properties)
-		{
-			var index = get_column_index(property.name);
-			if (index < 0)
-				throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
-				
-			var value = fetch_value_of_type(index, property.value_type);
-			if (value == null)
-				value = GLib.Value(property.value_type);
-			parameters += GLib.Parameter(){name = property.name, value = value};
-		}
-		return (T) GLib.Object.newv(type, parameters);
-	}
-	
-	/**
-	 * Fill ORM object from database data
-	 * 
-	 * @param object    the object to fill with database data
-	 * @throws DatabaseError if corresponding {@link ObjectSpec} is not found
-	 */
-	public void fill_object(GLib.Object object) throws DatabaseError
-	{
-		var type = object.get_type();
-		var object_spec = query.connection.database.get_object_spec(type);
-		if (object_spec == null)
-			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
-		
-		foreach (var property in object_spec.properties)
-		{
-			var index = get_column_index(property.name);
-			if (index < 0)
-				throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
-			
-			var value = fetch_value_of_type(index, property.value_type);
-			if (value == null)
-				value = GLib.Value(property.value_type);
-				
-			if ((property.flags & ParamFlags.WRITABLE) != 0
-			&& (property.flags & ParamFlags.CONSTRUCT_ONLY) == 0)
-			{
-				object.set_property(property.name, value);
-			}
-			else if ((property.flags & ParamFlags.READABLE) != 0)
-			{
-				var current_value = GLib.Value(property.value_type);
-				object.get_property(property.name, ref current_value);
-				if (!Diorite.Value.equal(current_value, value))
-					throw new DatabaseError.MISMATCH("Read-only value of property '%s' doesn't match database data.", property.name);
-			}
-		}
 	}
 	
 	/**
@@ -364,7 +295,9 @@ public class Result : GLib.Object
 	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
-		return Dioritedb.convert_error(query.connection.db, result, sql, statement);
+		if (Dioritedb.is_sql_error(result))
+			throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
+		return result;
 	}
 	
 	/**

@@ -31,17 +31,20 @@ namespace Dioritedb
 public class ObjectCursor<T>
 {
 	public uint counter {get; private set; default=0;}
+	private OrmManager orm;
 	private Cancellable? cancellable;
 	private Result result;
 	
 	/**
 	 * Creates new ObjectCursor
 	 * 
+	 * @param orm            ORM manager
 	 * @param result         the result of ORM query
 	 * @param cancellable    Cancelable object
 	 */
-	public ObjectCursor(Result result, Cancellable? cancellable=null)
+	public ObjectCursor(OrmManager orm, Result result, Cancellable? cancellable=null)
 	{
+		this.orm = orm;
 		this.result = result;
 		this.cancellable = cancellable;
 	}
@@ -78,7 +81,7 @@ public class ObjectCursor<T>
 	 */
 	public T get() throws Error, DatabaseError
 	{
-		return result.create_object<T>();
+		return orm.create_object<T>(result);
 	}
 }
 

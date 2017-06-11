@@ -38,7 +38,7 @@ public class ConnectionTest: Diorite.TestCase
 		try
 		{
 			db.open();
-			conn = new Connection(db);
+			conn = db.open_connection();
 			conn.query(TABLE_USERS_SQL).exec();
 			conn.query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
 				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
@@ -108,11 +108,11 @@ public class ConnectionTest: Diorite.TestCase
 		}
 	}
 	
-	public void test_query_objects()
+	public void test_get_objects()
 	{
 		try
 		{
-			conn.query_objects<User>(null);
+			conn.get_objects<User>();
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
@@ -122,8 +122,8 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-			conn.query_objects<User>(null);
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+			conn.get_objects<User>(null);
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
@@ -133,8 +133,8 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id"));
-			conn.query_objects<User>(null);
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
+			conn.get_objects<User>(null);
 			expectation_failed("Expected error");
 		}
 		catch (GLib.Error e)
@@ -144,13 +144,21 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-			conn.query_objects<User>(null);
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			conn.get_objects<User>(null);
 		}
 		catch (GLib.Error e)
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
+	}
+	
+	public void test_query_with_values()
+	{
+		expect_no_error(() => conn.query_with_values(null,
+			"INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?i, ?s, ?i, ?f, ?B, ?b, ?s)".printf(TABLE_USERS_NAME),
+			123, "George", 30, 1.72, new Bytes.take({7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+			true, null).exec(), "q with values");
 	}
 	
 	public void test_get_object()
@@ -177,7 +185,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
 			conn.get_object<User>(1);
 			expectation_failed("Expected error");
 		}
@@ -188,7 +196,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id"));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
 			conn.get_object<User>(1);
 			expectation_failed("Expected error");
 		}
@@ -199,7 +207,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
 			conn.get_object<User>(1);
 			expectation_failed("Expected error");
 		}
@@ -210,7 +218,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 			conn.get_object<User>(0);
 			expectation_failed("Expected error");
 		}
@@ -221,7 +229,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 			conn.get_object<User>("hello");
 			expectation_failed("Expected error");
 		}
@@ -232,7 +240,7 @@ public class ConnectionTest: Diorite.TestCase
 		
 		try
 		{
-			db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
 			var user = conn.get_object<User>(2);
 			expect_int64_equals(2, user.id, "id");
 			expect_str_equals("Jean", user.name, "name");

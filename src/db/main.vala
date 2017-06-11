@@ -95,33 +95,43 @@ private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, str
  * 
  * SQLite error codes: [[http://www.sqlite.org/rescode.html]]
  * 
- * Parameters `db`, `sql` and `stm` are optional but add more information
+ * Parameters `message`, `sql` and `stm` are optional but add more information
  * to the resulting error message.
  * 
- * @param db        database where the error occurred
- * @param result    sqlite error code
- * @param sql       executed sql query
- * @param stm       sqlite statement
- * @throws DatabaseError if result code corresponds to a failure
- * @return `result` if it indicates success code
+ * @param errno      sqlite error code
+ * @param message    error message
+ * @param sql        executed sql query
+ * @param stm        sqlite statement
+ * @return corresponding {@link DatabaseError}
  */
-
-private static int convert_error(Sqlite.Database? db, int result, string? sql=null,
-	Sqlite.Statement? stm = null) throws DatabaseError
+private DatabaseError convert_sqlite_error(int errno, string? message, string? sql=null,
+	Sqlite.Statement? stm = null)
 {
-	switch (result)
+	var msg = "SQLite Error %d: %s. |%s|".printf(
+		errno,
+		message ?? "(unknown message)",
+		sql ?? (stm != null ? stm.sql() : null));
+	return new DatabaseError.GENERAL(msg);
+}
+
+
+/**
+ * Check whether sqlite result code is an error code
+ * 
+ * @param result_code    sqlite result code
+ * @return `true` if the code corresponds to an error, `false` otherwise
+ */
+private inline bool is_sql_error(int result_code)
+{
+	switch (result_code)
 	{
 		case Sqlite.OK:
 		case Sqlite.ROW:
 		case Sqlite.DONE:
-			return result;
-		
+			return false;
+		default:
+			return true;
 	}
-	var msg = "SQLite Error %d: %s. |%s|".printf(
-		result,
-		db != null ? db.errmsg() : "(unknown database)",
-		sql ?? (stm != null ? stm.sql() : null));
-	throw new DatabaseError.GENERAL(msg);
 }
 
 /**
@@ -138,7 +148,7 @@ private static int convert_error(Sqlite.Database? db, int result, string? sql=nu
  * @param file           Source code file
  * @param line           Source code line
  */
-public void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
+private void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
 	throws IOError
 {
     if (cancellable != null && cancellable.is_cancelled())

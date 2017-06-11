@@ -74,13 +74,13 @@ public class QueryTest: Diorite.TestCase
 		}
 	}
 	
-	private RawQuery? query(string sql) throws GLib.Error, DatabaseError
+	private Query? query(string sql) throws GLib.Error, DatabaseError
 	{
 		
 		if (!db.opened)
 			db.open();
 		
-		return new Connection(db).query(sql);
+		return db.open_connection().query(sql);
 	}
 	
 	public void test_exec_no_bind()

@@ -30,17 +30,22 @@ namespace Dioritedb
  * 
  * Used for ORM queries.
  */
-public class ObjectQuery<T> : Query
+public class ObjectQuery<T> : GLib.Object
 {
+	// Query to retrieve objects.
+	private Query query;
+	private OrmManager orm;
+	
 	/**
 	 * Creates new ObjectQuery object.
 	 * 
-	 * @param connection    corresponding database connection
-	 * @param sql           a SQL query, possibly with placeholders
+	 * @param orm      ORM manager
+	 * @param query    the corresponding {@link Query} to retrieve object data
 	 */
-	 public ObjectQuery(Connection connection, string sql)
+	public ObjectQuery(OrmManager orm, Query query)
 	{
-		base(connection, sql);
+		this.orm = orm;
+		this.query = query;
 	}
 	
 	/**
@@ -53,11 +58,10 @@ public class ObjectQuery<T> : Query
 	 */
 	public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
-		check_not_executed_and_set(true);
-		var result = new Result(this);
+		var result = query.get_result();
 		if (!result.next(cancellable))
 			throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
-		var object = result.create_object<T>();
+		var object = orm.create_object<T>(result);
 		var initable = object as GLib.Initable;
 		if (initable != null)
 			initable.init(cancellable);
@@ -76,159 +80,7 @@ public class ObjectQuery<T> : Query
 	 */
 	public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
 	{
-		check_not_executed_and_set(true); 
-		return new ObjectCursor<T>(new Result(this), cancellable);
-	}
-	
-	/**
-	 * Get cursor to browse resulting set of objects.
-	 * 
-	 * @return data set cursor
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public ObjectCursor<T> iterator() throws Error, DatabaseError
-	{
-		return get_cursor();
-	}
-	
-	/**
-	 * Bind value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when provided data type is not supported or operation fails
-	 */
-	public new ObjectQuery<T> bind(int index, GLib.Value? value) throws DatabaseError
-	{
-		base.bind(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind null value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_null(int index) throws DatabaseError
-	{
-		base.bind_null(index);
-		return this;
-	}
-	
-	/**
-	 * Bind boolean value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_bool(int index, bool value) throws DatabaseError
-	{
-		base.bind_bool(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind integer value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_int(int index, int value) throws DatabaseError
-	{
-		base.bind_int(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind 64bit integer value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_int64(int index, int64 value) throws DatabaseError
-	{
-		base.bind_int64(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind string value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_string(int index, string? value) throws DatabaseError
-	{
-		base.bind_string(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind double value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_double(int index, double value) throws DatabaseError
-	{
-		base.bind_double(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind binary data value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_blob(int index, uint8[] value) throws DatabaseError
-	{
-		base.bind_blob(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind {@link GLib.Bytes} value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_bytes(int index, GLib.Bytes? value) throws DatabaseError
-	{
-		base.bind_bytes(index, value);
-		return this;
-	}
-	
-	/**
-	 * Bind {@link GLib.ByteArray} value to query
-	 * 
-	 * @param index    the index of the value placeholder in the SQL query
-	 * @param value    the value to bind
-	 * @return `this` query object for easier chaining
-	 * @throws DatabaseError when operation fails
-	 */
-	public new ObjectQuery<T> bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError
-	{
-		base.bind_byte_array(index, value);
-		return this;
+		return new ObjectCursor<T>(orm, query.get_result(), cancellable);
 	}
 }
 

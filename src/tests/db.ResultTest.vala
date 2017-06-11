@@ -78,13 +78,13 @@ public class ResultTest: Diorite.TestCase
 		}
 	}
 	
-	private RawQuery? query(string sql) throws GLib.Error, DatabaseError
+	private Query? query(string sql) throws GLib.Error, DatabaseError
 	{
 		
 		if (!db.opened)
 			db.open();
 		
-		return new Connection(db).query(sql);
+		return db.open_connection().query(sql);
 	}
 	
 	private Result select_data()  throws GLib.Error, DatabaseError
@@ -504,175 +504,6 @@ public class ResultTest: Diorite.TestCase
 				{
 					expect_str_match("*type %s is not supported*".printf(t.name()), e.message, "type %s", t.name());
 				}
-			}
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
-	
-	public void test_create_object()
-	{
-		try
-		{
-			var result = select_data();
-			/* All fields */
-			try
-			{
-				result.create_object<User>();
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*ObjectSpec for DioritedbUser has not been found*", e.message, "no ospec");
-			}
-			
-			
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "id"));
-				result.create_object<User>();
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-				result.create_object<User>();
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
-			
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-				var user = result.create_object<User>();
-				expect_int64_equals(1, user.id, "id");
-				expect_str_equals("George", user.name, "name");
-				expect_int_equals(30, user.age, "age");
-				expect_double_equals(1.72, user.height, "height");
-				expect_true(user.alive, "alive");
-				expect_bytes_equal(
-					new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-					user.blob, "blob");
-				expect(null == user.extra, "extra");
-				expect_int_equals(1024, user.not_in_db, "not_in_db");
-			}
-			catch (GLib.Error e)
-			{
-				expectation_failed("Unexpected error: %s", e.message);
-			}
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
-				var user = result.create_object<User>();
-				expect_int64_equals(1, user.id, "id");
-				expect_str_equals("George", user.name, "name");
-				expect_int_equals(30, user.age, "age");
-				expect_double_equals(1.72, user.height, "height");
-				expect_true(user.alive, "alive");
-				expect_bytes_equal(
-					new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-					user.blob, "blob");
-				expect(null == user.extra, "extra");
-				expect_int_equals(1024, user.not_in_db, "not_in_db");
-			}
-			catch (GLib.Error e)
-			{
-				expectation_failed("Unexpected error: %s", e.message);
-			}
-			
-			/* Not GObject */
-			try
-			{
-				result.create_object<SimpleUser>();
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*Data type DioritedbSimpleUser is not supported*", e.message, "invalid type");
-			}
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
-	
-	public void test_fill_object()
-	{
-		try
-		{
-			var result = select_data();
-			User user;
-			
-			try
-			{
-				user = new User(2, "Lololo", 45, 2.25, false);
-				result.fill_object(user);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*ObjectSpec for DioritedbUser has not been found*", e.message, "mismatch, all fields");
-			}
-			
-			db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
-			
-			try
-			{
-				user = new User(2, "Lololo", 45, 2.25, false);
-				result.fill_object(user);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
-			}
-			
-			/* Matches */
-			user = new User(1, "Lololo", 45, 2.25, false);
-			result.fill_object(user);
-			expect_int64_equals(1, user.id, "id");
-			expect_str_equals("George", user.name, "name");
-			expect_int_equals(30, user.age, "age");
-			expect_double_equals(1.72, user.height, "height");
-			expect_true(user.alive, "alive");
-			expect_bytes_equal(
-				new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-				user.blob, "blob");
-			expect(null == user.extra, "extra");
-			expect_int_equals(1024, user.not_in_db, "not_in_db");
-			
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "id"));
-				user = new User(1, "Lololo", 45, 2.25, false);
-				result.fill_object(user);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
-			
-			try
-			{
-				db.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-				user = new User(1, "Lololo", 45, 2.25, false);
-				result.fill_object(user);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
 			}
 		}
 		catch (GLib.Error e)
