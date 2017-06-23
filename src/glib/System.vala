@@ -288,4 +288,22 @@ public int[] find_pid_by_basename(string basename)
 	return result;
 }
 
+/**
+ * Send signal to multiple processes.
+ * 
+ * @param pids      The ids of processes to send signal to.
+ * @param signum    The signal number. See {@link GLib.ProcessSignal}.
+ * @return `0` on success, error code on the very first failure.
+ */
+public int sigall(int[] pids, int signum)
+{
+	foreach (var pid in pids)
+	{
+		var result = Posix.kill((Posix.pid_t) pid, signum);
+		if (result != 0)
+			return result;
+	}
+	return 0;
+}
+
 } // namespace Drt.System
