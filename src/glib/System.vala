@@ -244,3 +244,48 @@ namespace Diorite.System
 		return result;
 	}
 }
+
+namespace Drt.System
+{
+
+/**
+ * Find process id for command basename
+ * 
+ * @param basename    the basename of program's path
+ * @return all process ids with given program basename
+ */
+public int[] find_pid_by_basename(string basename)
+{
+	int[] result = {};
+	try
+	{
+		var procfs = Dir.open("/proc", 0);
+		string? name = null;
+		while ((name = procfs.read_name()) != null)
+		{
+			var pid = int.parse(name);
+			var path = Path.build_filename ("/proc", name, "exe");
+			if (pid > 0 && FileUtils.test(path, FileTest.IS_SYMLINK))
+			{
+				try
+				{
+					var target = FileUtils.read_link(path);
+					if (Path.get_basename(target) == basename)
+						result += pid;
+				}
+				catch (FileError e)
+				{
+					if (pid > 1)
+						warning("readlink error: %s.", e.message);
+				}
+			}
+		}
+	}
+	catch (FileError e)
+	{
+		warning("pidof error: %s.", e.message);
+	}
+	return result;
+}
+
+} // namespace Drt.System
