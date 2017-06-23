@@ -28,8 +28,7 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-NEW_VERSION_SCHEME = True
-VERSION = "0.3.4" if not NEW_VERSION_SCHEME else "4.4.0"
+VERSION = "4.4.0"
 
 MIN_VALA = "0.34.0"
 MIN_GLIB = "2.42.1"
@@ -65,16 +64,9 @@ def add_version_info(ctx):
 	if revision_id != REVISION_SNAPSHOT:
 		revision_id = "{}-{}".format(n_commits, revision_id)
 	versions = list(int(i) for i in bare_version.split("."))
-	if NEW_VERSION_SCHEME:
-		versions[2] += int(n_commits)
-		
+	versions[2] += int(n_commits)
 	version = "{}.{}.{}".format(*versions)
-	if NEW_VERSION_SCHEME:
-		series = str(versions[0])
-	else:
-		series = "{}.{}".format(*versions)
-		version += "." + n_commits
-	
+	series = str(versions[0])
 	ctx.env.SERIES = series
 	ctx.env.VERSION = version
 	ctx.env.VERSIONS = versions
