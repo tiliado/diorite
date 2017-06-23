@@ -1,6 +1,14 @@
 Diorite Changelog
 =================
 
+Release 4.5.0 - June 23rd, 2017
+-------------------------------
+
+  * Fix wscript for non-git builds. Issue: tiliado/diorite#16
+  * Dioritedb has been refactored significantly.
+  * Bundled glib.vapi is no longer used.
+  * Various utility functions were added, see git log for details.
+  
 Release 4.4.0 - May 27th, 2017
 ------------------------------
 
