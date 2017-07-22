@@ -31,7 +31,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	public InfoBarStack info_bars {get; private set;}
 	public Gtk.HeaderBar header_bar {get; private set;}
 	private Diorite.SlideInRevealer? header_bar_revealer = null;
-	private unowned Application app;
+	protected unowned Application app;
 	private Gtk.MenuButton menu_button = null;
 	private string[]? menu_button_items = null;
 	
