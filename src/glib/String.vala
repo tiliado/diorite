@@ -46,6 +46,40 @@ public inline string? null_if_empty(string? str)
 	return (str == null || str[0] == '\0') ? null : str;
 }
 
+/**
+ * Concatenate two strings with an optional separator
+ * 
+ * If the first string is empty, the second string is returned.
+ * Otherwise, the strings are joined with the separator if specified.
+ * 
+ * @param initial     Initial string.
+ * @param separator   A separator to include between strings.
+ * @param text        The second string.
+ * @return Joined string.
+ */
+public string? concat(string? initial, string? separator, owned string text)
+{
+	if (is_empty(initial))
+		return (owned) text;
+	if (is_empty(separator))
+		return initial + text;
+	return initial + separator + text;
+}
+
+/**
+ * Append string to the other string.
+ * 
+ * Separator is included if it is specified and the initial string is not empty.
+ * 
+ * @param initial      The initial string, which will be overwritten with the result.
+ * @param separator    The separator which will be added if the initial string is not empty.
+ * @param text         The text to append.
+ */
+public void append(ref string? initial, string? separator, owned string text)
+{
+	initial = concat(initial, separator, (owned) text);
+}
+
 /**	
  * Splits a string into a maximum of `max_tokens` pieces, using the given `delimiter` and ignoring
  * empty elements after stripping.

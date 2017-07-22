@@ -46,6 +46,56 @@ public class StringTest: Diorite.TestCase
 			expect_true(result.contains(s), "item: %s", s);
 		expect_false(result.contains("Bye"), "item: %s", "Bye");
 	}
+	
+	public void test_concat()
+	{
+		expect_str_equals("bar", Diorite.String.concat(null, "foo", "bar"), "");
+		expect_str_equals("bar", Diorite.String.concat("", "foo", "bar"), "");
+		expect_str_equals("xfoobar", Diorite.String.concat("x", "foo", "bar"), "");
+		
+		expect_str_equals("bar", Diorite.String.concat(null, null, "bar"), "");
+		expect_str_equals("bar", Diorite.String.concat("", null, "bar"), "");
+		expect_str_equals("xbar", Diorite.String.concat("x", null, "bar"), "");
+		
+		expect_str_equals("bar", Diorite.String.concat(null, "", "bar"), "");
+		expect_str_equals("bar", Diorite.String.concat("", "", "bar"), "");
+		expect_str_equals("xbar", Diorite.String.concat("x", "", "bar"), "");
+	}
+	
+	public void test_append()
+	{
+		string? buffer = null;
+		
+		buffer = null;
+		Diorite.String.append(ref buffer, "foo", "bar");
+		expect_str_equals("bar", buffer, "");
+		buffer = null;
+		Diorite.String.append(ref buffer, null, "bar");
+		expect_str_equals("bar", buffer, "");
+		buffer = null;
+		Diorite.String.append(ref buffer, "", "bar");
+		expect_str_equals("bar", buffer, "");
+		
+		buffer = "";
+		Diorite.String.append(ref buffer, "foo", "bar");
+		expect_str_equals("bar", buffer, "");
+		buffer = "";
+		Diorite.String.append(ref buffer, null, "bar");
+		expect_str_equals("bar", buffer, "");
+		buffer = "";
+		Diorite.String.append(ref buffer, "", "bar");
+		expect_str_equals("bar", buffer, "");
+		
+		buffer = "x";
+		Diorite.String.append(ref buffer, "foo", "bar");
+		expect_str_equals("xfoobar", buffer, "");
+		buffer = "x";
+		Diorite.String.append(ref buffer, null, "bar");
+		expect_str_equals("xbar", buffer, "");
+		buffer = "x";
+		Diorite.String.append(ref buffer, "", "bar");
+		expect_str_equals("xbar", buffer, "");
+	}
 }
 
 } // namespace Diorite
