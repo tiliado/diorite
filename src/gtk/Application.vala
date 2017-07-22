@@ -173,6 +173,7 @@ public abstract class Application : Gtk.Application
 		shell = DesktopShell.get_default();
 		shell.app_menu_changed.connect(on_app_menu_changed);
 		set_menubar(reset_menubar());
+		apply_custom_styles(Gdk.Screen.get_default());
 	}
 	
 	public void set_app_menu_items(string[] items)
@@ -194,6 +195,24 @@ public abstract class Application : Gtk.Application
 			default_menubar.append_submenu("_App", menubar_app_submenu);
 		}
 		return default_menubar;
+	}
+	
+	/**
+	 * Apply custom CSS styles.
+	 * 
+	 * @param screen    Screen to apply styles to.
+	 */
+	public virtual void apply_custom_styles(Gdk.Screen screen)
+	{
+		try
+		{
+			Drt.Css.apply_custom_styles(screen);
+
+		}
+		catch (GLib.Error e)
+		{
+			warning("Failed to load custom CSS: %s", e.message);
+		}
 	}
 	
 	private static void terminate_handler(int sig_num)
