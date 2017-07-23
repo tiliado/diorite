@@ -55,4 +55,4 @@ public class PopoverButton : Gtk.Button
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

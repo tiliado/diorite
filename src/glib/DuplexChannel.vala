@@ -271,7 +271,7 @@ public abstract class DuplexChannel: GLib.Object
 			{
 				write_data_sync(payload.direction, payload.id, payload.data);
 			}
-			catch (Diorite.IOError e)
+			catch (IOError e)
 			{
 				warning("Channel(%u) %s(%u): Failed to send. %s",
 					this.id, payload.direction == REQUEST ? "Request": "Response", payload.id, e.message);
@@ -404,8 +404,8 @@ public abstract class DuplexChannel: GLib.Object
 	void read_header(uint8[] buffer, uint offset, out bool direction, out uint id, out uint32 size)
 	{
 		uint32 header;
-		Diorite.uint32_from_bytes(buffer, out header, offset);
-		Diorite.uint32_from_bytes(buffer, out size, (uint)(offset + sizeof(uint32)));
+		uint32_from_bytes(buffer, out header, offset);
+		uint32_from_bytes(buffer, out size, (uint)(offset + sizeof(uint32)));
 		direction = (header & HEADER_MASK) != 0 ? RESPONSE : REQUEST;
 		id = (uint)(header & ~HEADER_MASK);
 	}
@@ -421,14 +421,14 @@ public abstract class DuplexChannel: GLib.Object
 	void write_header(ref uint8[] buffer, uint offset, bool direction, uint id, uint32 size)
 	{
 		uint32 header = ((uint32) id) | (direction == RESPONSE ? HEADER_MASK : 0);
-		Diorite.uint32_to_bytes(ref buffer, header, offset);
-		Diorite.uint32_to_bytes(ref buffer, size, (uint)(offset + sizeof(uint32)));
+		uint32_to_bytes(ref buffer, header, offset);
+		uint32_to_bytes(ref buffer, size, (uint)(offset + sizeof(uint32)));
 	}
 	
-	protected void write_data_sync(bool direction, uint32 id, ByteArray? data) throws Diorite.IOError
+	protected void write_data_sync(bool direction, uint32 id, ByteArray? data) throws IOError
 	{
 		if (data.len > get_max_message_size())
-			throw new Diorite.IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
+			throw new IOError.TOO_MANY_DATA("Only %s bytes can be sent.", get_max_message_size().to_string());
 		
 		uint8* data_ptr;
 		unowned uint8[] data_buf;
@@ -449,7 +449,7 @@ public abstract class DuplexChannel: GLib.Object
 			}
 			catch (GLib.IOError e)
 			{
-				throw new Diorite.IOError.READ("Failed to write header. %s", e.message);
+				throw new IOError.READ("Failed to write header. %s", e.message);
 			}
 		}
 		while (bytes_written < data_size);
@@ -467,7 +467,7 @@ public abstract class DuplexChannel: GLib.Object
 			}
 			catch (GLib.IOError e)
 			{
-				throw new Diorite.IOError.READ("Failed to write data. %s", e.message);
+				throw new IOError.READ("Failed to write data. %s", e.message);
 			}
 		}
 		while (bytes_written < data_size);
@@ -492,7 +492,7 @@ public abstract class DuplexChannel: GLib.Object
 			}
 			catch (GLib.IOError e)
 			{
-				throw new Diorite.IOError.READ("Failed to read message header. %s", e.message);
+				throw new IOError.READ("Failed to read message header. %s", e.message);
 			}
 			if (bytes_read == 0)
 			{
@@ -513,7 +513,7 @@ public abstract class DuplexChannel: GLib.Object
 		buffer.length = (int) bytes_to_read;
 		read_header(buffer, 0, out direction, out id, out message_size);
 		if (message_size == 0)
-			throw new Diorite.IOError.READ("Empty message received.");
+			throw new IOError.READ("Empty message received.");
 		
 		bytes_read_total = 0;
 		while (bytes_read_total < message_size)
@@ -526,7 +526,7 @@ public abstract class DuplexChannel: GLib.Object
 			}
 			catch (GLib.IOError e)
 			{
-				throw new Diorite.IOError.READ("Failed to read from socket. %s", e.message);
+				throw new IOError.READ("Failed to read from socket. %s", e.message);
 			}
 			if (bytes_read == 0)
 			{

@@ -22,7 +22,7 @@
 namespace Drt
 {
 
-public class EventLoopTest: Diorite.TestCase
+public class EventLoopTest: Drt.TestCase
 {
 	public void test_add_idle()
 	{
@@ -133,4 +133,4 @@ public class EventLoopTest: Diorite.TestCase
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

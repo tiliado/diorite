@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 [CCode(has_target=false)]
@@ -359,9 +359,9 @@ public abstract class TestCase: GLib.Object
 		{
 			string? expected_hex = null, value_hex = null;
 			if (expected != null)
-				Diorite.bin_to_hex(expected.get_data(), out expected_hex);
+				bin_to_hex(expected.get_data(), out expected_hex);
 			if (value != null)
-				Diorite.bin_to_hex(value.get_data(), out value_hex);
+				bin_to_hex(value.get_data(), out value_hex);
 			stdout.printf("\t '%s' == '%s' failed.\n", expected_hex, value_hex);
 		}
 		return result;
@@ -846,4 +846,4 @@ public abstract class TestCase: GLib.Object
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

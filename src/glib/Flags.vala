@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Flags
+namespace Drt.Flags
 {
 
 /**
@@ -37,4 +37,4 @@ public static inline bool is_set(int value, int flag)
 	return (value & flag) != 0;
 }
 
-} // namespace Diorite.Flags
+} // namespace Drt.Flags

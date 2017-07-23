@@ -35,9 +35,9 @@ public class ApiChannel: MessageChannel
 		GLib.Object(id: id, channel: channel, router: router ?? new ApiRouter(), api_token: api_token);
 	}
 	
-	public ApiChannel.from_name(uint id, string name, string? api_token=null, uint timeout) throws Diorite.IOError
+	public ApiChannel.from_name(uint id, string name, string? api_token=null, uint timeout) throws IOError
 	{
-		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), null, api_token);
+		this(id, new SocketChannel.from_name(id, name, timeout), null, api_token);
 	}
 	
 	private string create_full_method_name(string name, bool allow_private, string flags, string params_format)

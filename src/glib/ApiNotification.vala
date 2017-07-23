@@ -55,16 +55,16 @@ public class ApiNotification : ApiCallable
 				"Method '%s' requires %d parameters but %d parameters have been provided.",
 				path, 2, (int) data.n_children());
 				
-		var entry = Diorite.unbox_variant(data.get_child_value(0));
-		if (!Diorite.variant_bool(entry, ref subscribe))
+		var entry = unbox_variant(data.get_child_value(0));
+		if (!variant_bool(entry, ref subscribe))
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' call expected the first parameter to be a boolean, but type of '%s' received.",
 				path, entry.get_type_string());
 		
 		if (n_children == 2)
 		{
-			entry = Diorite.unbox_variant(data.get_child_value(1));
-			if (!Diorite.variant_string(entry, out detail))
+			entry = unbox_variant(data.get_child_value(1));
+			if (!variant_string(entry, out detail))
 				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' call expected the second parameter to be a string, but type of '%s' received.",
 					path, entry.get_type_string());
@@ -80,22 +80,22 @@ public class ApiNotification : ApiCallable
 				"Method '%s' requires 2 parameters but no parameters have been provided.",
 				path);
 		if (data.get_type_string() != "(a{smv})")
-			Diorite.MessageListener.check_type_string(data, "a{smv}");
+			MessageListener.check_type_string(data, "a{smv}");
 			
 		var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-		var entry = Diorite.unbox_variant(dict.lookup_value("subscribe", null));
+		var entry = unbox_variant(dict.lookup_value("subscribe", null));
 		if (entry == null)
 			throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
 					path);
 		
-		if (!Diorite.variant_bool(entry, ref subscribe))
+		if (!variant_bool(entry, ref subscribe))
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
 				path, entry.get_type_string());
 		
-		entry = Diorite.unbox_variant(dict.lookup_value("detail", null));
-		if (entry != null && !Diorite.variant_string(entry, out detail))
+		entry = unbox_variant(dict.lookup_value("detail", null));
+		if (entry != null && !variant_string(entry, out detail))
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
 				path, entry.get_type_string());

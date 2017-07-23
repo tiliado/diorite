@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public delegate void ActionCallback();
@@ -83,7 +83,7 @@ public abstract class Action: GLib.Object
 			warning("Cannot activate action '%s', because it is disabled.", name);
 		else if (parameter == null && this is ToggleAction)
 			activate(!this.state.get_boolean());
-		else if (parameter == null || !Diorite.variant_equal(parameter, this.state))
+		else if (parameter == null || !variant_equal(parameter, this.state))
 			activated(parameter);
 	}
 }
@@ -165,4 +165,4 @@ public class RadioOption
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

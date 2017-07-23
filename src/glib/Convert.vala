@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -277,4 +277,4 @@ public void int32_from_bytes(uint8[] buffer, out int32 data, uint offset=0)
 		data += buffer[offset + i] * (1 << ((int32)size - 1 - i) * 8);
 }
 
-} // namespace Diorite
+} // namespace Drt

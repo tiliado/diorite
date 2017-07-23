@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -84,4 +84,4 @@ public class ObjectQuery<T> : GLib.Object
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

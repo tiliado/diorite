@@ -22,7 +22,7 @@
 namespace Drt
 {
 
-public class JsonObjectTest: Diorite.TestCase
+public class JsonObjectTest: Drt.TestCase
 {
 	
 	private JsonObject load_object() throws GLib.Error

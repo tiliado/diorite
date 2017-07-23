@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 [Flags]
@@ -236,4 +236,4 @@ public class PropertyBinding
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

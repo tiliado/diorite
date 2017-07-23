@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -119,4 +119,4 @@ public class SlideInRevealer: Gtk.Box
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

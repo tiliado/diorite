@@ -27,12 +27,12 @@ namespace Drt
 
 public class MessageRouter: GLib.Object
 {
-	protected HashTable<string, Diorite.HandlerAdaptor?>? handlers;
+	protected HashTable<string, HandlerAdaptor?>? handlers;
 	
-	public MessageRouter(HashTable<string, Diorite.HandlerAdaptor?>? handlers)
+	public MessageRouter(HashTable<string, HandlerAdaptor?>? handlers)
 	{
-		this.handlers = handlers != null ? handlers : new HashTable<string, Diorite.HandlerAdaptor?>(str_hash, str_equal);
-		add_handler("echo", Diorite.TYPE_STRING_ANY, Diorite.MessageListener.echo_handler);
+		this.handlers = handlers != null ? handlers : new HashTable<string, HandlerAdaptor?>(str_hash, str_equal);
+		add_handler("echo", TYPE_STRING_ANY, MessageListener.echo_handler);
 	}
 	
 	/**
@@ -46,20 +46,20 @@ public class MessageRouter: GLib.Object
 	public virtual Variant? handle_message(GLib.Object source, string name, Variant? data) throws GLib.Error
 	{
 		if (handlers == null)
-			throw new Diorite.MessageError.UNSUPPORTED("This message channel doesn't support requests.");
+			throw new MessageError.UNSUPPORTED("This message channel doesn't support requests.");
 			
 		Variant? response = null;
 		var adaptor = handlers[name];
 		if (adaptor == null)
-			throw new Diorite.MessageError.UNSUPPORTED("No handler for message '%s'", name);
+			throw new MessageError.UNSUPPORTED("No handler for message '%s'", name);
 	
 		adaptor.handle(source, data, out response);
 		return response;
 	}
 	
-	public void add_handler(string message_name, string? type_string, owned Diorite.MessageHandler handler)
+	public void add_handler(string message_name, string? type_string, owned MessageHandler handler)
 	{
-		handlers[message_name] = new Diorite.HandlerAdaptor((owned) handler, type_string);
+		handlers[message_name] = new HandlerAdaptor((owned) handler, type_string);
 	}
 	
 	public bool remove_handler(string message_name)

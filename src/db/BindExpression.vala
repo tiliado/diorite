@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -118,7 +118,7 @@ public class BindExpression
 			if (c == '?')
 			{
 				pos++;
-				sql.append_len(Diorite.String.offset(sql_str, offset), pos - offset);
+				sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
 				if (pos >= len)
 					throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
 				offset = pos + 1;
@@ -158,8 +158,8 @@ public class BindExpression
 		
 		values.reverse();		
 		if (pos > offset)
-			sql.append_len(Diorite.String.offset(sql_str, offset), pos - offset);
+			sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

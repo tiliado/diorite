@@ -23,7 +23,7 @@
  */
 
 private const string G_LOG_DOMAIN="DioriteGtk";
-namespace Diorite
+namespace Drt
 {
 	
 [CCode (cheader_filename = "sys/prctl.h", cname = "prctl")]
@@ -276,7 +276,7 @@ public abstract class Application : Gtk.Application
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt
 
 [DBus(name = "org.xfce.Session.Manager")]
 private interface XfceSessionManager : Object

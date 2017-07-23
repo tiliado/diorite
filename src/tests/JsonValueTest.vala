@@ -22,7 +22,7 @@
 namespace Drt
 {
 
-public class JsonValueTest: Diorite.TestCase
+public class JsonValueTest: Drt.TestCase
 {
 	public void test_null()
 	{

@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -85,4 +85,4 @@ public class ObjectCursor<T>
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

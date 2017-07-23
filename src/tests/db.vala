@@ -19,11 +19,11 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 private const string TABLE_USERS_SQL = """
-CREATE TABLE DioritedbUser(
+CREATE TABLE DrtdbUser(
 	id INTEGER PRIMARY KEY ASC,
 	name TEXT,
 	age INTEGER,
@@ -33,7 +33,7 @@ CREATE TABLE DioritedbUser(
 	extra BLOB
 )""";
 
-private const string TABLE_USERS_NAME = "DioritedbUser";
+private const string TABLE_USERS_NAME = "DrtdbUser";
 
 private class User : GLib.Object
 {
@@ -82,6 +82,6 @@ private class SimpleUser
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb
 
 

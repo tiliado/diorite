@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public static SocketService create_socket_service(string path) throws IOError
@@ -58,4 +58,4 @@ public static SocketConnection create_socket_connection(string path, Cancellable
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

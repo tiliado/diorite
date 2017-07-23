@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 /**
  * Simple Error dialog with OK button.
@@ -231,4 +231,4 @@ public class QuestionDialog: Gtk.MessageDialog
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

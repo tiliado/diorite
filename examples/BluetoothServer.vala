@@ -21,7 +21,7 @@ Drt.BluetoothConnection? connection = null;
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	var beef = "0000beef-0000-1000-1000-dead5f9b34fb";
 	var service = new Drt.BluetoothService(beef, "DJ Beef", 0);
 	service.incoming.connect(on_incoming);

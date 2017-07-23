@@ -18,17 +18,17 @@
  */
 
 int counter;
-Diorite.InfoBarStack stack;
+Drt.InfoBarStack stack;
 
 int main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Gtk.init(ref args);
 	Gtk.Settings.get_default().gtk_enable_animations = true;
 	var window = new Gtk.Window();
 	window.delete_event.connect(() => { quit(); return false;});
 	window.show();
-	stack = new Diorite.InfoBarStack();
+	stack = new Drt.InfoBarStack();
 	stack.show();
 	var vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
 	vbox.pack_start(stack, false, false, 0);

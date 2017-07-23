@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class ConnectionTest: Diorite.TestCase
+public class ConnectionTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -117,7 +117,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*ObjectSpec for DioritedbUser has not been found.*", e.message, "missing ospec");
+			expect_str_match("*ObjectSpec for DrtdbUser has not been found.*", e.message, "missing ospec");
 		}
 		
 		try
@@ -128,7 +128,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
 		
 		try
@@ -139,7 +139,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
 		
 		try
@@ -170,7 +170,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*type DioritedbSimpleUser is not supported*", e.message, "wrong type");
+			expect_str_match("*type DrtdbSimpleUser is not supported*", e.message, "wrong type");
 		}
 		
 		try
@@ -180,7 +180,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*ObjectSpec for DioritedbUser has not been found.*", e.message, "missing ospec");
+			expect_str_match("*ObjectSpec for DrtdbUser has not been found.*", e.message, "missing ospec");
 		}
 		
 		try
@@ -191,7 +191,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid primary column");
+			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid primary column");
 		}
 		
 		try
@@ -202,7 +202,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid column");
+			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
 		
 		try
@@ -213,7 +213,7 @@ public class ConnectionTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*no such column: DioritedbUser.not-in-db.*", e.message, "invalid primary column");
+			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid primary column");
 		}
 		
 		try
@@ -261,4 +261,4 @@ public class ConnectionTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

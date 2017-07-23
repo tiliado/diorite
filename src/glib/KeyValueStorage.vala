@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public interface KeyValueStorage: GLib.Object
@@ -130,4 +130,4 @@ public interface KeyValueStorage: GLib.Object
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

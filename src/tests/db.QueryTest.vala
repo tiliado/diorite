@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class QueryTest: Diorite.TestCase
+public class QueryTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -513,7 +513,7 @@ public class QueryTest: Diorite.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Diorite.bin_to_hex(value, out hex);
+					Drt.bin_to_hex(value, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}
@@ -562,7 +562,7 @@ public class QueryTest: Diorite.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Diorite.bin_to_hex(value.get_data(), out hex);
+					Drt.bin_to_hex(value.get_data(), out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 				try
@@ -572,7 +572,7 @@ public class QueryTest: Diorite.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Diorite.bin_to_hex(value.get_data(), out hex);
+					Drt.bin_to_hex(value.get_data(), out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}
@@ -621,7 +621,7 @@ public class QueryTest: Diorite.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Diorite.bin_to_hex(value.data, out hex);
+					Drt.bin_to_hex(value.data, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 				try
@@ -631,7 +631,7 @@ public class QueryTest: Diorite.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Diorite.bin_to_hex(value.data, out hex);
+					Drt.bin_to_hex(value.data, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}
@@ -643,4 +643,4 @@ public class QueryTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

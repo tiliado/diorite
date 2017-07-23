@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 [CCode(cname="sqlite3_errstr")]
@@ -279,7 +279,7 @@ public class Database: GLib.Object, Queryable
 		Sqlite.Database db;
 		var result = Sqlite.Database.open_v2(
 			db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null);
-		if (Dioritedb.is_sql_error(result))
+		if (Drtdb.is_sql_error(result))
 			throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
 		return new Connection((owned) db, orm);
 	}
@@ -296,4 +296,4 @@ public class Database: GLib.Object, Queryable
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

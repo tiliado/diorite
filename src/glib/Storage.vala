@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -265,4 +265,4 @@ public class XdgStorage: Storage
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

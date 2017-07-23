@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public bool variant_equal(Variant? a, Variant? b)
@@ -335,11 +335,6 @@ public string? variant_to_string(Variant? value, string? default_val=null)
 		return unboxed.get_string();
 	return default_val;
 }
-
-} // namespace Diorite
-
-namespace Drt
-{
 
 public Variant? new_variant_string_or_null(string? str)
 {

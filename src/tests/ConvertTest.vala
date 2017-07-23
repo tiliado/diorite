@@ -19,12 +19,12 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class ConvertTest: Diorite.TestCase
+public class ConvertTest: Drt.TestCase
 {
-	public void test_int64_to_bin() throws Diorite.TestError
+	public void test_int64_to_bin() throws Drt.TestError
 	{
 		var rand = new Rand();
 		int64 val;
@@ -49,7 +49,7 @@ public class ConvertTest: Diorite.TestCase
 		}
 	}
 	
-	public void test_bin_to_hex() throws Diorite.TestError
+	public void test_bin_to_hex() throws Drt.TestError
 	{
 		string[] values = {"01", "aa", "bb", "cc", "aabbcc", "deadbeef"};
 		var rand = new Rand();
@@ -91,7 +91,7 @@ public class ConvertTest: Diorite.TestCase
 			assert(!hex_to_bin(invalid, out data, ':'), "invalid '%s'", invalid);
 	}
 	
-	public void test_int64_to_hex() throws Diorite.TestError
+	public void test_int64_to_hex() throws Drt.TestError
 	{
 		var rand = new Rand();
 		int64 val;

@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -249,10 +249,10 @@ public class Connection: GLib.Object, Queryable
 	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
-		if (Dioritedb.is_sql_error(result))
+		if (Drtdb.is_sql_error(result))
 			throw convert_sqlite_error(result, get_last_error_message(), sql);
 		return result;
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

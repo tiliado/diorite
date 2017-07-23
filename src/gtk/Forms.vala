@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public abstract class FormEntry : GLib.Object
@@ -309,7 +309,7 @@ public class Form : Gtk.Grid
 				e_disables = variant_to_strv(entry_spec[4]);
 			else
 				e_disables = {};
-			var entry = new Diorite.BoolEntry(e_label, e_enables, e_disables);
+			var entry = new BoolEntry(e_label, e_enables, e_disables);
 			entry.state = e_value;
 			entry.toggled.connect(on_entry_toggled);
 			label = entry.label;
@@ -349,7 +349,7 @@ public class Form : Gtk.Grid
 				e_disables = variant_to_strv(entry_spec[5]);
 			else
 				e_disables = {};
-			var entry = new Diorite.OptionEntry(e_label, e_enables, e_disables);
+			var entry = new OptionEntry(e_label, e_enables, e_disables);
 			
 			label = entry.label;
 			widget = entry.widget;
@@ -416,7 +416,7 @@ public class Form : Gtk.Grid
 		var entries = this.entries.get_values();
 		foreach (var entry in entries)
 		{
-			var toggle = entry as Diorite.ToggleEntry;
+			var toggle = entry as ToggleEntry;
 			if (toggle != null)
 				entry_toggled(toggle);
 		}
@@ -480,4 +480,4 @@ public class Form : Gtk.Grid
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

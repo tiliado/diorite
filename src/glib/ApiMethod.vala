@@ -75,7 +75,7 @@ public class ApiMethod : ApiCallable
 		for (var i = 0; i < params.length; i++)
 		{
 			var param = params[i];
-			var child = Diorite.unbox_variant(data.get_child_value(i));
+			var child = unbox_variant(data.get_child_value(i));
 			handler_params[i] = param.get_value(path, child);
 		}
 		response = handler(conn, new ApiParams(this, handler_params));
@@ -94,7 +94,7 @@ public class ApiMethod : ApiCallable
 				"Method '%s' requires %d parameters but no parameters have been provided.",
 				path, params.length);
 		if (data.get_type_string() != "(a{smv})")
-			Diorite.MessageListener.check_type_string(data, "a{smv}");
+			MessageListener.check_type_string(data, "a{smv}");
 			
 		var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
 		Variant?[] handler_params = new Variant?[params.length];
@@ -110,7 +110,7 @@ public class ApiMethod : ApiCallable
 			
 			if (entry == null)
 				entry = param.default_value;
-			handler_params[i] = param.get_value(path, entry == null ? null : Diorite.unbox_variant(entry));
+			handler_params[i] = param.get_value(path, entry == null ? null : unbox_variant(entry));
 		}
 		response = handler(conn, new ApiParams(this, handler_params));
 	}

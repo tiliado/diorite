@@ -19,9 +19,9 @@
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	
-	var tree = new Diorite.KeyValueTree();
+	var tree = new Drt.KeyValueTree();
 	tree.set_value("a", "a");
 	tree.set_value("b", "b");
 	tree.set_value("c.a", "c.a");
@@ -37,36 +37,36 @@ void main(string[] args)
 	
 	// Process 1
 	// a) Provider server provides access to key-value storages
-	var provider_server = new Diorite.Ipc.MessageServer("test");
+	var provider_server = new Drt.Ipc.MessageServer("test");
 	try
 	{
 		provider_server.start_service();
 	}
-	catch (Diorite.IOError e)
+	catch (Drt.IOError e)
 	{
 		error("Cannot start server service %s: %s", provider_server.name, e.message);
 	}
 	// b) Create provider server IPC interface and add one storage provider KeyValueTree "tree"
-	var storage_server = new Diorite.KeyValueStorageServer(provider_server);
-	tree = new Diorite.KeyValueTree();
+	var storage_server = new Drt.KeyValueStorageServer(provider_server);
+	tree = new Drt.KeyValueTree();
 	storage_server.add_provider("tree", tree);
 	
 	// Process 2
 	// a) Listener server receives "changed" signal notifications
-	var listener_server = new Diorite.Ipc.MessageServer("test-listener");
+	var listener_server = new Drt.Ipc.MessageServer("test-listener");
 	try
 	{
 		listener_server.start_service();
 	}
-	catch (Diorite.IOError e)
+	catch (Drt.IOError e)
 	{
 		error("Cannot start server service %s: %s", listener_server.name, e.message);
 	}
 	// b) Provider client communicates with provider server
-	var provider_client = new Diorite.Ipc.MessageClient("test", 15);
+	var provider_client = new Drt.Ipc.MessageClient("test", 15);
 	assert(provider_client.wait_for_echo(10000));
 	// c) Storage client communicates with interface provided by provider server
-	var storage_client = new Diorite.KeyValueStorageClient(provider_client, listener_server);
+	var storage_client = new Drt.KeyValueStorageClient(provider_client, listener_server);
 	// d) Create a proxy object for a storage provider "tree"
 	var proxy = storage_client.get_proxy("tree", 15);
 	proxy.set_value("a", "a");

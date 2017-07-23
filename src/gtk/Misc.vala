@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public uint get_gtk_version()
@@ -36,4 +36,4 @@ public bool check_gtk_version(uint min, uint max)
 	return version >= min && version < max;
 }
 
-} // namespace Diorite
+} // namespace Drt

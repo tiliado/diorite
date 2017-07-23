@@ -22,7 +22,7 @@
 namespace Drt
 {
 
-public class ConditionalExpressionTest: Diorite.TestCase
+public class ConditionalExpressionTest: Drt.TestCase
 {
 	public void test_valid_expressions()
 	{

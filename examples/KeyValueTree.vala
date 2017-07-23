@@ -19,8 +19,8 @@
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
-	var tree = new Diorite.KeyValueTree();
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	var tree = new Drt.KeyValueTree();
 	tree.set_value("a", "a");
 	tree.set_value("b", "b");
 	tree.set_value("c.a", "c.a");
@@ -37,8 +37,8 @@ void main(string[] args)
 	
 	var person = new Person("Jiří Janoušek", 25, 65.5);
 	tree.bind_object_property("person.", person, "name");
-	tree.bind_object_property("person.", person, "age", Diorite.PropertyBindingFlags.PROPERTY_TO_KEY);
-	tree.bind_object_property("person.", person, "weight", Diorite.PropertyBindingFlags.KEY_TO_PROPERTY);
+	tree.bind_object_property("person.", person, "age", Drt.PropertyBindingFlags.PROPERTY_TO_KEY);
+	tree.bind_object_property("person.", person, "weight", Drt.PropertyBindingFlags.KEY_TO_PROPERTY);
 	person.name = "John";
 	person.age = 16;
 	person.weight = 100.25;

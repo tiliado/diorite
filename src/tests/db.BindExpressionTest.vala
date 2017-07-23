@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class BindExpressionTest: Diorite.TestCase
+public class BindExpressionTest: Drt.TestCase
 {
 	
 	
@@ -109,4 +109,4 @@ public class BindExpressionTest: Diorite.TestCase
 	
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

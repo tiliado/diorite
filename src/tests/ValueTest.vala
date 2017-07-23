@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class ValueTest: Diorite.TestCase
+public class ValueTest: Drt.TestCase
 {
 	public void test_to_string()
 	{
@@ -58,9 +58,9 @@ public class ValueTest: Diorite.TestCase
 		expect_str_equals("<gdouble:1024.25>", Value.describe((double)1024.25), "double");
 		expect_str_equals("<gfloat:1024.25>", Value.describe((float)1024.25), "float");
 		
-		expect_str_equals("<DioriteValueTest:%p>".printf(this), Value.describe(this), "object");
+		expect_str_equals("<DrtValueTest:%p>".printf(this), Value.describe(this), "object");
 		var dummy = new DummyObject();
-		expect_str_equals("<DioriteValueTestDummyObject:%p>".printf(dummy), Value.describe(dummy), "simple object");
+		expect_str_equals("<DrtValueTestDummyObject:%p>".printf(dummy), Value.describe(dummy), "simple object");
 		
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		expect_str_equals("<GBytes:01020304050607>", Value.describe(bytes), "bytes");
@@ -156,10 +156,10 @@ public class ValueTest: Diorite.TestCase
 		expect_str_equals("<gfloat:1024.25> != <gfloat:1024.26>", description, "float != float");
 		
 		expect_true(Value.equal_verbose(this, this, out description), "object == object");
-		expect_str_equals("equal <DioriteValueTest:%p>".printf(this), description, "object == object");
+		expect_str_equals("equal <DrtValueTest:%p>".printf(this), description, "object == object");
 		var dummy = new DummyObject();
 		expect_false(Value.equal_verbose(this, dummy, out description), "object != simple object");
-		expect_str_equals("<DioriteValueTest:%p> != <DioriteValueTestDummyObject:%p>".printf(this, dummy), description, "object != simple object");
+		expect_str_equals("<DrtValueTest:%p> != <DrtValueTestDummyObject:%p>".printf(this, dummy), description, "object != simple object");
 		
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var bytes2 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
@@ -177,4 +177,4 @@ public class ValueTest: Diorite.TestCase
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

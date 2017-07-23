@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Blobs
+namespace Drt.Blobs
 {
 
 public bool blob_equal(uint8[]? value1, uint8[]? value2)
@@ -69,4 +69,4 @@ public string? byte_array_to_string(GLib.ByteArray? value)
 	return blob_to_string(value != null ? value.data : null);
 }
 
-} // namespace Diorite.Blobs
+} // namespace Drt.Blobs

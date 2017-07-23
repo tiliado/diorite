@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
@@ -227,8 +227,8 @@ public class Actions : GLib.Object
 	
 	public Gtk.Button? create_action_button(string full_name, bool use_image, bool symbolic_images)
 	{
-		Diorite.Action action;
-		Diorite.RadioOption option;
+		Action action;
+		RadioOption option;
 		string detailed_name;
 		if (find_and_parse_action(full_name, out detailed_name, out action, out option))
 		{
@@ -243,7 +243,7 @@ public class Actions : GLib.Object
 				critical("Failed to parse '%s': %s", action.scope + "." + detailed_name, e.message);
 				return null;
 			}
-			if (action is Diorite.SimpleAction)
+			if (action is SimpleAction)
 			{
 				var button = use_image && action.icon != null
 				? new Gtk.Button.from_icon_name(
@@ -256,7 +256,7 @@ public class Actions : GLib.Object
 				button.vexpand = false;
 				return button;
 			}
-			else if (action is Diorite.ToggleAction)
+			else if (action is ToggleAction)
 			{
 				var button = new Gtk.CheckButton.with_label(action.label);
 				button.action_name = action_name;
@@ -265,9 +265,9 @@ public class Actions : GLib.Object
 				button.vexpand = false;
 				return button;
 			}
-			else if (action is Diorite.RadioAction)
+			else if (action is RadioAction)
 			{
-				warning("Diorite.ActionsRegistry.create_action_button doesn't support radio actions.");
+				warning("Drt.ActionsRegistry.create_action_button doesn't support radio actions.");
 				return null;
 			}
 		}
@@ -356,7 +356,7 @@ public class Actions : GLib.Object
 		var action = o as Action;
 		if (action == null)
 		{
-			critical("Passed object has to be Diorite.Action.");
+			critical("Passed object has to be Drt.Action.");
 			return;
 		}
 		
@@ -405,4 +405,4 @@ public class Actions : GLib.Object
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

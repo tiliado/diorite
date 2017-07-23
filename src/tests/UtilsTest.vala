@@ -24,7 +24,7 @@ using Drt.Utils;
 namespace Drt
 {
 
-public class UtilsTest: Diorite.TestCase
+public class UtilsTest: Drt.TestCase
 {
 	public void test_slist_to_strv()
 	{
@@ -53,4 +53,4 @@ public class UtilsTest: Diorite.TestCase
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

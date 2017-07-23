@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class SocketChannel : Drt.DuplexChannel
@@ -34,7 +34,7 @@ public class SocketChannel : Drt.DuplexChannel
 	
 	public static SocketConnection create_socket_from_name(string name) throws GLib.Error
 	{
-		var path = Diorite.Ipc.create_path(name);
+		var path = Ipc.create_path(name);
 		var address = new UnixSocketAddress(path);
 		var socket = new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
 		var connection = SocketConnection.factory_create_connection(socket);
@@ -52,7 +52,7 @@ public class SocketChannel : Drt.DuplexChannel
 		connection.notify["closed"].connect_after(on_connection_closed);
 	}
 	
-	public SocketChannel.from_name(uint id, string name, uint timeout) throws Diorite.IOError
+	public SocketChannel.from_name(uint id, string name, uint timeout) throws IOError
 	{
 		try
 		{
@@ -61,11 +61,11 @@ public class SocketChannel : Drt.DuplexChannel
 		}
 		catch (GLib.Error e)
 		{
-			throw new Diorite.IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
+			throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
 		}
 	}
 	
-	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws Diorite.IOError
+	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError
 	{
 		var name = "fd:%d".printf(socket.get_fd());
 		try
@@ -75,7 +75,7 @@ public class SocketChannel : Drt.DuplexChannel
 		}
 		catch (GLib.Error e)
 		{
-			throw new Diorite.IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
+			throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
 		}
 	}
 	
@@ -120,4 +120,4 @@ public class SocketChannel : Drt.DuplexChannel
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

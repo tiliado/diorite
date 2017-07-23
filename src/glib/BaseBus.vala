@@ -40,38 +40,38 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 	{
 		this.name = name;
 		this.timeout = timeout;
-		this.path = Diorite.Ipc.create_path(name);
+		this.path = Ipc.create_path(name);
 		this.base_router = router;
 		clients = new HashTable<void*, BaseChannel>(direct_hash, direct_equal);
 	}
 	
-	public void start() throws Diorite.IOError
+	public void start() throws IOError
 	{
 		create_service();
 		service.start();
 	}
 	
-	public ChannelType connect_channel(string name, uint timeout) throws Diorite.IOError
+	public ChannelType connect_channel(string name, uint timeout) throws IOError
 	{
 		var id = get_next_client_id();
 		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
-			id: id, channel: new Diorite.SocketChannel.from_name(id, name, timeout), router: base_router);
+			id: id, channel: new SocketChannel.from_name(id, name, timeout), router: base_router);
 		clients[id.to_pointer()] = channel;
 		return (ChannelType) channel;
 	}
 	
-	public ChannelType connect_channel_socket(Socket socket, uint timeout) throws Diorite.IOError
+	public ChannelType connect_channel_socket(Socket socket, uint timeout) throws IOError
 	{
 		var id = get_next_client_id();
 		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
-			id: id, channel: new Diorite.SocketChannel.from_socket(id, socket, timeout), router: base_router);
+			id: id, channel: new SocketChannel.from_socket(id, socket, timeout), router: base_router);
 		clients[id.to_pointer()] = channel;
 		return (ChannelType) channel;
 	}
 	
 	public signal void incoming(ChannelType channel);
 	
-	private void create_service() throws Diorite.IOError
+	private void create_service() throws IOError
 	{
 		if (service != null)
 			return;
@@ -92,7 +92,7 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 		}
 		catch (GLib.Error e)
 		{
-			throw new Diorite.IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
+			throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
 		}
 		service.incoming.connect(on_incoming);
 	}
@@ -117,7 +117,7 @@ public abstract class BaseBus<ChannelType, RouterType>: GLib.Object
 	{
 		var id = get_next_client_id();
 		var channel = (BaseChannel) GLib.Object.@new(typeof(ChannelType),
-				id: id, channel: new Diorite.SocketChannel(id, path, connection, timeout), router: router);
+				id: id, channel: new SocketChannel(id, path, connection, timeout), router: router);
 		clients[id.to_pointer()] = channel;
 		channel.notify["closed"].connect_after(on_channel_closed);
 		incoming((ChannelType) channel);

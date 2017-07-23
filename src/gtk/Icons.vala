@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Icons
+namespace Drt.Icons
 {
 
 public static Gdk.Pixbuf? load_theme_icon(string[] names, int size)
@@ -43,4 +43,4 @@ public static Gdk.Pixbuf? load_theme_icon(string[] names, int size)
 	return null;
 }
 
-} // namespace Diorite
+} // namespace Drt

@@ -23,7 +23,7 @@
  */
 
 private const string G_LOG_DOMAIN="DioriteGlib";
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -271,4 +271,4 @@ public class Logger
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

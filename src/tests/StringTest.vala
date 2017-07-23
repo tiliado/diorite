@@ -24,23 +24,23 @@ using Drt.Utils;
 namespace Drt
 {
 
-public class StringTest: Diorite.TestCase
+public class StringTest: Drt.TestCase
 {
 	public void test_semicolon_separated_set()
 	{
-		var result = Diorite.String.semicolon_separated_set(null, true);
+		var result = Drt.String.semicolon_separated_set(null, true);
 		expect_uint_equals(0, result.length, "null string");
-		result = Diorite.String.semicolon_separated_set("", true);
+		result = Drt.String.semicolon_separated_set("", true);
 		expect_uint_equals(0, result.length, "empty string");
-		result = Diorite.String.semicolon_separated_set(";", true);
+		result = Drt.String.semicolon_separated_set(";", true);
 		expect_uint_equals(0, result.length, "empty set");
 		var dataset = " hello ; Bye;;1234;byE;;;";
-		result = Diorite.String.semicolon_separated_set(dataset, false);
+		result = Drt.String.semicolon_separated_set(dataset, false);
 		expect_uint_equals(4, result.length, "original set");
 		foreach (var s in new string[]{"hello", "Bye", "1234", "byE"})
 			expect_true(result.contains(s), "item: %s", s);
 		expect_false(result.contains("bye"), "item: %s", "bye");
-		result = Diorite.String.semicolon_separated_set(dataset, true);
+		result = Drt.String.semicolon_separated_set(dataset, true);
 		expect_uint_equals(3, result.length, "lowercase set");
 		foreach (var s in new string[]{"hello", "bye", "1234"})
 			expect_true(result.contains(s), "item: %s", s);
@@ -49,17 +49,17 @@ public class StringTest: Diorite.TestCase
 	
 	public void test_concat()
 	{
-		expect_str_equals("bar", Diorite.String.concat(null, "foo", "bar"), "");
-		expect_str_equals("bar", Diorite.String.concat("", "foo", "bar"), "");
-		expect_str_equals("xfoobar", Diorite.String.concat("x", "foo", "bar"), "");
+		expect_str_equals("bar", Drt.String.concat(null, "foo", "bar"), "");
+		expect_str_equals("bar", Drt.String.concat("", "foo", "bar"), "");
+		expect_str_equals("xfoobar", Drt.String.concat("x", "foo", "bar"), "");
 		
-		expect_str_equals("bar", Diorite.String.concat(null, null, "bar"), "");
-		expect_str_equals("bar", Diorite.String.concat("", null, "bar"), "");
-		expect_str_equals("xbar", Diorite.String.concat("x", null, "bar"), "");
+		expect_str_equals("bar", Drt.String.concat(null, null, "bar"), "");
+		expect_str_equals("bar", Drt.String.concat("", null, "bar"), "");
+		expect_str_equals("xbar", Drt.String.concat("x", null, "bar"), "");
 		
-		expect_str_equals("bar", Diorite.String.concat(null, "", "bar"), "");
-		expect_str_equals("bar", Diorite.String.concat("", "", "bar"), "");
-		expect_str_equals("xbar", Diorite.String.concat("x", "", "bar"), "");
+		expect_str_equals("bar", Drt.String.concat(null, "", "bar"), "");
+		expect_str_equals("bar", Drt.String.concat("", "", "bar"), "");
+		expect_str_equals("xbar", Drt.String.concat("x", "", "bar"), "");
 	}
 	
 	public void test_append()
@@ -67,35 +67,35 @@ public class StringTest: Diorite.TestCase
 		string? buffer = null;
 		
 		buffer = null;
-		Diorite.String.append(ref buffer, "foo", "bar");
+		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("bar", buffer, "");
 		buffer = null;
-		Diorite.String.append(ref buffer, null, "bar");
+		Drt.String.append(ref buffer, null, "bar");
 		expect_str_equals("bar", buffer, "");
 		buffer = null;
-		Diorite.String.append(ref buffer, "", "bar");
+		Drt.String.append(ref buffer, "", "bar");
 		expect_str_equals("bar", buffer, "");
 		
 		buffer = "";
-		Diorite.String.append(ref buffer, "foo", "bar");
+		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("bar", buffer, "");
 		buffer = "";
-		Diorite.String.append(ref buffer, null, "bar");
+		Drt.String.append(ref buffer, null, "bar");
 		expect_str_equals("bar", buffer, "");
 		buffer = "";
-		Diorite.String.append(ref buffer, "", "bar");
+		Drt.String.append(ref buffer, "", "bar");
 		expect_str_equals("bar", buffer, "");
 		
 		buffer = "x";
-		Diorite.String.append(ref buffer, "foo", "bar");
+		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("xfoobar", buffer, "");
 		buffer = "x";
-		Diorite.String.append(ref buffer, null, "bar");
+		Drt.String.append(ref buffer, null, "bar");
 		expect_str_equals("xbar", buffer, "");
 		buffer = "x";
-		Diorite.String.append(ref buffer, "", "bar");
+		Drt.String.append(ref buffer, "", "bar");
 		expect_str_equals("xbar", buffer, "");
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

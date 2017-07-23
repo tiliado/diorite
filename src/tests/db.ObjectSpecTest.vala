@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class ObjectSpecTest: Diorite.TestCase
+public class ObjectSpecTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -74,7 +74,7 @@ public class ObjectSpecTest: Diorite.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			expect_str_match("*Data type DioritedbSimpleUser is not supported*", e.message, "invalid type");
+			expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
 		}
 		
 		try
@@ -127,4 +127,4 @@ public class ObjectSpecTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

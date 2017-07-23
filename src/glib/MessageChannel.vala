@@ -42,15 +42,15 @@ public class MessageChannel: BaseChannel
 		GLib.Object(id: id, channel: channel, router: router ?? new MessageRouter(null));
 	}
 	
-	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout) throws Diorite.IOError
+	public MessageChannel.from_name(uint id, string name, MessageRouter? router, uint timeout) throws IOError
 	{
-		this(id, new Diorite.SocketChannel.from_name(id, name, timeout), router);
+		this(id, new SocketChannel.from_name(id, name, timeout), router);
 	}
 
 	construct
 	{
 		allowed_errors = new GenericSet<void*>(null, null);
-		allow_error_propagation(new Diorite.MessageError.UNKNOWN("").domain);
+		allow_error_propagation(new MessageError.UNKNOWN("").domain);
 		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
 		
 		channel.notify["closed"].connect_after(on_channel_closed);
@@ -109,7 +109,7 @@ public class MessageChannel: BaseChannel
 			debug("Channel(%u) Request #%u: %s => %s",
 				channel.id, id, name, parameters != null ? parameters.print(false) : "null");
 			
-		var buffer = Diorite.serialize_message(name, parameters, 0);
+		var buffer = serialize_message(name, parameters, 0);
 		var payload = new ByteArray.take((owned) buffer);
 		return payload;
 	}
@@ -120,30 +120,30 @@ public class MessageChannel: BaseChannel
 		var buffer = Bytes.unref_to_data((owned) bytes);
 		string? label = null;
 		Variant? parameters = null;
-		if (!Diorite.deserialize_message((owned) buffer, out label, out parameters, 0))
-			throw new Diorite.MessageError.INVALID_RESPONSE("Server returned invalid response. Cannot deserialize message.");
+		if (!deserialize_message((owned) buffer, out label, out parameters, 0))
+			throw new MessageError.INVALID_RESPONSE("Server returned invalid response. Cannot deserialize message.");
 		
 		if (log_comunication)
 			debug("Channel(%u) Response #%u: %s => %s",
 				channel.id, id, label, parameters != null ? parameters.print(false) : "null");
 		
-		if (label == Diorite.Ipc.RESPONSE_OK)
+		if (label == Ipc.RESPONSE_OK)
 			return parameters;
 			
-		if (label == Diorite.Ipc.RESPONSE_ERROR)
+		if (label == Ipc.RESPONSE_ERROR)
 		{
 			if (parameters == null)
-				throw new Diorite.MessageError.INVALID_RESPONSE("Server returned empty error.");
+				throw new MessageError.INVALID_RESPONSE("Server returned empty error.");
 				
-			var e = Diorite.deserialize_error(parameters);
+			var e = deserialize_error(parameters);
 			if (e == null)
-				throw new Diorite.MessageError.UNKNOWN("Server returned unknown error.");
+				throw new MessageError.UNKNOWN("Server returned unknown error.");
 			if (!is_error_allowed(e.domain))
-				throw new Diorite.MessageError.UNKNOWN("Server returned unknown error (%s).", e.domain.to_string());
+				throw new MessageError.UNKNOWN("Server returned unknown error (%s).", e.domain.to_string());
 			throw e;
 		}
 		
-		throw new Diorite.MessageError.INVALID_RESPONSE("Server returned invalid response status '%s'.", label);
+		throw new MessageError.INVALID_RESPONSE("Server returned invalid response status '%s'.", label);
 	}
 	
 	public bool close()
@@ -173,13 +173,13 @@ public class MessageChannel: BaseChannel
 		
 		var bytes = ByteArray.free_to_bytes((owned) data);
 		var buffer = Bytes.unref_to_data((owned) bytes);
-		if (!Diorite.deserialize_message((owned) buffer, out name, out parameters, 0))
+		if (!deserialize_message((owned) buffer, out name, out parameters, 0))
 		{
 			warning("Server sent invalid request. Cannot deserialize message.");
 			return;
 		}
 		handle_request(name, parameters, out status, out response);
-		buffer = Diorite.serialize_message(status, response, 0);
+		buffer = serialize_message(status, response, 0);
 		var payload = new ByteArray.take((owned) buffer);
 		try
 		{
@@ -212,16 +212,16 @@ public class MessageChannel: BaseChannel
 		try 
 		{
 			response = router.handle_message(this, name, parameters);
-			status = Diorite.Ipc.RESPONSE_OK;
+			status = Ipc.RESPONSE_OK;
 		}
 		catch (GLib.Error e)
 		{
-			status = Diorite.Ipc.RESPONSE_ERROR;
+			status = Ipc.RESPONSE_ERROR;
 			if (!is_error_allowed(e.domain))
-				response = Diorite.serialize_error(
-					new Diorite.MessageError.UNKNOWN("Server returned unknown error (%s).", e.domain.to_string()));
+				response = serialize_error(
+					new MessageError.UNKNOWN("Server returned unknown error (%s).", e.domain.to_string()));
 			else
-				response = Diorite.serialize_error(e);
+				response = serialize_error(e);
 		}
 		return true;
 	}	

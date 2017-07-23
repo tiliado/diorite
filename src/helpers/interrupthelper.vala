@@ -24,7 +24,7 @@
 
 using Win32;
 
-namespace Diorite
+namespace Drt
 {
 
 int main(string[] args)
@@ -77,4 +77,4 @@ int main(string[] args)
 	return 0;
 }
 
-} // namespace Diorite
+} // namespace Drt

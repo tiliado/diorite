@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -55,7 +55,7 @@ public delegate string ImageLocator(string uri);
  * * <ul> - unordered list (bullets)
  * * <li> - list item
  * 
- * Tag <a> is inserted as anonymous Diorite.SimpleDocLink, <img> is inserted as Gtk.Pixbuf.
+ * Tag <a> is inserted as anonymous Drt.SimpleDocLink, <img> is inserted as Gtk.Pixbuf.
  * Other tags are inserted as Gtk.TextTags with names TEXT_TAG_*.
  */
 public class RichTextBuffer: Gtk.TextBuffer
@@ -272,7 +272,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 		string doc_text;
 		try
 		{
-			doc_text = Diorite.System.read_file(doc_file);
+			doc_text = System.read_file(doc_file);
 		}
 		catch (GLib.Error e)
 		{
@@ -734,5 +734,5 @@ public class RichTextLink: Gtk.TextTag
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt
 

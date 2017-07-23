@@ -109,7 +109,7 @@ button.badge-ok:hover {
 /**
  * Apply Diorite CSS styles.
  * 
- * Not necessary if {@link Diorite.Application} is used.
+ * Not necessary if {@link Drt.Application} is used.
  */
 public Gtk.CssProvider apply_custom_styles(Gdk.Screen screen) throws GLib.Error
 {

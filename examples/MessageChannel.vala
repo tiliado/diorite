@@ -21,7 +21,7 @@ int counter;
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	try
 	{
 		var conn = new Drt.MessageChannel.from_name(0, "test", null);
@@ -32,7 +32,7 @@ void main(string[] args)
 			return true;
 		});
 	}
-	catch (Diorite.IOError e)
+	catch (Drt.IOError e)
 	{
 		error("Failed to start service %s", e.message);
 	}

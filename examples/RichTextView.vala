@@ -132,14 +132,14 @@ const string TEXT = """
 int main(string[] args)
 {
 	
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Gtk.init(ref args);
 	var window = new Gtk.Window();
 	window.delete_event.connect(() => { quit(); return false;});
 	window.show();
 	
 	
-	var buffer = new Diorite.RichTextBuffer();
+	var buffer = new Drt.RichTextBuffer();
 	buffer.image_locator = image_requested;
 	
 	try
@@ -154,7 +154,7 @@ int main(string[] args)
 		assert_not_reached();
 	}
 	
-	var view = new Diorite.RichTextView(buffer);
+	var view = new Drt.RichTextView(buffer);
 	var scroll = new Gtk.ScrolledWindow(null, null);
 	scroll.set_size_request(400, 400);
 	scroll.add(view);

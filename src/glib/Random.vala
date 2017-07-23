@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 /**
@@ -69,4 +69,4 @@ public void random_bin(int n_bits, out uint8[] result)
 		uint32_to_bytes(ref result, GLib.Random.next_int(), offset);
 }
 
-} // namespace Diorite
+} // namespace Drt

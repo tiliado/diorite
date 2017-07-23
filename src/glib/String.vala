@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.String
+namespace Drt.String
 {
 /**
  * Check whether string is empty, i.e. `null` or `""`.
@@ -214,4 +214,4 @@ public unowned string offset(string str, int offset)
 	return result;
 }
 
-} // namespace Diorite.String
+} // namespace Drt.String

@@ -19,9 +19,9 @@
 
 
 
-public class MyApp : Diorite.Application
+public class MyApp : Drt.Application
 {
-	private Diorite.ApplicationWindow? main_window = null;
+	private Drt.ApplicationWindow? main_window = null;
 	private bool toggled = false;
 	
 	public MyApp()
@@ -47,7 +47,7 @@ public class MyApp : Diorite.Application
 		menubar.append_submenu("_Go", actions.build_menu({Actions.GO_HOME, Actions.GO_RELOAD, Actions.GO_BACK, Actions.GO_FORWARD}, true, false));
 		menubar.append_submenu("_View", actions.build_menu({Actions.ZOOM_IN, Actions.ZOOM_OUT, Actions.ZOOM_RESET, "|", Actions.TOGGLE_SIDEBAR}, true, false));
 		
-		main_window = new Diorite.ApplicationWindow(this, true);
+		main_window = new Drt.ApplicationWindow(this, true);
 		main_window.set_default_size(400, 400);
 		main_window.set_title("My App Window");
 		main_window.create_toolbar({Actions.GO_BACK, Actions.GO_FORWARD, Actions.GO_RELOAD, Actions.GO_HOME, " ", Actions.DONATE});
@@ -66,24 +66,24 @@ public class MyApp : Diorite.Application
 	
 	private void append_actions()
 	{
-		Diorite.Action[] actions = {
+		Drt.Action[] actions = {
 		//          Action(group, scope, name, label?, mnemo_label?, icon?, keybinding?, callback?)
-		new Diorite.SimpleAction("main", "app", Actions.QUIT, "Quit", "_Quit", "application-exit", "<ctrl>Q", on_quit),
-		new Diorite.SimpleAction("main", "win", "menu", "Menu", null, "emblem-system-symbolic", null, null),
-		new Diorite.SimpleAction("main", "app", Actions.ACTIVATE, "Activate main window", null, null, null, null),
-		new Diorite.SimpleAction("main", "app", Actions.FORMAT_SUPPORT, "Format Support", "_Format support", null, null, null),
-		new Diorite.SimpleAction("main", "app", Actions.ABOUT, "About", "_About", null, null, null),
-		new Diorite.SimpleAction("main", "app", Actions.HELP, "Help", "_Help", null, "F1", null),
-		new Diorite.SimpleAction("main", "app", Actions.DONATE, "Donate", null, "emblem-favorite", null, null),
-		new Diorite.SimpleAction("main", "app", Actions.PREFERENCES, "Preferences", "_Preferences", null, null, null),
-		new Diorite.ToggleAction("main", "win", Actions.TOGGLE_SIDEBAR, "Show sidebar", "Show _sidebar", null, null, null, true),
-		new Diorite.SimpleAction("go", "app", Actions.GO_HOME, "Home", "_Home", "go-home", "<alt>Home", null),
-		new Diorite.SimpleAction("go", "app", Actions.GO_BACK, "Back", "_Back", "go-previous", "<alt>Left", null),
-		new Diorite.SimpleAction("go", "app", Actions.GO_FORWARD, "Forward", "_Forward", "go-next", "<alt>Right", null),
-		new Diorite.SimpleAction("go", "app", Actions.GO_RELOAD, "Reload", "_Reload", "view-refresh", "<ctrl>R", null),
-		new Diorite.SimpleAction("view", "win", Actions.ZOOM_IN, "Zoom in", null, "zoom-in", "<ctrl>plus", null),
-		new Diorite.SimpleAction("view", "win", Actions.ZOOM_OUT, "Zoom out", null, "zoom-out", "<ctrl>minus", null),
-		new Diorite.SimpleAction("view", "win", Actions.ZOOM_RESET, "Original zoom", null, "zoom-original", "<ctrl>0", null)
+		new Drt.SimpleAction("main", "app", Actions.QUIT, "Quit", "_Quit", "application-exit", "<ctrl>Q", on_quit),
+		new Drt.SimpleAction("main", "win", "menu", "Menu", null, "emblem-system-symbolic", null, null),
+		new Drt.SimpleAction("main", "app", Actions.ACTIVATE, "Activate main window", null, null, null, null),
+		new Drt.SimpleAction("main", "app", Actions.FORMAT_SUPPORT, "Format Support", "_Format support", null, null, null),
+		new Drt.SimpleAction("main", "app", Actions.ABOUT, "About", "_About", null, null, null),
+		new Drt.SimpleAction("main", "app", Actions.HELP, "Help", "_Help", null, "F1", null),
+		new Drt.SimpleAction("main", "app", Actions.DONATE, "Donate", null, "emblem-favorite", null, null),
+		new Drt.SimpleAction("main", "app", Actions.PREFERENCES, "Preferences", "_Preferences", null, null, null),
+		new Drt.ToggleAction("main", "win", Actions.TOGGLE_SIDEBAR, "Show sidebar", "Show _sidebar", null, null, null, true),
+		new Drt.SimpleAction("go", "app", Actions.GO_HOME, "Home", "_Home", "go-home", "<alt>Home", null),
+		new Drt.SimpleAction("go", "app", Actions.GO_BACK, "Back", "_Back", "go-previous", "<alt>Left", null),
+		new Drt.SimpleAction("go", "app", Actions.GO_FORWARD, "Forward", "_Forward", "go-next", "<alt>Right", null),
+		new Drt.SimpleAction("go", "app", Actions.GO_RELOAD, "Reload", "_Reload", "view-refresh", "<ctrl>R", null),
+		new Drt.SimpleAction("view", "win", Actions.ZOOM_IN, "Zoom in", null, "zoom-in", "<ctrl>plus", null),
+		new Drt.SimpleAction("view", "win", Actions.ZOOM_OUT, "Zoom out", null, "zoom-out", "<ctrl>minus", null),
+		new Drt.SimpleAction("view", "win", Actions.ZOOM_RESET, "Original zoom", null, "zoom-original", "<ctrl>0", null)
 		};
 		this.actions.add_actions(actions);
 		
@@ -123,7 +123,7 @@ namespace Actions
 
 int main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	var me = args[0];
 	debug("Debug: %s", me);
 	var app = new MyApp();

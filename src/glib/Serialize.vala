@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 	public const uint SERIALIZE_ALIGN = 8;
 	
@@ -154,4 +154,4 @@ namespace Diorite
 		e.get("(sis)", ref domain, ref code, ref message);
 		return new GLib.Error(GLib.Quark.from_string(domain), code, "%s", message);
 	}
-} // namespace Diorite
+} // namespace Drt

@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class DatabaseTest: Diorite.TestCase
+public class DatabaseTest: Drt.TestCase
 {
 	
 	private File db_file;
@@ -66,7 +66,7 @@ public class DatabaseTest: Diorite.TestCase
 		}
 	}
 	
-	public void test_open_close() throws Diorite.TestError
+	public void test_open_close() throws Drt.TestError
 	{
 		assert(!db_file.query_exists(), "");
 		try
@@ -81,7 +81,7 @@ public class DatabaseTest: Diorite.TestCase
 		assert(db_file.query_exists(), "");
 	}
 	
-	public void test_exec() throws Diorite.TestError
+	public void test_exec() throws Drt.TestError
 	{
 		try
 		{
@@ -118,4 +118,4 @@ public class DatabaseTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

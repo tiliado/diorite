@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public delegate Variant? MessageHandler(GLib.Object source, Variant? params) throws GLib.Error;
@@ -89,4 +89,4 @@ public class HandlerAdaptor
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

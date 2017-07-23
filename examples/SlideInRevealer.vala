@@ -20,7 +20,7 @@
 
 int main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Gtk.init(ref args);
 	Gtk.Settings.get_default().gtk_enable_animations = true;
 	var window = new Gtk.Window();
@@ -29,7 +29,7 @@ int main(string[] args)
 	var label = new Gtk.Label("THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS AS IS");
 	label.margin = 5;
 	label.show();
-	var slide_in = new Diorite.SlideInRevealer();
+	var slide_in = new Drt.SlideInRevealer();
 	slide_in.show();
 	slide_in.add(label);
 	var vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);

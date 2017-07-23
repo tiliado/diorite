@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class ApplicationWindow: Gtk.ApplicationWindow
@@ -30,7 +30,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	public Gtk.Grid top_grid {get; private set;}
 	public InfoBarStack info_bars {get; private set;}
 	public Gtk.HeaderBar header_bar {get; private set;}
-	private Diorite.SlideInRevealer? header_bar_revealer = null;
+	private SlideInRevealer? header_bar_revealer = null;
 	protected unowned Application app;
 	private Gtk.MenuButton menu_button = null;
 	private string[]? menu_button_items = null;
@@ -46,7 +46,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		top_grid.orientation = Gtk.Orientation.VERTICAL;
 		top_grid.show();
 		add(top_grid);
-		info_bars = new Diorite.InfoBarStack();
+		info_bars = new InfoBarStack();
 		top_grid.add(info_bars);
 		info_bars.show();
 		/* Don't show fallback menubar, because all significant actions should be already provided
@@ -78,7 +78,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		else if(collapsible_header_bar)
 		{
 			/* Other desktop environments, show collapsible toolbar */
-			header_bar_revealer = new Diorite.SlideInRevealer();
+			header_bar_revealer = new SlideInRevealer();
 			header_bar_revealer.button.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 			top_grid.attach_next_to(header_bar_revealer, null, Gtk.PositionType.TOP, 1, 1);
 			header_bar_revealer.revealer.notify["reveal-child"].connect_after(
@@ -239,4 +239,4 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

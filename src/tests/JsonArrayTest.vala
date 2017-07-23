@@ -24,7 +24,7 @@ using Drt.Utils;
 namespace Drt
 {
 
-public class JsonArrayTest: Diorite.TestCase
+public class JsonArrayTest: Drt.TestCase
 {
 	
 	private JsonArray load_array() throws GLib.Error

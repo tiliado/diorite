@@ -22,7 +22,7 @@ namespace Example
 
 int main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Gtk.init(ref args);
 	try
 	{

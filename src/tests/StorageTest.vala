@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class StorageTest: Diorite.TestCase
+public class StorageTest: Drt.TestCase
 {
 	public void test_get_data_file()
 	{
@@ -34,4 +34,4 @@ public class StorageTest: Diorite.TestCase
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

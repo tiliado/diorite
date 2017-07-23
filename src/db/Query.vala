@@ -24,7 +24,7 @@
 
 private extern const int SQLITE_TRANSIENT;
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -339,10 +339,10 @@ public class Query : GLib.Object
 	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
-		if (Dioritedb.is_sql_error(result))
+		if (Drtdb.is_sql_error(result))
 			throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
 		return result;
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

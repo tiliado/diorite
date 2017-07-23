@@ -17,11 +17,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-Diorite.Form form;
+Drt.Form form;
 
 int main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Gtk.init(ref args);
 	var window = new Gtk.Window();
 	window.delete_event.connect(() => { quit(); return false;});
@@ -37,7 +37,7 @@ int main(string[] args)
 	
 	try
 	{
-		form = Diorite.Form.create_from_spec(values, new Variant.tuple({
+		form = Drt.Form.create_from_spec(values, new Variant.tuple({
 			//new Variant.tuple({new Variant.string("bool"), new Variant.string("string"), new Variant.string("string"), new Variant.array(null, {new Variant.variant(new Variant.string("string")), new Variant.variant(new Variant.int32(12))})}),
 			new Variant.tuple({new Variant.string("bool"), new Variant.string("entrytype"), new Variant.string("Use short string"), new Variant.strv({"shortstring"}), new Variant.strv({"longstring"})}),
 			new Variant.tuple({new Variant.string("string"), new Variant.string("shortstring"), new Variant.string("Label")}),
@@ -51,7 +51,7 @@ int main(string[] args)
 			new Variant.tuple({new Variant.string("string"), new Variant.string("port"), new Variant.string("Port")})
 		}));
 	}
-	catch(Diorite.FormError e)
+	catch(Drt.FormError e)
 	{
 		error("%s", e.message);
 	}

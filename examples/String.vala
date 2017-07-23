@@ -20,10 +20,10 @@
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	var names = "John; Jack;Frank;;Joe ;  ; ; Matthew ; Lawrence ";
 	message("Names: '%s'", names);
-	var items = Diorite.String.split_strip(names, ";");
+	var items = Drt.String.split_strip(names, ";");
 	var i = 0;
 	foreach (unowned string name in items)
 		message("Name %d: '%s'", ++i, name);

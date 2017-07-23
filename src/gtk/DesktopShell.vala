@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public abstract class DesktopShell: GLib.Object
@@ -60,7 +60,7 @@ public abstract class DesktopShell: GLib.Object
 				debug("Shell: %s = %s", variable, shell);
 				if (shell != null)
 				{
-					var parts = Diorite.String.split_strip(shell.down(), ":");
+					var parts = String.split_strip(shell.down(), ":");
 					foreach (var part in parts)
 						shells.add(part);
 				}
@@ -212,4 +212,4 @@ private class XfceDesktopShell: DesktopShell
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

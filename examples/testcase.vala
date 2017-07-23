@@ -20,7 +20,7 @@
 namespace My
 {
 
-public class MyTest: Diorite.TestCase
+public class MyTest: Drt.TestCase
 {
 	
 	public override void set_up()

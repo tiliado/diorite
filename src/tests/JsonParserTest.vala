@@ -22,11 +22,11 @@
 namespace Drt
 {
 
-public class JsonParserTest: Diorite.TestCase
+public class JsonParserTest: Drt.TestCase
 {
 	private static inline string load_data(string name, int i) throws GLib.Error
 	{
-		return Diorite.System.read_file(File.new_for_path("src/tests/data/json/%s%d.json".printf(name, i)));
+		return Drt.System.read_file(File.new_for_path("src/tests/data/json/%s%d.json".printf(name, i)));
 	}
 	
 	public void test_pass()

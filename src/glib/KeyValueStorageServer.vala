@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class KeyValueStorageServer: GLib.Object
@@ -120,7 +120,7 @@ public class KeyValueStorageServer: GLib.Object
 		return provider;
 	}
 	
-	private Variant? handle_add_listener(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_add_listener(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var channel = source as Drt.ApiChannel;
 		return_val_if_fail(channel != null, new Variant.boolean(false));
@@ -128,7 +128,7 @@ public class KeyValueStorageServer: GLib.Object
 		return new Variant.boolean(add_listener(provider_name, channel));
 	}
 	
-	private Variant? handle_remove_listener(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_remove_listener(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var channel = source as Drt.ApiChannel;
 		return_val_if_fail(channel != null, new Variant.boolean(false));
@@ -136,21 +136,21 @@ public class KeyValueStorageServer: GLib.Object
 		return new Variant.boolean(remove_listener(provider_name, channel));
 	}
 	
-	private Variant? handle_has_key(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_has_key(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var name = params.pop_string();
 		var key = params.pop_string();
 		return new Variant.boolean(get_provider(name).storage.has_key(key));
 	}
 	
-	private Variant? handle_get_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_get_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var name = params.pop_string();
 		var key = params.pop_string();
 		return get_provider(name).storage.get_value(key);
 	}
 	
-	private Variant? handle_set_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_set_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var name = params.pop_string();
 		var key = params.pop_string();
@@ -159,7 +159,7 @@ public class KeyValueStorageServer: GLib.Object
 		return null;
 	}
 	
-	private Variant? handle_unset(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_unset(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var name = params.pop_string();
 		var key = params.pop_string();
@@ -167,7 +167,7 @@ public class KeyValueStorageServer: GLib.Object
 		return null;
 	}
 	
-	private Variant? handle_set_default_value(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_set_default_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var name = params.pop_string();
 		var key = params.pop_string();
@@ -214,4 +214,4 @@ public class KeyValueStorageServer: GLib.Object
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -37,7 +37,7 @@ public class OrmManager : GLib.Object
 	 */
 	public OrmManager()
 	{
-		object_specs = new HashTable<Type, ObjectSpec>(Diorite.Types.type_hash, Diorite.Types.type_equal);
+		object_specs = new HashTable<Type, ObjectSpec>(Drt.Types.type_hash, Drt.Types.type_equal);
 	}
 	
 	/**
@@ -133,11 +133,11 @@ public class OrmManager : GLib.Object
 			{
 				var current_value = GLib.Value(property.value_type);
 				object.get_property(property.name, ref current_value);
-				if (!Diorite.Value.equal(current_value, value))
+				if (!Drt.Value.equal(current_value, value))
 					throw new DatabaseError.MISMATCH("Read-only value of property '%s' doesn't match database data.", property.name);
 			}
 		}
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

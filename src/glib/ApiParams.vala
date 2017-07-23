@@ -185,7 +185,7 @@ public class ApiParams
 	 */
 	public HashTable<string, Variant?> pop_dict()
 	{
-		return Diorite.variant_to_hashtable(next(typeof(DictParam)));
+		return variant_to_hashtable(next(typeof(DictParam)));
 	}
 	
 	private Variant? next(Type param_type)
@@ -200,7 +200,7 @@ public class ApiParams
 			error(
 				"The parameter %d of method '%s' is of type '%s' but %s value requested.",
 				index, method.path, Type.from_instance(param).name(), param_type.name());
-		return Diorite.unbox_variant(data[index]);
+		return unbox_variant(data[index]);
 	}
 }
 
@@ -398,7 +398,7 @@ public class StringArrayParam: ApiParam
 		var size = value.n_children();
 		for (var i = 0; i < size; i++)
 		{
-			var child = Diorite.unbox_variant(value.get_child_value(i));
+			var child = unbox_variant(value.get_child_value(i));
 			if (child == null)
 				child = new Variant.string("");
 			if (!child.is_of_type(VariantType.STRING))

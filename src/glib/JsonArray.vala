@@ -576,7 +576,7 @@ public class JsonArray: JsonNode
 	 */
 	public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0)
 	{
-		var nl = !Diorite.String.is_empty(indent);
+		var nl = !String.is_empty(indent);
 		var item_sep = (nl || compact) ? "," : ", ";
 		buffer.append_c('[');
 		if (nl)

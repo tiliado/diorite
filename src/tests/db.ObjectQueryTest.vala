@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class ObjectQueryTest: Diorite.TestCase
+public class ObjectQueryTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -273,4 +273,4 @@ public class ObjectQueryTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

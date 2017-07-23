@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public delegate void UriOpener(string uri);
@@ -246,4 +246,4 @@ public class RichTextView: Gtk.TextView
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

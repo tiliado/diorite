@@ -19,14 +19,14 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public abstract class KeyValueStorageTest: Diorite.TestCase
+public abstract class KeyValueStorageTest: Drt.TestCase
 {
 	protected KeyValueStorage storage = null;
 	
-	public void test_get_null_for_empty_keys() throws Diorite.TestError
+	public void test_get_null_for_empty_keys() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		expect(storage.get_value("key1") == null, "");
@@ -37,7 +37,7 @@ public abstract class KeyValueStorageTest: Diorite.TestCase
 		expect(storage.get_value("key4.subkey3") == null, "");
 	}
 	
-	public void test_set_get_default_value() throws Diorite.TestError
+	public void test_set_get_default_value() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant v;
@@ -74,7 +74,7 @@ public abstract class KeyValueStorageTest: Diorite.TestCase
 		expect(storage.get_value(key).equal(v), "");
 	}
 	
-	public void test_set_get_value_no_default() throws Diorite.TestError
+	public void test_set_get_value_no_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant v;
@@ -111,7 +111,7 @@ public abstract class KeyValueStorageTest: Diorite.TestCase
 		expect(storage.get_value(key).equal(v), "");
 	}
 	
-	public void test_set_get_value_with_default() throws Diorite.TestError
+	public void test_set_get_value_with_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant d1 = new Variant.string("default1");
@@ -170,7 +170,7 @@ public abstract class KeyValueStorageTest: Diorite.TestCase
 		expect(storage.get_value(key).equal(v), "");
 	}
 	
-	public void test_unset_with_default() throws Diorite.TestError
+	public void test_unset_with_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant d1 = new Variant.string("default1");

@@ -21,7 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Diorite
+namespace Drt
 {
 
 public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
@@ -151,5 +151,5 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt
 

@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class EntryMultiCompletion : Gtk.EntryCompletion
@@ -66,17 +66,17 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 		key = null;
 		key_start = key_end = -1;
 		key_valid = false;
-		if (cursor > 0 && !Diorite.String.is_empty(text))
+		if (cursor > 0 && !String.is_empty(text))
 		{
-			key_start = Diorite.String.last_index_of_char(text, ' ', 0, cursor) + 1;
+			key_start = String.last_index_of_char(text, ' ', 0, cursor) + 1;
 			if (cursor > key_start)
 			{
-				key_end = Diorite.String.index_of_char(text, ' ', cursor);
+				key_end = String.index_of_char(text, ' ', cursor);
 				if (key_end < 0)
 					key_end = text.length;
 				key = text.slice(key_start, cursor);
 //~ 				debug("Text '%s', key '%s', %d→%d→%d", text, key, key_start, cursor, key_end);
-				if (!Diorite.String.is_empty(key.strip()))
+				if (!String.is_empty(key.strip()))
 					key_valid = true;
 			}
 		}	
@@ -89,7 +89,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 		string candidate;
 		model.get(iter, text_column, out candidate);
 		var prefix = key.strip().down();
-		if (Diorite.String.is_empty(prefix))
+		if (String.is_empty(prefix))
 			return false;
 		return candidate.down().has_prefix(prefix);
 	}
@@ -149,4 +149,4 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 	}	
 }
 
-} // namespace Diorite
+} // namespace Drt

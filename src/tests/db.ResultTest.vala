@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class ResultTest: Diorite.TestCase
+public class ResultTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -513,4 +513,4 @@ public class ResultTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

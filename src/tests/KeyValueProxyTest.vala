@@ -19,7 +19,7 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 #if FIXME
-namespace Diorite
+namespace Drt
 {
 
 public class KeyValueProxyTest: KeyValueStorageTest
@@ -36,7 +36,7 @@ public class KeyValueProxyTest: KeyValueStorageTest
 		{
 			listener_server.start_service();
 		}
-		catch (Diorite.IOError e)
+		catch (Drt.IOError e)
 		{
 			fail("Cannot start server service %s: %s", listener_server.name, e.message);
 		}
@@ -45,7 +45,7 @@ public class KeyValueProxyTest: KeyValueStorageTest
 		{
 			provider_server.start_service();
 		}
-		catch (Diorite.IOError e)
+		catch (Drt.IOError e)
 		{
 			fail("Cannot start server service %s: %s", provider_server.name, e.message);
 		}

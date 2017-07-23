@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class VectorClockTest: Diorite.TestCase
+public class VectorClockTest: Drt.TestCase
 {
 	const string A = "A";
 	const string B = "B";

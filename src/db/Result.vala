@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -295,7 +295,7 @@ public class Result : GLib.Object
 	 */
 	protected int throw_on_error(int result, string? sql=null) throws DatabaseError
 	{
-		if (Dioritedb.is_sql_error(result))
+		if (Drtdb.is_sql_error(result))
 			throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
 		return result;
 	}
@@ -325,4 +325,4 @@ public class Result : GLib.Object
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

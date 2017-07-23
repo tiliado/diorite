@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
-public class BlobsTest: Diorite.TestCase
+public class BlobsTest: Drt.TestCase
 {
 	public void test_blob_equal()
 	{
@@ -121,4 +121,4 @@ public class BlobsTest: Diorite.TestCase
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

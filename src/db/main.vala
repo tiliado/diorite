@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 public errordomain DatabaseError
@@ -166,4 +166,4 @@ private inline string escape_sql_id(string sql_id)
 	return sql_id.replace("\"", "\"\"");
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

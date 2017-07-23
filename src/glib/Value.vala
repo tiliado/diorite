@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Value
+namespace Drt.Value
 {
 
 /**
@@ -133,4 +133,4 @@ public bool equal_verbose(GLib.Value? value1, GLib.Value? value2, out string des
 	return result;
 }
 
-} // namespace Diorite.Value
+} // namespace Drt.Value

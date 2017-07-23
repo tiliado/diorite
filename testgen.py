@@ -321,8 +321,8 @@ class TestParser:
 				info("The class %s has been ignored because it is abstract." % klass.name)
 			elif klass.access != "public":
 				info("The class %s has been ignored because it is not public." % klass.name)
-			elif not self.is_subclass(klass, "Diorite.TestCase"):
-				info("The class %s has been ignored because it is not a Diorite.TestCase subclass." % klass.name)
+			elif not self.is_subclass(klass, "Drt.TestCase"):
+				info("The class %s has been ignored because it is not a Drt.TestCase subclass." % klass.name)
 			else:
 				methods_found = set()
 				base_path = "/" + klass.name.replace(".", "/") + "/"

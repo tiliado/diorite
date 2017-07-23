@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.System
+namespace Drt.System
 {
 	/**
 	 * Loads contents of a file in UTF-8 encoding

@@ -25,15 +25,15 @@ public enum Countries
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	Countries countries = Countries.CZECH_REPUBLIC;
 	message("Countries int: %d", countries);
-	message(@"Czech Republic: $(Diorite.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
-	message(@"Germany: $(Diorite.Flags.is_set(countries, Countries.GERMANY))");
+	message(@"Czech Republic: $(Drt.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
+	message(@"Germany: $(Drt.Flags.is_set(countries, Countries.GERMANY))");
 	countries |= Countries.GERMANY;
-	message(@"Czech Republic: $(Diorite.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
-	message(@"Germany: $(Diorite.Flags.is_set(countries, Countries.GERMANY))");
+	message(@"Czech Republic: $(Drt.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
+	message(@"Germany: $(Drt.Flags.is_set(countries, Countries.GERMANY))");
 	countries &= ~Countries.CZECH_REPUBLIC;
-	message(@"Czech Republic: $(Diorite.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
-	message(@"Germany: $(Diorite.Flags.is_set(countries, Countries.GERMANY))");
+	message(@"Czech Republic: $(Drt.Flags.is_set(countries, Countries.CZECH_REPUBLIC))");
+	message(@"Germany: $(Drt.Flags.is_set(countries, Countries.GERMANY))");
 }

@@ -19,7 +19,7 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class KeyValueTreeTest: KeyValueStorageTest
@@ -40,7 +40,7 @@ public class KeyValueTreeTest: KeyValueStorageTest
 	
 	public void test_print()
 	{
-		var tree = new Diorite.KeyValueTree();
+		var tree = new Drt.KeyValueTree();
 		tree.set_value("a", "a");
 		tree.set_value("b", "b");
 		tree.set_value("c.a", "c.a");

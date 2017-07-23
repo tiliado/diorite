@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite.Ipc
+namespace Drt.Ipc
 {
 public const string RESPONSE_OK = "OK";
 public const string RESPONSE_ERROR = "ERROR";

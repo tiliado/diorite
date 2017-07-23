@@ -19,10 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
-public class OrmManagerTest: Diorite.TestCase
+public class OrmManagerTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
@@ -108,7 +108,7 @@ public class OrmManagerTest: Diorite.TestCase
 			}
 			catch (GLib.Error e)
 			{
-				expect_str_match("*ObjectSpec for DioritedbUser has not been found*", e.message, "no ospec");
+				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "no ospec");
 			}
 			
 			
@@ -180,7 +180,7 @@ public class OrmManagerTest: Diorite.TestCase
 			}
 			catch (GLib.Error e)
 			{
-				expect_str_match("*Data type DioritedbSimpleUser is not supported*", e.message, "invalid type");
+				expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
 			}
 		}
 		catch (GLib.Error e)
@@ -204,7 +204,7 @@ public class OrmManagerTest: Diorite.TestCase
 			}
 			catch (GLib.Error e)
 			{
-				expect_str_match("*ObjectSpec for DioritedbUser has not been found*", e.message, "mismatch, all fields");
+				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "mismatch, all fields");
 			}
 			
 			orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
@@ -265,4 +265,4 @@ public class OrmManagerTest: Diorite.TestCase
 	}
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb

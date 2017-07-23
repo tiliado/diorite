@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Diorite
+namespace Drt
 {
 
 public class StackMenuButton : Gtk.MenuButton
@@ -147,4 +147,4 @@ public class StackMenuButton : Gtk.MenuButton
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

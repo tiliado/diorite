@@ -21,7 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Diorite
+namespace Drt
 {
 
 public class KeyValueStorageClient: GLib.Object
@@ -46,7 +46,7 @@ public class KeyValueStorageClient: GLib.Object
 		return new KeyValueStorageProxy(this, provider_name);
 	}
 	
-	private Variant? handle_changed(GLib.Object source, Drt.ApiParams? params) throws Diorite.MessageError
+	private Variant? handle_changed(GLib.Object source, Drt.ApiParams? params) throws MessageError
 	{
 		var provider_name = params.pop_string();
 		var key = params.pop_string();
@@ -56,4 +56,4 @@ public class KeyValueStorageClient: GLib.Object
 	}
 }
 
-} // namespace Diorite
+} // namespace Drt

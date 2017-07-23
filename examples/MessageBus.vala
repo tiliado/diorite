@@ -22,13 +22,13 @@ int counter;
 
 void main(string[] args)
 {
-	Diorite.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
+	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
 	var server = new Drt.MessageBus("test", null);
 	try
 	{
 		server.start();
 	}
-	catch (Diorite.IOError e)
+	catch (Drt.IOError e)
 	{
 		error("Failed to start service %s", e.message);
 	}

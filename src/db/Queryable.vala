@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Dioritedb
+namespace Drtdb
 {
 
 /**
@@ -78,4 +78,4 @@ public interface Queryable: GLib.Object
 	public abstract unowned string? get_last_error_message();
 }
 
-} // namespace Dioritedb
+} // namespace Drtdb
