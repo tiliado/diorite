@@ -64,7 +64,7 @@ public class ApiNotification : ApiCallable
 		if (n_children == 2)
 		{
 			entry = unbox_variant(data.get_child_value(1));
-			if (!variant_string(entry, out detail))
+			if (entry != null && !variant_string(entry, out detail))
 				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' call expected the second parameter to be a string, but type of '%s' received.",
 					path, entry.get_type_string());
