@@ -462,4 +462,32 @@ private void variant_dict_add_param(VariantBuilder dict_builder, string key, str
 	dict_builder.add("{smv}", param_key, param_value);
 }
 
+[CCode (cname="g_variant_ref")]
+private extern Variant* g_variant_ref(Variant* variant);
+
+[CCode (cname="g_variant_unref")]
+private extern void g_variant_unref(Variant* variant);
+
+/**
+ * Increase Variant reference if it is not null.
+ * 
+ * @param variant    Variant value to increase the reference of.
+ */
+public void variant_ref(Variant? variant)
+{
+	if (variant != null)
+		g_variant_ref(variant);
+}
+
+/**
+ * Decrease Variant reference if it is not null.
+ * 
+ * @param variant    Variant value to decrease the reference of.
+ */
+public void variant_unref(Variant? variant)
+{
+	if (variant != null)
+		g_variant_unref(variant);
+}
+
 } // namespace Drt
