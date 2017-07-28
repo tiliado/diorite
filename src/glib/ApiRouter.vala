@@ -269,6 +269,7 @@ public class ApiRouter: MessageRouter
 		
 		if (notification)
 		{
+			variant_ref(data);  // FIXME: Why is this necessary?
 			this.notification(conn, path, null, data);
 			return null;
 		}
