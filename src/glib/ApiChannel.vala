@@ -48,6 +48,30 @@ public class ApiChannel: MessageChannel
 			allow_private && api_token != null ? api_token : "");
 	}
 	
+	/**
+	 * Subscribe to notification.
+	 * 
+	 * @param notification    Notification path.
+	 * @param detail          Reserved for future use, pass `null`.
+	 * @throws GLib.Error on failure
+	 */
+	public async void subscribe(string notification, string? detail=null) throws GLib.Error
+	{
+		yield call_full(notification, true, "ws", "tuple", new Variant("(bms)", true, detail));
+	}
+	
+	/**
+	 * Unsubscribe from notification.
+	 * 
+	 * @param notification    Notification path.
+	 * @param detail          Reserved for future use, pass `null`.
+	 * @throws GLib.Error on failure
+	 */
+	public async void unsubscribe(string notification, string? detail=null) throws GLib.Error
+	{
+		yield call_full(notification, true, "ws", "tuple", new Variant("(bms)", false, detail));
+	}
+	
 	public Variant? call_sync(string method, Variant? params) throws GLib.Error
 	{
 		return send_message(create_full_method_name(method, true, "rw", "tuple"), params);
