@@ -336,6 +336,17 @@ public string? variant_to_string(Variant? value, string? default_val=null)
 	return default_val;
 }
 
+/**
+ * Dump variant as a string or return null.
+ * 
+ * @param value    Variant value.
+ * @return null if `value` is null, the variant value as a string otherwise
+ */
+public inline string? variant_dump(Variant? value)
+{
+	return value == null ? null : value.print(true);
+}
+
 public Variant? new_variant_string_or_null(string? str)
 {
 	if (str == null)
