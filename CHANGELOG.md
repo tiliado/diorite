@@ -1,6 +1,18 @@
 Diorite Changelog
 =================
 
+Release 4.6.0 - July 29th, 2017
+-------------------------------
+
+  * Namespaces have been united: Drt for Diorite and Drtdb for Diorite DB.
+  * Added utils to interact with GLib event loop (Drt.EventLoop).
+  * Added workaround for extra Variant unref in ApiNotifications (Drt.ApiChannel.(un)subscribe).
+  * Added methods to (un)subscribe for ApiNotifications.
+  * Added CSS style classes for badges (Drt.Css.BADGE_*).
+  * Added various utility functions (Drt.Time.get_unix_time_now_utc, Drt.String.concat, Drt.String.append,
+    Drt.variant_dump, Drt.variant_ref, Drt.variant_unref).
+  * ApplicationWindow.app field is now protected (private previously).
+  
 Release 4.5.0 - June 23rd, 2017
 -------------------------------
 
