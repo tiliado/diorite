@@ -37,6 +37,8 @@ public errordomain MessageError
 	INVALID_REQUEST,
 	INVALID_ARGUMENTS,
 	NOT_READY;
+	
+	public extern static GLib.Quark quark();
 }
 
 public const string TYPE_STRING_ANY = "#ANY#";

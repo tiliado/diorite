@@ -50,8 +50,8 @@ public class MessageChannel: BaseChannel
 	construct
 	{
 		allowed_errors = new GenericSet<void*>(null, null);
-		allow_error_propagation(new MessageError.UNKNOWN("").domain);
-		allow_error_propagation(new Drt.ApiError.UNKNOWN("").domain);
+		allow_error_propagation(MessageError.quark());
+		allow_error_propagation(Drt.ApiError.quark());
 		
 		channel.notify["closed"].connect_after(on_channel_closed);
 		channel.incoming_request.connect(on_incoming_request);

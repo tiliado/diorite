@@ -34,6 +34,8 @@ public errordomain Error
 	IOERROR,
 	NOT_FOUND,
 	ACCESS_DENIED;
+	
+	public extern static GLib.Quark quark();
 }
 
 public errordomain IOError
@@ -46,6 +48,8 @@ public errordomain IOError
 	TOO_MANY_DATA,
 	NOT_CONNECTED,
 	OP_FAILED;
+	
+	public extern static GLib.Quark quark();
 }
 
 } // namespace Drt

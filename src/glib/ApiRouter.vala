@@ -35,6 +35,8 @@ public errordomain ApiError
 	WRITABLE_FLAG,
 	SUBSCRIBE_FLAG,
 	API_TOKEN_REQUIRED;
+	
+	public extern static GLib.Quark quark();
 }
 
 /**
