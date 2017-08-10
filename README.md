@@ -16,8 +16,8 @@ Dependencies
 
   - Python 3 and the pyparsing module
   - valac >= 0.36.3
-  - glib-2.0 >= 2.44
-  - gio-2.0 >= 2.44
+  - glib-2.0 >= 2.52
+  - gio-2.0 >= 2.52
   - gtk+-3.0 >= 3.22
   - sqlite >= 3.7
   - x11
