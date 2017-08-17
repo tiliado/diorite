@@ -8,6 +8,7 @@ fi
 CFLAGS="$CFLAGS -I$PWD/build -L$PWD/build"
 CC="gcc"
 export CC CFLAGS PKG_CONFIG_PATH PATH LD_LIBRARY_PATH
+export GI_TYPELIB_PATH="$PWD/build:$GI_TYPELIB_PATH"
 
 alias configure="python3 ./waf configure --flatpak"
 alias waf="python3 ./waf -v "

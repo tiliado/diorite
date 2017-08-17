@@ -126,6 +126,14 @@ def valadoc(ctx, package_name, doclets="devhelp html", **kwargs):
 				skip = not ctx.options.buildvaladoc,
 				**kwargs))
 		return taskgens
+
+@conf
+def gir_compile(ctx, name, lib):
+	return ctx(
+		rule='${GIR_COMPILER} ${SRC} --output=${TGT} --shared-library="lib%s.so"' % lib,
+		source=ctx.path.find_or_declare(name + ".gir"),
+		target=ctx.path.find_or_declare(name + ".typelib"),
+		install_path="${LIBDIR}/girepository-1.0")
 				
 # Actions #
 #=========#
@@ -159,6 +167,7 @@ def configure(ctx):
 		
 	ctx.load('compiler_c vala')
 	ctx.check_vala(min_version=tuple(int(i) for i in MIN_VALA.split(".")))
+	ctx.find_program('g-ir-compiler', var='GIR_COMPILER')
 	
 	ctx.env.BUILD_VALADOC = ctx.options.buildvaladoc
 	if ctx.env.BUILD_VALADOC:
@@ -203,6 +212,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
+		gir = "Drt-1.0",
 		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		uselib = uselib,
@@ -211,6 +221,7 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
 	)
+	ctx.gir_compile("Drt-1.0", DIORITE_GLIB)
 	ctx.valadoc(
 		package_name = DIORITE_GLIB,
 		package_version = ctx.env.VERSION,
@@ -226,6 +237,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
+		gir = "Drtgtk-1.0",
 		source = ctx.path.ant_glob('src/gtk/*.vala'),
 		packages = packages_gtk,
 		uselib = uselib_gtk,
@@ -237,6 +249,7 @@ def build(ctx):
 		internal=True,
 		private=True,
 	)
+	ctx.gir_compile("Drtgtk-1.0", DIORITE_GTK)
 	ctx.valadoc(
 		package_name = DIORITE_GTK,
 		package_version = ctx.env.VERSION,
@@ -255,6 +268,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_DB,
 		name = DIORITE_DB,
+		gir = "Drtdb-1.0",
 		source = ctx.path.ant_glob('src/db/*.vala'),
 		packages = packages + " sqlite3",
 		uselib = uselib + " SQLITE",
@@ -264,6 +278,7 @@ def build(ctx):
 		vapi_dirs = ['vapi'],
 		vala_target_glib = TARGET_GLIB,
 	)
+	ctx.gir_compile("Drtdb-1.0", DIORITE_DB)
 	ctx.valadoc(
 		package_name = DIORITE_DB,
 		package_version = ctx.env.VERSION,

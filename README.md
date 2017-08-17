@@ -22,6 +22,7 @@ Dependencies
   - sqlite >= 3.7
   - x11
   - valadoc >= 0.36 (or pass --novaladoc)
+  - g-ir-compiler
 
 
 Waf
