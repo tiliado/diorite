@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public class InfoBarStack: Gtk.Stack
@@ -174,4 +176,4 @@ public class InfoBarStack: Gtk.Stack
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

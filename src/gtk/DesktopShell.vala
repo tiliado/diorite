@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public abstract class DesktopShell: GLib.Object
@@ -212,4 +214,4 @@ private class XfceDesktopShell: DesktopShell
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

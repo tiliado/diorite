@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Labels
+using Drt;
+
+namespace Drtgtk.Labels
 {
 
 public Gtk.Label plain(string? label, bool wrap=false)
@@ -50,4 +52,4 @@ public Gtk.Label header(string text)
 		halign: Gtk.Align.CENTER, yalign: 0.0f, xalign: 0.0f);
 }
 
-} // namespace Drt.Labels
+} // namespace Drtgtk.Labels

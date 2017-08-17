@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+namespace Drtgtk
 {
 
 /**
@@ -272,7 +272,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 		string doc_text;
 		try
 		{
-			doc_text = System.read_file(doc_file);
+			doc_text = Drt.System.read_file(doc_file);
 		}
 		catch (GLib.Error e)
 		{
@@ -734,5 +734,5 @@ public class RichTextLink: Gtk.TextTag
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk
 

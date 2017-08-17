@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Css
+using Drt;
+
+namespace Drtgtk.Css
 {
 
 /**

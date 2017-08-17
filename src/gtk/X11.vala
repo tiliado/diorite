@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.X11
+namespace Drtgtk.X11
 {
 
 /**
@@ -124,4 +124,4 @@ public Gdk.X11.Window? get_net_wm_check_window()
 	return window;
 }
 
-} // namespace Drt.X11
+} // namespace Drtgtk.X11

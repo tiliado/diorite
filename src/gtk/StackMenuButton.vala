@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+namespace Drtgtk
 {
 
 public class StackMenuButton : Gtk.MenuButton
@@ -147,4 +147,4 @@ public class StackMenuButton : Gtk.MenuButton
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

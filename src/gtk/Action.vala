@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public delegate void ActionCallback();
@@ -165,4 +167,4 @@ public class RadioOption
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

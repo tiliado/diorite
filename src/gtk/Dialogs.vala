@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 /**
  * Simple Error dialog with OK button.
@@ -231,4 +233,4 @@ public class QuestionDialog: Gtk.MessageDialog
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

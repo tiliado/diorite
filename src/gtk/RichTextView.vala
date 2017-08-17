@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+namespace Drtgtk
 {
 
 public delegate void UriOpener(string uri);
@@ -246,4 +246,4 @@ public class RichTextView: Gtk.TextView
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

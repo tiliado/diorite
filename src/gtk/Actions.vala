@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
@@ -405,4 +407,4 @@ public class Actions : GLib.Object
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

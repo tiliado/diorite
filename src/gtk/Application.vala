@@ -22,8 +22,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Drt;
+
 private const string G_LOG_DOMAIN="DioriteGtk";
-namespace Drt
+
+namespace Drtgtk
 {
 	
 [CCode (cheader_filename = "sys/prctl.h", cname = "prctl")]
@@ -206,7 +209,7 @@ public abstract class Application : Gtk.Application
 	{
 		try
 		{
-			Drt.Css.apply_custom_styles(screen);
+			Css.apply_custom_styles(screen);
 
 		}
 		catch (GLib.Error e)
@@ -276,7 +279,7 @@ public abstract class Application : Gtk.Application
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk
 
 [DBus(name = "org.xfce.Session.Manager")]
 private interface XfceSessionManager : Object

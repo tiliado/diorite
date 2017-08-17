@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public class ApplicationWindow: Gtk.ApplicationWindow
@@ -239,4 +241,4 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+using Drt;
+
+namespace Drtgtk
 {
 
 public abstract class FormEntry : GLib.Object
@@ -480,4 +482,4 @@ public class Form : Gtk.Grid
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk

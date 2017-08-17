@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
+namespace Drtgtk
 {
 /**
  * Button which shows popover on click.
@@ -55,4 +55,4 @@ public class PopoverButton : Gtk.Button
 	}
 }
 
-} // namespace Drt
+} // namespace Drtgtk
