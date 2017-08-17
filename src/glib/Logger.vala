@@ -49,6 +49,12 @@ public class Logger
 	public const int COLOR_CYAN = 6;
 	public const int COLOR_WHITE = 7;
 	
+	
+	public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
+	{
+		init(stderr, display_level, time, hint);
+	}
+	
 	/**
 	 * Initializes new logger for GLib
 	 * 
