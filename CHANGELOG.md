@@ -1,6 +1,14 @@
 Diorite Changelog
 =================
 
+Release 4.7.0 - September 1st, 2017
+--------------------------------
+
+  * Diorite no longer bundles *.vapi files and depends on those of Vala 0.36.3.
+  * GLib dependency has been raised to 2.52.0 to make use of Valac's GTask support.
+  * Diorite GTK namespace was changed to Drtgtk.
+  * GIR XML and typelib files are generated. Introduces new dependency on g-ir-compiler.
+  
 Release 4.6.0 - July 29th, 2017
 -------------------------------
 
