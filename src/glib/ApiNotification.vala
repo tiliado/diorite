@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -36,7 +36,7 @@ public class ApiNotification : ApiCallable
 		this.description = description;
 	}
 	
-	public static void parse_tuple_params(string? path, Variant? data, out bool subscribe, out string? detail) throws GLib.Error
+	public static void parse_params(string? path, Variant? data, out bool subscribe, out string? detail) throws GLib.Error
 	{
 		subscribe = true;
 		detail = null;
@@ -44,117 +44,93 @@ public class ApiNotification : ApiCallable
 		if (data == null)
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires 2 parameters but no parameters have been provided.", path);
-		if (!data.get_type().is_subtype_of(VariantType.TUPLE))
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' call expected a tuple of parameters, but type of '%s' received.",
-				path, data.get_type_string());
-		
-		var n_children = data.n_children();
-		if (n_children < 1 || n_children > 2)
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' requires %d parameters but %d parameters have been provided.",
-				path, 2, (int) data.n_children());
-				
-		var entry = unbox_variant(data.get_child_value(0));
-		if (!variant_bool(entry, ref subscribe))
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' call expected the first parameter to be a boolean, but type of '%s' received.",
-				path, entry.get_type_string());
-		
-		if (n_children == 2)
-		{
-			entry = unbox_variant(data.get_child_value(1));
+		var params_type = ApiChannel.get_params_type(data);
+		if (params_type == "tuple") {
+			if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
+				throw new ApiError.INVALID_PARAMS(
+					"Method '%s' call expected a tuple of parameters, but type of '%s' received.",
+					path, data.get_type_string());
+			}
+			var n_children = data.n_children();
+			if (n_children < 1 || n_children > 2) {
+				throw new ApiError.INVALID_PARAMS(
+					"Method '%s' requires %d parameters but %d parameters have been provided.",
+					path, 2, (int) data.n_children());
+			}
+			var entry = unbox_variant(data.get_child_value(0));
+			if (!variant_bool(entry, ref subscribe)) {
+				throw new ApiError.INVALID_PARAMS(
+					"Method '%s' call expected the first parameter to be a boolean, but type of '%s' received.",
+					path, entry.get_type_string());
+			}
+			if (n_children == 2) {
+				entry = unbox_variant(data.get_child_value(1));
+				if (entry != null && !variant_string(entry, out detail)) {
+					throw new ApiError.INVALID_PARAMS(
+						"Method '%s' call expected the second parameter to be a string, but type of '%s' received.",
+						path, entry.get_type_string());
+				}
+			}
+		} else {
+			if (data.get_type_string() != "(a{smv})")
+			MessageListener.check_type_string(data, "a{smv}");
+			
+			var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
+			var entry = unbox_variant(dict.lookup_value("subscribe", null));
+			if (entry == null)
+				throw new ApiError.INVALID_PARAMS(
+						"Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
+						path);
+			
+			if (!variant_bool(entry, ref subscribe))
+				throw new ApiError.INVALID_PARAMS(
+					"Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
+					path, entry.get_type_string());
+			
+			entry = unbox_variant(dict.lookup_value("detail", null));
 			if (entry != null && !variant_string(entry, out detail))
 				throw new ApiError.INVALID_PARAMS(
-					"Method '%s' call expected the second parameter to be a string, but type of '%s' received.",
+					"Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
 					path, entry.get_type_string());
 		}
 	}
 	
-	public static void parse_dict_params(string? path, Variant? data, out bool subscribe, out string? detail) throws GLib.Error
-	{
-		subscribe = true;
-		detail = null;
-		if (data == null)
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' requires 2 parameters but no parameters have been provided.",
-				path);
-		if (data.get_type_string() != "(a{smv})")
-			MessageListener.check_type_string(data, "a{smv}");
-			
-		var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-		var entry = unbox_variant(dict.lookup_value("subscribe", null));
-		if (entry == null)
-			throw new ApiError.INVALID_PARAMS(
-					"Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
-					path);
-		
-		if (!variant_bool(entry, ref subscribe))
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
-				path, entry.get_type_string());
-		
-		entry = unbox_variant(dict.lookup_value("detail", null));
-		if (entry != null && !variant_string(entry, out detail))
-			throw new ApiError.INVALID_PARAMS(
-				"Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
-				path, entry.get_type_string());
-	}
-	
-	public Variant? subscribe(GLib.Object conn, bool subscribe, string? detail) throws GLib.Error
-	{
-		if (subscribe)
+	public Variant? subscribe(GLib.Object conn, bool subscribe, string? detail) throws GLib.Error {
+		if (subscribe) {
 			subscribers.append(conn);
-		else
+		} else {
 			subscribers.remove(conn);
+		}
 		return null;
 	}
 	
-	public async bool emit(string? detail, Variant? data)
-	{
+	public async bool emit(string? detail, Variant? data) {
 		var result = true;
-		foreach (unowned GLib.Object conn in subscribers)
-		{
+		foreach (unowned GLib.Object conn in subscribers) {
 			var channel = conn as ApiChannel;
-			if (channel != null)
-			{
-				try
-				{
+			if (channel != null) {
+				try {
 					yield channel.call("n:" + path, data);
-				}
-				catch (GLib.Error e)
-				{
+				} catch (GLib.Error e) 	{
 					result = false;
 					warning("Failed to emit '%s': %s", path, e.message);
 				}
 				continue;
 			}
 			var bus = conn as ApiBus;
-			if (bus != null)
-			{
+			if (bus != null) {
 				(bus.router as ApiRouter).notification(bus, path, detail, data);
-			}
-			else
-			{
+			} else 	{
 				warning("Not an ApiChannel nor ApiBus: %s", conn.get_type().name());
 			}
 		}
 		return result;
 	}
 	
-	public override void run_with_args_tuple(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
-	{
+	public override void run(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error {
 		bool subscribe = true;
 		string? detail = null;
-		parse_tuple_params(path, data, out subscribe, out detail);
-		response = this.subscribe(conn, subscribe, detail);
-	}
-	
-	public override void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error
-	{
-		bool subscribe = true;
-		string? detail = null;
-		parse_dict_params(path, data, out subscribe, out detail);
+		parse_params(path, data, out subscribe, out detail);
 		response = this.subscribe(conn, subscribe, detail);
 	}
 }

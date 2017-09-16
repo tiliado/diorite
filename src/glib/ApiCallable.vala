@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,17 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public abstract class ApiCallable
-{
+public abstract class ApiCallable {
 	public string path {get; protected set;}
 	public ApiFlags flags {get; protected set;}
 	public string description {get; protected set;}
 	
-	public abstract void run_with_args_tuple(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error;
-	public abstract void run_with_args_dict(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error;
+	public abstract void run(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error;
 }
 
 } // namespace Drt

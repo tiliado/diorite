@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,40 +22,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class ApiBus: BaseBus<ApiChannel, ApiRouter>
-{
+public class ApiBus: BaseBus<ApiChannel, ApiRouter> {
 	protected static bool log_comunication;
 	
-	static construct
-	{
+	static construct {
 		log_comunication = Environment.get_variable("DIORITE_LOG_API_BUS_BUS") == "yes";
 	}
 	
-	public ApiBus(string name, ApiRouter? router, uint timeout)
-	{
+	public ApiBus(string name, ApiRouter? router, uint timeout) {
 		base(name, router, timeout);
 	}
 	
-	public Variant? call_local(string name, Variant? data) throws GLib.Error
-	{
-		return call_local_sync_full(name, true, "rw", "tuple",  data);
+	public Variant? call_local(string name, Variant? data) throws GLib.Error 	{
+		return call_local_sync_full(name, true, "rw",  data);
 	}
 	
-	public Variant? call_local_with_dict(string name, Variant? data) throws GLib.Error
-	{
-		return call_local_sync_full(name, true, "rw", "dict",  data);
-	}
-	
-	public Variant? call_local_sync_full(string name, bool allow_private, string flags, string data_format, Variant? data) throws GLib.Error
-	{
-		if (log_comunication)
+	public Variant? call_local_sync_full(string name, bool allow_private, string flags, Variant? data)
+	throws GLib.Error {
+		if (log_comunication) {
 			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
-		var response = router.handle_local_call(this, name, allow_private, flags, data_format, data);
-		if (log_comunication)
+		}
+		var response = router.handle_local_call(
+			this, name, allow_private, flags, ApiChannel.get_params_type(data), data);
+		if (log_comunication) {
 			debug("Local response: %s", response != null ? response.print(false) : "NULL");
+		}
 		return response;
 	}
 }

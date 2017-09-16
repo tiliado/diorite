@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,26 +22,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class ApiChannel: MessageChannel
-{
+public class ApiChannel: MessageChannel {
+	public static string get_params_type(GLib.Variant? params) throws MessageError {
+		if (params == null ) {
+			return "tuple";
+		} 
+		var type = params.get_type();
+		if (type.is_tuple()) {
+			return "tuple";
+		}
+		if (type.is_array()){
+			
+			return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
+		}
+		throw new MessageError.UNSUPPORTED("Param type %s is not supported.", params.get_type_string());
+	}
+	
 	public ApiRouter api_router {get{ return router as ApiRouter; }}
 	public string? api_token {private get; set; default = null;}
 	
-	public ApiChannel(uint id, Drt.DuplexChannel channel, ApiRouter? router, string? api_token=null)
-	{
+	public ApiChannel(uint id, Drt.DuplexChannel channel, ApiRouter? router, string? api_token=null) {
 		GLib.Object(id: id, channel: channel, router: router ?? new ApiRouter(), api_token: api_token);
 	}
 	
-	public ApiChannel.from_name(uint id, string name, string? api_token=null, uint timeout) throws IOError
-	{
+	public ApiChannel.from_name(uint id, string name, string? api_token=null, uint timeout)
+	throws IOError {
 		this(id, new SocketChannel.from_name(id, name, timeout), null, api_token);
 	}
 	
-	private string create_full_method_name(string name, bool allow_private, string flags, string params_format)
-	{
+	private string create_full_method_name(string name, bool allow_private, string flags,
+	string params_format) {
 		return "%s::%s%s,%s,%s".printf(
 			name, allow_private ? "p" : "",
 			flags, params_format,
@@ -55,9 +67,8 @@ public class ApiChannel: MessageChannel
 	 * @param detail          Reserved for future use, pass `null`.
 	 * @throws GLib.Error on failure
 	 */
-	public async void subscribe(string notification, string? detail=null) throws GLib.Error
-	{
-		yield call_full(notification, true, "ws", "tuple", new Variant("(bms)", true, detail));
+	public async void subscribe(string notification, string? detail=null) throws GLib.Error	{
+		yield call_full(notification, true, "ws", new Variant("(bms)", true, detail));
 	}
 	
 	/**
@@ -67,39 +78,29 @@ public class ApiChannel: MessageChannel
 	 * @param detail          Reserved for future use, pass `null`.
 	 * @throws GLib.Error on failure
 	 */
-	public async void unsubscribe(string notification, string? detail=null) throws GLib.Error
-	{
-		yield call_full(notification, true, "ws", "tuple", new Variant("(bms)", false, detail));
+	public async void unsubscribe(string notification, string? detail=null) throws GLib.Error {
+		yield call_full(notification, true, "ws", new Variant("(bms)", false, detail));
 	}
 	
-	public Variant? call_sync(string method, Variant? params) throws GLib.Error
-	{
-		return send_message(create_full_method_name(method, true, "rw", "tuple"), params);
+	public Variant? call_sync(string method, Variant? params) throws GLib.Error {
+		return send_message(create_full_method_name(method, true, "rw", get_params_type(params)), params);
 	}
 	
-	public async Variant? call(string method, Variant? params) throws GLib.Error
-	{
-		return yield send_message_async(create_full_method_name(method, true, "rw", "tuple"), params);
+	public async Variant? call(string method, Variant? params) throws GLib.Error	{
+		return yield send_message_async(
+			create_full_method_name(method, true, "rw", get_params_type(params)), params);
 	}
 	
-	public Variant? call_with_dict_sync(string method, Variant? params) throws GLib.Error
-	{
-		return send_message(create_full_method_name(method, true, "rw", "dict"), params);
+	public async Variant? call_full(string method, bool allow_private, string flags, Variant? params)
+	throws GLib.Error {
+		return yield send_message_async(
+			create_full_method_name(method, allow_private, flags, get_params_type(params)), params);
 	}
 	
-	public async Variant? call_with_dict(string method, Variant? params) throws GLib.Error
-	{
-		return yield send_message_async(create_full_method_name(method, true, "rw", "dict"), params);
-	}
-	
-	public async Variant? call_full(string method, bool allow_private, string flags, string params_format, Variant? params) throws GLib.Error
-	{
-		return yield send_message_async(create_full_method_name(method, allow_private, flags, params_format), params);
-	}
-	
-	public Variant? call_full_sync(string method, bool allow_private, string flags, string params_format, Variant? params) throws GLib.Error
-	{
-		return send_message(create_full_method_name(method, allow_private, flags, params_format), params);
+	public Variant? call_full_sync(string method, bool allow_private, string flags, Variant? params)
+	throws GLib.Error {
+		return send_message(
+			create_full_method_name(method, allow_private, flags, get_params_type(params)), params);
 	}
 }
 

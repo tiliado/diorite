@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -294,15 +294,7 @@ public class ApiRouter: MessageRouter
 		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && !uint8v_equal(this.token, token))
 			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 		
-		switch (format)
-		{
-		case "dict":
-			method.run_with_args_dict(conn, data, out response);
-			break;
-		default:
-			method.run_with_args_tuple(conn, data, out response);
-			break;
-		}
+		method.run(conn, data, out response);
 		return response;
 	}
 }
