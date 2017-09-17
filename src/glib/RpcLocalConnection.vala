@@ -226,7 +226,6 @@ public class RpcLocalConnection: RpcConnection{
 		}
 		
 		private bool idle_callback() {
-			warning("really resume %u", id);
 			this.callback();
 			return false;
 		}
