@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -21,17 +21,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueStorageClient: GLib.Object
-{
-	public Drt.ApiChannel channel {get; construct;}
+public class KeyValueStorageClient: GLib.Object {
+	public Drt.RpcChannel channel {get; construct;}
 	
-	public KeyValueStorageClient(Drt.ApiChannel channel)
-	{
+	public KeyValueStorageClient(Drt.RpcChannel channel) {
 		GLib.Object(channel: channel);
-		channel.api_router.add_method("/diorite/keyvaluestorageserver/changed", Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		channel.router.add_method("/diorite/keyvaluestorageserver/changed", Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_changed, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
@@ -41,18 +38,16 @@ public class KeyValueStorageClient: GLib.Object
 	
 	public signal void changed(string provider_name, string key, Variant? old_value);
 	
-	public KeyValueStorage get_proxy(string provider_name)
-	{
+	public KeyValueStorage get_proxy(string provider_name) {
 		return new KeyValueStorageProxy(this, provider_name);
 	}
 	
-	private Variant? handle_changed(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var provider_name = params.pop_string();
-		var key = params.pop_string();
-		var old_value = params.pop_variant();
+	private void handle_changed(Drt.RpcRequest request) throws RpcError {
+		var provider_name = request.pop_string();
+		var key = request.pop_string();
+		var old_value = request.pop_variant();
 		changed(provider_name, key, old_value);
-		return new Variant.boolean(true);
+		request.respond(new Variant.boolean(true));
 	}
 }
 

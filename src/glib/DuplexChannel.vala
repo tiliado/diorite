@@ -614,13 +614,13 @@ public abstract class DuplexChannel: GLib.Object
 		public void invoke_callback()
 		{
 			assert(this.callback != null);
-			ctx.invoke_full(Priority.HIGH, idle_callback);
+			EventLoop.add_idle(idle_callback, Priority.HIGH_IDLE, ctx);
 		}
 		
 		public void emit_incoming_request()
 		{
 			assert(ctx != null);
-			ctx.invoke_full(Priority.HIGH, emit_incoming_request_cb);
+			EventLoop.add_idle(emit_incoming_request_cb, Priority.HIGH_IDLE, ctx);
 		}
 		
 		private bool emit_incoming_request_cb()

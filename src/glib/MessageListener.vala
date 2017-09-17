@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,13 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public delegate Variant? MessageHandler(GLib.Object source, Variant? params) throws GLib.Error;
-
-public errordomain MessageError
-{
+public errordomain RpcError {
 	UNKNOWN,
 	REMOTE_ERROR,
 	UNSUPPORTED,
@@ -41,53 +37,79 @@ public errordomain MessageError
 	public extern static GLib.Quark quark();
 }
 
-public const string TYPE_STRING_ANY = "#ANY#";
-
-namespace MessageListener
-{
-	public static Variant? echo_handler(GLib.Object source, Variant? request) throws GLib.Error
-	{
-		return request;
-	}
+public errordomain ApiError {
+	UNKNOWN,
+	INVALID_REQUEST,
+	INVALID_PARAMS,
+	PRIVATE_FLAG,
+	READABLE_FLAG,
+	WRITABLE_FLAG,
+	SUBSCRIBE_FLAG,
+	API_TOKEN_REQUIRED;
 	
-	public static void check_type_string(Variant? data, string? type_string) throws GLib.Error
-	{
-		if (type_string != null && type_string == TYPE_STRING_ANY)
-			return;
-		
-		if (data == null && type_string != null)
-			throw new MessageError.INVALID_ARGUMENTS("Invalid data type null, expected '%s'.", type_string);
-		
-		if (data != null)
-		{
-			unowned string data_type_string = data.get_type_string();
-			
-			if (type_string == null)
-				throw new MessageError.INVALID_ARGUMENTS(
-					"Invalid data type '%s', expected null.", data_type_string);
-			
-			if (!data.check_format_string(type_string, false))
-				throw new MessageError.INVALID_ARGUMENTS(
-					"Invalid data type '%s', expected '%s'.", data_type_string, type_string);
-		}
-	}
+	public extern static GLib.Quark quark();
 }
 
-public class HandlerAdaptor
-{
-	private MessageHandler handler;
-	private string? type_string;
+[Flags]
+public enum RpcFlags {
+	PRIVATE,
+	READABLE,
+	WRITABLE,
+	SUBSCRIBE;
+}
+
+public delegate void RpcHandler(RpcRequest request) throws GLib.Error;
+
+namespace Rpc {
+	public const string TYPE_STRING_ANY = "#ANY#";
+	public const string RESPONSE_OK = "OK";
+	public const string RESPONSE_ERROR = "ERROR";
 	
-	public HandlerAdaptor(owned MessageHandler handler, string? type_string)
-	{
-		this.handler = (owned) handler;
-		this.type_string = type_string;
+	public void check_type_string(Variant? data, string? type_string) throws GLib.Error {
+		if (type_string != null && type_string == TYPE_STRING_ANY){
+			return;
+		}
+		if (data == null && type_string != null) {
+			throw new RpcError.INVALID_ARGUMENTS("Invalid data type null, expected '%s'.", type_string);
+		}
+		if (data != null) {
+			unowned string data_type_string = data.get_type_string();
+			if (type_string == null) {
+				throw new RpcError.INVALID_ARGUMENTS(
+					"Invalid data type '%s', expected null.", data_type_string);
+			}
+			if (!data.check_format_string(type_string, false)) {
+				throw new RpcError.INVALID_ARGUMENTS(
+					"Invalid data type '%s', expected '%s'.", data_type_string, type_string);
+			}
+		}
 	}
 	
-	public void handle(GLib.Object source, Variant? params,  out Variant? response) throws GLib.Error
-	{
-		MessageListener.check_type_string(params, type_string);
-		response = handler(source, params);
+	public string get_params_type(GLib.Variant? params) throws RpcError {
+		if (params == null ) {
+			return "tuple";
+		} 
+		var type = params.get_type();
+		if (type.is_tuple()) {
+			return "tuple";
+		}
+		if (type.is_array()){
+			
+			return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
+		}
+		throw new RpcError.UNSUPPORTED("Param type %s is not supported.", params.get_type_string());
+	}
+	
+	private string create_path(string name) {
+		var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
+		try {
+			File.new_for_path(dir_path).make_directory_with_parents();
+		} catch (GLib.Error e) {
+			if (!(e is GLib.IOError.EXISTS)) {
+				critical("Failed to create directory '%s'. %s", dir_path, e.message);
+			}
+		}
+		return Path.build_filename(dir_path, name);
 	}
 }
 

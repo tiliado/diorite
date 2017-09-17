@@ -24,32 +24,159 @@
 
 namespace Drt {
 
-public class ApiBus: BaseBus<ApiChannel, ApiRouter> {
+/**
+ * RPC Bus with associated {@link RpcRouter} and multiple instances of {@link RpcChannel}.
+ */
+public class RpcBus: GLib.Object {
+	public RpcRouter router {get; construct;}
+	public RpcLocalConnection local {get; private set;}
+	public uint timeout {get; set;}
+	public string name {get; construct;}
+	private string path;
+	private SocketService? service = null;
+	protected HashTable<void*, RpcChannel?> clients = null;
+	uint last_client_id = 0;
 	protected static bool log_comunication;
 	
 	static construct {
 		log_comunication = Environment.get_variable("DIORITE_LOG_API_BUS_BUS") == "yes";
 	}
 	
-	public ApiBus(string name, ApiRouter? router, uint timeout) {
-		base(name, router, timeout);
+	/**
+	 * Create new RpcBus.
+	 * 
+	 * @param name       Bus name.
+	 * @param router     RPC router defining callback for RPC calls.
+	 * @param timeout    Timeout for requests.
+	 */
+	public RpcBus(string name, RpcRouter router, uint timeout) {
+		GLib.Object(router: router, timeout: timeout, name: name);
+		this.path = Rpc.create_path(name);
+		clients = new HashTable<void*, RpcChannel>(direct_hash, direct_equal);
+		local = new RpcLocalConnection(0, router); 
 	}
 	
-	public Variant? call_local(string name, Variant? data) throws GLib.Error 	{
-		return call_local_sync_full(name, true, "rw",  data);
+	/**
+	 * Emitted when there is a new incoming connection.
+	 * 
+	 * @param channel    New RpcChannel.
+	 */
+	public signal void incoming(RpcChannel channel);
+	
+	/**
+	 * Start RPC Bus.
+	 * 
+	 * @throws IOError on failure.
+	 */
+	public void start() throws IOError {
+		create_service();
+		service.start();
 	}
 	
-	public Variant? call_local_sync_full(string name, bool allow_private, string flags, Variant? data)
-	throws GLib.Error {
-		if (log_comunication) {
-			debug("Local request '%s': %s", name, data != null ? data.print(false) : "NULL");
+	/**
+	 * Add new channel to the bus.
+	 * 
+	 * @param name       Channel name.
+	 * @param timeout    Request timeout.
+	 * @return New RpcChannel.
+	 * @throws IOError on failure.
+	 */
+	public RpcChannel connect_channel(string name, uint timeout) throws IOError	{
+		var id = get_next_client_id();
+		var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
+			id: id, channel: new SocketChannel.from_name(id, name, timeout), router: router);
+		clients[id.to_pointer()] = channel;
+		return channel;
+	}
+	
+	/**
+	 * Add new channel from a socket connection.
+	 * 
+	 * @param socket    Socket connection
+	 * @param timeout   Request timeout.
+	 * @return New RpcChannel.
+	 * @throws IOError on failure.
+	 */
+	public RpcChannel connect_channel_socket(Socket socket, uint timeout) throws IOError	{
+		var id = get_next_client_id();
+		var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
+			id: id, channel: new SocketChannel.from_socket(id, socket, timeout), router: router);
+		clients[id.to_pointer()] = channel;
+		return channel;
+	}
+	
+	/**
+	 * Create new socket service for this bus.
+	 * 
+	 * @throws IOError on failure.
+	 */
+	private void create_service() throws IOError {
+		if (service != null) {
+			return;
 		}
-		var response = router.handle_local_call(
-			this, name, allow_private, flags, ApiChannel.get_params_type(data), data);
-		if (log_comunication) {
-			debug("Local response: %s", response != null ? response.print(false) : "NULL");
+		try	{
+			File.new_for_path(path).delete();
+		} catch (GLib.Error e) 	{
 		}
-		return response;
+		
+		var address = new UnixSocketAddress(path);
+		service = new SocketService();
+		SocketAddress effective_address;
+		try	{
+			service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
+		} catch (GLib.Error e) {
+			throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
+		}
+		service.incoming.connect(on_incoming);
+	}
+	
+	/**
+	 * Get id for the next client.
+	 * 
+	 * @return The next client id.
+	 */
+	protected uint get_next_client_id() {
+		uint id = last_client_id;
+		do {
+			if (id == uint.MAX) {
+				id = 1;
+			} else {
+				id++;
+			}
+		}
+		while (clients.contains(id.to_pointer()));
+		clients[id.to_pointer()] = null;
+		last_client_id = id;
+		return id;
+	}
+	
+	/**
+	 * Called when there is a new incoming client socket connection.
+	 * 
+	 * @param connection       Incoming socket connection.
+	 * @param source_object    The source of the connection.
+	 */
+	private bool on_incoming(SocketConnection connection, GLib.Object? source_object) {
+		var id = get_next_client_id();
+		var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
+				id: id, channel: new SocketChannel(id, path, connection, timeout), router: router);
+		clients[id.to_pointer()] = channel;
+		channel.notify["closed"].connect_after(on_channel_closed);
+		incoming(channel);
+		return true;
+	}
+	
+	/**
+	 * Called when channel is closed.
+	 * 
+	 * @param source   RpcChannel.
+	 * @param param    Param spec.
+	 */
+	public void on_channel_closed(GLib.Object source, ParamSpec param) {
+		var channel = source as RpcChannel;
+		return_if_fail(channel != null);
+		channel.notify["closed"].disconnect(on_channel_closed);
+		clients.remove(channel.id.to_pointer());
 	}
 }
 

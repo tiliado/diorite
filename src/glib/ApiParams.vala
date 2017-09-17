@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,24 +22,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * Class containing parameters of a method call.
  * 
  * Parameters are returned in same order as in parameters specification in method declaration.
  */
-public class ApiParams
-{
-	private ApiMethod method;
+public class RpcRequest {
+	public RpcConnection connection {get; private set;}
+	public RpcMethod method {get; private set;}
 	private Variant?[] data;
 	private int counter = 0;
+	private uint uid;
+	bool response_sent = false;
 	
-	public ApiParams(ApiMethod method, Variant?[] data)
-	{
+	public RpcRequest(RpcConnection connection, uint uid, RpcMethod method, Variant?[] data) {
+		this.connection = connection;
 		this.method = method;
 		this.data = data;
+		this.uid = uid;
+	}
+	
+	~RpcRequest() {
+		if (!response_sent) {
+			fail(new RpcError.INVALID_RESPONSE("No response have been sent."));
+		}
 	}
 	
 	/**
@@ -47,8 +55,7 @@ public class ApiParams
 	 * 
 	 * @return Index of a parameter.
 	 */
-	public int get_current_index()
-	{
+	public int get_current_index() {
 		return counter;
 	}
 	
@@ -57,16 +64,14 @@ public class ApiParams
 	 * 
 	 * @return Number of a parameter.
 	 */
-	public int get_length()
-	{
+	public int get_length() {
 		return data.length;
 	}
 	
 	/**
 	 * Reset parameter index back to 1.
 	 */
-	public void reset()
-	{
+	public void reset() {
 		counter = 0;
 	}
 	
@@ -77,8 +82,7 @@ public class ApiParams
 	 * 
 	 * @return string value or null.
 	 */
-	public string? pop_string()
-	{
+	public string? pop_string() {
 		var variant = next(typeof(StringParam));
 		return variant == null ? null : variant.get_string();;
 	}
@@ -90,8 +94,7 @@ public class ApiParams
 	 * 
 	 * @return boolean value.
 	 */
-	public bool pop_bool()
-	{
+	public bool pop_bool() {
 		return next(typeof(BoolParam)).get_boolean();
 	}
 	
@@ -102,8 +105,7 @@ public class ApiParams
 	 * 
 	 * @return double value.
 	 */
-	public double pop_double()
-	{
+	public double pop_double() {
 		return next(typeof(DoubleParam)).get_double();
 	}
 	
@@ -114,8 +116,7 @@ public class ApiParams
 	 * 
 	 * @return int value.
 	 */
-	public int pop_int()
-	{
+	public int pop_int() {
 		return (int) next(typeof(IntParam)).get_int32();
 	}
 	
@@ -126,8 +127,7 @@ public class ApiParams
 	 * 
 	 * @return Variant value.
 	 */
-	public Variant? pop_variant()
-	{
+	public Variant? pop_variant() {
 		return next(typeof(VariantParam));
 	}
 	
@@ -138,8 +138,7 @@ public class ApiParams
 	 * 
 	 * @return VariantIter iterator of the variant array.
 	 */
-	public VariantIter? pop_variant_array()
-	{
+	public VariantIter? pop_variant_array() {
 		var value = next(typeof(VarArrayParam));
 		return value == null ? null : value.iterator();
 	}
@@ -151,8 +150,7 @@ public class ApiParams
 	 * 
 	 * @return string[] value. May be empty, but not null.
 	 */
-	public string[] pop_strv()
-	{
+	public string[] pop_strv() {
 		var variant = next(typeof(StringArrayParam));
 		return variant == null ? new string[]{} : variant.dup_strv();
 	}
@@ -164,8 +162,7 @@ public class ApiParams
 	 * 
 	 * @return list of string values. May be empty.
 	 */
-	public SList<string>pop_str_list()
-	{
+	public SList<string>pop_str_list() {
 		SList<string> list = null;
 		var array = next(typeof(StringArrayParam));
 		var iter = array.iterator();
@@ -183,28 +180,52 @@ public class ApiParams
 	 * 
 	 * @return a dictionary. May be empty but not null.
 	 */
-	public HashTable<string, Variant?> pop_dict()
-	{
+	public HashTable<string, Variant?> pop_dict() {
 		return variant_to_hashtable(next(typeof(DictParam)));
 	}
 	
-	private Variant? next(Type param_type)
-	{
+	private Variant? next(Type param_type) {
 		var index = counter++;
-		if (index >= data.length)
+		if (index >= data.length) {
 			error(
 				"Method '%s' receives only %d arguments. Access to index %d denied.",
 				method.path, data.length, index);
+		}
 		var param =  method.params[index];
-		if (Type.from_instance(param) != param_type)
+		if (Type.from_instance(param) != param_type) {
 			error(
 				"The parameter %d of method '%s' is of type '%s' but %s value requested.",
 				index, method.path, Type.from_instance(param).name(), param_type.name());
+		}
 		return unbox_variant(data[index]);
+	}
+	
+	/**
+	 * Send response back to the caller.
+	 * 
+	 * @param data    Response data.
+	 */
+	public void respond(Variant? data) {
+		if (!response_sent) {
+			connection.respond(uid, data);
+			response_sent = true;
+		}
+	}
+	
+	/**
+	 * Send error back to the caller.
+	 * 
+	 * @param e    Error.
+	 */
+	public void fail(GLib.Error e) {
+		if (!response_sent) {
+			connection.fail(uid, e);
+			response_sent = true;
+		}
 	}
 }
 
-public abstract class ApiParam
+public abstract class RpcParam
 {
 	public string name {get; protected set; default = null;}
 	public bool nullable {get; protected set; default = false;}
@@ -213,7 +234,7 @@ public abstract class ApiParam
 	public string type_string {get; protected set; default = null;}
 	public string? description {get; protected set; default = null;}
 	
-	public ApiParam(string name, bool required, bool nullable, Variant? default_value, string type_string,
+	public RpcParam(string name, bool required, bool nullable, Variant? default_value, string type_string,
 		string? description)
 	{
 		this.name = name;
@@ -244,7 +265,7 @@ public abstract class ApiParam
 	}
 }
 
-public class StringParam: ApiParam
+public class StringParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type string.
@@ -276,7 +297,7 @@ public class StringParam: ApiParam
 	}
 }
 
-public class BoolParam: ApiParam
+public class BoolParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type boolean.
@@ -300,7 +321,7 @@ public class BoolParam: ApiParam
 	}
 }
 
-public class DoubleParam: ApiParam
+public class DoubleParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type double.
@@ -324,7 +345,7 @@ public class DoubleParam: ApiParam
 	}
 }
 
-public class IntParam: ApiParam
+public class IntParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type int.
@@ -348,7 +369,7 @@ public class IntParam: ApiParam
 	}
 }
 
-public class StringArrayParam: ApiParam
+public class StringArrayParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type string[].
@@ -411,7 +432,7 @@ public class StringArrayParam: ApiParam
 	}
 }
 
-public class DictParam: ApiParam
+public class DictParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type HashTable<string, Variant>.
@@ -457,7 +478,7 @@ public class DictParam: ApiParam
 	}
 }
 
-public class VariantParam: ApiParam
+public class VariantParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type Variant.
@@ -503,7 +524,7 @@ public class VariantParam: ApiParam
 	}
 }
 
-public class VarArrayParam: ApiParam
+public class VarArrayParam: RpcParam
 {
 	/** 
 	 * Creates new parameter of type Variant array.

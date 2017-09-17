@@ -38,55 +38,56 @@ public async void resume_later()
  * Attach an idle callback to the thread-default {@link GLib.MainContext}.
  * 
  * Similar to {@link GLib.Idle.add} but uses the thread-default {@link GLib.MainContext} instead of the global
- * {@link GLib.MainContext}.
+ * {@link GLib.MainContext} if context is not specified.
  * 
  * @param function    The idle callback function.
  * @param priority    The priority of the callback.
+ * @param context        The context to use instead of the thread-default one.
  * @return Id of the corresponding event source.
  */
-public uint add_idle(owned SourceFunc function, int priority=GLib.Priority.DEFAULT_IDLE)
-{
-	var context = MainContext.ref_thread_default();
+public uint add_idle(owned SourceFunc function, int priority=GLib.Priority.DEFAULT_IDLE,
+MainContext? context=null) {
 	var source = new IdleSource();
 	source.set_priority(priority);
 	source.set_callback((owned) function);
-	return source.attach(context);
+	return source.attach(context ?? MainContext.ref_thread_default());
 }
 
 /**
  * Attach a timeout callback to the thread-default {@link GLib.MainContext}.
  * 
  * Similar to {@link GLib.Timeout.add} but uses the thread-default {@link GLib.MainContext} instead of the global
- * {@link GLib.MainContext}.
+ * {@link GLib.MainContext} if context is not specified.
  * 
  * @param interval_ms    The number of miliseconds to wait before the callback is called.
  * @param function       The callback function.
  * @param priority       The priority of the callback.
+ * @param context        The context to use instead of the thread-default one.
  * @return Id of the corresponding event source.
  */
-public uint add_timeout_ms(uint interval_ms, owned SourceFunc function, int priority=GLib.Priority.DEFAULT)
-{
-	var context = MainContext.ref_thread_default();
+public uint add_timeout_ms(uint interval_ms, owned SourceFunc function, int priority=GLib.Priority.DEFAULT,
+MainContext? context=null) {
 	var source = new TimeoutSource(interval_ms);
 	source.set_priority(priority);
 	source.set_callback((owned) function);
-	return source.attach(context);
+	return source.attach(context ?? MainContext.ref_thread_default());
 }
 
 /**
  * Attach a timeout callback to the thread-default {@link GLib.MainContext}.
  * 
  * Similar to {@link GLib.Timeout.add_seconds} but uses the thread-default {@link GLib.MainContext} instead
- * of the global {@link GLib.MainContext}.
+ * of the global {@link GLib.MainContext} if context is not specified.
  * 
  * @param interval_s    The number of seconds to wait before the callback is called.
  * @param function      The callback function.
  * @param priority      The priority of the callback.
+ * @param context        The context to use instead of the thread-default one.
  * @return Id of the corresponding event source.
  */
-public uint add_timeout_sec(uint interval_s, owned SourceFunc function, int priority=GLib.Priority.DEFAULT)
-{
-	return add_timeout_ms(interval_s * 1000, (owned) function, priority);
+public uint add_timeout_sec(uint interval_s, owned SourceFunc function, int priority=GLib.Priority.DEFAULT,
+MainContext? context=null) {
+	return add_timeout_ms(interval_s * 1000, (owned) function, priority, context);
 }
 
 } // namespace Drt.EventLoop

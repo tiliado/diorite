@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueStorageServer: GLib.Object
-{
+public class KeyValueStorageServer: GLib.Object {
 	internal const string METHOD_ADD_LISTENER = "/diorite/keyvaluestorageserver/add_listener";
 	internal const string METHOD_REMOVE_LISTENER = "/diorite/keyvaluestorageserver/remove_listener";
 	internal const string METHOD_HAS_KEY = "/diorite/keyvaluestorageserver/has_key";
@@ -36,44 +34,42 @@ public class KeyValueStorageServer: GLib.Object
 	internal const string METHOD_SET_DEFAULT_VALUE = "/diorite/keyvaluestorageserver/set_default_value";
 	internal const string METHOD_CHANGED = "/diorite/keyvaluestorageserver/changed";
 	
-	public Drt.ApiRouter router {get; construct;}
+	public Drt.RpcRouter router {get; construct;}
 	private HashTable<string, Provider?> providers;
 	
-	
-	public KeyValueStorageServer(Drt.ApiRouter router)
-	{
+	public KeyValueStorageServer(Drt.RpcRouter router) {
 		GLib.Object(router: router);
 		providers = new HashTable<string, Provider?>(str_hash, str_equal);
-		router.add_method(METHOD_ADD_LISTENER, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		router.add_method(METHOD_ADD_LISTENER, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_add_listener, {
 			new Drt.StringParam("provider", true, false),
 		});
-		router.add_method(METHOD_REMOVE_LISTENER, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		router.add_method(METHOD_REMOVE_LISTENER, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_remove_listener, {
 			new Drt.StringParam("provider", true, false),
 		});
-		router.add_method(METHOD_HAS_KEY, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.READABLE,
+		router.add_method(METHOD_HAS_KEY, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.READABLE,
 			null, handle_has_key, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
 		});
-		router.add_method(METHOD_GET_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.READABLE,
+		router.add_method(METHOD_GET_VALUE, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.READABLE,
 			null, handle_get_value, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
 		});
-		router.add_method(METHOD_SET_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		router.add_method(METHOD_SET_VALUE, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_set_value, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
 			new Drt.VariantParam("value", true, true),
 		});
-		router.add_method(METHOD_UNSET, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		router.add_method(METHOD_UNSET, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_unset, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
 		});
-		router.add_method(METHOD_SET_DEFAULT_VALUE, Drt.ApiFlags.PRIVATE|Drt.ApiFlags.WRITABLE,
+		router.add_method(METHOD_SET_DEFAULT_VALUE, Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
 			null, handle_set_default_value, {
 			new Drt.StringParam("provider", true, false),
 			new Drt.StringParam("key", true, false),
@@ -81,18 +77,15 @@ public class KeyValueStorageServer: GLib.Object
 		});
 	}
 	
-	public void add_provider(string name, KeyValueStorage storage)
-	{
+	public void add_provider(string name, KeyValueStorage storage) {
 		providers[name] = new Provider(name, storage);
 	}
 	
-	public void remove_provider(string name)
-	{
+	public void remove_provider(string name) {
 		providers.remove(name);
 	}
 	
-	public bool add_listener(string provider_name, Drt.ApiChannel listener)
-	{
+	public bool add_listener(string provider_name, Drt.RpcConnection listener) {
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
 			return false;
@@ -101,8 +94,7 @@ public class KeyValueStorageServer: GLib.Object
 		return true;
 	}
 	
-	public bool remove_listener(string provider_name, Drt.ApiChannel listener)
-	{
+	public bool remove_listener(string provider_name, Drt.RpcConnection listener) {
 		unowned Provider? provider = providers[provider_name];
 		if (provider == null)
 			return false;
@@ -111,92 +103,75 @@ public class KeyValueStorageServer: GLib.Object
 		return true;
 	}
 	
-	private unowned Provider get_provider(string name) throws MessageError
-	{
+	private unowned Provider get_provider(string name) throws RpcError {
 		unowned Provider? provider = providers[name];
 		if (provider == null)
-			throw new MessageError.INVALID_REQUEST(
+			throw new RpcError.INVALID_REQUEST(
 				"No key-value storage provider named '%s' has been found.", name);
 		return provider;
 	}
 	
-	private Variant? handle_add_listener(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var channel = source as Drt.ApiChannel;
-		return_val_if_fail(channel != null, new Variant.boolean(false));
-		var provider_name = params.pop_string();
-		return new Variant.boolean(add_listener(provider_name, channel));
+	private void handle_add_listener(Drt.RpcRequest request) throws RpcError {
+		var provider_name = request.pop_string();
+		request.respond(new Variant.boolean(add_listener(provider_name, request.connection)));
 	}
 	
-	private Variant? handle_remove_listener(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var channel = source as Drt.ApiChannel;
-		return_val_if_fail(channel != null, new Variant.boolean(false));
-		var provider_name = params.pop_string();
-		return new Variant.boolean(remove_listener(provider_name, channel));
+	private void handle_remove_listener(Drt.RpcRequest request) throws RpcError {
+		var provider_name = request.pop_string();
+		request.respond(new Variant.boolean(remove_listener(provider_name, request.connection)));
 	}
 	
-	private Variant? handle_has_key(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var name = params.pop_string();
-		var key = params.pop_string();
-		return new Variant.boolean(get_provider(name).storage.has_key(key));
+	private void handle_has_key(Drt.RpcRequest request) throws RpcError {
+		var name = request.pop_string();
+		var key = request.pop_string();
+		request.respond(new Variant.boolean(get_provider(name).storage.has_key(key)));
 	}
 	
-	private Variant? handle_get_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var name = params.pop_string();
-		var key = params.pop_string();
-		return get_provider(name).storage.get_value(key);
+	private void handle_get_value(Drt.RpcRequest request) throws RpcError {
+		var name = request.pop_string();
+		var key = request.pop_string();
+		request.respond(get_provider(name).storage.get_value(key));
 	}
 	
-	private Variant? handle_set_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var name = params.pop_string();
-		var key = params.pop_string();
-		var value = params.pop_variant();
+	private void handle_set_value(Drt.RpcRequest request) throws RpcError {
+		var name = request.pop_string();
+		var key = request.pop_string();
+		var value = request.pop_variant();
 		get_provider(name).storage.set_value(key, value);
-		return null;
+		request.respond(null);
 	}
 	
-	private Variant? handle_unset(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var name = params.pop_string();
-		var key = params.pop_string();
+	private void handle_unset(Drt.RpcRequest request) throws RpcError {
+		var name = request.pop_string();
+		var key = request.pop_string();
 		get_provider(name).storage.unset(key);
-		return null;
+		request.respond(null);
 	}
 	
-	private Variant? handle_set_default_value(GLib.Object source, Drt.ApiParams? params) throws MessageError
-	{
-		var name = params.pop_string();
-		var key = params.pop_string();
-		var value = params.pop_variant();
+	private void handle_set_default_value(Drt.RpcRequest request) throws RpcError {
+		var name = request.pop_string();
+		var key = request.pop_string();
+		var value = request.pop_variant();
 		get_provider(name).storage.set_default_value(key, value);
-		return null;
+		request.respond(null);
 	}
 	
 	[Compact]
-	private class Provider
-	{
+	private class Provider {
 		public unowned string name;
 		public KeyValueStorage storage;
-		public SList<Drt.ApiChannel> listeners;
+		public SList<Drt.RpcConnection> listeners;
 		
-		public Provider(string name, KeyValueStorage storage)
-		{
+		public Provider(string name, KeyValueStorage storage) {
 			this.name = name;
 			this.storage = storage;
 			storage.changed.connect(on_changed);
 			listeners = null;
 		}
 		
-		private void on_changed(string key, Variant? old_value)
-		{
-			foreach (var listener in listeners)
-			{
-				try
-				{
+		private void on_changed(string key, Variant? old_value) {
+			foreach (var listener in listeners) {
+				try {
 					var response = listener.call_sync(METHOD_CHANGED,
 						new Variant("(ssmv)", name, key, old_value));
 					if (response == null
@@ -204,9 +179,7 @@ public class KeyValueStorageServer: GLib.Object
 					|| !response.get_boolean())
 						warning("Invalid response to %s: %s", METHOD_CHANGED,
 							response == null ? "null" : response.print(false));
-				}
-				catch (GLib.Error e)
-				{
+				} catch (GLib.Error e) {
 					critical("%s client error: %s", METHOD_CHANGED, e.message);
 				}
 			}

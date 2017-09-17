@@ -22,71 +22,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
-
-public errordomain ApiError
-{
-	UNKNOWN,
-	INVALID_REQUEST,
-	INVALID_PARAMS,
-	PRIVATE_FLAG,
-	READABLE_FLAG,
-	WRITABLE_FLAG,
-	SUBSCRIBE_FLAG,
-	API_TOKEN_REQUIRED;
-	
-	public extern static GLib.Quark quark();
-}
+namespace Drt {
 
 /**
- * ApiRouter provides advanced IPC API framework.
+ * RpcRouter provides advanced IPC API framework.
  * 
- *   * Private API calls can be marked with `ApiFlags.PRIVATE` and require a proper `token`.
- *   * Writable API calls can be marked with `ApiFlags.WRITABLE` and require that the same flag is set
+ *   * Private API calls can be marked with `RpcFlags.PRIVATE` and require a proper `token`.
+ *   * Writable API calls can be marked with `RpcFlags.WRITABLE` and require that the same flag is set
  *     during a method call.
  *   * Method as well as parameters can hold description which can be then shown to API consumers,
  *     e.g. command-line or HTTP/JSON interface.
  */
-public class ApiRouter: MessageRouter
-{
+public class RpcRouter: GLib.Object {
 	private static bool log_comunication;
-	public string hex_token
-	{
-		owned get
-		{
+	public string hex_token {
+		owned get {
 			string result;
 			bin_to_hex(token, out result);
 			return result;
 		}
 	}
 	protected uint8[] token;
-	protected HashTable<string, ApiCallable?> methods;
+	protected HashTable<string, RpcCallable?> methods;
 	
-	static construct
-	{
+	static construct {
 		log_comunication = Environment.get_variable("DIORITE_LOG_API_ROUTER") == "yes";
 	}
 	
-	public ApiRouter()
-	{
-		base(null);
-		methods = new HashTable<string, ApiCallable?>(str_hash, str_equal);
+	/**
+	 * Creates new RPC Router.
+	 */
+	public RpcRouter() {
+		methods = new HashTable<string, RpcCallable?>(str_hash, str_equal);
 		random_bin(256, out token);
 	}
-
-	public signal void notification(GLib.Object source, string name, string? detail, Variant? parameters);
 	
-	public bool emit(string name, string? detail=null, Variant? data=null)
-	{
-		var notification = methods[name] as ApiNotification;
-		if (notification == null)
-		{
+	/**
+	 * Emitted when a notification is received.
+	 * 
+	 * @param source    The source of the notification.
+	 * @param name      The name of the notification.
+	 * @param detail    Unused, reserved for future.
+	 * @param data      Notification data.
+	 */
+	public signal void notification(RpcConnection source, string name, string? detail, Variant? data);
+	
+	/**
+	 * Emit remote notification.
+	 * 
+	 * @param name      The name of the notification.
+	 * @param detail    Unused, reserved for future.
+	 * @param data      Notification data.
+	 * @return true if notification exists and has been sent.
+	 */
+	public bool emit(string name, string? detail, Variant? data) {
+		var notification = methods[name] as RpcNotification;
+		if (notification == null) {
 			warning("Notification '%s' not found.", name);
 			return false;
 		}
-		Idle.add(() =>
-		{
+		Idle.add(() => {
 			notification.emit.begin(detail, data , (o, res) => {notification.emit.end(res);});
 			return false;
 		});
@@ -102,10 +97,9 @@ public class ApiRouter: MessageRouter
 	 * @param handler        Handler to be called upon successful execution.
 	 * @param parameters         Specification of parameters.
 	 */
-	public virtual void add_method(string path, ApiFlags flags, string? description,
-		owned ApiHandler handler, ApiParam[]? parameters)
-	{
-		methods[path] = new ApiMethod(path, flags, parameters, (owned) handler, description);
+	public virtual void add_method(string path, RpcFlags flags, string? description,
+		owned RpcHandler handler, RpcParam[]? parameters) {
+		methods[path] = new RpcMethod(path, flags, parameters, (owned) handler, description);
 	}
 	
 	/**
@@ -115,9 +109,8 @@ public class ApiRouter: MessageRouter
 	 * @param flags          Notification call flags.
 	 * @param description    Description of the notification for API consumers.
 	 */
-	public virtual void add_notification(string path, ApiFlags flags, string? description)
-	{
-		methods[path] = new ApiNotification(path, flags, description);
+	public virtual void add_notification(string path, RpcFlags flags, string? description) {
+		methods[path] = new RpcNotification(path, flags, description);
 	}
 	
 	/**
@@ -126,8 +119,7 @@ public class ApiRouter: MessageRouter
 	 * @param path    The path of a method.
 	 * @return true if method has been found and removed.
 	 */
-	public virtual bool remove_method(string path)
-	{
+	public virtual bool remove_method(string path) {
 		return methods.remove(path);
 	}
 	
@@ -137,49 +129,56 @@ public class ApiRouter: MessageRouter
 	 * @param path    The path of a notification.
 	 * @return true if notification has been found and removed.
 	 */
-	public virtual bool remove_notification(string path)
-	{
+	public virtual bool remove_notification(string path) {
 		return methods.remove(path);
 	}
 	
-	public bool list_methods(string parent_path, string? strip, bool list_private, out Variant list)
-	{
+	/**
+	 * List available RPc methods.
+	 * 
+	 * @param parent_path     Parent namespace.
+	 * @param strip           Prefix to strip.
+	 * @param list_private    Whether to list private methods.
+	 * @param list            The resulting list.
+	 * @return true if there is at least one method.
+	 */
+	public bool list_methods(string parent_path, string? strip, bool list_private, out Variant list) {
 		var strip_len = strip != null ? strip.length : 0;
 		var root = new VariantBuilder(new VariantType("a{sv}"));
 		var builder = new VariantBuilder(new VariantType("aa{smv}"));
 		var paths = methods.get_keys();
 		paths.sort(string.collate);
 		var prefix = parent_path.has_suffix("/") ? parent_path : parent_path + "/";
-		foreach (string path in paths)
-		{
-			if (!path.has_prefix(prefix))
+		foreach (string path in paths) {
+			if (!path.has_prefix(prefix)) {
 				continue;
+			}
 			
 			var callable = methods[path];
 			var flags = "";
-			if ((callable.flags & ApiFlags.PRIVATE) != 0)
-			{
-				if (!list_private)
+			if ((callable.flags & RpcFlags.PRIVATE) != 0) {
+				if (!list_private) {
 					continue;
+				}
 				flags += "p";
 			}
 
-			if ((callable.flags & ApiFlags.READABLE) != 0)
+			if ((callable.flags & RpcFlags.READABLE) != 0) {
 				flags += "r";
-			if ((callable.flags & ApiFlags.WRITABLE) != 0)
+			}
+			if ((callable.flags & RpcFlags.WRITABLE) != 0) {
 				flags += "w";
-			
-			if (strip != null && path.has_prefix(strip))
+			}
+			if (strip != null && path.has_prefix(strip)) {
 				path = path.substring(strip_len);
+			}
 				
 			builder.open(new VariantType("a{smv}"));
 			var params = new VariantBuilder(new VariantType("aa{smv}"));
-			var method = callable as ApiMethod;
-			if (method != null)
-			{
+			var method = callable as RpcMethod;
+			if (method != null) {
 				builder.add("{smv}", "type", new Variant.string("method"));
-				foreach (var param in method.params)
-				{
+				foreach (var param in method.params) {
 					params.open(new VariantType("a{smv}"));
 					params.add("{smv}", "name", new Variant.string(param.name));
 					params.add("{smv}", "type", new Variant.string(param.type_string));
@@ -190,9 +189,8 @@ public class ApiRouter: MessageRouter
 					params.close();
 				}
 			}
-			var notification = callable as ApiNotification;
-			if (notification != null)
-			{
+			var notification = callable as RpcNotification;
+			if (notification != null) {
 				builder.add("{smv}", "type", new Variant.string("notification"));
 				params.open(new VariantType("a{smv}"));
 				params.add("{smv}", "name", new Variant.string("subscribe"));
@@ -225,77 +223,78 @@ public class ApiRouter: MessageRouter
 		return count > 0;
 	}
 	
-	public override Variant? handle_message(GLib.Object conn, string name, Variant? data) throws GLib.Error
-	{
-		return handle_message_internal(false, conn, name, data);
-	}
-		
-	public Variant? handle_local_call(GLib.Object conn, string method, bool allow_private, string flags, string data_format, Variant? data) throws GLib.Error
-	{
-		var full_name = "%s::%s%s,%s,".printf(method, allow_private ? "p" : "", flags, data_format);
-		return handle_message_internal(allow_private, conn, full_name, data);
-	}
-	
-	private Variant? handle_message_internal(bool always_secure, GLib.Object conn, string name, Variant? data) throws GLib.Error
-	{
-		if (log_comunication)
-			debug("Handle message %s: %s", name, data == null ? "null" : data.print(false));
-		
-		Variant? response = null;
+	/**
+	 * Handle RPC request.
+	 * 
+	 * @param conn          Request connection.
+	 * @param id            Request id.
+	 * @param name          Request name.
+	 * @param parameters    Request parameters.
+	 * @throws GLib.Error on failure.
+	 */
+	public void handle_request(RpcConnection conn, uint id, string name, Variant? parameters) throws GLib.Error {
+		var always_secure = conn is RpcLocalConnection;
+		if (log_comunication) {
+			debug("Handle message %s: %s", name, parameters == null ? "null" : parameters.print(false));
+		}
+		if (name == "echo") {
+			conn.respond(id, parameters);
+			return;
+		}
 		var pos = name.last_index_of("::");
-		if (pos < 0)
-			return base.handle_message(conn, name, data);
+		if (pos < 0) {
+			throw new ApiError.INVALID_REQUEST("Method name is incomplete: '%s'", name);
+		}
 		
 		int offset = 0;
 		var notification = false;
-		if (name.has_prefix("n:"))
-		{
+		if (name.has_prefix("n:")) {
 			notification = true;
 			offset = 2;
 		}
 		
 		var path = name.substring(offset, pos - offset);
 		var spec = name.substring(pos + 2).split(",");
-		if (spec.length < 3)
+		if (spec.length < 3) {
 			throw new ApiError.INVALID_REQUEST("Message format specification is incomplete: '%s'", name);
-		
+		}
 		var flags = spec[0];
-		var format = spec[1];
-		
 		var hex_token = String.null_if_empty(spec[2]);
 		uint8[] token;
-		if (hex_token != null)
+		if (hex_token != null) {
 			hex_to_bin(hex_token, out token);
-		else
+		} else {
 			token = {};
-		
-		if (notification)
-		{
-			variant_ref(data);  // FIXME: Why is this necessary?
-			this.notification(conn, path, null, data);
-			return null;
 		}
-		
+		if (notification) {
+			variant_ref(parameters);  // FIXME: Why is this necessary?
+			this.notification(conn, path, null, parameters);
+			conn.respond(id, null);
+			return;
+		}
 		var method = methods[path];
-		if (method == null)
-		{
-			var ok = list_methods(path, "/nuvola/", false, out response);
-			return  ok ? response : base.handle_message(conn, name, data);
+		if (method == null) {
+			Variant? listing = null;
+			list_methods(path, "/nuvola/", false, out listing);
+			conn.respond(id, listing);
+		} else {
+			if ((method.flags & RpcFlags.PRIVATE) != 0 && !("p" in flags)) {
+				throw new ApiError.PRIVATE_FLAG("Message doesn't have private flag set: '%s'", name);
+			}
+			if ((method.flags & RpcFlags.READABLE) != 0 && !("r" in flags)) {
+				throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
+			}
+			if ((method.flags & RpcFlags.WRITABLE) != 0 && !("w" in flags)) {
+				throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
+			}
+			if ((method.flags & RpcFlags.SUBSCRIBE) != 0 && !("s" in flags)) {
+				throw new ApiError.SUBSCRIBE_FLAG("Message doesn't have subscribe flag set: '%s'", name);
+			}
+			if (!always_secure && (method.flags & RpcFlags.PRIVATE) != 0 && !uint8v_equal(this.token, token)) {
+				throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
+			}
+			method.run(conn, id, parameters);
 		}
-		
-		if ((method.flags & ApiFlags.PRIVATE) != 0 && !("p" in flags))
-			throw new ApiError.PRIVATE_FLAG("Message doesn't have private flag set: '%s'", name);
-		if ((method.flags & ApiFlags.READABLE) != 0 && !("r" in flags))
-			throw new ApiError.READABLE_FLAG("Message doesn't have readable flag set: '%s'", name);
-		if ((method.flags & ApiFlags.WRITABLE) != 0 && !("w" in flags))
-			throw new ApiError.WRITABLE_FLAG("Message doesn't have writable flag set: '%s'", name);
-		if ((method.flags & ApiFlags.SUBSCRIBE) != 0 && !("s" in flags))
-			throw new ApiError.SUBSCRIBE_FLAG("Message doesn't have subscribe flag set: '%s'", name);
-		if (!always_secure && (method.flags & ApiFlags.PRIVATE) != 0 && !uint8v_equal(this.token, token))
-			throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
-		
-		method.run(conn, data, out response);
-		return response;
 	}
 }
 

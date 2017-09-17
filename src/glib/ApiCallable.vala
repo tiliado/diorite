@@ -24,12 +24,22 @@
 
 namespace Drt {
 
-public abstract class ApiCallable {
+/**
+ * Callable RPC object.
+ */
+public abstract class RpcCallable {
 	public string path {get; protected set;}
-	public ApiFlags flags {get; protected set;}
+	public RpcFlags flags {get; protected set;}
 	public string description {get; protected set;}
 	
-	public abstract void run(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error;
+	/**
+	 * Run callable object with data from RPC request.
+	 * @param conn    Request connection.
+	 * @param id      Request id.
+	 * @param data    Request data.
+	 * @throws GLib.Error on failure.
+	 */
+	public abstract void run(RpcConnection conn, uint id, Variant? data) throws GLib.Error;
 }
 
 } // namespace Drt

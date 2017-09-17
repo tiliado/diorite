@@ -34,7 +34,7 @@ public class SocketChannel : Drt.DuplexChannel
 	
 	public static SocketConnection create_socket_from_name(string name) throws GLib.Error
 	{
-		var path = Ipc.create_path(name);
+		var path = Rpc.create_path(name);
 		var address = new UnixSocketAddress(path);
 		var socket = new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
 		var connection = SocketConnection.factory_create_connection(socket);

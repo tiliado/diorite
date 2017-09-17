@@ -22,29 +22,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class ApiNotification : ApiCallable
-{
-	private SList<GLib.Object> subscribers = null;
+/**
+ * RPC Notification handles incoming request to subscribe/unsubscribe and emits notifications..
+ */
+public class RpcNotification : RpcCallable {
+	private SList<RpcConnection> subscribers = null;
 	
-	public ApiNotification(string path, ApiFlags flags, string? description)
-	{
+	/**
+	 * Creates new Rpcnotification handler
+	 * 
+	 * @param path           Notification path.
+	 * @param flags          Notification flags.
+	 * @param description    Notification description for API index.
+	 */
+	public RpcNotification(string path, RpcFlags flags, string? description) {
 		this.path = path;
 		this.flags = flags;
 		this.description = description;
 	}
 	
-	public static void parse_params(string? path, Variant? data, out bool subscribe, out string? detail) throws GLib.Error
-	{
+	/**
+	 * Parse raw data of (un)subscribe request.
+	 * 
+	 * @param path         Request path.
+	 * @param data         Raw request data.
+	 * @param subscribe    Whether to subscribe or unsubscribe.
+	 * @param detail       Unused, reserved for future.
+	 * @throws GLib.Error on failure.
+	 */
+	public static void parse_params(string? path, Variant? data, out bool subscribe, out string? detail)
+	throws GLib.Error {
 		subscribe = true;
 		detail = null;
-		
-		if (data == null)
+		if (data == null) {
 			throw new ApiError.INVALID_PARAMS(
 				"Method '%s' requires 2 parameters but no parameters have been provided.", path);
-		var params_type = ApiChannel.get_params_type(data);
+		}
+		var params_type = Rpc.get_params_type(data);
 		if (params_type == "tuple") {
 			if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
 				throw new ApiError.INVALID_PARAMS(
@@ -73,7 +89,7 @@ public class ApiNotification : ApiCallable
 			}
 		} else {
 			if (data.get_type_string() != "(a{smv})")
-			MessageListener.check_type_string(data, "a{smv}");
+			Rpc.check_type_string(data, "a{smv}");
 			
 			var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
 			var entry = unbox_variant(dict.lookup_value("subscribe", null));
@@ -95,43 +111,54 @@ public class ApiNotification : ApiCallable
 		}
 	}
 	
-	public Variant? subscribe(GLib.Object conn, bool subscribe, string? detail) throws GLib.Error {
+	/**
+	 * Subscribe or unsubscribe from notification.
+	 * 
+	 * @param conn      RpcConnection to (un)subscribe.
+	 * @param detail    Unused, reserved for future.
+	 * @throws GLib.Error on failure.
+	 */
+	public void subscribe(RpcConnection conn, bool subscribe, string? detail) throws GLib.Error {
 		if (subscribe) {
 			subscribers.append(conn);
 		} else {
 			subscribers.remove(conn);
 		}
-		return null;
 	}
 	
+	/**
+	 * Emit notification.
+	 * 
+	 * @param detail    Unused, reserved for future.
+	 * @param data      Notification body.
+	 * @return true if there have been no errors.
+	 */
 	public async bool emit(string? detail, Variant? data) {
 		var result = true;
-		foreach (unowned GLib.Object conn in subscribers) {
-			var channel = conn as ApiChannel;
-			if (channel != null) {
-				try {
-					yield channel.call("n:" + path, data);
-				} catch (GLib.Error e) 	{
-					result = false;
-					warning("Failed to emit '%s': %s", path, e.message);
-				}
-				continue;
-			}
-			var bus = conn as ApiBus;
-			if (bus != null) {
-				(bus.router as ApiRouter).notification(bus, path, detail, data);
-			} else 	{
-				warning("Not an ApiChannel nor ApiBus: %s", conn.get_type().name());
+		foreach (unowned RpcConnection channel in subscribers) {
+			try {
+				yield channel.call("n:" + path, new Variant("(msmv)", detail, data));
+			} catch (GLib.Error e) 	{
+				result = false;
+				warning("Failed to emit '%s': %s", path, e.message);
 			}
 		}
 		return result;
 	}
 	
-	public override void run(GLib.Object conn, Variant? data, out Variant? response) throws GLib.Error {
+	/**
+	 * Run callable object with data from RPC request.
+	 * @param conn    Request connection.
+	 * @param id      Request id.
+	 * @param data    Request data.
+	 * @throws GLib.Error on failure.
+	 */
+	public override void run(RpcConnection conn, uint id, Variant? data) throws GLib.Error {
 		bool subscribe = true;
 		string? detail = null;
 		parse_params(path, data, out subscribe, out detail);
-		response = this.subscribe(conn, subscribe, detail);
+		this.subscribe(conn, subscribe, detail);
+		conn.respond(id, null);
 	}
 }
 
