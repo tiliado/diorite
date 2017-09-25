@@ -68,6 +68,22 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		return false;
 	}
 	
+	public async bool has_key_async(string key)
+	{
+		var method = KeyValueStorageServer.METHOD_HAS_KEY;
+		try {
+			var response = yield client.channel.call(method, new Variant("(ss)", name, key));
+			if (response.is_of_type(VariantType.BOOLEAN)) {
+				return response.get_boolean();
+			}
+			critical("Invalid response to %s: %s", method,
+				response == null ? "null" : response.print(false));
+		} catch (GLib.Error e) {
+			critical("%s client error: %s", method, e.message);
+		}
+		return false;
+	}
+	
 	protected Variant? get_value(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
@@ -77,6 +93,17 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 		catch (GLib.Error e)
 		{
+			critical("%s client error: %s", method, e.message);
+			return null;
+		}
+	}
+	
+	protected async Variant? get_value_async(string key)
+	{
+		var method = KeyValueStorageServer.METHOD_GET_VALUE;
+		try {
+			return unbox_variant(yield client.channel.call(method, new Variant("(ss)", name, key)));
+		} catch (GLib.Error e) {
 			critical("%s client error: %s", method, e.message);
 			return null;
 		}
@@ -95,6 +122,15 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
+	protected async void set_value_unboxed_async(string key, Variant? value) {
+		var method = KeyValueStorageServer.METHOD_SET_VALUE;
+		try {
+			yield client.channel.call(method, new Variant("(ssmv)", name, key, value));
+		} catch (GLib.Error e) {
+			critical("%s client error: %s", method, e.message);
+		}
+	}
+	
 	protected void set_default_value_unboxed(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
@@ -104,6 +140,16 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 		catch (GLib.Error e)
 		{
+			critical("%s client error: %s", method, e.message);
+		}
+	}
+	
+	protected async void set_default_value_unboxed_async(string key, Variant? value)
+	{
+		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
+		try {
+			yield client.channel.call(method, new Variant("(ssmv)", name, key, value));
+		} catch (GLib.Error e) {
 			critical("%s client error: %s", method, e.message);
 		}
 	}
@@ -121,33 +167,36 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	private void toggle_listener(bool state)
-	{
+	public async void unset_async(string key) {
+		var method = KeyValueStorageServer.METHOD_UNSET;
+		try {
+			yield client.channel.call(method, new Variant("(ss)", name, key));
+		} catch (GLib.Error e) {
+			critical("%s client error: %s", method, e.message);
+		}
+	}
+	
+	private void toggle_listener(bool state) {
 		string method;
 		Variant payload;
-		if (state)
-		{
+		if (state) {
 			method = KeyValueStorageServer.METHOD_ADD_LISTENER;
 			payload = new Variant("(s)", name);
-		}
-		else
-		{
+		} else {
 			method = KeyValueStorageServer.METHOD_REMOVE_LISTENER;
 			payload = new Variant("(s)", name);
 		}
-		
-		try
-		{
-			var response = client.channel.call_sync(method, payload);
-			if (response == null || ! response.is_of_type(VariantType.BOOLEAN)
-			|| !response.get_boolean())
-				warning("Invalid response to %s: %s", method,
-					response == null ? "null" : response.print(false));
-		}
-		catch (GLib.Error e)
-		{
-			critical("%s client error: %s", method, e.message);
-		}
+		var channel = client.channel;
+		channel.call.begin(method, payload, (o, res ) => {
+			try {
+				var response = channel.call.end(res);
+				if (response == null || !response.is_of_type(VariantType.BOOLEAN) || !response.get_boolean()) {
+					warning("Invalid response to %s: %s", method, response == null ? "null" : response.print(false));
+				}
+			} catch (GLib.Error e) {
+				critical("%s client error: %s", method, e.message);
+			}
+		});	
 	}
 }
 

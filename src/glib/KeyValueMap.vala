@@ -44,6 +44,11 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 		return key in values;
 	}
 	
+	public async bool has_key_async(string key) {
+		yield EventLoop.resume_later();
+		return has_key(key);
+	}
+	
 	public Variant? get_value(string key)
 	{
 		Variant? value = null;
@@ -52,11 +57,21 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 		return default_values[key];
 	}
 	
+	public async Variant? get_value_async(string key) {
+		yield EventLoop.resume_later();
+		return get_value(key);
+	}
+	
 	public void unset(string key)
 	{
 		var old_value = get_value(key);
 		if (values.remove(key))
 			changed(key, old_value);
+	}
+	
+	public async void unset_async(string key) {
+		unset(key);
+		yield EventLoop.resume_later();
 	}
 	
 	protected void set_value_unboxed(string key, Variant? value)
@@ -67,9 +82,19 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
+	protected async void set_value_unboxed_async(string key, Variant? value) {
+		set_value_unboxed(key, value);
+		yield EventLoop.resume_later();
+	}
+	
 	protected void set_default_value_unboxed(string key, Variant? value)
 	{
 		default_values[key] = value;
+	}
+	
+	protected async void set_default_value_unboxed_async(string key, Variant? value) {
+		set_default_value_unboxed(key, value);
+		yield EventLoop.resume_later();
 	}
 }
 

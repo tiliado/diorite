@@ -31,19 +31,37 @@ public interface KeyValueStorage: GLib.Object
 	
 	public signal void changed(string key, Variant? old_value);
 	
+	public abstract async bool has_key_async(string key);
+	
 	public abstract bool has_key(string key);
+	
+	public abstract async Variant? get_value_async(string key);
 	
 	public abstract Variant? get_value(string key);
 	
+	public abstract async void unset_async(string key);
+	
 	public abstract void unset(string key);
+	
+	protected abstract async void set_default_value_unboxed_async(string key, Variant? value);
 	
 	protected abstract void set_default_value_unboxed(string key, Variant? value);
 	
+	protected abstract async void set_value_unboxed_async(string key, Variant? value);
+	
 	protected abstract void set_value_unboxed(string key, Variant? value);
+	
+	public async void set_value_async(string key, Variant? value) {
+		yield set_value_unboxed_async(key, unbox_variant(value));
+	}
 	
 	public void set_value(string key, Variant? value)
 	{
 		set_value_unboxed(key, unbox_variant(value));
+	}
+	
+	public async void set_default_value_async(string key, Variant? value) {
+		yield set_default_value_unboxed_async(key, unbox_variant(value));
 	}
 	
 	public void set_default_value(string key, Variant? value)
