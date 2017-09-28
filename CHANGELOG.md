@@ -6,7 +6,14 @@ Diorite Changelog
  * Developers, maintainers and packagers are supposed to subscribe to
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
- 
+
+Release 4.8.0 - September 28th, 2017
+--------------------------------
+
+  * Various IPC classes were refactored and united into new API (Rpc prefix) and it is possible to respond
+    to IPC messages asynchronously.
+  * KeyValueStorage got async equivalents of non-void methods.
+
 Release 4.7.0 - September 1st, 2017
 --------------------------------
 
