@@ -112,6 +112,57 @@ public class RpcNotification : RpcCallable {
 	}
 	
 	/**
+	 * Parse raw data of notification.
+	 * 
+	 * @param data         Raw notification data.
+	 * @param detail       Unused, reserved for future.
+	 * @param params       Notification parameters
+	 * @throws GLib.Error on failure.
+	 */
+	public static void get_detail_and_params(Variant data, out string? detail, out Variant? params)
+	throws GLib.Error {
+		detail = null;
+		params = null;
+		var params_type = Rpc.get_params_type(data);
+		if (params_type == "tuple") {
+			if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
+				throw new ApiError.INVALID_PARAMS(
+					"Notification call expected a tuple of parameters, but type of '%s' received.",
+					data.get_type_string());
+			}
+			var n_children = data.n_children();
+			if (n_children > 2) {
+				throw new ApiError.INVALID_PARAMS(
+					"Notification requires %d parameters but %d parameters have been provided.",
+					2, (int) data.n_children());
+			}
+			if (n_children > 0) {
+				var entry = unbox_variant(data.get_child_value(0));
+				if (entry != null && !variant_string(entry, out detail)) {
+					throw new ApiError.INVALID_PARAMS(
+						"Notification call expected the first parameter to be a string, but type of '%s' received.",
+						entry.get_type_string());
+				}
+				if (n_children == 2) {
+					params = unbox_variant(data.get_child_value(1));
+				}
+			}
+		} else {
+			if (data.get_type_string() != "(a{smv})"){
+				Rpc.check_type_string(data, "a{smv}");
+			}
+			var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
+			var entry = unbox_variant(dict.lookup_value("detail", null));
+			if (entry != null && !variant_string(entry, out detail)) {
+				throw new ApiError.INVALID_PARAMS(
+					"Notification call expected the detail parameter to be a string, but type of '%s' received.",
+					entry.get_type_string());
+			}
+			params = unbox_variant(dict.lookup_value("params", null));
+		}
+	}
+	
+	/**
 	 * Subscribe or unsubscribe from notification.
 	 * 
 	 * @param conn      RpcConnection to (un)subscribe.
