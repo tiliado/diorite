@@ -289,6 +289,20 @@ public int[] find_pid_by_basename(string basename)
 }
 
 /**
+ * Get command line of a process with given PID.
+ * 
+ * @param pid    Process id.
+ * @return Its command line if the process exists, null otherwise.
+ */
+public string? cmdline_for_pid(int pid) {
+	try {
+		return read_file(File.new_for_path("/proc/%d/cmdline".printf(pid)));
+	} catch (GLib.Error e) {
+		return null;
+	}
+}
+
+/**
  * Send signal to multiple processes.
  * 
  * @param pids      The ids of processes to send signal to.
