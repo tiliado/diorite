@@ -142,9 +142,12 @@ public abstract class Application : Gtk.Application
 		/* Set program name */
 		Gdk.set_program_class(app_id); // must be set after Gtk.init()!
 		instance = this;
-		Posix.signal(Posix.SIGINT, terminate_handler);
-		Posix.signal(Posix.SIGTERM, terminate_handler);
-		Posix.signal(Posix.SIGHUP, terminate_handler);
+		Posix.sigaction_t sig_action = {};
+		sig_action.sa_sigaction = terminate_handler;
+		sig_action.sa_flags |= Posix.SA_SIGINFO;
+		Posix.sigaction(Posix.SIGTERM, sig_action, null);
+		Posix.sigaction(Posix.SIGTERM, sig_action, null);
+		Posix.sigaction(Posix.SIGHUP, sig_action, null);
 		Bus.watch_name(BusType.SESSION, XFCE_SESSION_SERVICE_NAME,
 		BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
 		base.startup();
@@ -218,13 +221,19 @@ public abstract class Application : Gtk.Application
 		}
 	}
 	
-	private static void terminate_handler(int sig_num)
-	{
-		debug("Caught signal %d, exiting ...", sig_num);
-		if (instance == null)
-			error("No instance to terminate");
-		
-		instance.quit();
+	private static void terminate_handler(int sig_num, Posix.siginfo_t info, void* data) {
+		var sig_pid = (int) info.si_pid;
+		var cmdline = System.cmdline_for_pid(sig_pid);
+		if (sig_num == Posix.SIGTERM && sig_pid == Posix.getpid()) {
+			warning("Ignoring signal %d from PID %d (%s).", sig_num, sig_pid, cmdline);
+		} else {
+			debug("Caught signal %d from PID %d (%s), exiting ...", sig_num, sig_pid, cmdline);
+			if (instance == null) {
+				error("No instance to terminate");
+			} else {
+				instance.quit();
+			}
+		}
 	}
 	
 	private void on_xfce_session_appeared(DBusConnection conn, string name, string owner)
