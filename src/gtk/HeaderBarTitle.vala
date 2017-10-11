@@ -33,6 +33,7 @@ public class HeaderBarTitle: Gtk.Grid {
 	public HeaderBarTitle(string? title=null, string? subtitle=null) {
 		set_title(title);
 		set_subtitle(subtitle);
+		hexpand = vexpand = false;
 	}
 	
 	public void set_title(string? title) {
