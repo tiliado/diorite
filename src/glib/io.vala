@@ -42,19 +42,16 @@ public static SocketService create_socket_service(string path) throws IOError
 	return service;
 }
 
-public static SocketConnection create_socket_connection(string path, Cancellable? cancellable=null) throws IOError
-{
-	try
-	{
+public static SocketConnection create_socket_connection(string path, Cancellable? cancellable=null)
+throws IOError {
+	try {
 		var address = new UnixSocketAddress(path);
 		var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
 		var connection = SocketConnection.factory_create_connection(socket);
 		connection.connect(address, cancellable);
 		return connection;
-	}
-	catch (GLib.Error e)
-	{
-		throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", path, e.message);
+	} catch (GLib.Error e) {
+		throw new IOError.CONN_FAILED("Failed to create socket connection for path '%s'. %s", path, e.message);
 	}
 }
 

@@ -52,30 +52,22 @@ public class SocketChannel : Drt.DuplexChannel
 		connection.notify["closed"].connect_after(on_connection_closed);
 	}
 	
-	public SocketChannel.from_name(uint id, string name, uint timeout) throws IOError
-	{
-		try
-		{
+	public SocketChannel.from_name(uint id, string name, uint timeout) throws IOError {
+		try {
 			var connection = create_socket_from_name(name);
 			this(id, name, connection, timeout);
-		}
-		catch (GLib.Error e)
-		{
-			throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
+		} catch (GLib.Error e) {
+			throw new IOError.CONN_FAILED("Failed to create socket channel from name '%s'. %s", name, e.message);
 		}
 	}
 	
-	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError
-	{
+	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError {
 		var name = "fd:%d".printf(socket.get_fd());
-		try
-		{
+		try {
 			var connection = SocketConnection.factory_create_connection(socket);
 			this(id, name, connection, timeout);
-		}
-		catch (GLib.Error e)
-		{
-			throw new IOError.CONN_FAILED("Failed to connect to socket '%s'. %s", name, e.message);
+		} catch (GLib.Error e) {
+			throw new IOError.CONN_FAILED("Failed to create socket channel from socket '%s'. %s", name, e.message);
 		}
 	}
 	
