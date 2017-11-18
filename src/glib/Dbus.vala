@@ -25,6 +25,18 @@
 namespace Drt.Dbus {
 
 /**
+ * Get XDG DBus root object.
+ * 
+ * @param bus            The bus to get the root object from.
+ * @param cancellable    Cancellable object.
+ * @return XDG DBus root object.
+ * @throws GLib.Error on failure.
+ */
+public async XdgDbus get_xdg_dbus(DBusConnection bus, Cancellable? cancellable = null) throws GLib.Error {
+	return yield bus.get_proxy<XdgDbus>("org.freedesktop.DBus", "/", 0, cancellable);
+}
+
+/**
  * Ensure that given service is running and start it when necessary.
  * 
  * @param bus            The bus to find the service at.
@@ -34,7 +46,7 @@ namespace Drt.Dbus {
  */
 public async void ensure_service(DBusConnection bus, string name, Cancellable? cancellable = null)
 throws GLib.Error {
-	var dbus = yield bus.get_proxy<XdgDbus>("org.freedesktop.DBus", "/", 0, cancellable);
+	var dbus = yield get_xdg_dbus(bus, cancellable);
 	if (yield dbus.name_has_owner(name)) {
 		yield dbus.start_service_by_name(name, 0);
 	}
