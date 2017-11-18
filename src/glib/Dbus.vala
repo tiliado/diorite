@@ -186,6 +186,14 @@ public interface XdgDbus: GLib.Object {
 	 * @return 1 when the service was successfully started, 2 when a connection already owns the given name.
 	 */
 	public abstract async uint32 start_service_by_name(string name, uint32 flags) throws GLib.Error;
+	
+	/**
+	 * Returns a list of all names that can be activated on the bus.
+	 * 
+	 * @return Array of strings where each string is a bus name.
+	 * @throws GLib.Error on failure.
+	 */
+	public abstract async string[] list_activatable_names() throws GLib.Error;
 }
 
 [DBus(name = "org.freedesktop.DBus.Introspectable")]
