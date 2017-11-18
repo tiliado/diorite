@@ -116,13 +116,13 @@ public class RpcNotification : RpcCallable {
 	 * 
 	 * @param data         Raw notification data.
 	 * @param detail       Unused, reserved for future.
-	 * @param params       Notification parameters
+	 * @param parameters       Notification parameters
 	 * @throws GLib.Error on failure.
 	 */
-	public static void get_detail_and_params(Variant data, out string? detail, out Variant? params)
+	public static void get_detail_and_params(Variant data, out string? detail, out Variant? parameters)
 	throws GLib.Error {
 		detail = null;
-		params = null;
+		parameters = null;
 		var params_type = Rpc.get_params_type(data);
 		if (params_type == "tuple") {
 			if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
@@ -144,7 +144,7 @@ public class RpcNotification : RpcCallable {
 						entry.get_type_string());
 				}
 				if (n_children == 2) {
-					params = unbox_variant(data.get_child_value(1));
+					parameters = unbox_variant(data.get_child_value(1));
 				}
 			}
 		} else {
@@ -158,7 +158,7 @@ public class RpcNotification : RpcCallable {
 					"Notification call expected the detail parameter to be a string, but type of '%s' received.",
 					entry.get_type_string());
 			}
-			params = unbox_variant(dict.lookup_value("params", null));
+			parameters = unbox_variant(dict.lookup_value("params", null));
 		}
 	}
 	
