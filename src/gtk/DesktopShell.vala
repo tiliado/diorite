@@ -81,6 +81,37 @@ public abstract class DesktopShell: GLib.Object
 		DesktopShell.default_shell = default_shell;
 	}
 	
+	/**
+	 * Get the current GTK+ theme name.
+	 * 
+	 * @return The name of the current GTK+ theme.
+	 */
+	public static string get_gtk_theme() {
+		var theme = Gtk.Settings.get_default().gtk_theme_name;
+		return theme != "" ? theme : "Adwaita";
+	}
+	
+	/**
+	 * Returns the directory of a GTK+ theme.
+	 * 
+	 * @param theme    The name of GTK+ theme to look up.
+	 * @return Theme directory, or null if not found.
+	 */ 
+	public static File? lookup_gtk_theme_dir(string theme) {
+		var gtk_css = new Drt.XdgStorage().get_data_file("themes/%s/gtk-3.0/gtk.css".printf(theme));
+		return gtk_css != null ? gtk_css.get_parent() : null;
+	}
+	
+	/**
+	 * Check whether a GTK+ theme exists.
+	 * 
+	 * @param theme    The name of GTK+ theme to look up.
+	 * @return true if the theme exists, false otherwise.
+	 */
+	public static bool gtk_theme_exists(string theme) {
+		return lookup_gtk_theme_dir(theme) != null;
+	}
+	
 	public void set_app_menu_from_model(GLib.MenuModel model)
 	{
 		if (_app_menu == null)
