@@ -112,6 +112,44 @@ public abstract class DesktopShell: GLib.Object
 		return lookup_gtk_theme_dir(theme) != null;
 	}
 	
+	/**
+	 * List available GTK+ themes.
+	 * 
+	 * @return A HashTable of GTK+ theme names and corresponding `gtk+3.0` theme directories.
+	 */
+	public static async HashTable<string, File> list_gtk_themes() {
+		var storage = new Drt.XdgStorage();
+		var theme_dirs = new HashTable<string, File>(str_hash, str_equal);
+		foreach (unowned File data_dir in storage.data_dirs) {
+			var themes_dir = data_dir.get_child("themes");
+			try {
+				var enumerator = yield themes_dir.enumerate_children_async(
+					"standard::*", FileQueryInfoFlags.NOFOLLOW_SYMLINKS, Priority.DEFAULT, null);
+				FileInfo info;
+				while ((info = enumerator.next_file(null)) != null) {
+					var name = info.get_name();
+					if (!(name in theme_dirs)) {
+						var theme_dir = themes_dir.get_child(name).get_child("gtk-3.0");
+						var gtk_css = theme_dir.get_child("gtk.css");
+						try {
+							yield gtk_css.query_info_async(FileAttribute.STANDARD_TYPE, 0, Priority.DEFAULT, null);
+							theme_dirs[name] = theme_dir;
+						} catch (GLib.Error e) {
+							if (!(e is GLib.IOError.NOT_FOUND)) {
+								warning("Failed to get file info for '%s': %s", gtk_css.get_path(), e.message);
+							}
+						}
+					}
+				}
+			} catch (GLib.Error e) {
+				if (!(e is GLib.IOError.NOT_FOUND)) {
+					warning("Failed to enumerate '%s': %s", themes_dir.get_path(), e.message);
+				}
+			}
+		}
+		return theme_dirs;
+	}
+	
 	public void set_app_menu_from_model(GLib.MenuModel model)
 	{
 		if (_app_menu == null)
