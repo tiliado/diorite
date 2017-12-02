@@ -92,6 +92,15 @@ public abstract class DesktopShell: GLib.Object
 	}
 	
 	/**
+	 * Set the current GTK+ theme name.
+	 * 
+	 * @param theme    The name of the GTK+ theme to set.
+	 */
+	public static void set_gtk_theme(string theme) {
+		Gtk.Settings.get_default().gtk_theme_name = theme;
+	}
+	
+	/**
 	 * Returns the directory of a GTK+ theme.
 	 * 
 	 * @param theme    The name of GTK+ theme to look up.
