@@ -17,6 +17,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+Gtk.Label theme_name_label;
+Gtk.Label theme_dir_label;
 
 void main(string[] args){
 	Drt.Logger.init(stderr, GLib.LogLevelFlags.LEVEL_DEBUG);
@@ -30,15 +32,21 @@ void main(string[] args){
 	
 	var label = new Gtk.Label("Current GTK+ theme:");
 	grid.attach(label, 0, line, 1, 1);
-	var theme_name = Drtgtk.DesktopShell.get_gtk_theme();
-	label = new Gtk.Label(theme_name);
-	grid.attach(label, 1, line, 1, 1);
+	theme_name_label = new Gtk.Label(null);
+	grid.attach(theme_name_label, 1, line, 1, 1);
 	
-	var theme_dir = Drtgtk.DesktopShell.lookup_gtk_theme_dir(theme_name);
 	label = new Gtk.Label("Theme dir:");
 	grid.attach(label, 0, ++line, 1, 1);
-	label = new Gtk.Label(theme_dir != null ? theme_dir.get_path() : "(not found)");
-	grid.attach(label, 1, line, 1, 1);
+	theme_dir_label = new Gtk.Label(null);
+	grid.attach(theme_dir_label, 1, line, 1, 1);
+	
+	var selector = new Drtgtk.GtkThemeSelector();
+	selector.changed.connect(on_theme_changed);
+	label = new Gtk.Label("Themes:");
+	grid.attach(label, 0, ++line, 1, 1);
+	grid.attach(selector, 1, line, 1, 1);
+	
+	on_theme_changed();
 	win.show_all();
 	
 	lookup_gtk_themes.begin((o, res) => lookup_gtk_themes.end(res));
@@ -53,4 +61,11 @@ async void lookup_gtk_themes() {
 	foreach (var name in names) {
 		stdout.printf("- %s: %s\n", name, themes[name].get_path());
 	}
+}
+
+void on_theme_changed() {
+	var theme_name = Drtgtk.DesktopShell.get_gtk_theme();
+	theme_name_label.set_text(theme_name);
+	var theme_dir = Drtgtk.DesktopShell.lookup_gtk_theme_dir(theme_name);
+	theme_dir_label.set_text(theme_dir != null ? theme_dir.get_path() : "(not found)");
 }
