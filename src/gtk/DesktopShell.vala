@@ -31,6 +31,7 @@ public abstract class DesktopShell: GLib.Object
 {
 	private static DesktopShell? default_shell = null;
 	private static GenericSet<string> shells = null;
+	private static string? initial_gtk_theme = null;
 	public bool shows_app_menu {get; protected set; default = false;}
 	public bool shows_menu_bar {get; protected set; default = false;}
 	public bool client_side_decorations {get; protected set; default = false;}
@@ -92,11 +93,24 @@ public abstract class DesktopShell: GLib.Object
 	}
 	
 	/**
+	 * Get the initial GTK+ theme name.
+	 * 
+	 * @return The name of the initial GTK+ theme. May be an empty string but not null.
+	 */
+	public static unowned string get_initial_gtk_theme() {
+		if (initial_gtk_theme == null) {
+			initial_gtk_theme = Gtk.Settings.get_default().gtk_theme_name ?? "";
+		}
+		return initial_gtk_theme;
+	}
+	
+	/**
 	 * Set the current GTK+ theme name.
 	 * 
 	 * @param theme    The name of the GTK+ theme to set.
 	 */
 	public static void set_gtk_theme(string theme) {
+		get_initial_gtk_theme();  // remember initial GTK+ theme
 		Gtk.Settings.get_default().gtk_theme_name = theme;
 	}
 	
