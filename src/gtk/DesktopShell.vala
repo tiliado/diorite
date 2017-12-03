@@ -115,6 +115,13 @@ public abstract class DesktopShell: GLib.Object
 	}
 	
 	/**
+	 * Reset the initial GTK+ theme name.
+	 */
+	public static void reset_gtk_theme() {
+		Gtk.Settings.get_default().gtk_theme_name = get_initial_gtk_theme();
+	}
+	
+	/**
 	 * Returns the directory of a GTK+ theme.
 	 * 
 	 * @param theme    The name of GTK+ theme to look up.
