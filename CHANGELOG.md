@@ -7,6 +7,20 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.9.0 - December 17th, 2017
+-------------------------------
+
+  * New widget: Drtgtk.Entry - an enhanced version og Gtk.Entry.
+  * Fixed parsing of RPC notifications. Issue: tiliado/nuvolaruntime#385
+  * New widget: Drtgtk.HeaderBarTitle - a custom title widget for Gtk.HeaderBar.
+  * New utility function: System.cmdline_for_pid - Get command line of a process with given PID.
+  * Better debugging: Distinguish between socket creation errors. Issue: tiliado/nuvolaruntime#378
+  * New namespace: Drt.Dbus -  DBus introspection and service activation.
+  * New utility method: Drt.Flatpak.check_desktop_portal_available - to check whether a proper XDG Desktop Portal
+    DBus interface is present.
+  * New functionality: Functions to get, set and look up GTK+ 3 themes - see Drtgtk.DesktopShell.
+  * New widget: Drtgtk.GtkThemeSelector - a selector to list and change a GTK+ theme.
+  
 Release 4.8.0 - September 28th, 2017
 --------------------------------
 
