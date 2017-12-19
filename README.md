@@ -15,13 +15,12 @@ Dependencies
 ------------
 
   - Python 3 and the pyparsing module
-  - valac >= 0.36.3
+  - valac >= 0.38.4 (built with valadoc or pass --novaladoc)
   - glib-2.0 >= 2.52
   - gio-2.0 >= 2.52
   - gtk+-3.0 >= 3.22
   - sqlite >= 3.7
   - x11
-  - valadoc >= 0.36 (or pass --novaladoc)
   - g-ir-compiler
 
 
