@@ -48,7 +48,7 @@ public class Entry: Gtk.Entry {
 			escape();
 			return true;
 		}
-		return false;
+		return base.key_press_event(event);
 	}
 }
 
