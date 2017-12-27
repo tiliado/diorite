@@ -490,4 +490,14 @@ public void variant_unref(Variant? variant)
 		g_variant_unref(variant);
 }
 
+/**
+ * Print variant as string
+ * 
+ * @param variant    Variant to print.
+ * @return Printed value.
+ */
+public string print_variant(Variant? variant) {
+	return variant != null ? variant.print(true) : "null";
+}
+
 } // namespace Drt
