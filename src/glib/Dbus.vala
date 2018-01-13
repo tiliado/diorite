@@ -64,8 +64,20 @@ throws GLib.Error {
  */
 public async string introspect_xml(DBusConnection bus, string name, string path,
 Cancellable? cancellable = null) throws GLib.Error {
-	var introspectable = yield bus.get_proxy<XdgDbusIntrospectable>(name, path, 0, cancellable);
-	return yield introspectable.introspect();
+	var allowed_timeouts = 10;
+	while (true) {
+		try {
+			var introspectable = yield bus.get_proxy<XdgDbusIntrospectable>(name, path, 0, cancellable);
+			return yield introspectable.introspect();
+		} catch (GLib.IOError e) {
+			if (allowed_timeouts < 1 || !(e is GLib.IOError.TIMED_OUT)) {
+				throw e;
+			} else {
+				allowed_timeouts--;
+			}
+		}
+	}
+	assert_not_reached();
 }
 
 /**
