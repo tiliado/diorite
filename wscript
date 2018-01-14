@@ -37,6 +37,7 @@ MIN_GTK = "3.22.0"
 # Extras #
 #========#
 
+import os
 import sys
 assert sys.version_info >= (3, 4, 0), "Run waf with Python >= 3.4"
 
@@ -210,6 +211,11 @@ def build(ctx):
 	uselib_gtk = uselib + " GTK+ GDK X11 GDKX11"
 	vala_defines = ctx.env.VALA_DEFINES
 	
+	vapi_dirs = ['build', 'vapi']
+	env_vapi_dir = os.environ.get("VAPIDIR")
+	if env_vapi_dir:
+		vapi_dirs.extend(os.path.relpath(path) for path in env_vapi_dir.split(":"))
+	
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
@@ -219,7 +225,7 @@ def build(ctx):
 		uselib = uselib,
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGlib"'],
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 	)
 	if ctx.env.BUILD_GIR:
@@ -230,7 +236,7 @@ def build(ctx):
 		files = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		vala_defines = vala_defines,
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		force = True,
 		verbose=True
@@ -246,7 +252,7 @@ def build(ctx):
 		use = [DIORITE_GLIB],
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteGtk"'],
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		internal=True,
 		private=True,
@@ -260,7 +266,7 @@ def build(ctx):
 		use = [DIORITE_GLIB],
 		packages = packages_gtk,
 		vala_defines = vala_defines,
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		internal=True,
 		private=True,
@@ -278,7 +284,7 @@ def build(ctx):
 		use = [DIORITE_GLIB],
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteDB"'],
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 	)
 	if ctx.env.BUILD_GIR:
@@ -290,7 +296,7 @@ def build(ctx):
 		use = [DIORITE_GLIB],
 		packages = packages + " sqlite3",
 		vala_defines = vala_defines,
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		internal=True,
 		private=True,
@@ -307,7 +313,7 @@ def build(ctx):
 		use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB],
 		vala_defines = vala_defines,
 		cflags = ['-DG_LOG_DOMAIN="DioriteTests"'],
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		install_path = None,
 		install_binding = False
@@ -327,7 +333,7 @@ def build(ctx):
 		use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB, DIORITE_TESTS],
 		vala_defines = vala_defines,
 		defines = ['G_LOG_DOMAIN="DioriteTests"'],
-		vapi_dirs = ['vapi'],
+		vapi_dirs = vapi_dirs,
 		vala_target_glib = TARGET_GLIB,
 		install_path = None
 	)
