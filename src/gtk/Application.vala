@@ -95,30 +95,31 @@ public abstract class Application : Gtk.Application
 	/**
 	 * Try to show URI and show info bar warning on failure.
 	 */
-	public void show_uri(string uri, uint32 timestamp=Gdk.CURRENT_TIME)
-	{
+	public void show_uri(string uri, uint32 timestamp=Gdk.CURRENT_TIME) {
 		var app_window = active_window as ApplicationWindow;
-		if (app_window == null)
-		{
+		if (app_window == null) {
 			unowned List<weak Gtk.Window> windows = get_windows();
-			foreach (var window in windows)
-			{
-				if (window is ApplicationWindow)
-				{
+			foreach (var window in windows) {
+				if (window is ApplicationWindow) {
 					app_window = (ApplicationWindow) window;
 					break;
 				}
 			}
 		}
-		try
-		{
-			Gtk.show_uri_on_window(app_window, uri, timestamp);
-		}
-		catch (GLib.Error e)
-		{
+		try {
+			var reference_window = active_window;
+			var toplevels = Gtk.Window.list_toplevels();
+			foreach (var toplevel in toplevels) {
+				if (active_window == toplevel.get_transient_for()) {
+					/* Do not show XDG Desktop Portal web browser selector under a dialog. */
+					reference_window = toplevel;
+					break;
+				}
+			}
+			Gtk.show_uri_on_window(reference_window, uri, timestamp);
+		} catch (GLib.Error e) {
 			warning("Failed to show URI %s. %s", uri, e.message);			
-			if (app_window != null)
-			{
+			if (app_window != null) {
 				var info_bar = new Gtk.InfoBar();
 				info_bar.show_close_button = true;
 				info_bar.message_type = Gtk.MessageType.WARNING;
@@ -133,7 +134,6 @@ public abstract class Application : Gtk.Application
 				info_bar.show_all();
 				app_window.info_bars.add(info_bar);
 			}
-			
 		}
 	}
 	
