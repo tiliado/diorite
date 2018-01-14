@@ -14,7 +14,7 @@ for arg in sys.argv[1:]:
 		name, value = arg.split("=", 1)
 	except ValueError:
 		name, value = arg, None
-	if arg.startswith("!-"):
+	if arg.startswith(("!--", "---")):
 		waf.append(arg[1:])
 	elif name == "--libdir":
 		libdir = value
