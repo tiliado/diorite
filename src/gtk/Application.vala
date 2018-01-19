@@ -108,12 +108,14 @@ public abstract class Application : Gtk.Application
 		}
 		try {
 			var reference_window = active_window;
-			var toplevels = Gtk.Window.list_toplevels();
-			foreach (var toplevel in toplevels) {
-				if (active_window == toplevel.get_transient_for()) {
-					/* Do not show XDG Desktop Portal web browser selector under a dialog. */
-					reference_window = toplevel;
-					break;
+			if (reference_window != null) {
+				var toplevels = Gtk.Window.list_toplevels();
+				foreach (var toplevel in toplevels) {
+					if (toplevel.visible && active_window == toplevel.get_transient_for()) {
+						/* Do not show XDG Desktop Portal web browser selector under a dialog. */
+						reference_window = toplevel;
+						break;
+					}
 				}
 			}
 			Gtk.show_uri_on_window(reference_window, uri, timestamp);
