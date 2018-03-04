@@ -40,7 +40,7 @@ void main(string[] args){
 	theme_dir_label = new Gtk.Label(null);
 	grid.attach(theme_dir_label, 1, line, 1, 1);
 	
-	var selector = new Drtgtk.GtkThemeSelector();
+	var selector = new Drtgtk.GtkThemeSelector(true);
 	selector.changed.connect(on_theme_changed);
 	label = new Gtk.Label("Themes:");
 	grid.attach(label, 0, ++line, 1, 1);

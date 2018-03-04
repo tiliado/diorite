@@ -33,29 +33,40 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 	/**
 	 * Creates new GtkThemeSelector.
 	 */
-	public GtkThemeSelector() {
+	public GtkThemeSelector(bool select_current, string? select_theme=null) {
 		changed.connect(on_changed);
-		update.begin((o, res) => update.end(res));
+		update.begin(select_current, select_theme, (o, res) => update.end(res));
 	}
 	
 	~GtkThemeSelector() {
 		changed.disconnect(on_changed);
 	}
 	
-	private async void update() {
+	private async void update(bool select_current, string? select_theme) {
 		remove_all();
 		var themes = yield DesktopShell.list_gtk_themes();
 		var names = themes.get_keys();
 		names.sort(strcmp);
+		append("", "Default");
 		foreach (var name in names) {
 			append(name, name);
 		}
-		active_id = DesktopShell.get_gtk_theme();
+		if (select_theme != null) {
+			active_id = select_theme;
+		}
+		if (active_id == null) {
+			active_id = select_current ? DesktopShell.get_gtk_theme() : "";
+		}
+		if (active_id == null) {
+			active_id = "";
+		}
 	}
 	
 	private void on_changed() {
-		var theme_name = get_active_text();
-		if (theme_name != null) {
+		var theme_name = active_id;
+		if (theme_name == "") {
+			DesktopShell.reset_gtk_theme();
+		} else if (theme_name != null) {
 			DesktopShell.set_gtk_theme(theme_name);
 		}
 	}
