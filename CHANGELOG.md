@@ -7,6 +7,18 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.10.0 - March 4th, 2018
+--------------------------------
+
+* Increased requirements: Vala >= 0.38.4.
+* The VAPIDIR environment variable is supported to set extra Vala API directories.
+* GIR generation is now optional, you can pass `--no-gir` to disable it.
+* Fixed bug in Entry widget that prevented user input.
+* Fixed bug when XDG Desktop Portal web browser selector was shown under a dialog window instead of above it.
+* RequirementsParser supports 4 states: 
+* New utility functions: Drt.print_variant()
+* Added Drt.Event thread synchronization primitive.
+
 Release 4.9.0 - December 17th, 2017
 -------------------------------
 
