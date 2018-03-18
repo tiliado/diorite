@@ -80,7 +80,7 @@ namespace Drt.System
 	}
 	
 	public async void make_directory_with_parents_async(
-		File directory, int io_priority=Priority.DEFAULT, Cancellable? cancellable = null) throws GLib.Error
+		File directory, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable = null) throws GLib.Error
 	{
 		
 		Drt.Lst<File> dirs = new Drt.Lst<File>();
