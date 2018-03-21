@@ -35,10 +35,16 @@ public delegate void UriOpener(string uri);
  */
 public class RichTextView: Gtk.TextView
 {
-	[Description(nick = "Link opener", blurb = "Function to be used to open links.")]
-	public UriOpener? link_opener {get; owned set;}
-	[Description(nick = "Image opener", blurb = "Function to be used to open images.")]
-	public UriOpener? image_opener {get; owned set;}
+	private UriOpener? _link_opener = null;
+	public void set_link_opener(owned UriOpener? opener) {
+		_link_opener = (owned) opener;
+	}
+
+	private UriOpener? _image_opener {get; owned set;}
+	public void set_image_opener(owned UriOpener? opener) {
+		_image_opener = (owned) opener;
+	}
+	
 	private Gdk.Cursor? cursor = null;
 	
 	
@@ -60,8 +66,8 @@ public class RichTextView: Gtk.TextView
 	public RichTextView(RichTextBuffer? buffer=null)
 	{
 		Object(editable: false, wrap_mode: Gtk.WrapMode.WORD);
-		link_opener = default_opener;
-		image_opener = default_opener;
+		_link_opener = default_opener;
+		_image_opener = default_opener;
 		this.buffer = buffer ?? new RichTextBuffer();
 	}
 	
@@ -74,8 +80,8 @@ public class RichTextView: Gtk.TextView
 	public virtual signal void link_clicked(string uri)
 	{
 		debug("Open link: %s", uri);
-		if (link_opener != null)
-			link_opener(uri);
+		if (_link_opener != null)
+			_link_opener(uri);
 	}
 	
 	/**
@@ -87,8 +93,8 @@ public class RichTextView: Gtk.TextView
 	public virtual signal void image_clicked(string path)
 	{
 		debug("Open image: %s", path);
-		if (image_opener != null)
-			image_opener(path);
+		if (_image_opener != null)
+			_image_opener(path);
 	}
 	
 	public override void realize()
@@ -125,7 +131,7 @@ public class RichTextView: Gtk.TextView
 		}
 		
 		if (link_color != null)
-			doc_buffer.link_color = link_color;
+			doc_buffer.set_link_color(link_color);
 	}
 	
 	public override bool button_release_event(Gdk.EventButton event)

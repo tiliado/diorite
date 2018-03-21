@@ -112,22 +112,22 @@ public class RichTextBuffer: Gtk.TextBuffer
 	public const string IMAGE_PATH = "path";
 	
 	private Gdk.RGBA? _link_color = null;
-	[Description(nick = "Link color", blurb = "Foreground color for links.")]
-	public Gdk.RGBA? link_color
-	{
-		get
-		{
-			return _link_color;
-		}
-		set
-		{
-			_link_color = value;
-			if (_link_color != null)
-				tag_table.@foreach(find_link_and_set_color);
+	
+	public Gdk.RGBA? get_link_color()  {
+		return _link_color;
+	}
+	
+	public void set_link_color(Gdk.RGBA? color) {
+		_link_color = color;
+		if (_link_color != null) {
+			tag_table.@foreach(find_link_and_set_color);
 		}
 	}
-	[Description(nick = "Image locator", blurb = "Function to be used to retrieve path of image for given uri.")]
-	public ImageLocator? image_locator {get; owned set;}
+
+	private ImageLocator? _image_locator = null;
+	public void set_image_locator(owned ImageLocator? locator) {
+		_image_locator = (owned) locator;
+	}
 	
 	/* Input tags supported by parser */
 	private const string INPUT_TAG_HEADING1 = "h1";
@@ -207,7 +207,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 		tag_dd = create_tag(TEXT_TAG_DEFINITION, "left-margin", 50);
 		tag_ul = create_tag(TEXT_TAG_UNORDERED_LIST);
 		tag_li = create_tag(TEXT_TAG_LIST_ITEM, "left-margin", 13, "indent", -13);
-		image_locator = default_image_locator;
+		_image_locator = default_image_locator;
 	}
 	
 	/**
@@ -221,8 +221,8 @@ public class RichTextBuffer: Gtk.TextBuffer
 	 */
 	public virtual signal void image_requested(string uri, int width, int height)
 	{
-		if (image_locator != null)
-			insert_image_at_cursor(image_locator(uri), width, height);
+		if (_image_locator != null)
+			insert_image_at_cursor(_image_locator(uri), width, height);
 	}
 	
 	public string default_image_locator(string uri)
@@ -623,9 +623,9 @@ public class RichTextBuffer: Gtk.TextBuffer
 	{
 		var tag = new RichTextLink(uri);
 		tag_table.add(tag);
-		if (link_color != null)
+		if (_link_color != null)
 		{
-			tag.foreground_rgba = link_color;
+			tag.foreground_rgba = _link_color;
 		}
 		weak RichTextLink weak_tag = tag;
 		return weak_tag;
@@ -634,7 +634,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 	private void find_link_and_set_color(Gtk.TextTag tag)
 	{
 		if (tag is RichTextLink)
-			tag.foreground_rgba = link_color;
+			tag.foreground_rgba = _link_color;
 	}
 	
 	private Gdk.Pixbuf get_missing_image_pixbuf()

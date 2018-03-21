@@ -35,17 +35,14 @@ public class Storage: GLib.Object
 	public GLib.File user_data_dir {get; protected set;}
 	
 	protected File[] _data_dirs;
-	[Description(nick = "System data dirs", blurb = "Directories with system-wide data. Read-only access.")]
-	public GLib.File[] data_dirs
-	{
-		owned get
-		{
-			File[] dirs = {};
-			foreach (var dir in _data_dirs)
-				if (dir.query_file_type(0) == FileType.DIRECTORY)
-					dirs += dir;
-			return dirs;
+	public GLib.File[] data_dirs() {
+		File[] dirs = {};
+		foreach (var dir in _data_dirs) {
+			if (dir.query_file_type(0) == FileType.DIRECTORY) {
+				dirs += dir;
+			}
 		}
+		return dirs;
 	}
 	
 	[Description(nick = "User cache dir", blurb = "Directory used to store user-specific cached data. Read-write access may be available.")]
@@ -181,7 +178,7 @@ public class Storage: GLib.Object
 		File f = user_data_dir.get_child(name);
 		if (f.query_file_type(0) == FileType.REGULAR)
 			return f;
-		foreach (File dir in data_dirs)
+		foreach (File dir in data_dirs())
 		{
 			f = dir.get_child(name);
 			if (f.query_file_type(0) == FileType.REGULAR)
@@ -208,7 +205,7 @@ public class Storage: GLib.Object
 			return data_file;
 		
 		var paths = user_data_dir.get_path();
-		foreach (File dir in data_dirs)
+		foreach (File dir in data_dirs())
 			paths += ":" + dir.get_path();
 		error("Required data file '%s' not found in '%s'.", name, paths);
 	}

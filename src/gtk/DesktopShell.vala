@@ -150,7 +150,7 @@ public abstract class DesktopShell: GLib.Object
 	public static async HashTable<string, File> list_gtk_themes() {
 		var storage = new Drt.XdgStorage();
 		var theme_dirs = new HashTable<string, File>(str_hash, str_equal);
-		foreach (unowned File data_dir in storage.data_dirs) {
+		foreach (unowned File data_dir in storage.data_dirs()) {
 			var themes_dir = data_dir.get_child("themes");
 			try {
 				var enumerator = yield themes_dir.enumerate_children_async(
