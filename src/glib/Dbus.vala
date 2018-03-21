@@ -77,7 +77,6 @@ Cancellable? cancellable = null) throws GLib.Error {
 			}
 		}
 	}
-	assert_not_reached();
 }
 
 /**

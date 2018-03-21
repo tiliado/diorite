@@ -63,12 +63,8 @@ public class SocketChannel : Drt.DuplexChannel
 	
 	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError {
 		var name = "fd:%d".printf(socket.get_fd());
-		try {
-			var connection = SocketConnection.factory_create_connection(socket);
-			this(id, name, connection, timeout);
-		} catch (GLib.Error e) {
-			throw new IOError.CONN_FAILED("Failed to create socket channel from socket '%s'. %s", name, e.message);
-		}
+		var connection = SocketConnection.factory_create_connection(socket);
+		this(id, name, connection, timeout);
 	}
 	
 	~SocketChannel()
