@@ -85,7 +85,8 @@ public class OrmManager : GLib.Object
 		if (object_spec == null)
 			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
 		
-		Parameter[] parameters = {};
+		Value[] parameters = {};
+		string[] names = {};
 		foreach (var property in object_spec.properties)
 		{
 			var index = result.get_column_index(property.name);
@@ -95,9 +96,10 @@ public class OrmManager : GLib.Object
 			var value = result.fetch_value_of_type(index, property.value_type);
 			if (value == null)
 				value = GLib.Value(property.value_type);
-			parameters += GLib.Parameter(){name = property.name, value = value};
+			names += property.name;
+			parameters += value;
 		}
-		return (T) GLib.Object.newv(type, parameters);
+		return (T) GLib.Object.new_with_properties (type, names, parameters);
 	}
 	
 	/**
