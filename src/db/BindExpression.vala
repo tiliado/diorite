@@ -159,7 +159,7 @@ public class BindExpression
 				default:
 					throw new DatabaseError.DATA_TYPE("Unknown data type specifier: '%c'.", data[pos]);
 				}
-				values.prepend(val);
+				values.prepend((owned) val);
 			}
 		}
 		
