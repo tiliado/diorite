@@ -40,7 +40,7 @@ public class RichTextView: Gtk.TextView
 		_link_opener = (owned) opener;
 	}
 
-	private UriOpener? _image_opener {get; owned set;}
+	private UriOpener? _image_opener = null;
 	public void set_image_opener(owned UriOpener? opener) {
 		_image_opener = (owned) opener;
 	}
