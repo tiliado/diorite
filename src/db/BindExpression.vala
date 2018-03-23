@@ -122,32 +122,39 @@ public class BindExpression
 				if (pos >= len)
 					throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
 				offset = pos + 1;
-				Value? val = {};
+				Value? val = null;
 				switch (data[pos])
 				{
 				case 'v':
 					val = args.arg();
 					break;
 				case 'b':
-					val.init(typeof(bool)).set_boolean(args.arg());
+					val = GLib.Value(typeof(bool));
+					val.set_boolean(args.arg());
 					break;
 				case 'i':
-					val.init(typeof(int)).set_int(args.arg());
+					val = GLib.Value(typeof(int));
+					val.set_int(args.arg());
 					break;
 				case 'l':
-					val.init(typeof(int64)).set_int64(args.arg());
+					val = GLib.Value(typeof(int64));
+					val.set_int64(args.arg());
 					break;
 				case 'f':
-					val.init(typeof(double)).set_double(args.arg());
+					val = GLib.Value(typeof(double));
+					val.set_double(args.arg());
 					break;
 				case 's':
-					val.init(typeof(string)).set_string(args.arg());
+					val = GLib.Value(typeof(string));
+					val.set_string(args.arg());
 					break;
 				case 'B':
-					val.init(typeof(GLib.Bytes)).set_boxed(args.arg<GLib.Bytes>());
+					val = GLib.Value(typeof(GLib.Bytes));
+					val.set_boxed(args.arg<GLib.Bytes>());
 					break;
 				case 'A':
-					val.init(typeof(GLib.ByteArray)).set_boxed(args.arg<GLib.ByteArray>());
+					val = GLib.Value(typeof(GLib.ByteArray));
+					val.set_boxed(args.arg<GLib.ByteArray>());
 					break;
 				default:
 					throw new DatabaseError.DATA_TYPE("Unknown data type specifier: '%c'.", data[pos]);
