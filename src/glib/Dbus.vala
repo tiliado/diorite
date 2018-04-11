@@ -69,8 +69,9 @@ Cancellable? cancellable = null) throws GLib.Error {
 		try {
 			var introspectable = yield bus.get_proxy<XdgDbusIntrospectable>(name, path, 0, cancellable);
 			return yield introspectable.introspect();
-		} catch (GLib.IOError e) {
-			if (allowed_timeouts < 1 || !(e is GLib.IOError.TIMED_OUT)) {
+		} catch (GLib.Error e) {
+			// Catch also GLib.DBusError.TIMED_OUT. See tiliado/nuvolaruntime#419
+			if (allowed_timeouts < 1 || !(e is GLib.IOError.TIMED_OUT || e is GLib.DBusError.TIMED_OUT)) {
 				throw e;
 			} else {
 				allowed_timeouts--;
