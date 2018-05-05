@@ -296,6 +296,19 @@ public class JsonBuilder
 		set_member(member_name);
 		return add(new JsonValue.@string(string_value));
 	}
+
+	/**
+	 * Add a new string value member to an object.
+	 * 
+	 * @param member_name     the name of a member to add
+	 * @param string_value    the string value to add, or null to add null
+	 * @return this JsonBuilder object for easier chaining
+	 */
+	public unowned JsonBuilder set_string_or_null(string member_name, string? string_value)
+	{
+		set_member(member_name);
+		return add(string_value != null ? new JsonValue.@string(string_value) : new JsonValue.@null());
+	}
 	
 	/**
 	 * Add a new formatted string value member to an object.
