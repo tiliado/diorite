@@ -7,6 +7,17 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.11.0 - May 8th, 2018
+------------------------------
+
+* Fix "The name Priority' does not exist" Vala 0.40 error. Issue: tiliado/diorite#19
+* Fix "Type X can not be used for a GLib.Object property" Vala 0.40 warning. Issue: tiliado/diorite#20
+* Fix test case for Valac 0.40. Issue: tiliado/diorite#23
+* Add OverlayNotification.
+* Catch also GLib.DBusError.TIMED_OUT. Issue: tiliado/nuvolaruntime#419
+* Add JsonBuilder.set_string_or_null.
+
+
 Release 4.10.0 - March 4th, 2018
 --------------------------------
 
