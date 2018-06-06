@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - master
+        - circleci
+    docker:
+      - image: fedora:28
+    working_directory: ~/workdir
+    steps:
+      - checkout
+      - run: 
+          name: Install deps
+          command: |
+            dnf update -y
+            dnf install -y
+              gcc gobject-introspection-devel pkgconfig(python3) \
+              pkgconfig(gtk+-3.0) valac sqlite-devel python3-pyparsing valadoc
+            dnf clean
+      - run: 
+          name: Build
+          command: |
+            ./waf configure build install
+            /sbin/ldconfig
+            LD_LIBRARY_PATH=./build ./build/run-dioritetests
