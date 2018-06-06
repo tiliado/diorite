@@ -1,4 +1,4 @@
-Diorite Library 4.x
+Diorite Library 4.x [![CircleCI](https://circleci.com/gh/tiliado/diorite.svg?style=svg)](https://circleci.com/gh/tiliado/diorite)
 ===================
 
 ![Diorite stone](diorite.jpg)
