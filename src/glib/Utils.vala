@@ -97,4 +97,19 @@ public string[] list_to_strv(List<string> list)
 	return array;
 }
 
+/**
+ * Export date and time as an ISO 8601 string.
+ *
+ * @param datetime    Date time object to export
+ * @return Date and time as an ISO 8601 string,
+ */
+public static string datetime_to_iso_8601(DateTime datetime) {
+	string format = "%FT%T";
+	if (datetime.get_microsecond() > 0) {
+		format += ".%06d".printf(datetime.get_microsecond());
+	}
+	format += datetime.get_utc_offset() == 0 ? "Z" : "%z";
+	return datetime.format(format);
+}
+
 } // namespace Drt.Utils
