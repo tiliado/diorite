@@ -112,4 +112,8 @@ public static string datetime_to_iso_8601(DateTime datetime) {
 	return datetime.format(format);
 }
 
+public static string human_datetime(DateTime? datetime) {
+	return (datetime == null ? new DateTime.now_local() : datetime.to_local()).format("%x %X");
+}
+
 } // namespace Drt.Utils
