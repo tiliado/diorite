@@ -96,7 +96,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		
 		menu_button = new Gtk.MenuButton();
-		var image = new Gtk.Image.from_icon_name("emblem-system-symbolic",
+		var image = new Gtk.Image.from_icon_name("format-justify-fill-symbolic",
 			Gtk.IconSize.SMALL_TOOLBAR);
 		menu_button.image = image;
 		menu_button.valign = Gtk.Align.CENTER;
