@@ -137,7 +137,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		
 		var app_menu = app.shell.app_menu;
-		if (app_menu != null && (!app.shell.shows_app_menu || app.shell.shows_menu_bar))
+		if (app_menu != null)
 			menu.append_section(null, Actions.copy_menu_model(app_menu));
 		menu_button.menu_model = menu;
 		menu_button.visible = menu.get_n_items() > 0;
