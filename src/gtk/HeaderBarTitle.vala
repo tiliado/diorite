@@ -25,10 +25,36 @@
 namespace Drtgtk {
 
 public class HeaderBarTitle: Gtk.Grid {
-	private Gtk.Label? title_label = null;
-	private Gtk.Label? subtitle_label = null;
-	private Gtk.Widget? start_widget = null;
-	private Gtk.Widget? end_widget = null;
+	public Gtk.Label? title_label {get; private set; default = null;}
+	public Gtk.Label? subtitle_label {get; private set; default = null;}
+	public Gtk.Widget? start_widget {
+		get {return _start_widget;}
+		set {
+			if (_start_widget != null && _start_widget.get_parent() == this) {
+				remove(_start_widget);
+			}
+			_start_widget = value;
+			if (value != null) {
+				value.vexpand = true;
+				attach(value, 0, 0, 1, 2);
+			}
+		}
+	}
+	public Gtk.Widget? end_widget {
+		get {return _end_widget;}
+		set {
+			if (_end_widget != null && _end_widget.get_parent() == this) {
+				remove(_end_widget);
+			}
+			_end_widget = value;
+			if (value != null) {
+				value.vexpand = true;
+				attach(value, 2, 0, 1, 2);
+			}
+		}
+	}
+	private Gtk.Widget? _start_widget  = null;
+	private Gtk.Widget? _end_widget = null;
 	
 	public HeaderBarTitle(string? title=null, string? subtitle=null) {
 		set_title(title);
@@ -68,33 +94,12 @@ public class HeaderBarTitle: Gtk.Grid {
 			subtitle_label.vexpand = true;
 			subtitle_label.halign = Gtk.Align.CENTER;
 			subtitle_label.valign = Gtk.Align.CENTER;
+			subtitle_label.ellipsize = Pango.EllipsizeMode.END;
 			attach(subtitle_label, 1, 1, 1, 1);
 			subtitle_label.get_style_context().add_class("subtitle");
 			subtitle_label.show();
 		} else {
 			subtitle_label.label = subtitle;
-		}
-	}
-	
-	public void set_start_widget(Gtk.Widget? widget) {
-		if (start_widget != null && start_widget.get_parent() == this) {
-			remove(start_widget);
-		}
-		start_widget = widget;
-		if (widget != null) {
-			widget.vexpand = true;
-			attach(widget, 0, 0, 1, 2);
-		}
-	}
-	
-	public void set_end_widget(Gtk.Widget? widget) {
-		if (end_widget != null && end_widget.get_parent() == this) {
-			remove(end_widget);
-		}
-		end_widget = widget;
-		if (widget != null) {
-			widget.vexpand = true;
-			attach(widget, 2, 0, 1, 2);
 		}
 	}
 }
