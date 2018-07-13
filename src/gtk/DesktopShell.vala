@@ -34,7 +34,7 @@ public abstract class DesktopShell: GLib.Object
 	private static string? initial_gtk_theme = null;
 	public bool shows_app_menu {get; protected set; default = false;}
 	public bool shows_menu_bar {get; protected set; default = false;}
-	public bool client_side_decorations {get; protected set; default = false;}
+	public bool client_side_decorations {get; set; default = false;}
 	public GLib.MenuModel? app_menu {get{return _app_menu;}}
 	#if !FLATPAK
 	public string? wm_name {get; protected set; default = null;}
