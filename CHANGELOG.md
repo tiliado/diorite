@@ -7,6 +7,16 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.12.0 - July 21st, 2018
+--------------------------------
+
+* A continuous integration job was added to test builds with a Fedora image.
+* New utility functions were added: Utils.datetime_to_iso_8601 and Add Utils.human_datetime.
+* Following GNOME's [App Menu Migration proposal](https://wiki.gnome.org/Design/Whiteboards/AppMenuMigration),
+  ApplicationWindow uses a "hamburger" icon for menu button in the header bar and app menu button is always appended to
+  the hamburger menu.
+* DesktopShell.client_side_decorations is writeable to override auto detection. Issue: tiliado/nuvolaruntime#451
+
 Release 4.11.0 - May 8th, 2018
 ------------------------------
 
