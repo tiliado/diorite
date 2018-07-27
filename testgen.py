@@ -100,8 +100,8 @@ class Method(Node):
 			buf.append(", %s" % self.access)
 		if self.abstract:
 			buf.append(", abstract")
-		if self.async:
-			buf.append(", async")
+		if self.is_async:
+			buf.append(", is_async")
 		if self.override:
 			buf.append(", override")
 		if self.throws:
@@ -237,7 +237,7 @@ anotation = pp.Group(pp.Literal('[').suppress() + ident("name") + pp.Optional(pa
 anotations = pp.ZeroOrMore(anotation).setParseAction(parse_anotations)("anotations")
 access = pp.Optional(pp.Keyword("protected") | pp.Keyword("public") | pp.Keyword("private") | pp.Keyword("internal"))("access")
 abstract = pp.Optional(pp.Keyword("abstract"))("abstract")
-async = pp.Optional(pp.Keyword("async"))("async")
+is_async = pp.Optional(pp.Keyword("is_async"))("is_async")
 override = pp.Optional(pp.Keyword("override"))("override")
 throws = (pp.Optional(pp.Keyword("throws").suppress() + dot_ident + pp.ZeroOrMore(pp.Literal(',').suppress() + dot_ident)))("throws")
 arg = type_name + ident + pp.Optional(pp.Literal("=") + value)
