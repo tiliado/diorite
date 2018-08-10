@@ -397,7 +397,7 @@ public class Form : Gtk.Grid
 		if (label != null)
 		{
 			attach_next_to(label, null, Gtk.PositionType.BOTTOM, 1, 1);
-			label.margin_left = 8;
+			label.margin_start = 8;
 			label.margin_top = 5;
 			label.halign = Gtk.Align.START;
 			label.show();
@@ -407,8 +407,8 @@ public class Form : Gtk.Grid
 		{
 			attach_next_to(widget, null, Gtk.PositionType.BOTTOM, 2, 1);
 		}
-		widget.margin_left = 8;
-		widget.margin_right = 8;
+		widget.margin_start = 8;
+		widget.margin_end = 8;
 		widget.margin_top = 5;
 		widget.show();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2018 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -41,7 +41,7 @@ public class InfoBarStack: Gtk.Stack
 		left_button.valign = Gtk.Align.CENTER;
 		left_button.expand = false;
 		left_button.relief = Gtk.ReliefStyle.NONE;
-		left_button.margin_left = 6;
+		left_button.margin_start = 6;
 		left_button.no_show_all = true;
 		left_button.clicked.connect(() => {go_previous();});
 		var img = new Gtk.Image.from_icon_name("go-previous-symbolic", Gtk.IconSize.BUTTON);
@@ -52,7 +52,7 @@ public class InfoBarStack: Gtk.Stack
 		right_button.valign = Gtk.Align.CENTER;
 		right_button.expand = false;
 		right_button.relief = Gtk.ReliefStyle.NONE;
-		right_button.margin_left = 6;
+		right_button.margin_start = 6;
 		right_button.no_show_all = true;
 		right_button.clicked.connect(() => {go_next();});
 		img = new Gtk.Image.from_icon_name("go-next-symbolic", Gtk.IconSize.BUTTON);
