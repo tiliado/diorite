@@ -142,7 +142,7 @@ def options(ctx):
 	ctx.add_option('--flatpak', action='store_true', default=False, dest='flatpak', help="Enable Flatpak tweaks.")
 	ctx.add_option('--nodebug', action='store_false', default=True, dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
-	ctx.add_option('--no-gir', action='store_false', default=True, dest='build_gir', help="Don't build GIR.")
+	ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
 	
 def configure(ctx):
 	add_version_info(ctx)
@@ -219,7 +219,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
-		gir = "Drt-1.0",
+		gir = "Drt-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		uselib = uselib,
@@ -245,7 +245,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
-		gir = "Drtgtk-1.0",
+		gir = "Drtgtk-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/gtk/*.vala'),
 		packages = packages_gtk,
 		uselib = uselib_gtk,
@@ -277,7 +277,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_DB,
 		name = DIORITE_DB,
-		gir = "Drtdb-1.0",
+		gir = "Drtdb-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/db/*.vala'),
 		packages = packages + " sqlite3",
 		uselib = uselib + " SQLITE",
