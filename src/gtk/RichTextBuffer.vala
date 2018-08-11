@@ -637,12 +637,12 @@ public class RichTextBuffer: Gtk.TextBuffer
 			tag.foreground_rgba = _link_color;
 	}
 	
-	private Gdk.Pixbuf get_missing_image_pixbuf()
-	{
-		var widget = new Gtk.OffscreenWindow();
-		var pixbuf = widget.render_icon(Gtk.Stock.MISSING_IMAGE, Gtk.IconSize.DIALOG, null);
-		widget.destroy();
-		return pixbuf;
+	private Gdk.Pixbuf get_missing_image_pixbuf() {
+		try {
+			return Gtk.IconTheme.get_default().load_icon("image-missing", 64, 0);
+		} catch (GLib.Error e) {
+			Drt.fatal_error(e, "Failed to load missing image pixbuf.");
+		}
 	}
 	
 	/**
