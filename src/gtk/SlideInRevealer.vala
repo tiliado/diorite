@@ -56,7 +56,6 @@ public class SlideInRevealer: Gtk.Box
 		
 		var event_box =  new Gtk.EventBox();
 		event_box.visible_window = false;
-		event_box.override_background_color(Gtk.StateFlags.PRELIGHT, {1.0, 1.0, 1.0, 0.4});
 		event_box.button_press_event.connect(on_button_press_event);
 		event_box.enter_notify_event.connect(on_enter_notify_event);
 		event_box.leave_notify_event.connect(on_leave_notify_event);
