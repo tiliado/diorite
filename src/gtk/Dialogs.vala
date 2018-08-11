@@ -122,60 +122,6 @@ public class InfoDialog : Gtk.MessageDialog
 	}
 }
 
-/**
- * Simple Warning dialog with OK button and checkbox.
- */
-public class WarningDialog : Gtk.MessageDialog
-{
-	public bool show_again
-	{
-		get
-		{
-			return checkbutton == null || !checkbutton.active;
-		}
-	}
-	
-	private Gtk.CheckButton? checkbutton;
-	
-	/**
-	 * Constructs new error dialog.
-	 * 
-	 * @param title            Title of the warning (not title of the dialog)
-	 * @param message          Text of the warning
-	 * @param checkbox_label    Adds a checkbox with specified label
-	 */
-	public WarningDialog(string title, string message, string? checkbox_label=null)
-	{
-		Object(
-			title: "",
-			modal: true,
-			message_type: Gtk.MessageType.WARNING,
-			buttons: Gtk.ButtonsType.OK
-		);
-		this.text = title;
-		this.secondary_text = message;
-		
-		if (checkbox_label != null)
-		{
-			var action_area = get_action_area() as Gtk.ButtonBox;
-			checkbutton = new Gtk.CheckButton.with_label(checkbox_label);
-			action_area.pack_start(checkbutton, true, true, 10);
-			action_area.reorder_child(checkbutton, 0);
-			checkbutton.has_focus = false;
-			checkbutton.can_focus = false;
-			checkbutton.show();
-		}
-		else
-		{
-			checkbutton = null;
-		}
-	}
-	
-	public override void response(int id)
-	{
-		this.destroy();
-	}
-}
 
 
 /**
