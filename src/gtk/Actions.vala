@@ -89,8 +89,10 @@ public class Actions : GLib.Object
 		actions.set(action.name, action);
 		action.activated.connect(on_action_activated);
 		var keybinding = action.keybinding;
-		if (keybinding != null)
-			app.add_accelerator(keybinding, action.scope + "." + action.name, null);
+		if (keybinding != null) {
+			app.set_accels_for_action(
+				GLib.Action.print_detailed_name(action.scope + "." + action.name, null), {keybinding});
+		}
 		action.notify.connect_after(on_action_changed);
 		if (action.scope == Action.SCOPE_APP)
 			action.add_to_map(app);
@@ -370,7 +372,7 @@ public class Actions : GLib.Object
 			var found = Gtk.AccelMap.lookup_entry(accel_name, null);
 			if (!found && keybinding != null)
 			{
-				app.add_accelerator(keybinding, full_name, null);
+				app.set_accels_for_action(GLib.Action.print_detailed_name(full_name, null), {keybinding});
 			}
 			else if (found)
 			{
