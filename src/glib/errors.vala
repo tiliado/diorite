@@ -159,7 +159,7 @@ public void critical_error_f(GLib.Error e, string format, ...) {
 
 
 [NoReturn]
-public void error_fatal(GLib.Error e, string? text=null) {
+public void fatal_error(GLib.Error e, string? text=null) {
 	unowned string empty = "";
 	error("%s%s%s", text ?? empty, text == null ? empty : " ", error_to_string(e));
 }
@@ -167,8 +167,8 @@ public void error_fatal(GLib.Error e, string? text=null) {
 
 [NoReturn]
 [PrintfFormat]
-public void error_fatalf(GLib.Error e, string format, ...) {
-	error_fatal(e, format.vprintf(va_list()));
+public void fatal_error_f(GLib.Error e, string format, ...) {
+	fatal_error(e, format.vprintf(va_list()));
 }
 
 } // namespace Drt
