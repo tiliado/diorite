@@ -143,6 +143,7 @@ def options(ctx):
 	ctx.add_option('--nodebug', action='store_false', default=True, dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
 	ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
+	ctx.add_option('--no-strict', action='store_false', default=True, dest='strict', help="Disable strict checks (e.g. fatal warnings).")
 	
 def configure(ctx):
 	add_version_info(ctx)
@@ -154,7 +155,9 @@ def configure(ctx):
 		ctx.msg("Upstream revision", "unknown", color="RED")
 	ctx.msg('Install prefix', ctx.options.prefix, color="GREEN")
 	
-	ctx.env.append_unique("VALAFLAGS", "-v")
+	ctx.env.append_unique("VALAFLAGS", ["-v"])
+	if ctx.options.strict:
+		ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
 	ctx.env.FLATPAK = ctx.options.flatpak
 	if ctx.env.FLATPAK:
