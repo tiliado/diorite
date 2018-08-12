@@ -72,7 +72,7 @@ public class StackMenuButton : Gtk.MenuButton
 		text_attrs.change(Pango.attr_weight_new(Pango.Weight.BOLD));
 		label.set_attributes(text_attrs);
 		
-		var arrow = new Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.NONE);
+		var arrow = new Gtk.Image.from_icon_name("go-down-symbolic", Gtk.IconSize.BUTTON);
 		arrow.margin = 2;
 		arrow.show();
 		
