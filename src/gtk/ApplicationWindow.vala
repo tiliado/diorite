@@ -83,8 +83,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		
 		menu_button = new Gtk.MenuButton();
-		var image = new Gtk.Image.from_icon_name("format-justify-fill-symbolic",
-			Gtk.IconSize.SMALL_TOOLBAR);
+		var image = new Gtk.Image.from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON);
 		menu_button.image = image;
 		menu_button.valign = Gtk.Align.CENTER;
 		menu_button.vexpand = false;
