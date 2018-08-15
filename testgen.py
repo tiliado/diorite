@@ -243,7 +243,7 @@ throws = (pp.Optional(pp.Keyword("throws").suppress() + dot_ident + pp.ZeroOrMor
 arg = type_name + ident + pp.Optional(pp.Literal("=") + value)
 args = arg + pp.ZeroOrMore(pp.Literal(',') + arg)
 args_in_parens = pp.Group(pp.Literal('(') + pp.Optional(args) + pp.Literal(')'))
-method = (anotations + access + override + async + type_name()("rtype") + ident()("name") + args_in_parens + throws + pp.Literal(';').suppress()).setParseAction(parse_method)
+method = (anotations + access + override + is_async + type_name()("rtype") + ident()("name") + args_in_parens + throws + pp.Literal(';').suppress()).setParseAction(parse_method)
 member = pp.Group(access + type_name + ident + pp.Literal(';'));
 constructor = (access + dot_ident()("name") + args_in_parens + throws + pp.Literal(';')).setParseAction(parse_constructor)
 klass_body = pp.ZeroOrMore(constructor | method | member)
