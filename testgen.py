@@ -3,14 +3,14 @@
 # Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met: 
-# 
+# modification, are permitted provided that the following conditions are met:
+#
 # 1. Redistributions of source code must retain the above copyright notice, this
-#    list of conditions and the following disclaimer. 
+#    list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution. 
-# 
+#    and/or other materials provided with the distribution.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,7 +38,7 @@ class Namespace(Node):
 		super().__init__()
 		self.name = name
 		self.members = members
-	
+
 	def __repr__(self):
 		buf = ["<Namespace %s" % self.name]
 		if self.members:
@@ -59,7 +59,7 @@ class Class(Node):
 		self.abstract = abstract
 		self.constructors = constructors
 		self.methods = methods
-	
+
 	def __repr__(self):
 		buf = ["<Class %s" % self.name]
 		if self.parent:
@@ -81,7 +81,7 @@ class Class(Node):
 
 
 class Method(Node):
-	def __init__(self, name, access, parent=None, rtype=None, params=None, throws=None, override=False, abstract=False, anotations=None, async=False):
+	def __init__(self, name, access, parent=None, rtype=None, params=None, throws=None, override=False, abstract=False, anotations=None, is_async=False):
 		super().__init__()
 		self.name = name
 		self.access = access
@@ -92,7 +92,7 @@ class Method(Node):
 		self.override = override
 		self.abstract = abstract
 		self.anotations = anotations
-		self.async = async
+		self.is_async = is_async
 
 	def __repr__(self):
 		buf = ["<Method %s -> %s" % (self.name, self.rtype)]
@@ -100,8 +100,8 @@ class Method(Node):
 			buf.append(", %s" % self.access)
 		if self.abstract:
 			buf.append(", abstract")
-		if self.async:
-			buf.append(", async")
+		if self.is_async:
+			buf.append(", sync")
 		if self.override:
 			buf.append(", override")
 		if self.throws:
@@ -123,7 +123,7 @@ class Constructor(Node):
 		self.params = params
 		self.throws = throws
 		self.anotations = anotations
-	
+
 	def __repr__(self):
 		buf = ["<Constructor %s" % self.name]
 		if self.access:
@@ -137,16 +137,16 @@ class Constructor(Node):
 		buf.append("\n>")
 		return "".join(buf)
 
-		
+
 def tokenMap(func, *args):
 	def pa(s,l,t):
-		return [func(tokn, *args) for tokn in t] 
-	try: 
+		return [func(tokn, *args) for tokn in t]
+	try:
 		func_name = getattr(func, '__name__', getattr(func, '__class__').__name__)
-	except Exception: 
-		func_name = str(func) 
-	pa.__name__ = func_name 
-	return pa 
+	except Exception:
+		func_name = str(func)
+	pa.__name__ = func_name
+	return pa
 
 
 def indent(x):
@@ -200,30 +200,30 @@ def parse_constructor(toks):
 		anotations = toks.anotations,
 		throws = list(toks.throws) if toks.throws else [])
 
-		
+
 def parse_method(toks):
 	return Method(
 		name = toks.name,
 		access = toks.access,
 		override = bool(toks.override),
 		abstract = bool(toks.abstract),
-		async = bool(toks.async),
+		is_async = bool(toks.is_async),
 		rtype = toks.rtype,
 		anotations = toks.anotations,
 		throws = list(toks.throws) if toks.throws else [])
-	
-	
+
+
 def parse_namespace(toks):
 	return Namespace(toks.name, toks.members)
 
 
 # VAPI Parser Grammar
-ident = pp.Word(pp.alphas + '_', pp.alphanums + '_').setName("ident") 
+ident = pp.Word(pp.alphas + '_', pp.alphanums + '_').setName("ident")
 dot_ident = pp.Combine(ident + pp.ZeroOrMore(pp.Literal(".") + ident))
 integer = pp.Regex(r'[+-]?\d+').setName("integer").setParseAction(tokenMap(int))
 real = pp.Regex(r'[+-]?\d+\.\d*').setName("real").setParseAction(tokenMap(float))
 sci_real = pp.Regex(r'[+-]?\d+([eE][+-]?\d+|\.\d*([eE][+-]?\d+)?)').setName("scireal").setParseAction(tokenMap(float))
-number = (sci_real | real | integer).streamline() 
+number = (sci_real | real | integer).streamline()
 string = pp.QuotedString("\"", "\\")
 null = pp.Literal("null").setParseAction(lambda toks: None)
 true = pp.Literal("true").setParseAction(lambda toks: True)
@@ -237,20 +237,20 @@ anotation = pp.Group(pp.Literal('[').suppress() + ident("name") + pp.Optional(pa
 anotations = pp.ZeroOrMore(anotation).setParseAction(parse_anotations)("anotations")
 access = pp.Optional(pp.Keyword("protected") | pp.Keyword("public") | pp.Keyword("private") | pp.Keyword("internal"))("access")
 abstract = pp.Optional(pp.Keyword("abstract"))("abstract")
-async = pp.Optional(pp.Keyword("async"))("async")
+is_async = pp.Optional(pp.Keyword("async"))("async")
 override = pp.Optional(pp.Keyword("override"))("override")
 throws = (pp.Optional(pp.Keyword("throws").suppress() + dot_ident + pp.ZeroOrMore(pp.Literal(',').suppress() + dot_ident)))("throws")
 arg = type_name + ident + pp.Optional(pp.Literal("=") + value)
 args = arg + pp.ZeroOrMore(pp.Literal(',') + arg)
 args_in_parens = pp.Group(pp.Literal('(') + pp.Optional(args) + pp.Literal(')'))
-method = (anotations + access + override + async + type_name()("rtype") + ident()("name") + args_in_parens + throws + pp.Literal(';').suppress()).setParseAction(parse_method)
+method = (anotations + access + override + is_async + type_name()("rtype") + ident()("name") + args_in_parens + throws + pp.Literal(';').suppress()).setParseAction(parse_method)
 member = pp.Group(access + type_name + ident + pp.Literal(';'));
 constructor = (access + dot_ident()("name") + args_in_parens + throws + pp.Literal(';')).setParseAction(parse_constructor)
 klass_body = pp.ZeroOrMore(constructor | method | member)
 klass = (anotations + access + abstract + pp.Keyword("class") \
  + type_name()("name") + pp.Optional(pp.Literal(":").suppress() + type_name)("parent") \
  + pp.Group(pp.Literal('{').suppress() + klass_body + pp.Literal('}').suppress())("body")).setParseAction(parse_class)
-namespace_elements = klass 
+namespace_elements = klass
 namespace = (pp.Keyword("namespace").suppress() + dot_ident.copy()("name") + pp.Literal('{').suppress() + pp.Group(pp.ZeroOrMore(namespace_elements))("members") + pp.Literal('}').suppress()).setParseAction(parse_namespace)
 toplevel = pp.OneOrMore(namespace | klass).ignore(pp.cppStyleComment)
 
@@ -266,7 +266,7 @@ class TestParser:
 		self.namespaces = []
 		self.class_names = set()
 		self.children = []
-	
+
 	def parse(self, data):
 		result = toplevel.parseString(data, parseAll=True)
 		self.toplevel_ns = Namespace(None, result)
@@ -274,7 +274,7 @@ class TestParser:
 		self.walk_namespace(self.toplevel_ns)
 		self.resolve_parents()
 		return self.toplevel_ns
-	
+
 	def walk_namespace(self, ns):
 		self.namespaces.append(self.ns)
 		if self.ns and ns.name:
@@ -327,9 +327,9 @@ class TestParser:
 				methods_found = set()
 				base_path = "/" + klass.name.replace(".", "/") + "/"
 				for method in self.find_test_methods(klass, methods_found):
-					path = base_path + method.name					
-					yield (path, klass.name, method.name, method.async, method.throws)
-	
+					path = base_path + method.name
+					yield (path, klass.name, method.name, method.is_async, method.throws)
+
 	def find_test_methods(self, klass, methods_found):
 		for method in klass.methods:
 			name = method.name
@@ -353,7 +353,7 @@ class TestParser:
 			pass
 		else:
 			yield from self.find_test_methods(parent, methods_found)
-					
+
 
 class TestGenerator:
 	def __init__(self, parser, prefix="diorite_testgen_"):
@@ -361,18 +361,18 @@ class TestGenerator:
 		if prefix and prefix[-1] != "_":
 			prefix += "_"
 		self.prefix = prefix or ""
-	
+
 	def generate_tests(self, data):
 		buf = ['/* Generated by Diorite Testgen */\n/* Included code blocks are in public domain */\n\n']
 		self.parser.parse(data)
 		run_funcs = []
-		for path, klass, method, async, throws in self.parser.find_tests():
+		for path, klass, method, is_async, throws in self.parser.find_tests():
 			run_func = self.prefix + "run" + path.replace("/", "_")
 			run_funcs.append((path, run_func))
 			buf.append('void %s()\n{\n' % run_func)
 			buf.append('\tvar test = new %s();\n' % klass)
 			buf.append('\ttest.set_up();\n')
-			if async:
+			if is_async:
 				buf.append('\tvar loop = new MainLoop();\n')
 				buf.append('\ttest.%s.begin((o, res) =>\n' % method)
 				buf.append('\t{\n')
@@ -399,7 +399,7 @@ class TestGenerator:
 			buf.append('\tGLib.Test.add_func("%s", %s);\n' % (path, run_func))
 		buf.append('\treturn Test.run();\n}\n')
 		return "".join(buf)
-	
+
 
 if __name__ == "__main__":
 	import argparse
@@ -407,7 +407,7 @@ if __name__ == "__main__":
 	parser.add_argument("-i", "--input", type=argparse.FileType('r'), help="source files to extract test cases from")
 	parser.add_argument("-o", "--output", type=argparse.FileType('w'), help="where to write generated test runner")
 	args = parser.parse_args()
-	
+
 	input = args.input or sys.stdin
 	output = args.output or sys.stdout
 	generator = TestGenerator(TestParser())
