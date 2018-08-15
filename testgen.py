@@ -81,7 +81,7 @@ class Class(Node):
 
 
 class Method(Node):
-	def __init__(self, name, access, parent=None, rtype=None, params=None, throws=None, override=False, abstract=False, anotations=None, async=False):
+	def __init__(self, name, access, parent=None, rtype=None, params=None, throws=None, override=False, abstract=False, anotations=None, is_async=False):
 		super().__init__()
 		self.name = name
 		self.access = access
@@ -92,7 +92,7 @@ class Method(Node):
 		self.override = override
 		self.abstract = abstract
 		self.anotations = anotations
-		self.async = async
+		self.is_async = is_async
 
 	def __repr__(self):
 		buf = ["<Method %s -> %s" % (self.name, self.rtype)]
@@ -207,7 +207,7 @@ def parse_method(toks):
 		access = toks.access,
 		override = bool(toks.override),
 		abstract = bool(toks.abstract),
-		async = bool(toks.async),
+		is_async = bool(toks.is_async),
 		rtype = toks.rtype,
 		anotations = toks.anotations,
 		throws = list(toks.throws) if toks.throws else [])
@@ -328,7 +328,7 @@ class TestParser:
 				base_path = "/" + klass.name.replace(".", "/") + "/"
 				for method in self.find_test_methods(klass, methods_found):
 					path = base_path + method.name
-					yield (path, klass.name, method.name, method.async, method.throws)
+					yield (path, klass.name, method.name, method.is_async, method.throws)
 
 	def find_test_methods(self, klass, methods_found):
 		for method in klass.methods:
