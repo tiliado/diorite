@@ -31,7 +31,7 @@ namespace Drtgtk
 public class SlideInRevealer: Gtk.Box
 {
 	public Gtk.Revealer revealer {get; construct;}
-	public Gtk.Arrow arrow {get; private set;}
+	public Gtk.Image arrow {get; private set;}
 	public Gtk.Widget button {get; private set;}
 	
 	public SlideInRevealer(Gtk.Revealer? revealer=null)
@@ -46,17 +46,14 @@ public class SlideInRevealer: Gtk.Box
 	
 	construct
 	{
-		arrow = new Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.NONE);
-		arrow.set_padding(0, 0);
+		arrow = new Gtk.Image.from_icon_name("go-down-symbolic", Gtk.IconSize.BUTTON);
 		arrow.margin = 0;
 		arrow.opacity = 0.7;
-		arrow.set_size_request(18, 18);
 		arrow.hexpand = true;
 		arrow.halign = arrow.valign = Gtk.Align.CENTER;
 		
 		var event_box =  new Gtk.EventBox();
 		event_box.visible_window = false;
-		event_box.override_background_color(Gtk.StateFlags.PRELIGHT, {1.0, 1.0, 1.0, 0.4});
 		event_box.button_press_event.connect(on_button_press_event);
 		event_box.enter_notify_event.connect(on_enter_notify_event);
 		event_box.leave_notify_event.connect(on_leave_notify_event);
@@ -101,7 +98,7 @@ public class SlideInRevealer: Gtk.Box
 	
 	private void on_reveal_child_changed(GLib.Object o, ParamSpec p)
 	{
-		arrow.arrow_type = revealer.reveal_child ? Gtk.ArrowType.UP : Gtk.ArrowType.DOWN;
+		arrow.set_from_icon_name(revealer.reveal_child ? "go-up-symbolic" : "go-down-symbolic", Gtk.IconSize.BUTTON);
 	}
 	
 	private bool on_enter_notify_event(Gdk.EventCrossing event)

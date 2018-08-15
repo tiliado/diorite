@@ -30,9 +30,9 @@ out = 'build'
 APPNAME = "diorite"
 VERSION = "4.12.0"
 
-MIN_VALA = "0.38.4"
-MIN_GLIB = "2.52.0"
-MIN_GTK = "3.22.0"
+MIN_VALA = "0.40.8"
+MIN_GLIB = "2.56.1"
+MIN_GTK = "3.22.30"
 
 # Extras #
 #========#
@@ -142,7 +142,8 @@ def options(ctx):
 	ctx.add_option('--flatpak', action='store_true', default=False, dest='flatpak', help="Enable Flatpak tweaks.")
 	ctx.add_option('--nodebug', action='store_false', default=True, dest='debug', help="Turn off debugging symbols")
 	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
-	ctx.add_option('--no-gir', action='store_false', default=True, dest='build_gir', help="Don't build GIR.")
+	ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
+	ctx.add_option('--no-strict', action='store_false', default=True, dest='strict', help="Disable strict checks (e.g. fatal warnings).")
 	
 def configure(ctx):
 	add_version_info(ctx)
@@ -154,7 +155,9 @@ def configure(ctx):
 		ctx.msg("Upstream revision", "unknown", color="RED")
 	ctx.msg('Install prefix', ctx.options.prefix, color="GREEN")
 	
-	ctx.env.append_unique("VALAFLAGS", "-v")
+	ctx.env.append_unique("VALAFLAGS", ["-v"])
+	if ctx.options.strict:
+		ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
 	ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
 	ctx.env.FLATPAK = ctx.options.flatpak
 	if ctx.env.FLATPAK:
@@ -219,7 +222,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
-		gir = "Drt-1.0",
+		gir = "Drt-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/glib/*.vala') + ctx.path.ant_glob('src/glib/*.vapi'),
 		packages = packages,
 		uselib = uselib,
@@ -245,7 +248,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
-		gir = "Drtgtk-1.0",
+		gir = "Drtgtk-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/gtk/*.vala'),
 		packages = packages_gtk,
 		uselib = uselib_gtk,
@@ -277,7 +280,7 @@ def build(ctx):
 	ctx(features = "c cshlib",
 		target = DIORITE_DB,
 		name = DIORITE_DB,
-		gir = "Drtdb-1.0",
+		gir = "Drtdb-1.0" if ctx.env.BUILD_GIR else None,
 		source = ctx.path.ant_glob('src/db/*.vala'),
 		packages = packages + " sqlite3",
 		uselib = uselib + " SQLITE",

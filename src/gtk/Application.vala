@@ -147,9 +147,9 @@ public abstract class Application : Gtk.Application
 		Posix.sigaction_t sig_action = {};
 		sig_action.sa_sigaction = terminate_handler;
 		sig_action.sa_flags |= Posix.SA_SIGINFO;
-		Posix.sigaction(Posix.SIGTERM, sig_action, null);
-		Posix.sigaction(Posix.SIGTERM, sig_action, null);
-		Posix.sigaction(Posix.SIGHUP, sig_action, null);
+		Posix.sigaction(Posix.Signal.TERM, sig_action, null);
+		Posix.sigaction(Posix.Signal.TERM, sig_action, null);
+		Posix.sigaction(Posix.Signal.HUP, sig_action, null);
 		Bus.watch_name(BusType.SESSION, XFCE_SESSION_SERVICE_NAME,
 		BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
 		base.startup();
@@ -226,7 +226,7 @@ public abstract class Application : Gtk.Application
 	private static void terminate_handler(int sig_num, Posix.siginfo_t info, void* data) {
 		var sig_pid = (int) info.si_pid;
 		var cmdline = System.cmdline_for_pid(sig_pid);
-		if (sig_num == Posix.SIGTERM && sig_pid == Posix.getpid()) {
+		if (sig_num == Posix.Signal.TERM && sig_pid == Posix.getpid()) {
 			warning("Ignoring signal %d from PID %d (%s).", sig_num, sig_pid, cmdline);
 		} else {
 			debug("Caught signal %d from PID %d (%s), exiting ...", sig_num, sig_pid, cmdline);
