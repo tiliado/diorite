@@ -320,4 +320,52 @@ public int sigall(int[] pids, int signum)
 	return 0;
 }
 
+
+private static uint8[] cached_machine_id;
+
+
+/**
+ * Try to get machine id hash.
+ * 
+ * Why not to return the id directly? "It should be considered confidential, and must not be exposed in untrusted
+ * environments, in particular on the network. If a stable unique identifier that is tied to the machine is needed
+ * for some application, the machine ID or any part of it must not be used directly. Instead the machine ID should
+ * be hashed with a cryptographic, keyed hash function, using a fixed, application-specific key."
+ * [[https://www.freedesktop.org/software/systemd/man/machine-id.html|Source]].
+ * 
+ * @param app_key     The application-specific key.
+ * @param checksum    Checksum type.
+ * @return the hash of machine id on success, `null` on failure.
+ */
+public async string? get_machine_id_hash(uint8[] app_key, GLib.ChecksumType checksum) {
+	if (cached_machine_id == null) {
+	    uint8[] id;
+	    try {
+	        yield File.new_for_path("/etc/machine-id").load_contents_async(null, out id, null);
+	    } catch (GLib.Error e1) {
+	        try {
+	            yield File.new_for_path("/var/lib/dbus/machine-id").load_contents_async(null, out id, null);
+	        } catch (GLib.Error e2) {
+	            Drt.warn_error(e1, "Failed to get machine id.");
+	            Drt.warn_error(e2, "Failed to get machine id.");
+	            return null;
+	        }
+	    }
+	    if (id == null) {
+	        warning("Null machine id.");
+	        return null;
+	    }
+	    string id_string = ((string) id).strip();
+	    if (id_string.length < 32) {
+	        warning("Too short machine id (%d characters).", id_string.length);
+	        return null;
+	    }
+	    if (!hex_to_bin(id_string, out cached_machine_id)) {
+			warning("Machine id is not a valid hexadecimal string.");
+			cached_machine_id = id_string.data;
+		}
+	}
+    return GLib.Hmac.compute_for_data(checksum, app_key, cached_machine_id);
+}
+
 } // namespace Drt.System
