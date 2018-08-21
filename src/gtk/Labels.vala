@@ -27,10 +27,10 @@ using Drt;
 namespace Drtgtk.Labels
 {
 
-public Gtk.Label plain(string? label, bool wrap=false)
+public Gtk.Label plain(string? label, bool wrap=false, bool use_markup=false)
 {
 	return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
-		label: label, wrap: wrap, vexpand: false, hexpand: true,
+		label: label, wrap: wrap, vexpand: false, hexpand: true, use_markup: use_markup,
 		halign: Gtk.Align.START, yalign: 0.0f, xalign: 0.0f);
 }
 
