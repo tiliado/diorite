@@ -43,6 +43,16 @@ public inline bool is_empty(string? str) {
 public inline string? null_if_empty(owned string? str) {
 	return (str == null || ((uint8[]) str)[0] == 0) ? null : str;
 }
+
+/**
+ * Return the first string if it is not empty, otherwise return the second one.
+ *
+ * @param may_be_empty    The first string.
+ * @param fallback        The second string.
+ * @return The first string if it is not empty, otherwise return the second one.
+ */
+public unowned string not_empty_or(string? may_be_empty, string fallback) {
+	return is_empty(may_be_empty) ? fallback : may_be_empty;
 }
 
 /**
