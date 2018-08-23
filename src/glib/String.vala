@@ -30,9 +30,8 @@ namespace Drt.String
  * @param str    string to test
  * @return true if string is empty, false otherwise
  */
-public inline bool is_empty(string? str)
-{
-	return str == null || str[0] == '\0';
+public inline bool is_empty(string? str) {
+	return str == null || ((uint8[]) str)[0] == 0;
 }
 
 /**
@@ -41,9 +40,9 @@ public inline bool is_empty(string? str)
  * @param str    original string
  * @return original string if it isn't empty, null otherwise
  */
-public inline string? null_if_empty(string? str)
-{
-	return (str == null || str[0] == '\0') ? null : str;
+public inline string? null_if_empty(owned string? str) {
+	return (str == null || ((uint8[]) str)[0] == 0) ? null : str;
+}
 }
 
 /**
