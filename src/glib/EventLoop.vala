@@ -35,6 +35,16 @@ public async void resume_later()
 }
 
 /**
+ * Sleep asynchronously.
+ *
+ * @param interval_ms    Milliseconds to sleep.
+ */
+public async void sleep(uint interval_ms) {
+	add_timeout_ms(interval_ms, sleep.callback);
+	yield;
+}
+
+/**
  * Attach an idle callback to the thread-default {@link GLib.MainContext}.
  * 
  * Similar to {@link GLib.Idle.add} but uses the thread-default {@link GLib.MainContext} instead of the global
