@@ -267,7 +267,6 @@ public class RpcRouter: GLib.Object {
 			token = {};
 		}
 		if (notification) {
-			variant_ref(parameters);  // FIXME: Why is this necessary?
 			string? detail = null;
 			Variant data = null;
 			RpcNotification.get_detail_and_params(parameters, out detail, out data);
