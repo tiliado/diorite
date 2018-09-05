@@ -73,7 +73,7 @@ public void bin_to_hex(uint8[] array, out string result, char separator='\0') {
     var size = separator == '\0' ? 2 * array.length : 3 * array.length - 1;
     var buffer = new StringBuilder.sized(size);
     bin_to_hex_buf(array, buffer, separator);
-    result = buffer.str;
+    result = (owned) buffer.str;
 }
 
 
@@ -86,7 +86,7 @@ public void bin_to_hex(uint8[] array, out string result, char separator='\0') {
  * @param separator    The separator of hexadecimal pairs ('\0' for none).
  */
 public void bin_to_hex_buf(uint8[] array, StringBuilder buffer, char separator='\0') {
-    string hex_chars = "0123456789abcdef";
+    unowned string hex_chars = "0123456789abcdef";
     for (var i = 0; i < array.length; i++) {
         if (i > 0 && separator != '\0') {
             buffer.append_c(separator);
