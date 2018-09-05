@@ -52,7 +52,7 @@ public bool bin_to_int64(uint8[] array, out int64 result) {
     result = 0;
     if (array.length > sizeof(int64)) {
         return false;
-	}
+    }
     for (int i = 0; i < array.length; i++) {
         result <<= 8;
         result |= (int64) (array[i] & 0xFF);
