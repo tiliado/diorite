@@ -292,7 +292,7 @@ public class RpcRouter: GLib.Object {
 			if ((method.flags & RpcFlags.SUBSCRIBE) != 0 && !("s" in flags)) {
 				throw new ApiError.SUBSCRIBE_FLAG("Message doesn't have subscribe flag set: '%s'", name);
 			}
-			if (!always_secure && (method.flags & RpcFlags.PRIVATE) != 0 && !uint8v_equal(this.token, token)) {
+			if (!always_secure && (method.flags & RpcFlags.PRIVATE) != 0 && !Blobs.blob_equal(this.token, token)) {
 				throw new ApiError.API_TOKEN_REQUIRED("Message doesn't have a valid token: '%s'", name);
 			}
 			method.run(conn, id, parameters);

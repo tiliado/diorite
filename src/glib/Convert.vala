@@ -95,15 +95,6 @@ public void bin_to_hex_buf(uint8[] array, StringBuilder buffer, char separator='
     }
 }
 
-public bool uint8v_equal(uint8[] array1, uint8[] array2)
-{
-	if (array1.length != array2.length)
-		return false;
-	for (var i = 0; i < array1.length; i++)
-		if (array1[i] != array2[i])
-			return false;
-	return true;
-}
 
 /**
  * Convert a hexadecimal string to an array of bytes.
