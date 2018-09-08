@@ -96,7 +96,7 @@ public abstract class TestCase : GLib.Object {
      * @param expression    expression expected to be true
      */
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert(bool expression, string format, ...) throws TestError {
         if (!process(expression, format, va_list())) {
             abort_test();
@@ -110,7 +110,7 @@ public abstract class TestCase : GLib.Object {
      *
      */
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_not_reached(string format, ...) throws TestError {
         process(false, format, va_list());
         abort_test();
@@ -192,7 +192,7 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_uint_equals(uint expected, uint value, string format, ...) throws TestError {
         if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list())) {
             abort_test();
@@ -375,7 +375,7 @@ public abstract class TestCase : GLib.Object {
      * @param format      format string
      */
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) throws TestError {
         if (!process_value_equal(expected, actual, format, va_list())) {
             abort_test();
@@ -403,7 +403,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void fail(string format="", ...) throws TestError {
         process(false, format, va_list());
         abort_test();
@@ -601,7 +601,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_str_match(string pattern, string data, string format, ...) throws TestError {
         if (!process_str_match(true, pattern, data, format, va_list())) {
             abort_test();
@@ -609,7 +609,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_str_not_match(string pattern, string data, string format, ...) throws TestError {
         if (!process_str_match(false, pattern, data, format, va_list())) {
             abort_test();
@@ -625,7 +625,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    /* [PrintfFormat] https://bugzilla.gnome.org/show_bug.cgi?id=781061 */
+    [PrintfFormat]
     protected void assert_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, ...)
     throws TestError {
         if (!process_array(expected, found, eq, format, va_list())) {
