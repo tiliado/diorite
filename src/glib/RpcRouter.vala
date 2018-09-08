@@ -38,7 +38,7 @@ public class RpcRouter: GLib.Object {
 	public string hex_token {
 		owned get {
 			string result;
-			bin_to_hex(token, out result);
+			Blobs.hexadecimal_from_blob(token, out result);
 			return result;
 		}
 	}
@@ -262,7 +262,7 @@ public class RpcRouter: GLib.Object {
 		var hex_token = String.null_if_empty(spec[2]);
 		uint8[] token;
 		if (hex_token != null) {
-			hex_to_bin(hex_token, out token);
+			Blobs.hexadecimal_to_blob(hex_token, out token);
 		} else {
 			token = {};
 		}

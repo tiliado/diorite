@@ -42,10 +42,10 @@ public string random_hex(int n_bits)
 	var size = n_32bits * 4;
 	uint8[] buffer = new uint8[size];
 	for (uint offset = 0; offset + 4 <= size; offset += 4)
-		uint32_to_bytes(ref buffer, GLib.Random.next_int(), offset);
 	
+		Blobs.uint32_to_blob(ref buffer, GLib.Random.next_int(), offset);
 	string result;
-	bin_to_hex(buffer, out result);
+	Blobs.hexadecimal_from_blob(buffer, out result);
 	return size == n_bytes ? result : result.substring(0, n_bytes * 2);
 }
 
@@ -66,7 +66,7 @@ public void random_bin(int n_bits, out uint8[] result)
 	var size = n_32bits * 4;
 	result = new uint8[size];
 	for (uint offset = 0; offset + 4 <= size; offset += 4)
-		uint32_to_bytes(ref result, GLib.Random.next_int(), offset);
+		Blobs.uint32_to_blob(ref result, GLib.Random.next_int(), offset);
 }
 
 } // namespace Drt

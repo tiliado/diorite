@@ -477,7 +477,7 @@ public class QueryTest: Drt.TestCase
 			rand = new Rand();
 		
 		var size = rand.int_range(min_size, max_size);
-		uint8[] blob = new uint8[size];		
+		uint8[] blob = new uint8[size];
 		for (var j = 0; j < size; j++)
 			blob[j] = (uint8) rand.int_range(uint8.MIN, uint8.MAX);
 		return blob;
@@ -513,7 +513,7 @@ public class QueryTest: Drt.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Drt.bin_to_hex(value, out hex);
+					Drt.Blobs.hexadecimal_from_blob(value, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}
@@ -562,7 +562,7 @@ public class QueryTest: Drt.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Drt.bin_to_hex(value.get_data(), out hex);
+					Drt.Blobs.hexadecimal_from_blob(value.get_data(), out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 				try
@@ -572,7 +572,7 @@ public class QueryTest: Drt.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Drt.bin_to_hex(value.get_data(), out hex);
+					Drt.Blobs.hexadecimal_from_blob(value.get_data(), out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}
@@ -621,7 +621,7 @@ public class QueryTest: Drt.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Drt.bin_to_hex(value.data, out hex);
+					Drt.Blobs.hexadecimal_from_blob(value.data, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 				try
@@ -631,7 +631,7 @@ public class QueryTest: Drt.TestCase
 				catch (GLib.Error e)
 				{
 					string hex;
-					Drt.bin_to_hex(value.data, out hex);
+					Drt.Blobs.hexadecimal_from_blob(value.data, out hex);
 					expectation_failed("value %s; %s", hex, e.message);
 				}
 			}

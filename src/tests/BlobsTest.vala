@@ -111,6 +111,91 @@ public class BlobsTest: Drt.TestCase {
         expect_str_equals("01020304050606", Blobs.byte_array_to_string(byte_array_7_items_2), "7 items 2");
         expect_str_equals("0102030405060706", Blobs.byte_array_to_string(byte_array_8_items), "8 items");
     }
+
+    public void test_int64_to_blob() throws Drt.TestError {
+        var rand = new Rand();
+        int64 val;
+        uint8[] data;
+        int64 result;
+
+        int64[] values = {int64.MIN, int32.MIN, 0, int32.MAX, int64.MAX};
+        foreach (int64 i in values) {
+            val = i;
+            Blobs.int64_to_blob(val, out data);
+            // FIXME: round-trip is ok, but are the negative values really stored correctly?
+            assert(Blobs.int64_from_blob(data, out result), "");
+            assert(val == result, @"$val == $result");
+        }
+
+        for (int i = 0; i < 100; i++) {
+            val = 2 * ((int64) rand.int_range(int32.MIN, int32.MAX));
+            Blobs.int64_to_blob(val, out data);
+            assert(Blobs.int64_from_blob(data, out result), "");
+            assert(val == result, @"$val == $result");
+        }
+    }
+
+    public void test_hexadecimal_from_blob() throws Drt.TestError {
+        string[] values = {"01", "aa", "bb", "cc", "aabbcc", "deadbeef"};
+        var rand = new Rand();
+        uint8[] data;
+        string result;
+
+        foreach (unowned string i in values) {
+            assert(Blobs.hexadecimal_to_blob(i, out data), "Blobs.hexadecimal_to_blob");
+            Blobs.hexadecimal_from_blob(data, out result);
+            assert(i == result, @"$i == $result");
+        }
+
+        char[] separators = {'\0', ':', ' ', '.'};
+        foreach (char sep in separators) {
+            for (var i = 0; i < 10; i++) {
+                var size = rand.int_range(1, 50);
+                uint8[] orig = new uint8[size];
+                for (var j = 0; j < size; j++) {
+                    orig[j] = (uint8) rand.int_range(uint8.MIN, uint8.MAX);
+                }
+                string hex;
+                Blobs.hexadecimal_from_blob(orig, out hex, sep);
+                uint8[] output;
+                assert(Blobs.hexadecimal_to_blob(hex, out output, sep), "Blobs.hexadecimal_to_blob");
+                assert(output.length == size, @"$(output.length) == $size");
+                for (var k = 0; k < size; k++) {
+                    assert(orig[k] == output[k], "");
+                }
+            }
+        }
+
+        string[] invalid_hex = {"a", "abc", "efgh"};
+        foreach (unowned string invalid in invalid_hex) {
+            assert(!Blobs.hexadecimal_to_blob(invalid, out data), "");
+        }
+
+        invalid_hex = {"aa:", "ab:c", "a:bb:a", "ef:gh"};
+        foreach (unowned string invalid in invalid_hex) {
+            assert(!Blobs.hexadecimal_to_blob(invalid, out data, ':'), "invalid '%s'", invalid);
+        }
+    }
+
+    public void test_int64_to_hexadecimal() throws Drt.TestError {
+        var rand = new Rand();
+        int64 val;
+        string data;
+        int64 result;
+        int64[] values = {int64.MIN, int32.MIN, 0, int32.MAX, int64.MAX};
+        foreach (int64 i in values) {
+            val = i;
+            Blobs.int64_to_hexadecimal(val, out data);
+            assert(Blobs.int64_from_hexadecimal(data, out result), "");
+            assert(val == result, @"$val == $result");
+        }
+        for (var i = 0; i < 100; i++) {
+            val = 2 * ((int64) rand.int_range(int32.MIN, int32.MAX));
+            Blobs.int64_to_hexadecimal(val, out data);
+            assert(Blobs.int64_from_hexadecimal(data, out result), "");
+            assert(val == result, @"$val == $result");
+        }
+    }
 }
 
 } // namespace Drt

@@ -359,9 +359,9 @@ public abstract class TestCase: GLib.Object
 		{
 			string? expected_hex = null, value_hex = null;
 			if (expected != null)
-				bin_to_hex(expected.get_data(), out expected_hex);
+				Blobs.hexadecimal_from_blob(expected.get_data(), out expected_hex);
 			if (value != null)
-				bin_to_hex(value.get_data(), out value_hex);
+				Blobs.hexadecimal_from_blob(value.get_data(), out value_hex);
 			stdout.printf("\t '%s' == '%s' failed.\n", expected_hex, value_hex);
 		}
 		return result;

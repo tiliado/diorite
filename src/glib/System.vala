@@ -360,7 +360,7 @@ public async string? get_machine_id_hash(uint8[] app_key, GLib.ChecksumType chec
 	        warning("Too short machine id (%d characters).", id_string.length);
 	        return null;
 	    }
-	    if (!hex_to_bin(id_string, out cached_machine_id)) {
+	    if (!Blobs.hexadecimal_to_blob(id_string, out cached_machine_id)) {
 			warning("Machine id is not a valid hexadecimal string.");
 			cached_machine_id = id_string.data;
 		}
