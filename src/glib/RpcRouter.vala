@@ -54,7 +54,7 @@ public class RpcRouter: GLib.Object {
 	 */
 	public RpcRouter() {
 		methods = new HashTable<string, RpcCallable?>(str_hash, str_equal);
-		random_bin(256, out token);
+		Drt.Random.blob(256, out token);
 	}
 	
 	/**
