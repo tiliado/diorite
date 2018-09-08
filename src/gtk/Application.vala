@@ -225,7 +225,7 @@ public abstract class Application : Gtk.Application
 	
 	private static void terminate_handler(int sig_num, Posix.siginfo_t info, void* data) {
 		var sig_pid = (int) info.si_pid;
-		var cmdline = System.cmdline_for_pid(sig_pid);
+		var cmdline = System.get_cmdline_for_pid(sig_pid);
 		if (sig_num == Posix.Signal.TERM && sig_pid == Posix.getpid()) {
 			warning("Ignoring signal %d from PID %d (%s).", sig_num, sig_pid, cmdline);
 		} else {
