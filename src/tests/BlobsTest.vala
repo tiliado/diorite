@@ -116,13 +116,28 @@ public class BlobsTest: Drt.TestCase {
         var rand = new Rand();
         int64 val;
         uint8[] data;
+        uint8[] expected;
         int64 result;
 
-        int64[] values = {int64.MIN, int32.MIN, 0, int32.MAX, int64.MAX};
-        foreach (int64 i in values) {
-            val = i;
+        int64[] values = {int64.MIN, int32.MIN, -1, 0, 1, int32.MAX, int64.MAX};
+        // int64 = 64 bits = 8 bytes
+        // https://en.wikipedia.org/wiki/Signed_number_representations#Two's_complement
+        // Invert all the bits through the number, then add one.
+        // Done by hand :-)
+        uint8[,] blobs = {
+          {128, 0, 0, 0, 0, 0, 0, 0}, // −9,223,372,036,854,775,808
+          {255, 255, 255, 255, 128, 0, 0, 0},  // −2,147,483,648
+          {255, 255, 255, 255, 255, 255, 255, 255},  // -1
+          {0, 0, 0, 0, 0, 0, 0, 0},  // 0
+          {0, 0, 0, 0, 0, 0, 0, 1},  // 1
+          {0, 0, 0, 0, 127, 255, 255, 255},  // +2,147,483,647
+          {127, 255, 255, 255, 255, 255, 255, 255},  // +9,223,372,036,854,775,807
+        };
+        for (int i = 0; i < values.length; i++) {
+            val = values[i];
+            expected = Drt.Arrays.from_2d_uint8(blobs, i);
             Blobs.int64_to_blob(val, out data);
-            // FIXME: round-trip is ok, but are the negative values really stored correctly?
+            expect_blob_equal(expected, data, @"int64 value $i");
             assert(Blobs.int64_from_blob(data, out result), "");
             assert(val == result, @"$val == $result");
         }
