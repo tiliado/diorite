@@ -3,14 +3,14 @@
 # Copyright 2014-2018 Jiří Janoušek <janousek.jiri@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met: 
-# 
+# modification, are permitted provided that the following conditions are met:
+#
 # 1. Redistributions of source code must retain the above copyright notice, this
-#    list of conditions and the following disclaimer. 
+#    list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution. 
-# 
+#    and/or other materials provided with the distribution.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -132,7 +132,7 @@ def gir_compile(ctx, name, lib):
 		source=ctx.path.find_or_declare(name + ".gir"),
 		target=ctx.path.find_or_declare(name + ".typelib"),
 		install_path="${LIBDIR}/girepository-1.0")
-				
+
 # Actions #
 #=========#
 
@@ -144,17 +144,17 @@ def options(ctx):
 	ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
 	ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
 	ctx.add_option('--no-strict', action='store_false', default=True, dest='strict', help="Disable strict checks (e.g. fatal warnings).")
-	
+
 def configure(ctx):
 	add_version_info(ctx)
-	
+
 	ctx.msg("Version", ctx.env.VERSION, "GREEN")
 	if ctx.env.REVISION_ID != REVISION_SNAPSHOT:
 		ctx.msg("Upstream revision", ctx.env.REVISION_ID, color="GREEN")
 	else:
 		ctx.msg("Upstream revision", "unknown", color="RED")
 	ctx.msg('Install prefix', ctx.options.prefix, color="GREEN")
-	
+
 	ctx.env.append_unique("VALAFLAGS", ["-v"])
 	if ctx.options.strict:
 		ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
@@ -166,18 +166,18 @@ def configure(ctx):
 		ctx.env.append_unique('CFLAGS', '-O2')
 	if ctx.options.debug:
 		ctx.env.append_unique('CFLAGS', '-g3')
-		
+
 	ctx.load('compiler_c vala')
 	ctx.check_vala(min_version=tuple(int(i) for i in MIN_VALA.split(".")))
-	
+
 	ctx.env.BUILD_GIR = ctx.options.build_gir
 	if ctx.env.BUILD_GIR:
 		ctx.find_program('g-ir-compiler', var='GIR_COMPILER')
-	
+
 	ctx.env.BUILD_VALADOC = ctx.options.buildvaladoc
 	if ctx.env.BUILD_VALADOC:
 		ctx.load('valadoc', tooldir='.')
-	
+
 	pkgconfig(ctx, 'glib-2.0', 'GLIB', MIN_GLIB)
 	pkgconfig(ctx, 'gthread-2.0', 'GTHREAD', MIN_GLIB)
 	pkgconfig(ctx, 'gio-2.0', 'GIO', MIN_GLIB)
@@ -187,14 +187,14 @@ def configure(ctx):
 	pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
 	pkgconfig(ctx, 'x11', 'X11', "0")
 	pkgconfig(ctx, 'sqlite3', 'SQLITE', "3.7")
-	
+
 	ctx.define("DRT_VERSION", ctx.env.VERSION)
 	ctx.define("DRT_REVISION", ctx.env.REVISION_ID)
 	ctx.define("DRT_VERSION_MAJOR", ctx.env.VERSIONS[0])
 	ctx.define("DRT_VERSION_MINOR", ctx.env.VERSIONS[1])
 	ctx.define("DRT_VERSION_BUGFIX", ctx.env.VERSIONS[2])
 	ctx.define("DRT_VERSION_SUFFIX", ctx.env.REVISION_ID)
-	
+
 	ctx.define('GLIB_VERSION_MAX_ALLOWED', glib_encode_version(MIN_GLIB))
 	ctx.define('GLIB_VERSION_MIN_REQUIRED', glib_encode_version(MIN_GLIB))
 	ctx.define('GDK_VERSION_MAX_ALLOWED', glib_encode_version(MIN_GTK))
@@ -213,12 +213,12 @@ def build(ctx):
 	uselib = 'GLIB GIO UNIXGIO'
 	uselib_gtk = uselib + " GTK+ GDK X11 GDKX11"
 	vala_defines = ctx.env.VALA_DEFINES
-	
+
 	vapi_dirs = ['build', 'vapi']
 	env_vapi_dir = os.environ.get("VAPIDIR")
 	if env_vapi_dir:
 		vapi_dirs.extend(os.path.relpath(path) for path in env_vapi_dir.split(":"))
-	
+
 	ctx(features = "c cshlib",
 		target = DIORITE_GLIB,
 		name = DIORITE_GLIB,
@@ -244,7 +244,7 @@ def build(ctx):
 		force = True,
 		verbose=True
 	)
-	
+
 	ctx(features = "c cshlib",
 		target = DIORITE_GTK,
 		name = DIORITE_GTK,
@@ -276,7 +276,7 @@ def build(ctx):
 		force = True,
 		verbose=True
 	)
-	
+
 	ctx(features = "c cshlib",
 		target = DIORITE_DB,
 		name = DIORITE_DB,
@@ -306,7 +306,7 @@ def build(ctx):
 		force = True,
 		verbose=True
 	)
-	
+
 	ctx(features = "c cshlib",
 		target = DIORITE_TESTS,
 		name = DIORITE_TESTS,
@@ -321,13 +321,13 @@ def build(ctx):
 		install_path = None,
 		install_binding = False
 	)
-	
+
 	ctx(
 		rule='../testgen.py -i ${SRC} -o ${TGT}',
 		source=ctx.path.find_or_declare('%s.vapi' % DIORITE_TESTS),
 		target=ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)
 	)
-	
+
 	ctx.program(
 		target = RUN_DIORITE_TESTS,
 		source = [ctx.path.find_or_declare("%s.vala" % RUN_DIORITE_TESTS)],
@@ -340,7 +340,7 @@ def build(ctx):
 		vala_target_glib = TARGET_GLIB,
 		install_path = None
 	)
-	
+
 	ctx(features = 'subst',
 		source='src/dioriteglib.pc.in',
 		target='{}glib{}.pc'.format(APPNAME, ctx.env.SERIES),
@@ -353,7 +353,7 @@ def build(ctx):
 		PC_CFLAGS=PC_CFLAGS,
 		LIBNAME=DIORITE_GLIB,
 	)
-	
+
 	ctx(features = 'subst',
 		source='src/dioritegtk.pc.in',
 		target='{}gtk{}.pc'.format(APPNAME, ctx.env.SERIES),
@@ -367,7 +367,7 @@ def build(ctx):
 		LIBNAME=DIORITE_GTK,
 		DIORITE_GLIB=DIORITE_GLIB,
 	)
-	
+
 	ctx(features = 'subst',
 		source='src/dioritedb.pc.in',
 		target='{}db{}.pc'.format(APPNAME, ctx.env.SERIES),
@@ -381,5 +381,5 @@ def build(ctx):
 		LIBNAME=DIORITE_DB,
 		DIORITE_GLIB=DIORITE_GLIB,
 	)
-	
+
 	ctx.install_as('${BINDIR}/diorite-testgen' + ctx.env.SERIES, 'testgen.py', chmod=Utils.O755)

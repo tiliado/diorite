@@ -36,7 +36,7 @@ Diorite's source code. The build script `wscript` may not be compatible with oth
 to port wscript to a newer stable waf release, you may provide us with patches to be merged once we decide
 to update our waf binary. Meantime, you can carry them downstream.
 
-To find out what build parameters can be set run ./waf --help 
+To find out what build parameters can be set run ./waf --help
 
 Build
 -----
@@ -53,7 +53,7 @@ Install
 -------
 
     # ./waf install [--destdir=...]
-    
+
 Uninstall
 ---------
 
@@ -76,7 +76,7 @@ You probably want to use ``pkg-config``:
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
     -L/usr/local/lib -ldioriteglib4
-    
+
     $ pkg-config --libs --cflags dioritegtk4
     -I/usr/local/include/diorite-1.0 -I/usr/include/glib-2.0 \
     -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
@@ -89,14 +89,14 @@ Diorite recognizes several environment variables for debugging:
 
   * `DIORITE_SHOW_MENUBAR` - if `true` ApplicationWindow shows menubar. This is useful if you test
     menubar in other environments than Unity, because the menubar is not show by default.
- 
+
   * `DIORITE_GUI_MODE` - set to `unity`, `gnome`, `xfce` or `default` to simulate look of
     a application window (menu bar, header bar, app menu, etc.) in different environment.
-  
+
   * `DIORITE_LOG_MESSAGE_CHANNEL` - if `yes` MessageChannel communication will be logged
   * `DIORITE_LOG_DUPLEX_CHANNEL` - if `yes` DuplexChannel communication will be logged
   * `DIORITE_LOG_API_ROUTER` - if `yes` ApiRouter communication will be logged
-  
+
   * `DIORITE_DUPLEX_CHANNEL_FATAL_TIMEOUT` - if `yes`, DuplexChannel timeout will abort
   * `DIORITE_LOGGER_FATAL_STRING` - abort program when message matching the fatal
     [string pattern](https://developer.gnome.org/glib/stable/glib-Glob-style-pattern-matching.html) is logged.
