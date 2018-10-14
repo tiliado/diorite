@@ -36,7 +36,7 @@ Release 4.10.0 - March 4th, 2018
 * GIR generation is now optional, you can pass `--no-gir` to disable it.
 * Fixed bug in Entry widget that prevented user input.
 * Fixed bug when XDG Desktop Portal web browser selector was shown under a dialog window instead of above it.
-* RequirementsParser supports 4 states: 
+* RequirementsParser supports 4 states:
 * New utility functions: Drt.print_variant()
 * Added Drt.Event thread synchronization primitive.
 
@@ -53,7 +53,7 @@ Release 4.9.0 - December 17th, 2017
     DBus interface is present.
   * New functionality: Functions to get, set and look up GTK+ 3 themes - see Drtgtk.DesktopShell.
   * New widget: Drtgtk.GtkThemeSelector - a selector to list and change a GTK+ theme.
-  
+
 Release 4.8.0 - September 28th, 2017
 --------------------------------
 
@@ -68,7 +68,7 @@ Release 4.7.0 - September 1st, 2017
   * GLib dependency has been raised to 2.52.0 to make use of Valac's GTask support.
   * Diorite GTK namespace was changed to Drtgtk.
   * GIR XML and typelib files are generated. Introduces new dependency on g-ir-compiler.
-  
+
 Release 4.6.0 - July 29th, 2017
 -------------------------------
 
@@ -80,7 +80,7 @@ Release 4.6.0 - July 29th, 2017
   * Added various utility functions (Drt.Time.get_unix_time_now_utc, Drt.String.concat, Drt.String.append,
     Drt.variant_dump, Drt.variant_ref, Drt.variant_unref).
   * ApplicationWindow.app field is now protected (private previously).
-  
+
 Release 4.5.0 - June 23rd, 2017
 -------------------------------
 
@@ -88,7 +88,7 @@ Release 4.5.0 - June 23rd, 2017
   * Dioritedb has been refactored significantly.
   * Bundled glib.vapi is no longer used.
   * Various utility functions were added, see git log for details.
-  
+
 Release 4.4.0 - May 27th, 2017
 ------------------------------
 
@@ -97,7 +97,7 @@ Release 4.4.0 - May 27th, 2017
   * Vala documentation is built by default. Requires valadoc >= 0.36 but can be disabled with --novaladoc
     flag.
   * Various utility functions were added. See git log for details.
-  
+
 Release 0.3.4 - April 30th, 2017
 --------------------------------
 
@@ -114,7 +114,7 @@ Releases 0.3.x
 --------------
 
   * Development snapshots.
-  
+
 Release 0.2.0 - December 30, 2015
 ---------------------------------
 
