@@ -7,6 +7,28 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.13.0 - October 14th, 2018
+-----------------------------------
+
+* GIR is no longer built by default. Use `--gir` configure flag to build it.
+* Various utility functions to print errors were added.
+* All deprecation warnings were resolved. Issue: tiliado/diorite#20
+* Diorite is now built with fatal warnings but you can pass `--no-strict` to disable that.
+* Dependencies were increased: valac >= 0.42.0, glib-2.0 >= 2.56.1, gtk+-3.0 >= 3.22.30.
+  If your system contains a different version of Vala, we cannot guarantee that Diorite builds correctly and it
+  may lead to memory leaks or [invalid memory access](https://github.com/tiliado/nuvolaruntime/issues/464).
+  We recommend [building the correct Vala version from source](https://github.com/tiliado/diorite/commit/d56e4cf528237492cf30608d00fc6cd416e11437)
+  prior to building Diorite. You can then throw it away as Vala compiler is not needed after Diorite is built.
+* Theme selector uses more human-friendly labels for theme names, e.g. "Arc Darker Solid" instead of "Arc-Darker-solid".
+* Added function to get an app-specific machine id hash.
+* String.is_empty() check was improved and String.not_empty_or() utility function was added.
+* Icons.get_icon_name_for_position was added.
+* StackArrow widget was added to switch Gtk.Stack pages.
+* Utility function EventLoop.sleep() was added.
+* Drt.variant_ref and friends were removed. They were used as a workaround for Variant reference bugs in older Valac.
+  Therefore, you now need Valac >= 0.42 which contains the fixes for these issues.
+* CircleCI tasks now build Valac from source and you should do the same to avoid incompatibility issues.
+
 Release 4.12.0 - July 21st, 2018
 --------------------------------
 
