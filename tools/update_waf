@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+FILE=$(wget "https://waf.io/" -O - | grep -o -m 1 -E 'waf-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+')
+wget "https://waf.io/$FILE"
+echo "#!/usr/bin/env python3" > waf-new
+tail -n +2 "$FILE" >> waf-new
+chmod a+x waf-new
+mv waf-new waf
+rm "$FILE"
