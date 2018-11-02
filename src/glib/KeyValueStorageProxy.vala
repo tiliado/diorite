@@ -24,16 +24,14 @@
 namespace Drt
 {
 
-public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
+public class KeyValueStorageProxy: KeyValueStorage
 {
-	public Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	public KeyValueStorageClient client {get; construct;}
 	public string name {get; construct;}
 	
 	public KeyValueStorageProxy(KeyValueStorageClient client, string name)
 	{
 		GLib.Object(name: name, client: client);
-		property_bindings = new Drt.Lst<PropertyBinding>();
 		client.changed.connect(on_changed);
 		toggle_listener(true);
 	}
@@ -50,7 +48,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
-	public bool has_key(string key)
+	public override bool has_key(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
 		try
@@ -68,7 +66,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		return false;
 	}
 	
-	public async bool has_key_async(string key)
+	public override async bool has_key_async(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
 		try {
@@ -84,7 +82,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		return false;
 	}
 	
-	protected Variant? get_value(string key)
+	protected override Variant? get_value(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
 		try
@@ -98,7 +96,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	protected async Variant? get_value_async(string key)
+	protected override async Variant? get_value_async(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
 		try {
@@ -109,7 +107,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	protected void set_value_unboxed(string key, Variant? value)
+	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
 		try
@@ -122,7 +120,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	protected async void set_value_unboxed_async(string key, Variant? value) {
+	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
 		try {
 			yield client.channel.call(method, new Variant("(ssmv)", name, key, value));
@@ -131,7 +129,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	protected void set_default_value_unboxed(string key, Variant? value)
+	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
 		try
@@ -144,7 +142,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	protected async void set_default_value_unboxed_async(string key, Variant? value)
+	protected override async void set_default_value_unboxed_async(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
 		try {
@@ -154,7 +152,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	public void unset(string key)
+	public override void unset(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_UNSET;
 		try
@@ -167,7 +165,7 @@ public class KeyValueStorageProxy: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	public async void unset_async(string key) {
+	public override async void unset_async(string key) {
 		var method = KeyValueStorageServer.METHOD_UNSET;
 		try {
 			yield client.channel.call(method, new Variant("(ss)", name, key));

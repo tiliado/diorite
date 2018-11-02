@@ -25,20 +25,18 @@
 namespace Drt
 {
 
-public class KeyValueTree: GLib.Object, KeyValueStorage
+public class KeyValueTree: KeyValueStorage
 {
-	public Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	protected Node<Item?> root;
 	protected HashTable<string, unowned Node<Item?>> nodes;
 	
 	public KeyValueTree()
 	{
-		property_bindings = new Drt.Lst<PropertyBinding>();
 		root = new Node<Item?>(null);
 		nodes = new HashTable<string, unowned Node<Item?>>(str_hash, str_equal);
 	}
 	
-	public bool has_key(string key)
+	public override bool has_key(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node == null || node.data == null)
@@ -47,12 +45,12 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 		return node.data.value_set;
 	}
 	
-	public async bool has_key_async(string key) {
+	public override async bool has_key_async(string key) {
 		yield EventLoop.resume_later();
 		return has_key(key);
 	}
 	
-	public Variant? get_value(string key)
+	public override Variant? get_value(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node == null || node.data == null)
@@ -61,12 +59,12 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 		return node.data.get();
 	}
 	
-	public async Variant? get_value_async(string key) {
+	public override async Variant? get_value_async(string key) {
 		yield EventLoop.resume_later();
 		return get_value(key);
 	}
 	
-	public void unset(string key)
+	public override void unset(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node != null && node.data != null && node.data.value_set)
@@ -77,7 +75,7 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 		}
 	}
 	
-	public async void unset_async(string key) {
+	public override async void unset_async(string key) {
 		unset(key);
 		yield EventLoop.resume_later();
 	}
@@ -114,7 +112,7 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 		return unowned_node;
 	}
 	
-	protected void set_value_unboxed(string key, Variant? value)
+	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		unowned Node<Item?> node = get_or_create_node(key);
 		return_if_fail(node.data != null);
@@ -125,12 +123,12 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
-	protected async void set_value_unboxed_async(string key, Variant? value) {
+	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		set_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
 	
-	protected void set_default_value_unboxed(string key, Variant? value)
+	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		unowned Node<Item?> node = get_or_create_node(key);
 		return_if_fail(node.data != null);
@@ -143,7 +141,7 @@ public class KeyValueTree: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
-	protected async void set_default_value_unboxed_async(string key, Variant? value) {
+	protected override async void set_default_value_unboxed_async(string key, Variant? value) {
 		set_default_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}

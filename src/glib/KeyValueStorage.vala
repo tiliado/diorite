@@ -25,10 +25,10 @@
 namespace Drt
 {
 
-public interface KeyValueStorage: GLib.Object
+public abstract class KeyValueStorage: GLib.Object
 {
-	public abstract Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	
+	protected SList<PropertyBinding> property_bindings = null;
 	public signal void changed(string key, Variant? old_value);
 	
 	public abstract async bool has_key_async(string key);

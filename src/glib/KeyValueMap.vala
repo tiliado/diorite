@@ -25,9 +25,8 @@
 namespace Drt
 {
 
-public class KeyValueMap: GLib.Object, KeyValueStorage
+public class KeyValueMap: KeyValueStorage
 {
-	public Drt.Lst<PropertyBinding> property_bindings {get; protected set;}
 	protected HashTable<string, Variant> values;
 	protected HashTable<string, Variant> default_values;
 	
@@ -39,17 +38,17 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 		this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
 	}
 	
-	public bool has_key(string key)
+	public override bool has_key(string key)
 	{
 		return key in values;
 	}
 	
-	public async bool has_key_async(string key) {
+	public override async bool has_key_async(string key) {
 		yield EventLoop.resume_later();
 		return has_key(key);
 	}
 	
-	public Variant? get_value(string key)
+	public override Variant? get_value(string key)
 	{
 		Variant? value = null;
 		if (values.lookup_extended(key, null, out value))
@@ -57,24 +56,24 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 		return default_values[key];
 	}
 	
-	public async Variant? get_value_async(string key) {
+	public override async Variant? get_value_async(string key) {
 		yield EventLoop.resume_later();
 		return get_value(key);
 	}
 	
-	public void unset(string key)
+	public override void unset(string key)
 	{
 		var old_value = get_value(key);
 		if (values.remove(key))
 			changed(key, old_value);
 	}
 	
-	public async void unset_async(string key) {
+	public override async void unset_async(string key) {
 		unset(key);
 		yield EventLoop.resume_later();
 	}
 	
-	protected void set_value_unboxed(string key, Variant? value)
+	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		var old_value = get_value(key);
 		values[key] = value;
@@ -82,17 +81,17 @@ public class KeyValueMap: GLib.Object, KeyValueStorage
 			changed(key, old_value);
 	}
 	
-	protected async void set_value_unboxed_async(string key, Variant? value) {
+	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		set_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
 	
-	protected void set_default_value_unboxed(string key, Variant? value)
+	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		default_values[key] = value;
 	}
 	
-	protected async void set_default_value_unboxed_async(string key, Variant? value) {
+	protected override async void set_default_value_unboxed_async(string key, Variant? value) {
 		set_default_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
