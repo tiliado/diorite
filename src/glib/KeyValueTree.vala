@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,80 +29,80 @@ public class KeyValueTree: KeyValueStorage
 {
 	protected Node<Item?> root;
 	protected HashTable<string, unowned Node<Item?>> nodes;
-	
+
 	public KeyValueTree()
 	{
 		root = new Node<Item?>(null);
 		nodes = new HashTable<string, unowned Node<Item?>>(str_hash, str_equal);
 	}
-	
+
 	public override bool has_key(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node == null || node.data == null)
 			return false;
-		
+
 		return node.data.value_set;
 	}
-	
+
 	public override async bool has_key_async(string key) {
 		yield EventLoop.resume_later();
 		return has_key(key);
 	}
-	
+
 	public override Variant? get_value(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node == null || node.data == null)
 			return null;
-		
+
 		return node.data.get();
 	}
-	
+
 	public override async Variant? get_value_async(string key) {
 		yield EventLoop.resume_later();
 		return get_value(key);
 	}
-	
+
 	public override void unset(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node != null && node.data != null && node.data.value_set)
-		{ 
+		{
 			var old_value = node.data.value;
 			node.data.unset();
 			changed(key, old_value);
 		}
 	}
-	
+
 	public override async void unset_async(string key) {
 		unset(key);
 		yield EventLoop.resume_later();
 	}
-	
+
 	public string to_string()
 	{
 		return print();
 	}
-	
+
 	public string print(string? bullet=null)
 	{
 		var printer = new Printer(new StringBuilder("root\n"), bullet);
 		printer.print(root);
 		return printer.buffer.str;
 	}
-	
+
 	protected unowned Node<Item?> get_or_create_node(string key)
 	{
 		unowned Node<Item?> node = nodes[key];
 		if (node != null)
 			return node;
-		
+
 		var index = key.last_index_of_char('.');
 		unowned Node<Item?> parent = index > 0 ? get_or_create_node(key.substring(0, index)) : root;
 		return create_child_node(parent, key, key.substring(index + 1));
 	}
-	
+
 	protected unowned Node<Item?> create_child_node(Node<Item?> parent, string full_key, string name)
 	{
 		var node = new Node<Item?>(new Item(name, null, false, null));
@@ -111,23 +111,23 @@ public class KeyValueTree: KeyValueStorage
 		nodes[full_key] = unowned_node;
 		return unowned_node;
 	}
-	
+
 	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		unowned Node<Item?> node = get_or_create_node(key);
 		return_if_fail(node.data != null);
 		var old_value = node.data.get();
 		node.data.set(value);
-		
+
 		if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
 			changed(key, old_value);
 	}
-	
+
 	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		set_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
-	
+
 	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		unowned Node<Item?> node = get_or_create_node(key);
@@ -135,17 +135,17 @@ public class KeyValueTree: KeyValueStorage
 		var old_value = node.data.get();
 		node.data.default_value = value;
 		var new_value = node.data.get();
-		
+
 		if (old_value != new_value
 		&& (old_value == null || new_value == null || !old_value.equal(new_value)))
 			changed(key, old_value);
 	}
-	
+
 	protected override async void set_default_value_unboxed_async(string key, Variant? value) {
 		set_default_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
-	
+
 	[Compact]
 	protected class Item
 	{
@@ -153,7 +153,7 @@ public class KeyValueTree: KeyValueStorage
 		public Variant? value = null;
 		public bool value_set = false;
 		public Variant? default_value = null;
-		
+
 		public Item(string name, Variant? value, bool value_set, Variant? default_value=null)
 		{
 			this.name = name;
@@ -161,49 +161,49 @@ public class KeyValueTree: KeyValueStorage
 			this.value_set = value_set;
 			this.default_value = default_value;
 		}
-		
+
 		public unowned Variant? get()
 		{
 			return value_set ? value : default_value;
 		}
-		
+
 		public void set(Variant? value)
 		{
 			this.value = value;
 			value_set = true;
 		}
-		
+
 		public void unset()
 		{
 			value = null;
 			value_set = false;
 		}
 	}
-	
+
 	[Compact]
 	protected class Printer
 	{
 		public StringBuilder buffer;
 		public string bullet;
 		public int space_len;
-		
+
 		public Printer(owned StringBuilder buffer, string? bullet)
 		{
 			this.buffer = (owned) buffer;
 			this.bullet = bullet != null ? bullet : "  * ";
 			this.space_len = this.bullet.length;
 		}
-		
+
 		public void print(Node<Item?> root, int depth = -1)
 		{
 			root.traverse(TraverseType.PRE_ORDER, TraverseFlags.ALL, depth, print_node);
 		}
-		
+
 		private bool print_node(Node<Item?> node)
 		{
 			if (node.is_root())
 				return false;
-			
+
 			unowned Item? item = node.data;
 			if (item != null)
 			{

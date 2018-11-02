@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,88 +27,88 @@ namespace Drt
 
 public abstract class KeyValueStorage: GLib.Object
 {
-	
 	protected SList<PropertyBinding> property_bindings = null;
+
 	public signal void changed(string key, Variant? old_value);
-	
+
 	public abstract async bool has_key_async(string key);
-	
+
 	public abstract bool has_key(string key);
-	
+
 	public abstract async Variant? get_value_async(string key);
-	
+
 	public abstract Variant? get_value(string key);
-	
+
 	public abstract async void unset_async(string key);
-	
+
 	public abstract void unset(string key);
-	
+
 	protected abstract async void set_default_value_unboxed_async(string key, Variant? value);
-	
+
 	protected abstract void set_default_value_unboxed(string key, Variant? value);
-	
+
 	protected abstract async void set_value_unboxed_async(string key, Variant? value);
-	
+
 	protected abstract void set_value_unboxed(string key, Variant? value);
-	
+
 	public async void set_value_async(string key, Variant? value) {
 		yield set_value_unboxed_async(key, unbox_variant(value));
 	}
-	
+
 	public void set_value(string key, Variant? value)
 	{
 		set_value_unboxed(key, unbox_variant(value));
 	}
-	
+
 	public async void set_default_value_async(string key, Variant? value) {
 		yield set_default_value_unboxed_async(key, unbox_variant(value));
 	}
-	
+
 	public void set_default_value(string key, Variant? value)
 	{
 		set_default_value_unboxed(key, unbox_variant(value));
 	}
-	
+
 	public bool get_bool(string key)
 	{
 		return variant_to_bool(get_value(key));
 	}
-	
+
 	public int64 get_int64(string key)
 	{
 		return variant_to_int64(get_value(key));
 	}
-	
+
 	public double get_double(string key)
 	{
 		return variant_to_double(get_value(key));
 	}
-	
+
 	public string? get_string(string key)
 	{
 		return variant_to_string(get_value(key), null);
 	}
-	
+
 	public void set_string(string key, string? value)
 	{
 		set_value(key, value != null ? new Variant.string(value) : null);
 	}
-	
+
 	public void set_int64(string key, int64 value)
 	{
 		set_value(key, new Variant.int64(value));
 	}
-	
+
 	public void set_bool(string key, bool value)
 	{
 		set_value(key, new Variant.boolean(value));
 	}
-	
+
 	public void set_double(string key, double value)
 	{
 		set_value(key, new Variant.double(value));
 	}
-	
+
 	public PropertyBinding? bind_object_property(string key, GLib.Object object, string property_name,
 		PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL)
 	{
@@ -118,14 +118,14 @@ public abstract class KeyValueStorage: GLib.Object
 		property_bindings.prepend(binding);
 		return binding;
 	}
-	
+
 	public void unbind_object_property(string key, GLib.Object object, string property_name)
 	{
 		var binding = get_property_binding(key, object, property_name);
 		if (binding != null)
 			remove_property_binding(binding);
 	}
-	
+
 	public PropertyBinding? get_property_binding(string key, GLib.Object object,
 		string property_name)
 	{
@@ -136,12 +136,12 @@ public abstract class KeyValueStorage: GLib.Object
 				return binding;
 		return null;
 	}
-	
+
 	public void remove_property_binding(PropertyBinding binding)
 	{
 		property_bindings.remove(binding);
 	}
-	
+
 	private string make_full_key(string key, string property_name)
 	{
 		return key[key.length -1 ] != '.' ? key : key + property_name.replace("-", "_");

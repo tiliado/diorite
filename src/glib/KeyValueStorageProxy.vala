@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,26 +28,26 @@ public class KeyValueStorageProxy: KeyValueStorage
 {
 	public KeyValueStorageClient client {get; construct;}
 	public string name {get; construct;}
-	
+
 	public KeyValueStorageProxy(KeyValueStorageClient client, string name)
 	{
 		GLib.Object(name: name, client: client);
 		client.changed.connect(on_changed);
 		toggle_listener(true);
 	}
-	
+
 	~KeyValueStorageProxy()
 	{
 		client.changed.disconnect(on_changed);
 		toggle_listener(false);
 	}
-	
+
 	private void on_changed(string provider_name, string key, Variant? old_value)
 	{
 		if (provider_name == name)
 			changed(key, old_value);
 	}
-	
+
 	public override bool has_key(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
@@ -65,7 +65,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 		}
 		return false;
 	}
-	
+
 	public override async bool has_key_async(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_HAS_KEY;
@@ -81,7 +81,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 		}
 		return false;
 	}
-	
+
 	protected override Variant? get_value(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
@@ -95,7 +95,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			return null;
 		}
 	}
-	
+
 	protected override async Variant? get_value_async(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_GET_VALUE;
@@ -106,7 +106,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			return null;
 		}
 	}
-	
+
 	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
@@ -119,7 +119,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		var method = KeyValueStorageServer.METHOD_SET_VALUE;
 		try {
@@ -128,7 +128,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
@@ -141,7 +141,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	protected override async void set_default_value_unboxed_async(string key, Variant? value)
 	{
 		var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
@@ -151,7 +151,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	public override void unset(string key)
 	{
 		var method = KeyValueStorageServer.METHOD_UNSET;
@@ -164,7 +164,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	public override async void unset_async(string key) {
 		var method = KeyValueStorageServer.METHOD_UNSET;
 		try {
@@ -173,7 +173,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			critical("%s client error: %s", method, e.message);
 		}
 	}
-	
+
 	private void toggle_listener(bool state) {
 		string method;
 		Variant payload;
@@ -194,7 +194,7 @@ public class KeyValueStorageProxy: KeyValueStorage
 			} catch (GLib.Error e) {
 				critical("%s client error: %s", method, e.message);
 			}
-		});	
+		});
 	}
 }
 

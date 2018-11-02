@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,25 +29,24 @@ public class KeyValueMap: KeyValueStorage
 {
 	protected HashTable<string, Variant> values;
 	protected HashTable<string, Variant> default_values;
-	
+
 	public KeyValueMap(HashTable<string, Variant>? default_values=null,
 		HashTable<string, Variant>? values=null)
 	{
-		property_bindings = new Drt.Lst<PropertyBinding>();
 		this.values = values ?? new HashTable<string, Variant>(str_hash, str_equal);
 		this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
 	}
-	
+
 	public override bool has_key(string key)
 	{
 		return key in values;
 	}
-	
+
 	public override async bool has_key_async(string key) {
 		yield EventLoop.resume_later();
 		return has_key(key);
 	}
-	
+
 	public override Variant? get_value(string key)
 	{
 		Variant? value = null;
@@ -55,24 +54,24 @@ public class KeyValueMap: KeyValueStorage
 			return value;
 		return default_values[key];
 	}
-	
+
 	public override async Variant? get_value_async(string key) {
 		yield EventLoop.resume_later();
 		return get_value(key);
 	}
-	
+
 	public override void unset(string key)
 	{
 		var old_value = get_value(key);
 		if (values.remove(key))
 			changed(key, old_value);
 	}
-	
+
 	public override async void unset_async(string key) {
 		unset(key);
 		yield EventLoop.resume_later();
 	}
-	
+
 	protected override void set_value_unboxed(string key, Variant? value)
 	{
 		var old_value = get_value(key);
@@ -80,17 +79,17 @@ public class KeyValueMap: KeyValueStorage
 		if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
 			changed(key, old_value);
 	}
-	
+
 	protected override async void set_value_unboxed_async(string key, Variant? value) {
 		set_value_unboxed(key, value);
 		yield EventLoop.resume_later();
 	}
-	
+
 	protected override void set_default_value_unboxed(string key, Variant? value)
 	{
 		default_values[key] = value;
 	}
-	
+
 	protected override async void set_default_value_unboxed_async(string key, Variant? value) {
 		set_default_value_unboxed(key, value);
 		yield EventLoop.resume_later();
