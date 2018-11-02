@@ -116,8 +116,9 @@ public async void make_directory_with_parents_async(
 throws GLib.Error {
     SList<File> dirs = new SList<File>();
     dirs.prepend(directory);
-    File? dir;
-    while ((dir = dirs[0]) != null) {
+    unowned File? dir;
+    while (dirs != null) {
+        dir = dirs.data;
         try {
             yield dir.make_directory_async(io_priority, cancellable);
             dirs.remove_link(dirs);

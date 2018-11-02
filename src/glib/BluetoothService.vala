@@ -2,14 +2,14 @@
  * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,27 +34,27 @@ public class BluetoothService
 	private BluezProfile1? profile = null;
 	private string? profile_path = null;
 	private uint profile_id = 0;
-	
+
 	public BluetoothService(string uuid, string name, uint8 channel=0)
 	{
 		this.name = name;
 		this.uuid = uuid;
 		this.channel = channel;
     }
-	
+
 	public signal void incoming(BluetoothConnection connection);
-	
+
 	public void listen() throws GLib.Error
 	{
 		if (profile_manager == null)
 			profile_manager = Bus.get_proxy_sync(BusType.SYSTEM, "org.bluez", "/org/bluez");
-		
+
 		if (profile != null)
 			return;
-		
+
 		profile = new BluetoothProfile1(this);
 		profile_path = "/eu/tiliado/diorite/bluetooth/" + uuid.replace("-", "_");
-		Bus.get_sync(BusType.SYSTEM, null).register_object(new ObjectPath(profile_path), profile);	
+		Bus.get_sync(BusType.SYSTEM, null).register_object(new ObjectPath(profile_path), profile);
 		var options = new HashTable<string, Variant>(str_hash, str_equal);
         options["Name"] = name;
         options["Role"] = "server";
@@ -64,7 +64,7 @@ public class BluetoothService
         options["Channel"]= ((uint16) channel);
 		profile_manager.register_profile(new ObjectPath(profile_path), uuid, options);
 	}
-	
+
 	public void close() throws GLib.Error
 	{
 		if (profile != null)
@@ -77,7 +77,7 @@ public class BluetoothService
 			profile_id = 0;
 		}
 	}
-	
+
 	~BluetoothService()
 	{
 		try
@@ -95,14 +95,14 @@ public class BluetoothService
 private class BluetoothProfile1 : GLib.Object, BluezProfile1
 {
 	private weak BluetoothService service;
-	
 	private HashTable<ObjectPath, GenericArray<GLib.Socket>?> sockets;
+
 	public BluetoothProfile1(BluetoothService service)
 	{
 		this.service = service;
 		sockets = new HashTable<ObjectPath, GenericArray<GLib.Socket>?>(str_hash, str_equal);
 	}
-	
+
 	~BluetoothProfile1()
 	{
 		var devices = sockets.get_keys();
@@ -117,12 +117,12 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 			}
 		}
 	}
-	
+
 	public void release() throws GLib.Error
 	{
 		debug("Bluetooth service has been released.");
 	}
-	
+
 	public void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error
 	{
 		var parts = device.split("/");
@@ -138,7 +138,7 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 		connection.output.write(byte);
 		service.incoming(connection);
 	}
-	
+
 	public void request_disconnection(ObjectPath device) throws GLib.Error
 	{
 		debug("Bluetooth device disconnected: %s", device);
@@ -157,6 +157,6 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 			sockets.remove(device);
 		}
 	}
-}	
+}
 
 } // namespace Drt

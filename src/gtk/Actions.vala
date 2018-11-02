@@ -2,14 +2,14 @@
  * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,27 +34,27 @@ public class Actions : GLib.Object
 	private HashTable<string, GenericArray<Action?>?> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
-	
+
 	public Actions(Gtk.Application app)
 	{
 		this.app = app;
-		actions = new HashTable<string, Action?>(str_hash, str_equal); 
 		groups = new HashTable<string, GenericArray<Action?>?>(str_hash, str_equal);
+		actions = new HashTable<string, Action?>(str_hash, str_equal);
 	}
-	
+
 	public static GLib.Menu copy_menu_model(GLib.MenuModel model)
 	{
 		var menu = new Menu();
 		append_from_menu_model(menu, model);
 		return menu;
 	}
-	
+
 	public static int replace_from_menu_model(GLib.Menu menu, GLib.MenuModel model)
 	{
 		menu.remove_all();
 		return append_from_menu_model(menu, model);
 	}
-	
+
 	public static int append_from_menu_model(GLib.Menu menu, GLib.MenuModel model)
 	{
 		var size = model.get_n_items();
@@ -62,17 +62,17 @@ public class Actions : GLib.Object
 			menu.append_item(new MenuItem.from_model(model, i));
 		return size;
 	}
-	
+
 	public signal void action_added(Action action);
 	public signal void action_removed(Action action);
 	public signal void action_changed(Action action, ParamSpec p);
-	
+
 	public void add_actions(Action[] actions)
 	{
 		foreach (var action in actions)
 			add_action(action);
 	}
-	
+
 	public void add_action(Action action, bool prepend=false)
 	{
 		var group_name = action.group;
@@ -97,17 +97,17 @@ public class Actions : GLib.Object
 		action.notify.connect_after(on_action_changed);
 		if (action.scope == Action.SCOPE_APP)
 			action.add_to_map(app);
-		
+
 		action_added(action);
 	}
-	
+
 	public void remove_action(Action action)
 	{
 		var group_name = action.group;
 		GenericArray<Action?>? group = groups[group_name];
 		if (group != null)
 			group.remove(action);
-		
+
 		if (actions.remove(action.name))
 		{
 			action.activated.disconnect(on_action_activated);
@@ -115,7 +115,7 @@ public class Actions : GLib.Object
 			action_removed(action);
 		}
 	}
-	
+
 	public bool activate_action(string name, Variant? param=null)
 	{
 		var action = get_action(name);
@@ -124,12 +124,12 @@ public class Actions : GLib.Object
 		action.activate(param);
 		return true;
 	}
-	
+
 	public Action? get_action(string name)
 	{
 		return actions.get(name);
 	}
-	
+
 	public List<Action?> get_group(string group_name)
 	{
 		List<Action?> result = new List<Action?>();
@@ -141,17 +141,17 @@ public class Actions : GLib.Object
 		}
 		return (owned) result;
 	}
-	
+
 	public List<unowned string> list_groups()
 	{
 		return groups.get_keys();
 	}
-	
+
 	public List<weak Action?> list_actions()
 	{
 		return actions.get_values();
 	}
-	
+
 	public MenuItem? create_menu_item(string action_name, bool use_mnemonic=true, bool use_icons=true)
 	{
 		string? detailed_name = null;
@@ -159,7 +159,7 @@ public class Actions : GLib.Object
 		RadioOption? option = null;
 		if (!find_and_parse_action(action_name, out detailed_name, out action, out option))
 			return null;
-		
+
 		string? label;
 		string? icon;
 		if (option != null)
@@ -183,14 +183,14 @@ public class Actions : GLib.Object
 		}
 		return item;
 	}
-	
+
 	public Menu build_menu(string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		var menu = new Menu();
 		append_to_menu(menu, actions, use_mnemonic, use_icons);
 		return menu;
 	}
-	
+
 	public void append_to_menu(Menu menu, string[] actions, bool use_mnemonic=true, bool use_icons=true)
 	{
 		foreach (var full_name in actions)
@@ -198,7 +198,7 @@ public class Actions : GLib.Object
 			// TODO: Support separators in build_menu()
 			if (full_name == "|")
 				continue;
-				
+
 			var item = create_menu_item(full_name, use_mnemonic, use_icons);
 			if (item != null)
 				menu.append_item(item);
@@ -206,7 +206,7 @@ public class Actions : GLib.Object
 				warning("Action '%s' not found in registry.", full_name);
 		}
 	}
-	
+
 	public bool find_and_parse_action(string full_name, out string? detailed_name, out Action? action, out RadioOption? option)
 	{
 		detailed_name = null;
@@ -217,13 +217,13 @@ public class Actions : GLib.Object
 		action = this.actions.get(name);
 		if (action == null)
 			return false;
-			
+
 		if (option_index >= 0)
 		{
 			var radio = action as RadioAction;
 			if (radio == null)
 				return false;
-			
+
 			option = radio.get_option(option_index);
 			detailed_name = GLib.Action.print_detailed_name(name, option.parameter);
 		}
@@ -233,7 +233,7 @@ public class Actions : GLib.Object
 		}
 		return true;
 	}
-	
+
 	public Gtk.Button? create_action_button(string full_name, bool use_image, bool symbolic_images)
 	{
 		Action action;
@@ -282,7 +282,7 @@ public class Actions : GLib.Object
 		}
 		return null;
 	}
-	
+
 	public Gtk.Toolbar build_toolbar(string[] actions, Gtk.Toolbar? toolbar=null)
 	{
 		var t = toolbar ?? new Gtk.Toolbar();
@@ -312,7 +312,7 @@ public class Actions : GLib.Object
 					warning("Action '%s' not found in registry.", full_name);
 					continue;
 				}
-				
+
 				string? label;
 				string? icon;
 				if (option != null)
@@ -325,7 +325,7 @@ public class Actions : GLib.Object
 					label = action.label;
 					icon = action.icon;
 				}
-				
+
 				var button = new Gtk.ToolButton(null, label);
 				button.set_action_name(action.scope + "." + detailed_name);
 				if (icon != null)
@@ -335,14 +335,14 @@ public class Actions : GLib.Object
 		}
 		return t;
 	}
-	
+
 	public void add_to_map_by_scope(string scope, ActionMap map)
 	{
 		foreach (var action in actions.get_values())
 			if (action.scope == scope)
 				action.add_to_map(map);
 	}
-	
+
 	public void add_to_map_by_name(string[] names, ActionMap map)
 	{
 		foreach (var name in names)
@@ -352,14 +352,14 @@ public class Actions : GLib.Object
 				action.add_to_map(map);
 		}
 	}
-	
+
 	private void on_action_activated(Action action, Variant? parameter)
 	{
 		var a = action as Action;
 		assert(a != null);
 		debug("Action activated: %s/%s.%s(%s)", a.group, a.scope, a.name, parameter == null ? "null" : parameter.print(false));
 	}
-	
+
 	private void on_action_changed(GLib.Object o, ParamSpec p)
 	{
 		var action = o as Action;
@@ -368,7 +368,7 @@ public class Actions : GLib.Object
 			critical("Passed object has to be Drt.Action.");
 			return;
 		}
-		
+
 		if (p.name == "keybinding")
 		{
 			var full_name = action.scope + "." + action.name;
@@ -399,7 +399,7 @@ public class Actions : GLib.Object
 		}
 		action_changed(action, p);
 	}
-	
+
 	public static string parse_full_name(string full_name, out int option)
 	{
 		var i = full_name.index_of("::");
@@ -408,7 +408,7 @@ public class Actions : GLib.Object
 			option = -1;
 			return full_name;
 		}
-		
+
 		option = int.parse(full_name.substring(i + 2));
 		return full_name.substring(0, i);
 	}
