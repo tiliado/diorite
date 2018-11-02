@@ -31,15 +31,15 @@ public const string ATTRIBUTE_ITEM_ID = "x-diorite-item-id";
 
 public class Actions : GLib.Object
 {
-	private HashTable<string, Drt.Lst<Action?>> groups;
+	private HashTable<string, GenericArray<Action?>?> groups;
 	private HashTable<string, Action?> actions;
 	public Gtk.Application app {get; private set;}
 	
 	public Actions(Gtk.Application app)
 	{
 		this.app = app;
-		groups = new HashTable<string, Drt.Lst<Action?>>(str_hash, str_equal); 
 		actions = new HashTable<string, Action?>(str_hash, str_equal); 
+		groups = new HashTable<string, GenericArray<Action?>?>(str_hash, str_equal);
 	}
 	
 	public static GLib.Menu copy_menu_model(GLib.MenuModel model)
@@ -76,16 +76,17 @@ public class Actions : GLib.Object
 	public void add_action(Action action, bool prepend=false)
 	{
 		var group_name = action.group;
-		var group = groups.get(group_name);
+		GenericArray<Action?>? group = groups[group_name];
 		if (group == null)
 		{
-			group = new Drt.Lst<Action>();
+			group = new GenericArray<Action?>(1);
 			groups.insert((owned) group_name, group);
 		}
-		if (prepend)
-			group.prepend(action);
-		else
-			group.append(action);
+		if (prepend) {
+			group.insert(0, action);
+		} else {
+			group.add(action);
+		}
 		actions.set(action.name, action);
 		action.activated.connect(on_action_activated);
 		var keybinding = action.keybinding;
@@ -103,7 +104,7 @@ public class Actions : GLib.Object
 	public void remove_action(Action action)
 	{
 		var group_name = action.group;
-		var group = groups.get(group_name);
+		GenericArray<Action?>? group = groups[group_name];
 		if (group != null)
 			group.remove(action);
 		
@@ -129,12 +130,16 @@ public class Actions : GLib.Object
 		return actions.get(name);
 	}
 	
-	public SList<Action?> get_group(string group_name)
+	public List<Action?> get_group(string group_name)
 	{
-		var group = groups.get(group_name);
-		if (group == null)
-			return new SList<Action?>();
-		return group.to_slist();
+		List<Action?> result = new List<Action?>();
+		GenericArray<Action?>? group = groups[group_name];
+		if (group != null) {
+			for (int i = group.length - 1; i >= 0; i--) {
+				result.prepend(group[i]);
+			}
+		}
+		return (owned) result;
 	}
 	
 	public List<unowned string> list_groups()

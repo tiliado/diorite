@@ -95,12 +95,12 @@ public class BluetoothService
 private class BluetoothProfile1 : GLib.Object, BluezProfile1
 {
 	private weak BluetoothService service;
-	private HashTable<ObjectPath, Drt.Lst<GLib.Socket>> sockets;
 	
+	private HashTable<ObjectPath, GenericArray<GLib.Socket>?> sockets;
 	public BluetoothProfile1(BluetoothService service)
 	{
 		this.service = service;
-		sockets = new HashTable<ObjectPath, Drt.Lst<GLib.Socket>>(str_hash, str_equal);
+		sockets = new HashTable<ObjectPath, GenericArray<GLib.Socket>?>(str_hash, str_equal);
 	}
 	
 	~BluetoothProfile1()
@@ -129,10 +129,10 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 		var address = parts.length == 5
 			? "%s/%s".printf(parts[3], parts[4].substring(4).replace("_", ":")) : device;
 		debug("New bluetooth connection from %s (%d).", address, fd.fd);
-		var device_sockets = sockets[device];
+		GenericArray<GLib.Socket>? device_sockets = sockets[device];
 		if (device_sockets == null)
-			sockets[device] = device_sockets = new Drt.Lst<GLib.Socket>();
-		device_sockets.prepend(fd);
+			sockets[device] = device_sockets = new GenericArray<GLib.Socket>(1);
+		device_sockets.add(fd);
 		var connection = new BluetoothConnection(fd, address);
 		uint8[] byte = {1};
 		connection.output.write(byte);
@@ -142,18 +142,15 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
 	public void request_disconnection(ObjectPath device) throws GLib.Error
 	{
 		debug("Bluetooth device disconnected: %s", device);
-		var device_sockets = sockets[device];
+		GenericArray<GLib.Socket>? device_sockets = sockets[device];
 		if (device_sockets != null)
 		{
-			foreach (var socket in device_sockets)
-			{
-				try
-				{
+			for (int i = 0, size = device_sockets.length; i < size; i++) {
+				unowned GLib.Socket socket = device_sockets[i];
+				try {
 					if(!socket.is_closed())
 						socket.close();
-				}
-				catch (GLib.Error e)
-				{
+				} catch (GLib.Error e) {
 					warning("Failed to close bluetooth socket %d of device %s. %s", socket.fd, device, e.message);
 				}
 			}
