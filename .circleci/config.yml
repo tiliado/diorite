@@ -15,19 +15,6 @@ jobs:
               wget tar xz \
               make autoconf automake glib2-devel graphviz-devel flex bison libxslt
             dnf clean all > /dev/null
-      - run:
-          name: Download Vala
-          command: |
-            wget http://download.gnome.org/sources/vala/0.42/vala-0.42.2.tar.xz
-            tar -xJf vala-0.42.2.tar.xz
-      - run:
-          name: Build Vala
-          working_directory: ~/workdir/vala-0.42.2
-          command: |
-            ./configure --prefix=/usr --disable-dependency-tracking
-            make all
-            dnf remove -y vala valadoc
-            make install
       - checkout:
           path: ~/workdir/diorite
       - run:
