@@ -144,7 +144,7 @@ public abstract class Application : Gtk.Application {
         Posix.sigaction(Posix.Signal.TERM, sig_action, null);
         Posix.sigaction(Posix.Signal.HUP, sig_action, null);
         Bus.watch_name(BusType.SESSION, XFCE_SESSION_SERVICE_NAME,
-        BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
+            BusNameWatcherFlags.NONE, on_xfce_session_appeared, on_xfce_session_vanished);
         base.startup();
 
         /* Use this enviroment variable only for debugging purposes */

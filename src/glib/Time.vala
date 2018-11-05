@@ -32,7 +32,7 @@ namespace Drt.Time
  */
 public int64 get_unix_time_now_utc()
 {
-	return new GLib.DateTime.now_utc().to_unix();
+    return new GLib.DateTime.now_utc().to_unix();
 }
 
 } // namespace Drt.Time

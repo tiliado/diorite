@@ -26,31 +26,31 @@ namespace Drt
 
 public class UtilsTest: Drt.TestCase
 {
-	public void test_slist_to_strv()
-	{
-		SList<string> list = null;
-		string[] expected = new string[10];
-		for (var i = 0; i < 10; i++)
-		{
-			expected[i] = "item%d".printf(i);
-			list.append(expected[i]);
-		}
-		var result = Drt.Utils.slist_to_strv(list);
-		expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
-	}
+    public void test_slist_to_strv()
+    {
+        SList<string> list = null;
+        string[] expected = new string[10];
+        for (var i = 0; i < 10; i++)
+        {
+            expected[i] = "item%d".printf(i);
+            list.append(expected[i]);
+        }
+        var result = Drt.Utils.slist_to_strv(list);
+        expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
+    }
 
-	public void test_list_to_strv()
-	{
-		List<string> list = null;
-		string[] expected = new string[10];
-		for (var i = 0; i < 10; i++)
-		{
-			expected[i] = "item%d".printf(i);
-			list.append(expected[i]);
-		}
-		var result = Drt.Utils.list_to_strv(list);
-		expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
-	}
+    public void test_list_to_strv()
+    {
+        List<string> list = null;
+        string[] expected = new string[10];
+        for (var i = 0; i < 10; i++)
+        {
+            expected[i] = "item%d".printf(i);
+            list.append(expected[i]);
+        }
+        var result = Drt.Utils.list_to_strv(list);
+        expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
+    }
 }
 
 } // namespace Drt

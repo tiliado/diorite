@@ -335,7 +335,7 @@ public abstract class TestCase : GLib.Object {
     private bool process_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, va_list args) {
         var result = process(
             (expected == null && value == null)
-            || (expected != null && value != null && expected.compare(value) == 0),
+        || (expected != null && value != null && expected.compare(value) == 0),
             format, args);
         if (!result && !Test.quiet()) {
             string? expected_hex = null, value_hex = null;
@@ -447,11 +447,11 @@ public abstract class TestCase : GLib.Object {
     }
 
     private void abort_test() throws TestError {
-         throw new TestError.FAIL("Test failed");
+        throw new TestError.FAIL("Test failed");
     }
 
     protected void not_imlemented() throws TestError {
-         throw new TestError.NOT_IMPLEMENTED("Test not implemented.");
+        throw new TestError.NOT_IMPLEMENTED("Test not implemented.");
     }
 
     public void exception(GLib.Error e) {
@@ -579,7 +579,7 @@ public abstract class TestCase : GLib.Object {
     public void summary() {
         if (!Test.quiet()) {
             stdout.printf(("[%s] %d run, %d passed, %d failed"),
-            failed > 0 ? "FAIL" : (passed > 0 ? "PASS" : "N/A"), passed + failed, passed, failed);
+                failed > 0 ? "FAIL" : (passed > 0 ? "PASS" : "N/A"), passed + failed, passed, failed);
             if (GLib.Test.verbose()) {
                 stdout.puts("\n----------------------------8<----------------------------\n");
             } else {

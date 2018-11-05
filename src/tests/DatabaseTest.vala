@@ -25,97 +25,97 @@ namespace Drtdb
 public class DatabaseTest: Drt.TestCase
 {
 
-	private File db_file;
-	private Database db;
+    private File db_file;
+    private Database db;
 
-	public override void set_up()
-	{
-		base.set_up();
-		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
-		delete_db_file();
-		db = new Database(db_file);
-	}
+    public override void set_up()
+    {
+        base.set_up();
+        db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
+        delete_db_file();
+        db = new Database(db_file);
+    }
 
-	public override void tear_down()
-	{
-		base.tear_down();
-		try
-		{
-			if (db.opened)
-				db.close();
-		}
-		catch (GLib.Error e)
-		{
-			warning("%s", e.message);
-		}
-		delete_db_file();
-	}
+    public override void tear_down()
+    {
+        base.tear_down();
+        try
+        {
+            if (db.opened)
+            db.close();
+        }
+        catch (GLib.Error e)
+        {
+            warning("%s", e.message);
+        }
+        delete_db_file();
+    }
 
-	private void delete_db_file()
-	{
-		if (db_file.query_exists())
-		{
-			try
-			{
-				db_file.delete();
-			}
-			catch (GLib.Error e)
-			{
-				warning("Cannot delete %s: %s", db_file.get_path(), e.message);
-			}
-		}
-	}
+    private void delete_db_file()
+    {
+        if (db_file.query_exists())
+        {
+            try
+            {
+                db_file.delete();
+            }
+            catch (GLib.Error e)
+            {
+                warning("Cannot delete %s: %s", db_file.get_path(), e.message);
+            }
+        }
+    }
 
-	public void test_open_close() throws Drt.TestError
-	{
-		assert(!db_file.query_exists(), "");
-		try
-		{
-			db.open();
-			db.close();
-		}
-		catch (GLib.Error e)
-		{
-			assert_not_reached("%s", e.message);
-		}
-		assert(db_file.query_exists(), "");
-	}
+    public void test_open_close() throws Drt.TestError
+    {
+        assert(!db_file.query_exists(), "");
+        try
+        {
+            db.open();
+            db.close();
+        }
+        catch (GLib.Error e)
+        {
+            assert_not_reached("%s", e.message);
+        }
+        assert(db_file.query_exists(), "");
+    }
 
-	public void test_exec() throws Drt.TestError
-	{
-		try
-		{
-			db.open();
-		}
-		catch (GLib.Error e)
-		{
-			assert_not_reached("%s", e.message);
-		}
-		try
-		{
-			db.exec("SELECT name FROM users WHERE id = 1");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no such table: users*", e.message, "");
-		}
-		try
-		{
-			db.exec("CREATE TABLE users(id INTEGER PRIMARY KEY ASC, name TEXT)");
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-		try
-		{
-			db.exec("SELECT name FROM users WHERE id = 1");
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
+    public void test_exec() throws Drt.TestError
+    {
+        try
+        {
+            db.open();
+        }
+        catch (GLib.Error e)
+        {
+            assert_not_reached("%s", e.message);
+        }
+        try
+        {
+            db.exec("SELECT name FROM users WHERE id = 1");
+        }
+        catch (GLib.Error e)
+        {
+            expect_str_match("*no such table: users*", e.message, "");
+        }
+        try
+        {
+            db.exec("CREATE TABLE users(id INTEGER PRIMARY KEY ASC, name TEXT)");
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("%s", e.message);
+        }
+        try
+        {
+            db.exec("SELECT name FROM users WHERE id = 1");
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("%s", e.message);
+        }
+    }
 }
 
 } // namespace Drtdb

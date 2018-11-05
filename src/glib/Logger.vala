@@ -31,250 +31,250 @@ namespace Drt
  */
 public class Logger
 {
-	private static GLib.LogLevelFlags display_level;
-	private static unowned FileStream output;
-	private static bool colorful;
-	private static string? hint;
-	private static DateTime? time_ref;
-	private static PatternSpec? fatal_string;
+    private static GLib.LogLevelFlags display_level;
+    private static unowned FileStream output;
+    private static bool colorful;
+    private static string? hint;
+    private static DateTime? time_ref;
+    private static PatternSpec? fatal_string;
 
-	public const int COLOR_FOREGROUND = 30;
-	public const int COLOR_BACKGROUND = 40;
-	public const int COLOR_BLACK = 0;
-	public const int COLOR_RED = 1;
-	public const int COLOR_GREEN = 2;
-	public const int COLOR_YELLOW = 3;
-	public const int COLOR_BLUE = 4;
-	public const int COLOR_MAGENTA = 5;
-	public const int COLOR_CYAN = 6;
-	public const int COLOR_WHITE = 7;
+    public const int COLOR_FOREGROUND = 30;
+    public const int COLOR_BACKGROUND = 40;
+    public const int COLOR_BLACK = 0;
+    public const int COLOR_RED = 1;
+    public const int COLOR_GREEN = 2;
+    public const int COLOR_YELLOW = 3;
+    public const int COLOR_BLUE = 4;
+    public const int COLOR_MAGENTA = 5;
+    public const int COLOR_CYAN = 6;
+    public const int COLOR_WHITE = 7;
 
 
-	public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
-	{
-		init(stderr, display_level, time, hint);
-	}
+    public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
+    {
+        init(stderr, display_level, time, hint);
+    }
 
-	/**
-	 * Initializes new logger for GLib
-	 *
-	 * @param output           output to write logger messages to (e. g. sys.stderr)
-	 * @param display_level    lowest log level to log
-	 */
-	public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
-	{
-		Logger.output = output;
-		Logger.display_level = display_level;
-		Logger.hint = hint != null ? hint + ": " : null;
-		var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
-		if (use_colors == "yes")
-		{
-			colorful = true;
-		}
-		else if (use_colors == "no")
-		{
-			colorful = false;
-		}
-		else
-		{
-			colorful = colors_supported();
-			// For subprocesses (they might have redirected output)
-			Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
-		}
+    /**
+     * Initializes new logger for GLib
+     *
+     * @param output           output to write logger messages to (e. g. sys.stderr)
+     * @param display_level    lowest log level to log
+     */
+    public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
+    {
+        Logger.output = output;
+        Logger.display_level = display_level;
+        Logger.hint = hint != null ? hint + ": " : null;
+        var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
+        if (use_colors == "yes")
+        {
+            colorful = true;
+        }
+        else if (use_colors == "no")
+        {
+            colorful = false;
+        }
+        else
+        {
+            colorful = colors_supported();
+            // For subprocesses (they might have redirected output)
+            Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
+        }
 
-		time_ref = time ? new DateTime.now_local() : null;
+        time_ref = time ? new DateTime.now_local() : null;
 
-		var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
-		if (fatal_string != null && fatal_string[0] != '\0')
-			Logger.fatal_string = new PatternSpec(fatal_string);
+        var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
+        if (fatal_string != null && fatal_string[0] != '\0')
+        Logger.fatal_string = new PatternSpec(fatal_string);
 
-		GLib.Log.set_default_handler(Logger.log_handler);
-	}
+        GLib.Log.set_default_handler(Logger.log_handler);
+    }
 
-	public static bool colors_supported()
-	{
-		return Posix.isatty(output.fileno());
-	}
+    public static bool colors_supported()
+    {
+        return Posix.isatty(output.fileno());
+    }
 
-	/**
-	 * Prints message to log without any hint
-	 *
-	 * @param format    message format
-	 */
-	[PrintfFormat]
-	public static void printf(string format, ...)
-	{
-		lock (output)
-		{
-			output.vprintf(format, va_list());
-			output.flush();
-		}
-	}
+    /**
+     * Prints message to log without any hint
+     *
+     * @param format    message format
+     */
+    [PrintfFormat]
+    public static void printf(string format, ...)
+    {
+        lock (output)
+        {
+            output.vprintf(format, va_list());
+            output.flush();
+        }
+    }
 
-	/**
-	 * Prints line to log without any hint
-	 *
-	 * @param line    line to log
-	 */
-	public static void puts(string line)
-	{
-		lock (output)
-		{
-			output.puts(line);
-			output.flush();
-		}
-	}
+    /**
+     * Prints line to log without any hint
+     *
+     * @param line    line to log
+     */
+    public static void puts(string line)
+    {
+        lock (output)
+        {
+            output.puts(line);
+            output.flush();
+        }
+    }
 
-	/**
-	 * Prints message to log with hint if specified
-	 *
-	 * @param format    message format
-	 */
-	[PrintfFormat]
-	public static void logf(string format, ...)
-	{
-		lock (output)
-		{
-			if (hint != null)
-			{
-				output.puts(hint);
-				output.putc(' ');
-			}
+    /**
+     * Prints message to log with hint if specified
+     *
+     * @param format    message format
+     */
+    [PrintfFormat]
+    public static void logf(string format, ...)
+    {
+        lock (output)
+        {
+            if (hint != null)
+            {
+                output.puts(hint);
+                output.putc(' ');
+            }
 
-			output.vprintf(format, va_list());
-			output.flush();
-		}
-	}
+            output.vprintf(format, va_list());
+            output.flush();
+        }
+    }
 
-	/**
-	 * Prints line to log with hint if specified
-	 *
-	 * @param line    line to log
-	 */
-	public static void log(string line)
-	{
-		lock (output)
-		{
-			if (hint != null)
-			{
-				output.puts(hint);
-				output.putc(' ');
-			}
+    /**
+     * Prints line to log with hint if specified
+     *
+     * @param line    line to log
+     */
+    public static void log(string line)
+    {
+        lock (output)
+        {
+            if (hint != null)
+            {
+                output.puts(hint);
+                output.putc(' ');
+            }
 
-			output.puts(line);
-			output.flush();
-		}
-	}
+            output.puts(line);
+            output.flush();
+        }
+    }
 
-	private static void log_handler(string? domain, LogLevelFlags level, string message)
-	{
-		var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
-		if (!is_fatal_string && level > Logger.display_level)
-			return;
+    private static void log_handler(string? domain, LogLevelFlags level, string message)
+    {
+        var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
+        if (!is_fatal_string && level > Logger.display_level)
+        return;
 
-		print(domain ?? "<unknown>", level, message);
+        print(domain ?? "<unknown>", level, message);
 
-		switch ((int)level)
-		{
-		case LogLevelFlags.LEVEL_ERROR:
-		case 6:
-			print(domain ?? "<unknown>", level, "Application will be terminated.");
-			break;
-		case LogLevelFlags.LEVEL_CRITICAL:
-			print(domain ?? "<unknown>", level, "Application will not function properly.");
-			break;
-		}
+        switch ((int)level)
+        {
+        case LogLevelFlags.LEVEL_ERROR:
+        case 6:
+            print(domain ?? "<unknown>", level, "Application will be terminated.");
+            break;
+        case LogLevelFlags.LEVEL_CRITICAL:
+            print(domain ?? "<unknown>", level, "Application will not function properly.");
+            break;
+        }
 
-		if (is_fatal_string)
-		{
-			print(domain ?? "<unknown>", LogLevelFlags.LEVEL_ERROR, "Will abort because of fatal string match.");
-			Process.abort();
-		}
-	}
+        if (is_fatal_string)
+        {
+            print(domain ?? "<unknown>", LogLevelFlags.LEVEL_ERROR, "Will abort because of fatal string match.");
+            Process.abort();
+        }
+    }
 
-	private static void print(string domain, LogLevelFlags level, string message)
-	{
-		string name = "";
-		var color = -1;
-		switch ((int)level)
-		{
-		case LogLevelFlags.LEVEL_CRITICAL:
-			name = "CRITICAL";
-			color = COLOR_RED;
-			break;
-		case LogLevelFlags.LEVEL_ERROR:
-		case 6:
-			name = "ERROR";
-			color = COLOR_RED;
-			break;
-		case LogLevelFlags.LEVEL_WARNING:
-			name = "WARNING";
-			color = COLOR_YELLOW;
-			break;
-		case LogLevelFlags.LEVEL_MESSAGE:
-		case LogLevelFlags.LEVEL_INFO:
-			name = "INFO";
-			color = COLOR_GREEN;
-			break;
-		case LogLevelFlags.LEVEL_DEBUG:
-			name = "DEBUG";
-			color = COLOR_BLUE;
-			break;
-		case LogLevelFlags.LEVEL_MASK:
-			name = "MASK";
-			break;
-		case LogLevelFlags.FLAG_RECURSION:
-			name = "Recursion";
-			break;
-		case LogLevelFlags.FLAG_FATAL:
-			name = "Fatal";
-			break;
-		default:
-			name = "Unknown";
-			break;
-		}
+    private static void print(string domain, LogLevelFlags level, string message)
+    {
+        string name = "";
+        var color = -1;
+        switch ((int)level)
+        {
+        case LogLevelFlags.LEVEL_CRITICAL:
+            name = "CRITICAL";
+            color = COLOR_RED;
+            break;
+        case LogLevelFlags.LEVEL_ERROR:
+        case 6:
+            name = "ERROR";
+            color = COLOR_RED;
+            break;
+        case LogLevelFlags.LEVEL_WARNING:
+            name = "WARNING";
+            color = COLOR_YELLOW;
+            break;
+        case LogLevelFlags.LEVEL_MESSAGE:
+        case LogLevelFlags.LEVEL_INFO:
+            name = "INFO";
+            color = COLOR_GREEN;
+            break;
+        case LogLevelFlags.LEVEL_DEBUG:
+            name = "DEBUG";
+            color = COLOR_BLUE;
+            break;
+        case LogLevelFlags.LEVEL_MASK:
+            name = "MASK";
+            break;
+        case LogLevelFlags.FLAG_RECURSION:
+            name = "Recursion";
+            break;
+        case LogLevelFlags.FLAG_FATAL:
+            name = "Fatal";
+            break;
+        default:
+            name = "Unknown";
+            break;
+        }
 
-		var hint = Logger.hint ?? "";
+        var hint = Logger.hint ?? "";
 
-		lock (output)
-		{
-			if (time_ref != null)
-			{
-				var now = new DateTime.now_local();
-				TimeSpan diff;
-				lock (time_ref)
-				{
-					diff = now.difference(time_ref);
-					time_ref = now;
-				}
-				name += " Δ";
-				var hours = diff / TimeSpan.HOUR;
-				if (hours > 0)
-				{
-					diff -= hours * TimeSpan.HOUR;
-					name += "%dh".printf((int) hours);
-				}
-				var minutes = diff / TimeSpan.MINUTE;
-				if (minutes  > 0)
-				{
-					diff -= minutes * TimeSpan.MINUTE;
-					name += "%02dm".printf((int) minutes);
-				}
-				var seconds = diff / TimeSpan.SECOND;
-				if (seconds  > 0)
-				{
-					diff -= seconds * TimeSpan.SECOND;
-					name += "%02ds".printf((int) seconds);
-				}
-				name += "%06dus".printf((int) diff);
-			}
-			if (Logger.colorful && color >= 0)
-				output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
-			else
-				output.printf("%s[%-8s %5s] %s\n", hint, name, domain, message);
-			output.flush();
-		}
-	}
+        lock (output)
+        {
+            if (time_ref != null)
+            {
+                var now = new DateTime.now_local();
+                TimeSpan diff;
+                lock (time_ref)
+                {
+                    diff = now.difference(time_ref);
+                    time_ref = now;
+                }
+                name += " Δ";
+                var hours = diff / TimeSpan.HOUR;
+                if (hours > 0)
+                {
+                    diff -= hours * TimeSpan.HOUR;
+                    name += "%dh".printf((int) hours);
+                }
+                var minutes = diff / TimeSpan.MINUTE;
+                if (minutes  > 0)
+                {
+                    diff -= minutes * TimeSpan.MINUTE;
+                    name += "%02dm".printf((int) minutes);
+                }
+                var seconds = diff / TimeSpan.SECOND;
+                if (seconds  > 0)
+                {
+                    diff -= seconds * TimeSpan.SECOND;
+                    name += "%02ds".printf((int) seconds);
+                }
+                name += "%06dus".printf((int) diff);
+            }
+            if (Logger.colorful && color >= 0)
+            output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
+            else
+            output.printf("%s[%-8s %5s] %s\n", hint, name, domain, message);
+            output.flush();
+        }
+    }
 }
 
 } // namespace Drt

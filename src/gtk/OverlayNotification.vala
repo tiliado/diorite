@@ -27,97 +27,97 @@ using Drt;
 namespace Drtgtk {
 
 public class OverlayNotification : Gtk.Revealer {
-	private static Quark response_id_quark;
-	public Gtk.Grid content_area {get; construct;}
-	public Gtk.Grid button_area {get; construct;}
+    private static Quark response_id_quark;
+    public Gtk.Grid content_area {get; construct;}
+    public Gtk.Grid button_area {get; construct;}
 
-	static construct {
-		response_id_quark = GLib.Quark.from_string("OverlayNotification.response_id");
-	}
+    static construct {
+        response_id_quark = GLib.Quark.from_string("OverlayNotification.response_id");
+    }
 
     public OverlayNotification(string? text) {
-		var content_area = new Gtk.Grid();
-		content_area.orientation = Gtk.Orientation.HORIZONTAL;
-		content_area.hexpand = content_area.vexpand = true;
-		content_area.halign = content_area.valign = Gtk.Align.FILL;
-		var button_area = new Gtk.Grid();
-		button_area.orientation = Gtk.Orientation.HORIZONTAL;
-		button_area.vexpand = true;
-		button_area.hexpand = false;
-		button_area.halign = button_area.valign = Gtk.Align.FILL;
-		GLib.Object(content_area: content_area, button_area: button_area);
+        var content_area = new Gtk.Grid();
+        content_area.orientation = Gtk.Orientation.HORIZONTAL;
+        content_area.hexpand = content_area.vexpand = true;
+        content_area.halign = content_area.valign = Gtk.Align.FILL;
+        var button_area = new Gtk.Grid();
+        button_area.orientation = Gtk.Orientation.HORIZONTAL;
+        button_area.vexpand = true;
+        button_area.hexpand = false;
+        button_area.halign = button_area.valign = Gtk.Align.FILL;
+        GLib.Object(content_area: content_area, button_area: button_area);
         var frame = new Gtk.Frame(null);
         base.add(frame);
-		var grid = new Gtk.Grid();
-		grid.orientation = Gtk.Orientation.HORIZONTAL;
-		grid.column_spacing = grid.row_spacing = 10;
-		frame.add(grid);
-		frame.get_style_context().add_class("app-notification");
-		grid.add(content_area);
-		grid.add(button_area);
+        var grid = new Gtk.Grid();
+        grid.orientation = Gtk.Orientation.HORIZONTAL;
+        grid.column_spacing = grid.row_spacing = 10;
+        frame.add(grid);
+        frame.get_style_context().add_class("app-notification");
+        grid.add(content_area);
+        grid.add(button_area);
 
         transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
-		hexpand = vexpand = false;
-		hexpand = true;
-		halign = Gtk.Align.CENTER;
-		valign = Gtk.Align.START;
+        hexpand = vexpand = false;
+        hexpand = true;
+        halign = Gtk.Align.CENTER;
+        valign = Gtk.Align.START;
 
         var button = new Gtk.Button.from_icon_name("window-close-symbolic");
-		button.set_qdata<int>(response_id_quark, Gtk.ResponseType.CLOSE);
-		button.clicked.connect(on_button_clicked);
-		button.hexpand = false;
-		button.vexpand = true;
-		button.halign = Gtk.Align.END;
-		button.valign = Gtk.Align.CENTER;
-		grid.add(button);
+        button.set_qdata<int>(response_id_quark, Gtk.ResponseType.CLOSE);
+        button.clicked.connect(on_button_clicked);
+        button.hexpand = false;
+        button.vexpand = true;
+        button.halign = Gtk.Align.END;
+        button.valign = Gtk.Align.CENTER;
+        grid.add(button);
 
-		if (text != null) {
-			add_child(Drtgtk.Labels.plain(text, true));
-		}
+        if (text != null) {
+            add_child(Drtgtk.Labels.plain(text, true));
+        }
 
-		frame.show_all();
+        frame.show_all();
     }
 
     public virtual signal void response(int response_id) {
-	}
+    }
 
     public void reveal() {
-		show();
-		reveal_child = true;
-	}
+        show();
+        reveal_child = true;
+    }
 
     public unowned Gtk.Button add_button(string label, int response_id) {
-		var button = new Gtk.Button.with_label(label);
-		button.set_qdata<int>(response_id_quark, response_id);
-		button.clicked.connect(on_button_clicked);
-		button.hexpand = false;
-		button.vexpand = true;
-		button.halign = Gtk.Align.END;
-		button.valign = Gtk.Align.CENTER;
-		button_area.add(button);
-		button.show();
-		unowned Gtk.Button tmp = button;
-		return tmp;
-	}
+        var button = new Gtk.Button.with_label(label);
+        button.set_qdata<int>(response_id_quark, response_id);
+        button.clicked.connect(on_button_clicked);
+        button.hexpand = false;
+        button.vexpand = true;
+        button.halign = Gtk.Align.END;
+        button.valign = Gtk.Align.CENTER;
+        button_area.add(button);
+        button.show();
+        unowned Gtk.Button tmp = button;
+        return tmp;
+    }
 
-	public override void add(Gtk.Widget widget) {
-		add_child(widget);
-	}
+    public override void add(Gtk.Widget widget) {
+        add_child(widget);
+    }
 
-	public void add_child(Gtk.Widget widget) {
-		widget.vexpand = true;
-		widget.valign = Gtk.Align.CENTER;
-		widget.show();
-		content_area.add(widget);
-	}
+    public void add_child(Gtk.Widget widget) {
+        widget.vexpand = true;
+        widget.valign = Gtk.Align.CENTER;
+        widget.show();
+        content_area.add(widget);
+    }
 
-	public override void remove(Gtk.Widget widget) {
-		content_area.remove(widget);
-	}
+    public override void remove(Gtk.Widget widget) {
+        content_area.remove(widget);
+    }
 
-	private void on_button_clicked(Gtk.Button button) {
-		response(button.get_qdata<int>(response_id_quark));
-	}
+    private void on_button_clicked(Gtk.Button button) {
+        response(button.get_qdata<int>(response_id_quark));
+    }
 }
 
 } // namespace Drtgtk

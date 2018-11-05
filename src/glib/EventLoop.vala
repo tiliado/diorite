@@ -30,8 +30,8 @@ namespace Drt.EventLoop
  */
 public async void resume_later()
 {
-	add_idle(resume_later.callback);
-	yield;
+    add_idle(resume_later.callback);
+    yield;
 }
 
 /**
@@ -40,8 +40,8 @@ public async void resume_later()
  * @param interval_ms    Milliseconds to sleep.
  */
 public async void sleep(uint interval_ms) {
-	add_timeout_ms(interval_ms, sleep.callback);
-	yield;
+    add_timeout_ms(interval_ms, sleep.callback);
+    yield;
 }
 
 /**
@@ -56,11 +56,11 @@ public async void sleep(uint interval_ms) {
  * @return Id of the corresponding event source.
  */
 public uint add_idle(owned SourceFunc function, int priority=GLib.Priority.DEFAULT_IDLE,
-MainContext? context=null) {
-	var source = new IdleSource();
-	source.set_priority(priority);
-	source.set_callback((owned) function);
-	return source.attach(context ?? MainContext.ref_thread_default());
+    MainContext? context=null) {
+    var source = new IdleSource();
+    source.set_priority(priority);
+    source.set_callback((owned) function);
+    return source.attach(context ?? MainContext.ref_thread_default());
 }
 
 /**
@@ -76,11 +76,11 @@ MainContext? context=null) {
  * @return Id of the corresponding event source.
  */
 public uint add_timeout_ms(uint interval_ms, owned SourceFunc function, int priority=GLib.Priority.DEFAULT,
-MainContext? context=null) {
-	var source = new TimeoutSource(interval_ms);
-	source.set_priority(priority);
-	source.set_callback((owned) function);
-	return source.attach(context ?? MainContext.ref_thread_default());
+    MainContext? context=null) {
+    var source = new TimeoutSource(interval_ms);
+    source.set_priority(priority);
+    source.set_callback((owned) function);
+    return source.attach(context ?? MainContext.ref_thread_default());
 }
 
 /**
@@ -96,8 +96,8 @@ MainContext? context=null) {
  * @return Id of the corresponding event source.
  */
 public uint add_timeout_sec(uint interval_s, owned SourceFunc function, int priority=GLib.Priority.DEFAULT,
-MainContext? context=null) {
-	return add_timeout_ms(interval_s * 1000, (owned) function, priority, context);
+    MainContext? context=null) {
+    return add_timeout_ms(interval_s * 1000, (owned) function, priority, context);
 }
 
 } // namespace Drt.EventLoop

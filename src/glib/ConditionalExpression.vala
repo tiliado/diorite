@@ -107,7 +107,7 @@ public class ConditionalExpression
         var buf = new StringBuilder(data);
         buf.append_c('\n');
         for (var i = 0; i < pos; i++)
-            buf.append_c('_');
+        buf.append_c('_');
         buf.append_c('^');
         while (len > 1)
         {
@@ -136,9 +136,9 @@ public class ConditionalExpression
         reset();
         var result = parse_block(Toks.EOF);
         if (is_error_set())
-            throw error_object;
+        throw error_object;
         else
-            return result;
+        return result;
     }
 
     /**
@@ -160,7 +160,7 @@ public class ConditionalExpression
     protected virtual bool call(int pos, string ident, string? parameters)
     {
         if (parameters != null)
-            set_eval_error(pos, "Parameteres are not supported.");
+        set_eval_error(pos, "Parameteres are not supported.");
         return parameters == null && ident != "false";
     }
 
@@ -169,7 +169,7 @@ public class ConditionalExpression
      */
     protected virtual void reset()
     {
-	}
+    }
 
     /**
      * Set parse error
@@ -258,9 +258,9 @@ public class ConditionalExpression
     private bool next(out Toks tok, out string? val, out int position)
     {
         if (peek(out tok, out val, out position))
-            return skip();
+        return skip();
         else
-            return false;
+        return false;
     }
 
     private bool skip()
@@ -311,7 +311,7 @@ public class ConditionalExpression
                 critical("Regex error: %s", e.message);
             }
             if (tok != Toks.SPACE)
-                return false;
+            return false;
         }
         tok = Toks.EOF;
         return false;
@@ -325,9 +325,9 @@ public class ConditionalExpression
         int pos;
         next(out tok, out val, out pos);
         if (tok == end_tok)
-            return result;
+        return result;
         else
-            return wrong_token(pos, tok, end_tok.to_str() + " token");
+        return wrong_token(pos, tok, end_tok.to_str() + " token");
     }
 
     private bool parse_expr(Toks bind)
@@ -356,7 +356,7 @@ public class ConditionalExpression
         {
             peek(out tok, out val, null);
             if (tok > bind)
-                return lvalue;
+            return lvalue;
 
             switch (tok)
             {
@@ -383,9 +383,9 @@ public class ConditionalExpression
             skip();
             var len = parameters.length;
             if (len > 2)
-				parameters = parameters.substring(1, len - 2);
-			else
-				parameters = null;
+            parameters = parameters.substring(1, len - 2);
+            else
+            parameters = null;
             return parse_call(pos, ident, parameters);
         }
         return parse_call(pos, ident, null);
@@ -394,7 +394,7 @@ public class ConditionalExpression
     private bool parse_call(int pos, string ident, string? parameters)
     {
         if (is_error_set())
-            return false;
+        return false;
         return call(pos, ident, parameters);
     }
 

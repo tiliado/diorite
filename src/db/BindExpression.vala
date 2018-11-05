@@ -44,129 +44,129 @@ namespace Drtdb
  */
 public class BindExpression
 {
-	private SList<Value?> values;
-	private StringBuilder sql;
+    private SList<Value?> values;
+    private StringBuilder sql;
 
-	/**
-	 * Create new bind expression parser
-	 */
-	public BindExpression()
-	{
-		reset();
-	}
+    /**
+     * Create new bind expression parser
+     */
+    public BindExpression()
+    {
+        reset();
+    }
 
-	/**
-	 * Reset the parser to the initial state.
-	 */
-	public void reset()
-	{
-		values = null;
-		if (sql == null)
-			sql = new StringBuilder("");
-		else
-			sql.truncate();
-	}
+    /**
+     * Reset the parser to the initial state.
+     */
+    public void reset()
+    {
+        values = null;
+        if (sql == null)
+        sql = new StringBuilder("");
+        else
+        sql.truncate();
+    }
 
-	/**
-	 * Get parsed var args as a list of proper {@link GLib.Value} instances.
-	 *
-	 * @return data as {@link GLib.Value} instances
-	 */
-	public unowned SList<Value?> get_values()
-	{
-		return values;
-	}
+    /**
+     * Get parsed var args as a list of proper {@link GLib.Value} instances.
+     *
+     * @return data as {@link GLib.Value} instances
+     */
+    public unowned SList<Value?> get_values()
+    {
+        return values;
+    }
 
-	/**
-	 * Get final SQL query
-	 *
-	 * @return SQL query without data type specifiers
-	 */
-	public unowned string get_sql()
-	{
-		return sql.str;
-	}
+    /**
+     * Get final SQL query
+     *
+     * @return SQL query without data type specifiers
+     */
+    public unowned string get_sql()
+    {
+        return sql.str;
+    }
 
-	/**
-	 * Parse SQL bind expression
-	 *
-	 * @param sql_str    a sql string
-	 * @param ...        data corresponding to the placeholders in the sql string
-	 * @throws DatabaseError if the expression contains invalid data type or is incomplete
-	 */
-	public void parse(string sql_str, ...) throws DatabaseError
-	{
-		parse_va(sql_str, va_list());
-	}
+    /**
+     * Parse SQL bind expression
+     *
+     * @param sql_str    a sql string
+     * @param ...        data corresponding to the placeholders in the sql string
+     * @throws DatabaseError if the expression contains invalid data type or is incomplete
+     */
+    public void parse(string sql_str, ...) throws DatabaseError
+    {
+        parse_va(sql_str, va_list());
+    }
 
-	/**
-	 * Parse SQL bind expression
-	 *
-	 * @param sql_str    a sql string
-	 * @param args       data corresponding to the placeholders in the sql string
-	 * @throws DatabaseError if the expression contains invalid data type or is incomplete
-	 */
-	public void parse_va(string sql_str, va_list args) throws DatabaseError
-	{
-		var offset = 0;
-		var len = sql_str.length;
-		unowned uint8[] data = sql_str.data;
-		int pos;
-		for (pos = 0; pos < len; pos++)
-		{
-			uint8 c = data[pos];
-			if (c == '?')
-			{
-				pos++;
-				sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
-				if (pos >= len)
-					throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
-				offset = pos + 1;
-				Value? val = null;
-				switch (data[pos])
-				{
-				case 'v':
-					val = args.arg();
-					break;
-				case 'b':
-					val = GLib.Value(typeof(bool));
-					val.set_boolean(args.arg());
-					break;
-				case 'i':
-					val = GLib.Value(typeof(int));
-					val.set_int(args.arg());
-					break;
-				case 'l':
-					val = GLib.Value(typeof(int64));
-					val.set_int64(args.arg());
-					break;
-				case 'f':
-					val = GLib.Value(typeof(double));
-					val.set_double(args.arg());
-					break;
-				case 's':
-					val = GLib.Value(typeof(string));
-					val.set_string(args.arg());
-					break;
-				case 'B':
-					val = GLib.Value(typeof(GLib.Bytes));
-					val.set_boxed(args.arg<GLib.Bytes>());
-					break;
-				case 'A':
-					val = GLib.Value(typeof(GLib.ByteArray));
-					val.set_boxed(args.arg<GLib.ByteArray>());
-					break;
-				default:
-					throw new DatabaseError.DATA_TYPE("Unknown data type specifier: '%c'.", data[pos]);
-				}
-				values.prepend((owned) val);
-			}
-		}
+    /**
+     * Parse SQL bind expression
+     *
+     * @param sql_str    a sql string
+     * @param args       data corresponding to the placeholders in the sql string
+     * @throws DatabaseError if the expression contains invalid data type or is incomplete
+     */
+    public void parse_va(string sql_str, va_list args) throws DatabaseError
+    {
+        var offset = 0;
+        var len = sql_str.length;
+        unowned uint8[] data = sql_str.data;
+        int pos;
+        for (pos = 0; pos < len; pos++)
+        {
+            uint8 c = data[pos];
+            if (c == '?')
+            {
+                pos++;
+                sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
+                if (pos >= len)
+                throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
+                offset = pos + 1;
+                Value? val = null;
+                switch (data[pos])
+                {
+                case 'v':
+                    val = args.arg();
+                    break;
+                case 'b':
+                    val = GLib.Value(typeof(bool));
+                    val.set_boolean(args.arg());
+                    break;
+                case 'i':
+                    val = GLib.Value(typeof(int));
+                    val.set_int(args.arg());
+                    break;
+                case 'l':
+                    val = GLib.Value(typeof(int64));
+                    val.set_int64(args.arg());
+                    break;
+                case 'f':
+                    val = GLib.Value(typeof(double));
+                    val.set_double(args.arg());
+                    break;
+                case 's':
+                    val = GLib.Value(typeof(string));
+                    val.set_string(args.arg());
+                    break;
+                case 'B':
+                    val = GLib.Value(typeof(GLib.Bytes));
+                    val.set_boxed(args.arg<GLib.Bytes>());
+                    break;
+                case 'A':
+                    val = GLib.Value(typeof(GLib.ByteArray));
+                    val.set_boxed(args.arg<GLib.ByteArray>());
+                    break;
+                default:
+                    throw new DatabaseError.DATA_TYPE("Unknown data type specifier: '%c'.", data[pos]);
+                }
+                values.prepend((owned) val);
+            }
+        }
 
-		values.reverse();
-		if (pos > offset)
-			sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
-	}
+        values.reverse();
+        if (pos > offset)
+        sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
+    }
 }
 
 } // namespace Drtdb

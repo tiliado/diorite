@@ -29,30 +29,30 @@ namespace Drtgtk
  */
 public class PopoverButton : Gtk.Button
 {
-	public Gtk.Popover popover {get; private set;}
+    public Gtk.Popover popover {get; private set;}
 
-	/**
-	 * Create new PopoverButton.
-	 *
-	 * @param label    The label of the button.
-	 */
-	public PopoverButton(string? label=null)
-	{
-		GLib.Object();
-		if (label != null)
-			this.label = label;
-	}
+    /**
+     * Create new PopoverButton.
+     *
+     * @param label    The label of the button.
+     */
+    public PopoverButton(string? label=null)
+    {
+        GLib.Object();
+        if (label != null)
+        this.label = label;
+    }
 
-	construct
-	{
-		popover = new Gtk.Popover(this);
-		popover.position = Gtk.PositionType.BOTTOM;
-	}
+    construct
+    {
+        popover = new Gtk.Popover(this);
+        popover.position = Gtk.PositionType.BOTTOM;
+    }
 
-	public override void clicked()
-	{
-		popover.show();
-	}
+    public override void clicked()
+    {
+        popover.show();
+    }
 }
 
 } // namespace Drtgtk

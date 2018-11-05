@@ -34,31 +34,31 @@ namespace Drtgtk.Icons
  * @return The ison name for given position.
  */
 public static unowned string get_icon_name_for_position(Gtk.PositionType position) {
-	switch (position) {
-	case Gtk.PositionType.LEFT: return "go-previous-symbolic";
-	case Gtk.PositionType.RIGHT: return "go-next-symbolic";
-	case Gtk.PositionType.TOP: return "go-up-symbolic";
-	case Gtk.PositionType.BOTTOM: return "go-down-symbolic";
-	default: return "go-previous-symbolic";
-	}
+    switch (position) {
+    case Gtk.PositionType.LEFT: return "go-previous-symbolic";
+    case Gtk.PositionType.RIGHT: return "go-next-symbolic";
+    case Gtk.PositionType.TOP: return "go-up-symbolic";
+    case Gtk.PositionType.BOTTOM: return "go-down-symbolic";
+    default: return "go-previous-symbolic";
+    }
 }
 
 public static Gdk.Pixbuf? load_theme_icon(string[] names, int size)
 {
-	foreach (var name in names)
-	{
-		try
-		{
-			var icon = Gtk.IconTheme.get_default().load_icon(name, size, 0);
-			if (icon != null)
-				return icon;
-		}
-		catch (GLib.Error e)
-		{
-			warning("Failed to load icon '%s': %s", name, e.message);
-		}
-	}
-	return null;
+    foreach (var name in names)
+    {
+        try
+        {
+            var icon = Gtk.IconTheme.get_default().load_icon(name, size, 0);
+            if (icon != null)
+            return icon;
+        }
+        catch (GLib.Error e)
+        {
+            warning("Failed to load icon '%s': %s", name, e.message);
+        }
+    }
+    return null;
 }
 
 } // namespace Drtgtk

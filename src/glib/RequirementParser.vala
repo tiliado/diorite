@@ -40,22 +40,22 @@ public errordomain RequirementError {
 }
 
 public enum RequirementState {
-	/**
-	 * The requirement is not supported.
-	 */
-	UNSUPPORTED,
-	/**
-	 * The requirement is supported.
-	 */
-	SUPPORTED,
-	/**
-	 * The requirement may or may not be supported.
-	 */
-	UNKNOWN,
-	/**
-	 * Parser error occurred.
-	 */
-	ERROR;
+    /**
+     * The requirement is not supported.
+     */
+    UNSUPPORTED,
+    /**
+     * The requirement is supported.
+     */
+    SUPPORTED,
+    /**
+     * The requirement may or may not be supported.
+     */
+    UNKNOWN,
+    /**
+     * Parser error occurred.
+     */
+    ERROR;
 }
 
 /**
@@ -116,7 +116,7 @@ public class RequirementParser {
         buf.append_c('\n');
         for (var i = 0; i < pos; i++) {
             buf.append_c('_');
-		}
+        }
         buf.append_c('^');
         while (len > 1) {
             buf.append_c('^');
@@ -139,7 +139,7 @@ public class RequirementParser {
         parse_all();
         if (is_error_set()) {
             throw error_object;
-		}
+        }
     }
 
     /**
@@ -160,7 +160,7 @@ public class RequirementParser {
     protected virtual RequirementState call(int pos, string ident, string? parameters) {
         if (parameters != null) {
             set_eval_error(pos, "Parameteres are not supported.");
-		}
+        }
         return parameters == null && ident != "false" ? RequirementState.SUPPORTED : RequirementState.UNSUPPORTED;
     }
 
@@ -168,16 +168,16 @@ public class RequirementParser {
      * Reset the inner state before parsing and evaluation of a new expression.
      */
     protected virtual void reset() {
-		pos = 0;
-		n_supported = 0;
-		n_unsupported = 0;
-		n_unknown = 0;
-		error_pos = -1;
-		error_text = null;
-		error_object = null;
-		failed_requirements = null;
-		unknown_requirements = null;
-	}
+        pos = 0;
+        n_supported = 0;
+        n_unsupported = 0;
+        n_unknown = 0;
+        error_pos = -1;
+        error_text = null;
+        error_object = null;
+        failed_requirements = null;
+        unknown_requirements = null;
+    }
 
     /**
      * Set parse error
@@ -252,7 +252,7 @@ public class RequirementParser {
             return skip();
         } else {
             return false;
-		}
+        }
     }
 
     private bool skip() {
@@ -265,22 +265,22 @@ public class RequirementParser {
     }
 
     private void add_failed(string rule) {
-		if (failed_requirements == null) {
-			failed_requirements = "";
-		} else {
-			failed_requirements += " ";
-		}
-		failed_requirements += rule;
-	}
+        if (failed_requirements == null) {
+            failed_requirements = "";
+        } else {
+            failed_requirements += " ";
+        }
+        failed_requirements += rule;
+    }
 
     private void add_unknown(string rule) {
-		if (unknown_requirements == null) {
-			unknown_requirements = "";
-		} else {
-			unknown_requirements += " ";
-		}
-		unknown_requirements += rule;
-	}
+        if (unknown_requirements == null) {
+            unknown_requirements = "";
+        } else {
+            unknown_requirements += " ";
+        }
+        unknown_requirements += rule;
+    }
 
     private bool peek(out Toks tok, out string? val, out int position) {
         val = null;
@@ -311,7 +311,7 @@ public class RequirementParser {
             }
             if (tok != Toks.SPACE) {
                 return false;
-			}
+            }
         }
         tok = Toks.EOF;
         return false;
@@ -322,35 +322,35 @@ public class RequirementParser {
         string? val = null;
         int pos = 0;
         while (!is_error_set() && next(out tok, out val, out pos)) {
-			switch (tok) {
-			case Toks.SPACE:
-			case Toks.SEMICOLON:
-				continue;
-			case Toks.IDENT:
-				switch (parse_rule(pos, val)) {
-				case RequirementState.SUPPORTED:
-					n_supported++;
-					break;
-				case RequirementState.UNSUPPORTED:
-					n_unsupported++;
-					break;
-				case RequirementState.UNKNOWN:
-					n_unknown++;
-					break;
-				case RequirementState.ERROR:
-					return;
-				default:
-					assert_not_reached();
-				}
-				break;
-			default:
-				wrong_token(pos, tok, "One of SPACE, SEMICOLON, IDENT tokens");
-				return;
-			}
-		}
+            switch (tok) {
+            case Toks.SPACE:
+            case Toks.SEMICOLON:
+                continue;
+            case Toks.IDENT:
+                switch (parse_rule(pos, val)) {
+                case RequirementState.SUPPORTED:
+                    n_supported++;
+                    break;
+                case RequirementState.UNSUPPORTED:
+                    n_unsupported++;
+                    break;
+                case RequirementState.UNKNOWN:
+                    n_unknown++;
+                    break;
+                case RequirementState.ERROR:
+                    return;
+                default:
+                    assert_not_reached();
+                }
+                break;
+            default:
+                wrong_token(pos, tok, "One of SPACE, SEMICOLON, IDENT tokens");
+                return;
+            }
+        }
         if (tok != Toks.EOF) {
-			wrong_token(pos, tok, "EOF token");
-		}
+            wrong_token(pos, tok, "EOF token");
+        }
     }
 
     private RequirementState parse_rule(int pos, string ident) {
@@ -360,10 +360,10 @@ public class RequirementParser {
             skip();
             var len = parameters.length;
             if (len > 2) {
-				parameters = parameters.substring(1, len - 2);
-			} else {
-				parameters = null;
-			}
+                parameters = parameters.substring(1, len - 2);
+            } else {
+                parameters = null;
+            }
             return parse_call(pos, ident, parameters);
         }
         return parse_call(pos, ident, null);
@@ -372,11 +372,11 @@ public class RequirementParser {
     private RequirementState parse_call(int pos, string ident, string? parameters) {
         var result = call(pos, ident, parameters);
         if (result == RequirementState.UNSUPPORTED) {
-			add_failed("%s[%s]".printf(ident, parameters ?? ""));
-		} else if (result == RequirementState.UNKNOWN) {
-			add_unknown("%s[%s]".printf(ident, parameters ?? ""));
-		}
-		return result;
+            add_failed("%s[%s]".printf(ident, parameters ?? ""));
+        } else if (result == RequirementState.UNKNOWN) {
+            add_unknown("%s[%s]".printf(ident, parameters ?? ""));
+        }
+        return result;
     }
 
     private enum Toks {

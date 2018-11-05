@@ -27,13 +27,13 @@ namespace Drtgtk
 
 public uint get_gtk_version()
 {
-	return Gtk.get_major_version() * 10000 + Gtk.get_minor_version() * 100 + Gtk.get_micro_version();
+    return Gtk.get_major_version() * 10000 + Gtk.get_minor_version() * 100 + Gtk.get_micro_version();
 }
 
 public bool check_gtk_version(uint min, uint max)
 {
-	var version = get_gtk_version();
-	return version >= min && version < max;
+    var version = get_gtk_version();
+    return version >= min && version < max;
 }
 
 } // namespace Drtgtk

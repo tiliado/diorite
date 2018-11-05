@@ -30,38 +30,38 @@ namespace Drt.Value
  */
 public string? to_string(GLib.Value? value)
 {
-	if (value == null)
-		return null;
+    if (value == null)
+    return null;
 
-	var type = value.type();
-	if (type.is_object())
-		return "%p".printf((void*) value.get_object());
-	if (type == typeof(int))
-		return value.get_int().to_string();
-	if (type == typeof(uint))
-		return value.get_uint().to_string();
-	if (type == typeof(int64))
-		return value.get_int64().to_string();
-	if (type == typeof(uint64))
-		return value.get_uint64().to_string();
-	if (type == typeof(string))
-		return value.get_string();
-	if (type == typeof(bool))
-		return value.get_boolean().to_string();
-	if (type == typeof(double))
-		return value.get_double().to_string();
-	if (type == typeof(float))
-		return value.get_float().to_string();
-	if (type == typeof(GLib.Bytes))
-		return Blobs.bytes_to_string((GLib.Bytes) value.get_boxed());
-	if (type == typeof(GLib.ByteArray))
-		return Blobs.byte_array_to_string((GLib.ByteArray) value.get_boxed());
-	if (type.is_a(Type.BOXED))
-		return "%p".printf((void*) value.get_boxed());
-	if (type.is_classed())
-		return "%p".printf((void*) value.peek_pointer());
+    var type = value.type();
+    if (type.is_object())
+    return "%p".printf((void*) value.get_object());
+    if (type == typeof(int))
+    return value.get_int().to_string();
+    if (type == typeof(uint))
+    return value.get_uint().to_string();
+    if (type == typeof(int64))
+    return value.get_int64().to_string();
+    if (type == typeof(uint64))
+    return value.get_uint64().to_string();
+    if (type == typeof(string))
+    return value.get_string();
+    if (type == typeof(bool))
+    return value.get_boolean().to_string();
+    if (type == typeof(double))
+    return value.get_double().to_string();
+    if (type == typeof(float))
+    return value.get_float().to_string();
+    if (type == typeof(GLib.Bytes))
+    return Blobs.bytes_to_string((GLib.Bytes) value.get_boxed());
+    if (type == typeof(GLib.ByteArray))
+    return Blobs.byte_array_to_string((GLib.ByteArray) value.get_boxed());
+    if (type.is_a(Type.BOXED))
+    return "%p".printf((void*) value.get_boxed());
+    if (type.is_classed())
+    return "%p".printf((void*) value.peek_pointer());
 
-	return null;
+    return null;
 }
 
 /**
@@ -69,41 +69,41 @@ public string? to_string(GLib.Value? value)
  */
 public bool equal(GLib.Value? value1, GLib.Value? value2)
 {
-	if (value1 == null && value2 == null)
-		return true;
-	if (!(value1 != null && value2 != null))
-		return false;
+    if (value1 == null && value2 == null)
+    return true;
+    if (!(value1 != null && value2 != null))
+    return false;
 
-	var type = value1.type();
-	if (type != value2.type())
-		return false;
+    var type = value1.type();
+    if (type != value2.type())
+    return false;
 
-	if (type == typeof(bool))
-		return value1.get_boolean() == value2.get_boolean();
-	if (type == typeof(int))
-		return value1.get_int() == value2.get_int();
-	if (type == typeof(uint))
-		return value1.get_uint() == value2.get_uint();
-	if (type == typeof(int64))
-		return value1.get_int64() == value2.get_int64();
-	if (type == typeof(uint64))
-		return value1.get_uint64() == value2.get_uint64();
-	if (type == typeof(string))
-		return value1.get_string() == value2.get_string();
-	if (type == typeof(double))
-		return value1.get_double() == value2.get_double();
-	if (type == typeof(float))
-		return value1.get_float() == value2.get_float();
-	if (type.is_object())
-		return value1.get_object() == value2.get_object();
-	if (type == typeof(GLib.Bytes))
-		return Blobs.bytes_equal((GLib.Bytes) value1.get_boxed(), (GLib.Bytes) value2.get_boxed());
-	if (type == typeof(GLib.ByteArray))
-		return Blobs.byte_array_equal((GLib.ByteArray) value1.get_boxed(), (GLib.ByteArray) value2.get_boxed());
-	if (type.is_a(Type.BOXED))
-		return value1.get_boxed() == value2.get_boxed();
+    if (type == typeof(bool))
+    return value1.get_boolean() == value2.get_boolean();
+    if (type == typeof(int))
+    return value1.get_int() == value2.get_int();
+    if (type == typeof(uint))
+    return value1.get_uint() == value2.get_uint();
+    if (type == typeof(int64))
+    return value1.get_int64() == value2.get_int64();
+    if (type == typeof(uint64))
+    return value1.get_uint64() == value2.get_uint64();
+    if (type == typeof(string))
+    return value1.get_string() == value2.get_string();
+    if (type == typeof(double))
+    return value1.get_double() == value2.get_double();
+    if (type == typeof(float))
+    return value1.get_float() == value2.get_float();
+    if (type.is_object())
+    return value1.get_object() == value2.get_object();
+    if (type == typeof(GLib.Bytes))
+    return Blobs.bytes_equal((GLib.Bytes) value1.get_boxed(), (GLib.Bytes) value2.get_boxed());
+    if (type == typeof(GLib.ByteArray))
+    return Blobs.byte_array_equal((GLib.ByteArray) value1.get_boxed(), (GLib.ByteArray) value2.get_boxed());
+    if (type.is_a(Type.BOXED))
+    return value1.get_boxed() == value2.get_boxed();
 
-	return_val_if_reached(false);
+    return_val_if_reached(false);
 }
 
 /**
@@ -111,13 +111,13 @@ public bool equal(GLib.Value? value1, GLib.Value? value2)
  */
 public string describe(GLib.Value? value)
 {
-	if (value == null)
-		return "<null>";
-	var type = value.type();
-	var content = to_string(value);
-	if (content != null)
-		return "<%s:%s>".printf(type.name(), content);
-	return "<%s>".printf(type.name());
+    if (value == null)
+    return "<null>";
+    var type = value.type();
+    var content = to_string(value);
+    if (content != null)
+    return "<%s:%s>".printf(type.name(), content);
+    return "<%s>".printf(type.name());
 }
 
 /**
@@ -125,12 +125,12 @@ public string describe(GLib.Value? value)
  */
 public bool equal_verbose(GLib.Value? value1, GLib.Value? value2, out string description)
 {
-	var result = equal(value1, value2);
-	if (result)
-		description = "equal %s".printf(describe(value1));
-	else
-		description = "%s != %s".printf(describe(value1), describe(value2));
-	return result;
+    var result = equal(value1, value2);
+    if (result)
+    description = "equal %s".printf(describe(value1));
+    else
+    description = "%s != %s".printf(describe(value1), describe(value2));
+    return result;
 }
 
 } // namespace Drt.Value

@@ -27,73 +27,73 @@ namespace Drt
 
 public class KeyValueMap: KeyValueStorage
 {
-	protected HashTable<string, Variant> values;
-	protected HashTable<string, Variant> default_values;
+    protected HashTable<string, Variant> values;
+    protected HashTable<string, Variant> default_values;
 
-	public KeyValueMap(HashTable<string, Variant>? default_values=null,
-		HashTable<string, Variant>? values=null)
-	{
-		this.values = values ?? new HashTable<string, Variant>(str_hash, str_equal);
-		this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
-	}
+    public KeyValueMap(HashTable<string, Variant>? default_values=null,
+        HashTable<string, Variant>? values=null)
+    {
+        this.values = values ?? new HashTable<string, Variant>(str_hash, str_equal);
+        this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
+    }
 
-	public override bool has_key(string key)
-	{
-		return key in values;
-	}
+    public override bool has_key(string key)
+    {
+        return key in values;
+    }
 
-	public override async bool has_key_async(string key) {
-		yield EventLoop.resume_later();
-		return has_key(key);
-	}
+    public override async bool has_key_async(string key) {
+        yield EventLoop.resume_later();
+        return has_key(key);
+    }
 
-	public override Variant? get_value(string key)
-	{
-		Variant? value = null;
-		if (values.lookup_extended(key, null, out value))
-			return value;
-		return default_values[key];
-	}
+    public override Variant? get_value(string key)
+    {
+        Variant? value = null;
+        if (values.lookup_extended(key, null, out value))
+        return value;
+        return default_values[key];
+    }
 
-	public override async Variant? get_value_async(string key) {
-		yield EventLoop.resume_later();
-		return get_value(key);
-	}
+    public override async Variant? get_value_async(string key) {
+        yield EventLoop.resume_later();
+        return get_value(key);
+    }
 
-	public override void unset(string key)
-	{
-		var old_value = get_value(key);
-		if (values.remove(key))
-			changed(key, old_value);
-	}
+    public override void unset(string key)
+    {
+        var old_value = get_value(key);
+        if (values.remove(key))
+        changed(key, old_value);
+    }
 
-	public override async void unset_async(string key) {
-		unset(key);
-		yield EventLoop.resume_later();
-	}
+    public override async void unset_async(string key) {
+        unset(key);
+        yield EventLoop.resume_later();
+    }
 
-	protected override void set_value_unboxed(string key, Variant? value)
-	{
-		var old_value = get_value(key);
-		values[key] = value;
-		if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
-			changed(key, old_value);
-	}
+    protected override void set_value_unboxed(string key, Variant? value)
+    {
+        var old_value = get_value(key);
+        values[key] = value;
+        if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
+        changed(key, old_value);
+    }
 
-	protected override async void set_value_unboxed_async(string key, Variant? value) {
-		set_value_unboxed(key, value);
-		yield EventLoop.resume_later();
-	}
+    protected override async void set_value_unboxed_async(string key, Variant? value) {
+        set_value_unboxed(key, value);
+        yield EventLoop.resume_later();
+    }
 
-	protected override void set_default_value_unboxed(string key, Variant? value)
-	{
-		default_values[key] = value;
-	}
+    protected override void set_default_value_unboxed(string key, Variant? value)
+    {
+        default_values[key] = value;
+    }
 
-	protected override async void set_default_value_unboxed_async(string key, Variant? value) {
-		set_default_value_unboxed(key, value);
-		yield EventLoop.resume_later();
-	}
+    protected override async void set_default_value_unboxed_async(string key, Variant? value) {
+        set_default_value_unboxed(key, value);
+        yield EventLoop.resume_later();
+    }
 }
 
 } // namespace Drt

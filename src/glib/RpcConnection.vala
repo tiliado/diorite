@@ -28,97 +28,97 @@ namespace Drt {
  * RPC Connection
  */
 public abstract class RpcConnection: GLib.Object {
-	public RpcRouter router {get; construct;}
-	public uint id {get; construct;}
-	public string? api_token {protected get; set; default = null;}
+    public RpcRouter router {get; construct;}
+    public uint id {get; construct;}
+    public string? api_token {protected get; set; default = null;}
 
-	/**
-	 * Send remote request asynchronously (non-blocking).
-	 *
-	 * @param method        Remote method name.
-	 * @param parameters    Remote method parameters.
-	 * @return Remote response.
-	 * @throws GLib.Error on failure.
-	 */
-	public async Variant? call(string method, Variant? parameters) throws GLib.Error	{
-		return yield call_full(method, parameters, true, "rw");
-	}
+    /**
+     * Send remote request asynchronously (non-blocking).
+     *
+     * @param method        Remote method name.
+     * @param parameters    Remote method parameters.
+     * @return Remote response.
+     * @throws GLib.Error on failure.
+     */
+    public async Variant? call(string method, Variant? parameters) throws GLib.Error	{
+        return yield call_full(method, parameters, true, "rw");
+    }
 
-	/**
-	 * Send remote request asynchronously (non-blocking) with additional options.
-	 *
-	 * @param method           Remote method name.
-	 * @param parameters       Remote method parameters.
-	 * @param allow_private    Allow calling private methods.
-	 * @param flags            Remote call flags.
-	 * @return Remote response.
-	 * @throws GLib.Error on failure.
-	 */
-	public abstract async Variant? call_full(string method, Variant? parameters, bool allow_private, string flags)
-	throws GLib.Error;
+    /**
+     * Send remote request asynchronously (non-blocking) with additional options.
+     *
+     * @param method           Remote method name.
+     * @param parameters       Remote method parameters.
+     * @param allow_private    Allow calling private methods.
+     * @param flags            Remote call flags.
+     * @return Remote response.
+     * @throws GLib.Error on failure.
+     */
+    public abstract async Variant? call_full(string method, Variant? parameters, bool allow_private, string flags)
+    throws GLib.Error;
 
-	/**
-	 * Send remote request synchronously (blocking).
-	 *
-	 * @param method        Remote method name.
-	 * @param parameters    Remote method parameters.
-	 * @return Remote response.
-	 * @throws GLib.Error on failure.
-	 */
-	public Variant? call_sync(string method, Variant? parameters) throws GLib.Error {
-		return call_full_sync(method, parameters, true, "rw");
-	}
+    /**
+     * Send remote request synchronously (blocking).
+     *
+     * @param method        Remote method name.
+     * @param parameters    Remote method parameters.
+     * @return Remote response.
+     * @throws GLib.Error on failure.
+     */
+    public Variant? call_sync(string method, Variant? parameters) throws GLib.Error {
+        return call_full_sync(method, parameters, true, "rw");
+    }
 
-	/**
-	 * Send remote request synchronously (blocking) with additional options..
-	 *
-	 * @param method        Remote method name.
-	 * @param parameters    Remote method parameters.
-	 * @param allow_private    Allow calling private methods.
-	 * @param flags            Remote call flags.
-	 * @return Remote response.
-	 * @throws GLib.Error on failure.
-	 */
-	public abstract Variant? call_full_sync(string method, Variant? parameters, bool allow_private, string flags)
-	throws GLib.Error;
+    /**
+     * Send remote request synchronously (blocking) with additional options..
+     *
+     * @param method        Remote method name.
+     * @param parameters    Remote method parameters.
+     * @param allow_private    Allow calling private methods.
+     * @param flags            Remote call flags.
+     * @return Remote response.
+     * @throws GLib.Error on failure.
+     */
+    public abstract Variant? call_full_sync(string method, Variant? parameters, bool allow_private, string flags)
+    throws GLib.Error;
 
-	/**
-	 * Subscribe to notification.
-	 *
-	 * @param notification    Notification path.
-	 * @param detail          Reserved for future use, pass `null`.
-	 * @throws GLib.Error on failure
-	 */
-	public async void subscribe(string notification, string? detail=null) throws GLib.Error	{
-		yield call_full(notification, new Variant("(bms)", true, detail), true, "ws");
-	}
+    /**
+     * Subscribe to notification.
+     *
+     * @param notification    Notification path.
+     * @param detail          Reserved for future use, pass `null`.
+     * @throws GLib.Error on failure
+     */
+    public async void subscribe(string notification, string? detail=null) throws GLib.Error	{
+        yield call_full(notification, new Variant("(bms)", true, detail), true, "ws");
+    }
 
-	/**
-	 * Unsubscribe from notification.
-	 *
-	 * @param notification    Notification path.
-	 * @param detail          Reserved for future use, pass `null`.
-	 * @throws GLib.Error on failure
-	 */
-	public async void unsubscribe(string notification, string? detail=null) throws GLib.Error {
-		yield call_full(notification, new Variant("(bms)", false, detail), true, "ws");
-	}
+    /**
+     * Unsubscribe from notification.
+     *
+     * @param notification    Notification path.
+     * @param detail          Reserved for future use, pass `null`.
+     * @throws GLib.Error on failure
+     */
+    public async void unsubscribe(string notification, string? detail=null) throws GLib.Error {
+        yield call_full(notification, new Variant("(bms)", false, detail), true, "ws");
+    }
 
-	/**
-	 * Send a response to remote call.
-	 *
-	 * @param id          Request id.
-	 * @param response    The response.
-	 */
-	public abstract void respond(uint id, Variant? response);
+    /**
+     * Send a response to remote call.
+     *
+     * @param id          Request id.
+     * @param response    The response.
+     */
+    public abstract void respond(uint id, Variant? response);
 
-	/**
-	 * Send an error to remote call.
-	 *
-	 * @param id    Request id.
-	 * @param e     The error.
-	 */
-	public abstract void fail(uint id, GLib.Error e);
+    /**
+     * Send an error to remote call.
+     *
+     * @param id    Request id.
+     * @param e     The error.
+     */
+    public abstract void fail(uint id, GLib.Error e);
 }
 
 } // namespace Drt

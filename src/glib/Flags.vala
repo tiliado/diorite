@@ -34,7 +34,7 @@ namespace Drt.Flags
  */
 public static inline bool is_set(int value, int flag)
 {
-	return (value & flag) != 0;
+    return (value & flag) != 0;
 }
 
 } // namespace Drt.Flags

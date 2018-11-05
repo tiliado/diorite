@@ -24,74 +24,74 @@ namespace Drt
 
 public class ConditionalExpressionTest: Drt.TestCase
 {
-	public void test_valid_expressions()
-	{
-		string[] entries = {
-	        "true",
-	        "false",
-	        "true and true",
-	        "true or true",
-	        "true and false",
-	        "false and true",
-	        "true or false",
-	        "not true",
-	        "not false",
-	        "not false and false",
-	        "not (false and false)",
-	        "false or not false",
+    public void test_valid_expressions()
+    {
+        string[] entries = {
+            "true",
+            "false",
+            "true and true",
+            "true or true",
+            "true and false",
+            "false and true",
+            "true or false",
+            "not true",
+            "not false",
+            "not false and false",
+            "not (false and false)",
+            "false or not false",
 
-	    };
-	    bool[] results = {
-	        true,
-	        false,
-	        true,
-	        true,
-	        false,
-	        false,
-	        true,
-	        false,
-	        true,
-	        false,
-	        true,
-	        true,
-	        false,
-	    };
-		var expr = new ConditionalExpression();
-		for (var i = 0; i < entries.length; i++)
-		{
-			var data = entries[i];
-			bool res = false;
-			expect_no_error(() => {res = expr.eval(data);}, "'%s'", data);
-			expect_true(results[i] == res, "'%s'", data);
-		}
-	}
+        };
+        bool[] results = {
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+        };
+        var expr = new ConditionalExpression();
+        for (var i = 0; i < entries.length; i++)
+        {
+            var data = entries[i];
+            bool res = false;
+            expect_no_error(() => {res = expr.eval(data);}, "'%s'", data);
+            expect_true(results[i] == res, "'%s'", data);
+        }
+    }
 
-	public void test_invalid_expressions()
-	{
-		string[] entries = {
-	        "false or not",
-	        "true and",
-	        "true or",
-	        "(true",
-	        "true true",
-	        "(true or false) (true or false)",
-	    };
-		string[] errors = {
-	        "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
-	        "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
-	        "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
-	        "*Unexpected end of data. RPAREN token expected*",
-	        "*Unexpected token IDENT. EOF token expected*",
-	        "*Unexpected token LPAREN. EOF token expected*",
-	    };
+    public void test_invalid_expressions()
+    {
+        string[] entries = {
+            "false or not",
+            "true and",
+            "true or",
+            "(true",
+            "true true",
+            "(true or false) (true or false)",
+        };
+        string[] errors = {
+            "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
+            "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
+            "*Unexpected end of data. One of IDENT, NOT or LPAREN tokens expected*",
+            "*Unexpected end of data. RPAREN token expected*",
+            "*Unexpected token IDENT. EOF token expected*",
+            "*Unexpected token LPAREN. EOF token expected*",
+        };
 
-		var expr = new ConditionalExpression();
-		for (var i = 0; i < entries.length; i++)
-		{
-			var data = entries[i];
-			expect_error(() => expr.eval(data), errors[i], "'%s'", data);
-		}
-	}
+        var expr = new ConditionalExpression();
+        for (var i = 0; i < entries.length; i++)
+        {
+            var data = entries[i];
+            expect_error(() => expr.eval(data), errors[i], "'%s'", data);
+        }
+    }
 
 
 }

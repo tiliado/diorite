@@ -24,37 +24,37 @@ namespace Drt
 
 public class KeyValueTreeTest: KeyValueStorageTest
 {
-	private KeyValueTree tree;
+    private KeyValueTree tree;
 
-	public override void set_up()
-	{
-		tree = new KeyValueTree();
-		storage = tree;
-	}
+    public override void set_up()
+    {
+        tree = new KeyValueTree();
+        storage = tree;
+    }
 
-	public override void tear_down()
-	{
-		tree = null;
-		storage = null;
-	}
+    public override void tear_down()
+    {
+        tree = null;
+        storage = null;
+    }
 
-	public void test_print()
-	{
-		var tree = new Drt.KeyValueTree();
-		tree.set_value("a", "a");
-		tree.set_value("b", "b");
-		tree.set_value("c.a", "c.a");
-		tree.set_value("c.b", "c.b");
-		tree.set_value("c.c", "c.c");
-		tree.set_value("c.d.a", "c.d.a");
-		tree.set_value("c.d.b", "c.d.b");
-		tree.set_value("c.d.c", "c.d.c");
-		tree.set_value("c.d.d", "c.d.d");
-		tree.set_value("d.a", 1);
-		tree.set_value("d.b", true);
-		tree.set_value("d.c", 3.14);
-		tree.set_value("d.d", int64.MAX);
-		var expected = """root
+    public void test_print()
+    {
+        var tree = new Drt.KeyValueTree();
+        tree.set_value("a", "a");
+        tree.set_value("b", "b");
+        tree.set_value("c.a", "c.a");
+        tree.set_value("c.b", "c.b");
+        tree.set_value("c.c", "c.c");
+        tree.set_value("c.d.a", "c.d.a");
+        tree.set_value("c.d.b", "c.d.b");
+        tree.set_value("c.d.c", "c.d.c");
+        tree.set_value("c.d.d", "c.d.d");
+        tree.set_value("d.a", 1);
+        tree.set_value("d.b", true);
+        tree.set_value("d.c", 3.14);
+        tree.set_value("d.d", int64.MAX);
+        var expected = """root
 - a: 'a'
 - b: 'b'
 - c: (null)
@@ -72,9 +72,9 @@ public class KeyValueTreeTest: KeyValueStorageTest
   - c: 3.1400000000000001
   - d: 9223372036854775807
 """;
-		var result = tree.print("- ");
-		expect(expected == result, "");
-	}
+        var result = tree.print("- ");
+        expect(expected == result, "");
+    }
 }
 
 } // namespace Nuvola

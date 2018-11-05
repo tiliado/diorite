@@ -24,199 +24,199 @@ namespace Drt
 
 public abstract class KeyValueStorageTest: Drt.TestCase
 {
-	protected KeyValueStorage storage = null;
+    protected KeyValueStorage storage = null;
 
-	public void test_get_null_for_empty_keys() throws Drt.TestError
-	{
-		assert(storage != null, "");
-		expect(storage.get_value("key1") == null, "");
-		expect(storage.get_value("key2") == null, "");
-		expect(storage.get_value("key3") == null, "");
-		expect(storage.get_value("key4.subkey1") == null, "");
-		expect(storage.get_value("key4.subkey2") == null, "");
-		expect(storage.get_value("key4.subkey3") == null, "");
-	}
+    public void test_get_null_for_empty_keys() throws Drt.TestError
+    {
+        assert(storage != null, "");
+        expect(storage.get_value("key1") == null, "");
+        expect(storage.get_value("key2") == null, "");
+        expect(storage.get_value("key3") == null, "");
+        expect(storage.get_value("key4.subkey1") == null, "");
+        expect(storage.get_value("key4.subkey2") == null, "");
+        expect(storage.get_value("key4.subkey3") == null, "");
+    }
 
-	public void test_set_get_default_value() throws Drt.TestError
-	{
-		assert(storage != null, "");
-		Variant v;
-		string key;
+    public void test_set_get_default_value() throws Drt.TestError
+    {
+        assert(storage != null, "");
+        Variant v;
+        string key;
 
-		key = "key1";
-		v = new Variant.int32(int32.MAX);
-		storage.set_default_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key1";
+        v = new Variant.int32(int32.MAX);
+        storage.set_default_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key2";
-		v = new Variant.string("hello");
-		storage.set_default_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key2";
+        v = new Variant.string("hello");
+        storage.set_default_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key3";
-		v = new Variant.double(3.14);
-		storage.set_default_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key3";
+        v = new Variant.double(3.14);
+        storage.set_default_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey1";
-		v = new Variant.int64(int64.MAX);
-		storage.set_default_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key4.subkey1";
+        v = new Variant.int64(int64.MAX);
+        storage.set_default_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey2";
-		v = new Variant.boolean(true);
-		storage.set_default_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-	}
+        key = "key4.subkey2";
+        v = new Variant.boolean(true);
+        storage.set_default_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+    }
 
-	public void test_set_get_value_no_default() throws Drt.TestError
-	{
-		assert(storage != null, "");
-		Variant v;
-		string key;
+    public void test_set_get_value_no_default() throws Drt.TestError
+    {
+        assert(storage != null, "");
+        Variant v;
+        string key;
 
-		key = "key1";
-		v = new Variant.int32(int32.MAX);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key1";
+        v = new Variant.int32(int32.MAX);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key2";
-		v = new Variant.string("hello");
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key2";
+        v = new Variant.string("hello");
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key3";
-		v = new Variant.double(3.14);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key3";
+        v = new Variant.double(3.14);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey1";
-		v = new Variant.int64(int64.MAX);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key4.subkey1";
+        v = new Variant.int64(int64.MAX);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey2";
-		v = new Variant.boolean(true);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-	}
+        key = "key4.subkey2";
+        v = new Variant.boolean(true);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+    }
 
-	public void test_set_get_value_with_default() throws Drt.TestError
-	{
-		assert(storage != null, "");
-		Variant d1 = new Variant.string("default1");
-		Variant d2 = new Variant.string("default2");
-		Variant v;
-		string key;
+    public void test_set_get_value_with_default() throws Drt.TestError
+    {
+        assert(storage != null, "");
+        Variant d1 = new Variant.string("default1");
+        Variant d2 = new Variant.string("default2");
+        Variant v;
+        string key;
 
-		key = "key1";
-		v = new Variant.int32(int32.MAX);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-		storage.set_default_value(key, d2);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key1";
+        v = new Variant.int32(int32.MAX);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+        storage.set_default_value(key, d2);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key2";
-		v = new Variant.string("hello");
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-		storage.set_default_value(key, d2);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key2";
+        v = new Variant.string("hello");
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+        storage.set_default_value(key, d2);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key3";
-		v = new Variant.double(3.14);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-		storage.set_default_value(key, d2);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key3";
+        v = new Variant.double(3.14);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+        storage.set_default_value(key, d2);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey1";
-		v = new Variant.int64(int64.MAX);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-		storage.set_default_value(key, d2);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
+        key = "key4.subkey1";
+        v = new Variant.int64(int64.MAX);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+        storage.set_default_value(key, d2);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
 
-		key = "key4.subkey2";
-		v = new Variant.boolean(true);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-		storage.set_default_value(key, d2);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(v), "");
-	}
+        key = "key4.subkey2";
+        v = new Variant.boolean(true);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+        storage.set_default_value(key, d2);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(v), "");
+    }
 
-	public void test_unset_with_default() throws Drt.TestError
-	{
-		assert(storage != null, "");
-		Variant d1 = new Variant.string("default1");
-		Variant v;
-		string key;
+    public void test_unset_with_default() throws Drt.TestError
+    {
+        assert(storage != null, "");
+        Variant d1 = new Variant.string("default1");
+        Variant v;
+        string key;
 
-		key = "key1";
-		v = new Variant.int32(int32.MAX);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		storage.unset(key);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(d1), "");
+        key = "key1";
+        v = new Variant.int32(int32.MAX);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        storage.unset(key);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(d1), "");
 
-		key = "key2";
-		v = new Variant.string("hello");
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		storage.unset(key);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(d1), "");
+        key = "key2";
+        v = new Variant.string("hello");
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        storage.unset(key);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(d1), "");
 
-		key = "key3";
-		v = new Variant.double(3.14);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		storage.unset(key);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(d1), "");
+        key = "key3";
+        v = new Variant.double(3.14);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        storage.unset(key);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(d1), "");
 
-		key = "key4.subkey1";
-		v = new Variant.int64(int64.MAX);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		storage.unset(key);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(d1), "");
+        key = "key4.subkey1";
+        v = new Variant.int64(int64.MAX);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        storage.unset(key);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(d1), "");
 
-		key = "key4.subkey2";
-		v = new Variant.boolean(true);
-		storage.set_default_value(key, d1);
-		storage.set_value(key, v);
-		storage.unset(key);
-		expect(storage.get_value(key) != null, "");
-		expect(storage.get_value(key).equal(d1), "");
-	}
+        key = "key4.subkey2";
+        v = new Variant.boolean(true);
+        storage.set_default_value(key, d1);
+        storage.set_value(key, v);
+        storage.unset(key);
+        expect(storage.get_value(key) != null, "");
+        expect(storage.get_value(key).equal(d1), "");
+    }
 }
 
 } // namespace Nuvola

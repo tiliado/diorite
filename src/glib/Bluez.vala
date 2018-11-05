@@ -28,16 +28,16 @@ namespace Drt
 [DBus(name = "org.bluez.ProfileManager1")]
 public interface BluezProfileManager1 : GLib.Object
 {
-	public abstract void register_profile(ObjectPath profile, string uuid, HashTable<string, Variant> options) throws GLib.Error;
-	public abstract void unregister_profile(ObjectPath profile) throws GLib.Error;
+    public abstract void register_profile(ObjectPath profile, string uuid, HashTable<string, Variant> options) throws GLib.Error;
+    public abstract void unregister_profile(ObjectPath profile) throws GLib.Error;
 }
 
 [DBus(name = "org.bluez.Profile1")]
 public interface BluezProfile1 : GLib.Object
 {
-	public abstract void release() throws GLib.Error;
-	public abstract void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error;
-	public abstract void request_disconnection(ObjectPath device) throws GLib.Error;
+    public abstract void release() throws GLib.Error;
+    public abstract void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error;
+    public abstract void request_disconnection(ObjectPath device) throws GLib.Error;
 }
 
 } // namespace Drt

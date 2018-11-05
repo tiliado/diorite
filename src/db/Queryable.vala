@@ -30,52 +30,52 @@ namespace Drtdb
  */
 public interface Queryable: GLib.Object
 {
-	/**
-	 * Execute a sql query on database conection
-	 *
-	 * @param sql            SQL query
-	 * @param cancellable    Cancellable object
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public abstract void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+    /**
+     * Execute a sql query on database conection
+     *
+     * @param sql            SQL query
+     * @param cancellable    Cancellable object
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails
+     */
+    public abstract void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
 
-	/**
-	 * Create new raw data query
-	 *
-	 * After query is created, primitive data types can be bound prior execution.
-	 *
-	 * @param sql            SQL query
-	 * @param cancellable    Cancellable object
-	 * @return new query object for further modifications prior execution
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public abstract Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+    /**
+     * Create new raw data query
+     *
+     * After query is created, primitive data types can be bound prior execution.
+     *
+     * @param sql            SQL query
+     * @param cancellable    Cancellable object
+     * @return new query object for further modifications prior execution
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails
+     */
+    public abstract Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
 
 
-	/**
-	 * Get ORM objects
-	 *
-	 * @param cancellable    Cancellable object
-	 * @return new ORM query object
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public abstract ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+    /**
+     * Get ORM objects
+     *
+     * @param cancellable    Cancellable object
+     * @return new ORM query object
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails
+     */
+    public abstract ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
 
-	/**
-	 * Get a single ORM object
-	 *
-	 * @param pk             value of primary key
-	 * @param cancellable    Cancellable object
-	 * @return new ORM object
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public abstract T get_object<T>(GLib.Value pk, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
+    /**
+     * Get a single ORM object
+     *
+     * @param pk             value of primary key
+     * @param cancellable    Cancellable object
+     * @return new ORM object
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails
+     */
+    public abstract T get_object<T>(GLib.Value pk, Cancellable? cancellable=null) throws GLib.Error, DatabaseError;
 
-	public abstract unowned string? get_last_error_message();
+    public abstract unowned string? get_last_error_message();
 }
 
 } // namespace Drtdb

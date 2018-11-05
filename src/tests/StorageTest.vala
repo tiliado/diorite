@@ -24,14 +24,14 @@ namespace Drt
 
 public class StorageTest: Drt.TestCase
 {
-	public void test_get_data_file()
-	{
-		var storage = new Storage("build/tmp", {"src/tests/data/storage"}, "build/tmp", "build/tmp");
-		expect_not_null(storage.get_data_file("file.txt"), "file.txt is regular");
-		expect_not_null(storage.get_data_file("file2.txt"), "file2.txt is symlink to regular");
-		expect_null(storage.get_data_file("file3.txt"), "file3.txt is broken symlink");
-		expect_null(storage.get_data_file("file4.txt"), "file4.txt is symlink to dir");
-	}
+    public void test_get_data_file()
+    {
+        var storage = new Storage("build/tmp", {"src/tests/data/storage"}, "build/tmp", "build/tmp");
+        expect_not_null(storage.get_data_file("file.txt"), "file.txt is regular");
+        expect_not_null(storage.get_data_file("file2.txt"), "file2.txt is symlink to regular");
+        expect_null(storage.get_data_file("file3.txt"), "file3.txt is broken symlink");
+        expect_null(storage.get_data_file("file4.txt"), "file4.txt is symlink to dir");
+    }
 }
 
 } // namespace Drt

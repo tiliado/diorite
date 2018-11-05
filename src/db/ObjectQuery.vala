@@ -32,56 +32,56 @@ namespace Drtdb
  */
 public class ObjectQuery<T> : GLib.Object
 {
-	// Query to retrieve objects.
-	private Query query;
-	private OrmManager orm;
+    // Query to retrieve objects.
+    private Query query;
+    private OrmManager orm;
 
-	/**
-	 * Creates new ObjectQuery object.
-	 *
-	 * @param orm      ORM manager
-	 * @param query    the corresponding {@link Query} to retrieve object data
-	 */
-	public ObjectQuery(OrmManager orm, Query query)
-	{
-		this.orm = orm;
-		this.query = query;
-	}
+    /**
+     * Creates new ObjectQuery object.
+     *
+     * @param orm      ORM manager
+     * @param query    the corresponding {@link Query} to retrieve object data
+     */
+    public ObjectQuery(OrmManager orm, Query query)
+    {
+        this.orm = orm;
+        this.query = query;
+    }
 
-	/**
-	 * Retrieve a single object.
-	 *
-	 * @param cancellable    Cancellable object
-	 * @return db record as a requested object
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails, e.g. no object or more then one object are found
-	 */
-	public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-	{
-		var result = query.get_result();
-		if (!result.next(cancellable))
-			throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
-		var object = orm.create_object<T>(result);
-		var initable = object as GLib.Initable;
-		if (initable != null)
-			initable.init(cancellable);
-		if (result.next(cancellable))
-			throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
-		return object;
-	}
+    /**
+     * Retrieve a single object.
+     *
+     * @param cancellable    Cancellable object
+     * @return db record as a requested object
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails, e.g. no object or more then one object are found
+     */
+    public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+    {
+        var result = query.get_result();
+        if (!result.next(cancellable))
+        throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
+        var object = orm.create_object<T>(result);
+        var initable = object as GLib.Initable;
+        if (initable != null)
+        initable.init(cancellable);
+        if (result.next(cancellable))
+        throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
+        return object;
+    }
 
-	/**
-	 * Get cursor to browse resulting set of objects.
-	 *
-	 * @param cancellable    Cancellable object
-	 * @return data set cursor
-	 * @throws GLib.IOError when the operation is cancelled
-	 * @throws DatabaseError when operation fails
-	 */
-	public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-	{
-		return new ObjectCursor<T>(orm, query.get_result(), cancellable);
-	}
+    /**
+     * Get cursor to browse resulting set of objects.
+     *
+     * @param cancellable    Cancellable object
+     * @return data set cursor
+     * @throws GLib.IOError when the operation is cancelled
+     * @throws DatabaseError when operation fails
+     */
+    public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
+    {
+        return new ObjectCursor<T>(orm, query.get_result(), cancellable);
+    }
 }
 
 } // namespace Drtdb

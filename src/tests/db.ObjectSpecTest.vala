@@ -24,107 +24,107 @@ namespace Drtdb
 
 public class ObjectSpecTest: Drt.TestCase
 {
-	private File db_file;
-	private Database db;
+    private File db_file;
+    private Database db;
 
-	public override void set_up()
-	{
-		base.set_up();
-		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
-		delete_db_file();
-		db = new Database(db_file);
-	}
+    public override void set_up()
+    {
+        base.set_up();
+        db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
+        delete_db_file();
+        db = new Database(db_file);
+    }
 
-	public override void tear_down()
-	{
-		base.tear_down();
-		try
-		{
-			if (db.opened)
-				db.close();
-		}
-		catch (GLib.Error e)
-		{
-			warning("%s", e.message);
-		}
-		delete_db_file();
-	}
+    public override void tear_down()
+    {
+        base.tear_down();
+        try
+        {
+            if (db.opened)
+            db.close();
+        }
+        catch (GLib.Error e)
+        {
+            warning("%s", e.message);
+        }
+        delete_db_file();
+    }
 
-	private void delete_db_file()
-	{
-		if (db_file.query_exists())
-		{
-			try
-			{
-				db_file.delete();
-			}
-			catch (GLib.Error e)
-			{
-				warning("Cannot delete %s: %s", db_file.get_path(), e.message);
-			}
-		}
-	}
+    private void delete_db_file()
+    {
+        if (db_file.query_exists())
+        {
+            try
+            {
+                db_file.delete();
+            }
+            catch (GLib.Error e)
+            {
+                warning("Cannot delete %s: %s", db_file.get_path(), e.message);
+            }
+        }
+    }
 
-	public void test_new()
-	{
-		try
-		{
-			new ObjectSpec(typeof(SimpleUser), "");
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
-		}
+    public void test_new()
+    {
+        try
+        {
+            new ObjectSpec(typeof(SimpleUser), "");
+            expectation_failed("Expected error");
+        }
+        catch (GLib.Error e)
+        {
+            expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
+        }
 
-		try
-		{
-			new ObjectSpec(typeof(User), "");
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no property named ''*", e.message, "empty primary key");
-		}
+        try
+        {
+            new ObjectSpec(typeof(User), "");
+            expectation_failed("Expected error");
+        }
+        catch (GLib.Error e)
+        {
+            expect_str_match("*no property named ''*", e.message, "empty primary key");
+        }
 
-		try
-		{
-			new ObjectSpec(typeof(User), "foo");
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no property named 'foo'*", e.message, "invalid primary key");
-		}
+        try
+        {
+            new ObjectSpec(typeof(User), "foo");
+            expectation_failed("Expected error");
+        }
+        catch (GLib.Error e)
+        {
+            expect_str_match("*no property named 'foo'*", e.message, "invalid primary key");
+        }
 
-		try
-		{
-			new ObjectSpec(typeof(User), "id", {"foo", "bar", "baz"});
-			expectation_failed("Expected error");
-		}
-		catch (GLib.Error e)
-		{
-			expect_str_match("*no property named 'foo'.*", e.message, "invalid property");
-		}
+        try
+        {
+            new ObjectSpec(typeof(User), "id", {"foo", "bar", "baz"});
+            expectation_failed("Expected error");
+        }
+        catch (GLib.Error e)
+        {
+            expect_str_match("*no property named 'foo'.*", e.message, "invalid property");
+        }
 
-		try
-		{
-			new ObjectSpec(typeof(User), "id", User.all_props());
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("Unexpected error: %s", e.message);
-		}
+        try
+        {
+            new ObjectSpec(typeof(User), "id", User.all_props());
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("Unexpected error: %s", e.message);
+        }
 
-		try
-		{
-			new ObjectSpec(typeof(User), "id");
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("Unexpected error: %s", e.message);
-		}
-	}
+        try
+        {
+            new ObjectSpec(typeof(User), "id");
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("Unexpected error: %s", e.message);
+        }
+    }
 }
 
 } // namespace Drtdb

@@ -224,29 +224,29 @@ public bool hexadecimal_to_blob(string hex, out uint8[] result, char separator='
             continue;
         }
         switch (c) {
-         case '0': j = 0; break;
-         case '1': j = 1; break;
-         case '2': j = 2; break;
-         case '3': j = 3; break;
-         case '4': j = 4; break;
-         case '5': j = 5; break;
-         case '6': j = 6; break;
-         case '7': j = 7; break;
-         case '8': j = 8; break;
-         case '9': j = 9; break;
-         case 'A': j = 10; break;
-         case 'B': j = 11; break;
-         case 'C': j = 12; break;
-         case 'D': j = 13; break;
-         case 'E': j = 14; break;
-         case 'F': j = 15; break;
-         case 'a': j = 10; break;
-         case 'b': j = 11; break;
-         case 'c': j = 12; break;
-         case 'd': j = 13; break;
-         case 'e': j = 14; break;
-         case 'f': j = 15; break;
-         default: return false;
+        case '0': j = 0; break;
+        case '1': j = 1; break;
+        case '2': j = 2; break;
+        case '3': j = 3; break;
+        case '4': j = 4; break;
+        case '5': j = 5; break;
+        case '6': j = 6; break;
+        case '7': j = 7; break;
+        case '8': j = 8; break;
+        case '9': j = 9; break;
+        case 'A': j = 10; break;
+        case 'B': j = 11; break;
+        case 'C': j = 12; break;
+        case 'D': j = 13; break;
+        case 'E': j = 14; break;
+        case 'F': j = 15; break;
+        case 'a': j = 10; break;
+        case 'b': j = 11; break;
+        case 'c': j = 12; break;
+        case 'd': j = 13; break;
+        case 'e': j = 14; break;
+        case 'f': j = 15; break;
+        default: return false;
         }
         result[i/2] += i % 2 == 0 ? (j << 4) : j;
     }

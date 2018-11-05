@@ -27,17 +27,17 @@ namespace Drtdb
 
 public errordomain DatabaseError
 {
-	UNKNOWN,
-	IOERROR,
-	DATABASE_NOT_OPENED,
-	GENERAL,
-	RANGE,
-	DATA_TYPE,
-	NAME,
-	MISMATCH,
-	MISUSE,
-	DOES_NOT_EXIST,
-	TOO_MANY_RESULTS;
+    UNKNOWN,
+    IOERROR,
+    DATABASE_NOT_OPENED,
+    GENERAL,
+    RANGE,
+    DATA_TYPE,
+    NAME,
+    MISMATCH,
+    MISUSE,
+    DOES_NOT_EXIST,
+    TOO_MANY_RESULTS;
 }
 
 /**
@@ -48,18 +48,18 @@ public errordomain DatabaseError
  */
 public bool is_type_supported(Type? type)
 {
-	return (
-		type == null
-		|| type == typeof(bool)
-		|| type == typeof(int)
-		|| type == typeof(int64)
-		|| type == typeof(string)
-		|| type == typeof(double)
-		|| type == typeof(float)
-		|| type == typeof(GLib.Bytes)
-		|| type == typeof(GLib.ByteArray)
-		|| type == typeof(void*)
-	);
+    return (
+        type == null
+    || type == typeof(bool)
+    || type == typeof(int)
+    || type == typeof(int64)
+    || type == typeof(string)
+    || type == typeof(double)
+    || type == typeof(float)
+    || type == typeof(GLib.Bytes)
+    || type == typeof(GLib.ByteArray)
+    || type == typeof(void*)
+    );
 }
 
 /**
@@ -70,24 +70,24 @@ public bool is_type_supported(Type? type)
  * @return array of requested property specifications
  */
 private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, string[]? properties = null)
-		throws DatabaseError
+throws DatabaseError
 {
-	(unowned ParamSpec)[] properties_list;
-	if (properties == null || properties.length == 0)
-	{
-		properties_list = class_spec.list_properties();
-	}
-	else
-	{
-		properties_list = new (unowned ParamSpec)[properties.length];
-		for (var i = 0; i < properties.length; i++)
-		{
-			properties_list[i] = class_spec.find_property(properties[i]);
-			if (properties_list[i] == null)
-				throw new DatabaseError.NAME("There is no property named '%s'.", properties[i]);
-		}
-	}
-	return properties_list;
+    (unowned ParamSpec)[] properties_list;
+    if (properties == null || properties.length == 0)
+    {
+        properties_list = class_spec.list_properties();
+    }
+    else
+    {
+        properties_list = new (unowned ParamSpec)[properties.length];
+        for (var i = 0; i < properties.length; i++)
+        {
+            properties_list[i] = class_spec.find_property(properties[i]);
+            if (properties_list[i] == null)
+            throw new DatabaseError.NAME("There is no property named '%s'.", properties[i]);
+        }
+    }
+    return properties_list;
 }
 
 /**
@@ -105,13 +105,13 @@ private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, str
  * @return corresponding {@link DatabaseError}
  */
 private DatabaseError convert_sqlite_error(int errno, string? message, string? sql=null,
-	Sqlite.Statement? stm = null)
+    Sqlite.Statement? stm = null)
 {
-	var msg = "SQLite Error %d: %s. |%s|".printf(
-		errno,
-		message ?? "(unknown message)",
-		sql ?? (stm != null ? stm.sql() : null));
-	return new DatabaseError.GENERAL(msg);
+    var msg = "SQLite Error %d: %s. |%s|".printf(
+        errno,
+        message ?? "(unknown message)",
+        sql ?? (stm != null ? stm.sql() : null));
+    return new DatabaseError.GENERAL(msg);
 }
 
 
@@ -123,15 +123,15 @@ private DatabaseError convert_sqlite_error(int errno, string? message, string? s
  */
 private inline bool is_sql_error(int result_code)
 {
-	switch (result_code)
-	{
-		case Sqlite.OK:
-		case Sqlite.ROW:
-		case Sqlite.DONE:
-			return false;
-		default:
-			return true;
-	}
+    switch (result_code)
+    {
+    case Sqlite.OK:
+    case Sqlite.ROW:
+    case Sqlite.DONE:
+        return false;
+    default:
+        return true;
+    }
 }
 
 /**
@@ -149,10 +149,10 @@ private inline bool is_sql_error(int result_code)
  * @param line           Source code line
  */
 private void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
-	throws IOError
+throws IOError
 {
     if (cancellable != null && cancellable.is_cancelled())
-        throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
+    throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
 }
 
 /**
@@ -163,7 +163,7 @@ private void throw_if_cancelled(Cancellable? cancellable, string? method=null, s
  */
 private inline string escape_sql_id(string sql_id)
 {
-	return sql_id.replace("\"", "\"\"");
+    return sql_id.replace("\"", "\"\"");
 }
 
 } // namespace Drtdb

@@ -34,22 +34,22 @@ private extern const string VERSION_SUFFIX;
 
 public string get_revision()
 {
-	return REVISION;
+    return REVISION;
 }
 
 public string get_version()
 {
-	return VERSION;
+    return VERSION;
 }
 
 public string get_version_suffix()
 {
-	return VERSION_SUFFIX;
+    return VERSION_SUFFIX;
 }
 
 public int[] get_versions()
 {
-	return {VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX};
+    return {VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX};
 }
 
 /**
@@ -57,7 +57,7 @@ public int[] get_versions()
  */
 public int get_encoded_version()
 {
-	return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_BUGFIX;
+    return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_BUGFIX;
 }
 
 } // namespace Drt

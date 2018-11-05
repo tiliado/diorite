@@ -30,46 +30,46 @@ namespace Drtdb
  */
 public class ObjectSpec
 {
-	public Type object_type {get; private set;}
-	public string table_name {get{ return object_type.name(); }}
-	public unowned ParamSpec primary_key {get; private set;}
-	public (unowned ParamSpec)[] properties {get; private set;}
+    public Type object_type {get; private set;}
+    public string table_name {get{ return object_type.name(); }}
+    public unowned ParamSpec primary_key {get; private set;}
+    public (unowned ParamSpec)[] properties {get; private set;}
 
-	/**
-	 * Creates new ORM object specification
-	 *
-	 * @param type           object type
-	 * @param primary_key    primary key of the corresponding database table
-	 * @param properties     properties to serialize into database
-	 * @throws DatabaseError if data type is invalid or primary key is not found
-	 */
-	public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError
-	{
-		if (!type.is_object())
-			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		var class_spec = (ObjectClass) type.class_ref();
-		var primary_pspec = class_spec.find_property(primary_key);
-		if (primary_pspec == null)
-			throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
-		this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
-	}
+    /**
+     * Creates new ORM object specification
+     *
+     * @param type           object type
+     * @param primary_key    primary key of the corresponding database table
+     * @param properties     properties to serialize into database
+     * @throws DatabaseError if data type is invalid or primary key is not found
+     */
+    public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError
+    {
+        if (!type.is_object())
+        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        var class_spec = (ObjectClass) type.class_ref();
+        var primary_pspec = class_spec.find_property(primary_key);
+        if (primary_pspec == null)
+        throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
+        this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
+    }
 
-	/**
-	 * Creates new ORM object specification
-	 *
-	 * @param type           object type
-	 * @param primary_key    primary key of the corresponding database table
-	 * @param properties     properties to serialize into database
-	 * @throws DatabaseError if data type is invalid or primary key is not found
-	 */
-	public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError
-	{
-		if (!type.is_object())
-			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		this.object_type = type;
-		this.properties = properties;
-		this.primary_key = primary_key;
-	}
+    /**
+     * Creates new ORM object specification
+     *
+     * @param type           object type
+     * @param primary_key    primary key of the corresponding database table
+     * @param properties     properties to serialize into database
+     * @throws DatabaseError if data type is invalid or primary key is not found
+     */
+    public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError
+    {
+        if (!type.is_object())
+        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        this.object_type = type;
+        this.properties = properties;
+        this.primary_key = primary_key;
+    }
 }
 
 } // namespace Drtdb

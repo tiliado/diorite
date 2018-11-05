@@ -27,32 +27,32 @@ namespace Drt
 
 public static SocketService create_socket_service(string path) throws IOError
 {
-	Posix.unlink(path);
-	var address = new UnixSocketAddress(path);
-	var service = new SocketService();
-	SocketAddress effective_address;
-	try
-	{
-		service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
-	}
-	catch (GLib.Error e)
-	{
-		throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
-	}
-	return service;
+    Posix.unlink(path);
+    var address = new UnixSocketAddress(path);
+    var service = new SocketService();
+    SocketAddress effective_address;
+    try
+    {
+        service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
+    }
+    catch (GLib.Error e)
+    {
+        throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
+    }
+    return service;
 }
 
 public static SocketConnection create_socket_connection(string path, Cancellable? cancellable=null)
 throws IOError {
-	try {
-		var address = new UnixSocketAddress(path);
-		var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
-		var connection = SocketConnection.factory_create_connection(socket);
-		connection.connect(address, cancellable);
-		return connection;
-	} catch (GLib.Error e) {
-		throw new IOError.CONN_FAILED("Failed to create socket connection for path '%s'. %s", path, e.message);
-	}
+    try {
+        var address = new UnixSocketAddress(path);
+        var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
+        var connection = SocketConnection.factory_create_connection(socket);
+        connection.connect(address, cancellable);
+        return connection;
+    } catch (GLib.Error e) {
+        throw new IOError.CONN_FAILED("Failed to create socket connection for path '%s'. %s", path, e.message);
+    }
 }
 
 } // namespace Drt

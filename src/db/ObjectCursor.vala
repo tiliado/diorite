@@ -30,59 +30,59 @@ namespace Drtdb
  */
 public class ObjectCursor<T>
 {
-	public uint counter {get; private set; default=0;}
-	private OrmManager orm;
-	private Cancellable? cancellable;
-	private Result result;
+    public uint counter {get; private set; default=0;}
+    private OrmManager orm;
+    private Cancellable? cancellable;
+    private Result result;
 
-	/**
-	 * Creates new ObjectCursor
-	 *
-	 * @param orm            ORM manager
-	 * @param result         the result of ORM query
-	 * @param cancellable    Cancelable object
-	 */
-	public ObjectCursor(OrmManager orm, Result result, Cancellable? cancellable=null)
-	{
-		this.orm = orm;
-		this.result = result;
-		this.cancellable = cancellable;
-	}
+    /**
+     * Creates new ObjectCursor
+     *
+     * @param orm            ORM manager
+     * @param result         the result of ORM query
+     * @param cancellable    Cancelable object
+     */
+    public ObjectCursor(OrmManager orm, Result result, Cancellable? cancellable=null)
+    {
+        this.orm = orm;
+        this.result = result;
+        this.cancellable = cancellable;
+    }
 
-	/**
-	 * Return iterator.
-	 *
-	 * @return `this` object
-	 */
-	public ObjectCursor<T> iterator()
-	{
-		return this;
-	}
+    /**
+     * Return iterator.
+     *
+     * @return `this` object
+     */
+    public ObjectCursor<T> iterator()
+    {
+        return this;
+    }
 
-	/**
-	 * Advance the cursor
-	 *
-	 * @return `true` if there is still data
-	 */
-	public bool next() throws Error, DatabaseError
-	{
-		 if (result.next())
-		 {
-			 counter++;
-			 return true;
-		 }
-		 return false;
-	}
+    /**
+     * Advance the cursor
+     *
+     * @return `true` if there is still data
+     */
+    public bool next() throws Error, DatabaseError
+    {
+        if (result.next())
+        {
+            counter++;
+            return true;
+        }
+        return false;
+    }
 
-	/**
-	 * Get object under cursor
-	 *
-	 * @return current object
-	 */
-	public T get() throws Error, DatabaseError
-	{
-		return orm.create_object<T>(result);
-	}
+    /**
+     * Get object under cursor
+     *
+     * @return current object
+     */
+    public T get() throws Error, DatabaseError
+    {
+        return orm.create_object<T>(result);
+    }
 }
 
 } // namespace Drtdb

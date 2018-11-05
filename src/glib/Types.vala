@@ -27,12 +27,12 @@ namespace Drt.Types
 
 public uint type_hash(Type type)
 {
-	return (uint) type;
+    return (uint) type;
 }
 
 public bool type_equal(Type type1, Type type2)
 {
-	return ((uint) type1) == ((uint) type2);
+    return ((uint) type1) == ((uint) type2);
 }
 
 } // namespace Drt.Types

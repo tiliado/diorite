@@ -36,34 +36,34 @@ namespace Drtgtk.X11
  */
 public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string property)
 {
-	Gdk.X11.Window? win, result = null;
-	if (window != null)
-		win = window as Gdk.X11.Window;
-	else
-		win = Gdk.get_default_root_window() as Gdk.X11.Window;
-	var display = win.get_display() as Gdk.X11.Display;
+    Gdk.X11.Window? win, result = null;
+    if (window != null)
+    win = window as Gdk.X11.Window;
+    else
+    win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    var display = win.get_display() as Gdk.X11.Display;
 
-	X.Atom type;
-	int format;
-	ulong n_items;
-	ulong bytes_after;
-	void* data;
+    X.Atom type;
+    int format;
+    ulong n_items;
+    ulong bytes_after;
+    void* data;
 
-	display.error_trap_push();
-	display.get_xdisplay().get_window_property(
-		win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property),
-		0, long.MAX, false, X.XA_WINDOW, out  type, out format, out n_items, out bytes_after, out data);
-	display.error_trap_pop_ignored();
+    display.error_trap_push();
+    display.get_xdisplay().get_window_property(
+        win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property),
+        0, long.MAX, false, X.XA_WINDOW, out  type, out format, out n_items, out bytes_after, out data);
+    display.error_trap_pop_ignored();
 
-	if (type == X.XA_WINDOW)
-	{
-		X.Window xwin = *(X.Window *) data;
-		result = new Gdk.X11.Window.foreign_for_display(display, xwin);
-	}
+    if (type == X.XA_WINDOW)
+    {
+        X.Window xwin = *(X.Window *) data;
+        result = new Gdk.X11.Window.foreign_for_display(display, xwin);
+    }
 
-	if (data != null)
-		X.free(data);
-	return result;
+    if (data != null)
+    X.free(data);
+    return result;
 }
 
 
@@ -77,33 +77,33 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
  */
 public string? get_window_property_as_utf8(Gdk.Window? window, string property)
 {
-	Gdk.X11.Window win;
-	if (window != null)
-		win = window as Gdk.X11.Window;
-	else
-		win = Gdk.get_default_root_window() as Gdk.X11.Window;
-	var display = win.get_display() as Gdk.X11.Display;
+    Gdk.X11.Window win;
+    if (window != null)
+    win = window as Gdk.X11.Window;
+    else
+    win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    var display = win.get_display() as Gdk.X11.Display;
 
-	X.Atom type;
-	int format;
-	ulong n_items;
-	ulong bytes_after;
-	void* data;
-	string? name = null;
+    X.Atom type;
+    int format;
+    ulong n_items;
+    ulong bytes_after;
+    void* data;
+    string? name = null;
 
-	display.error_trap_push();
-	display.get_xdisplay().get_window_property(
-		win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property), 0, long.MAX, false,
-		Gdk.X11.get_xatom_by_name_for_display(display, "UTF8_STRING"),
-		out type, out format, out n_items, out bytes_after, out data);
-	display.error_trap_pop_ignored();
+    display.error_trap_push();
+    display.get_xdisplay().get_window_property(
+        win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property), 0, long.MAX, false,
+        Gdk.X11.get_xatom_by_name_for_display(display, "UTF8_STRING"),
+        out type, out format, out n_items, out bytes_after, out data);
+    display.error_trap_pop_ignored();
 
-	if (data != null)
-	{
-		name = (string) data;
-		X.free(data);
-	}
-	return name;
+    if (data != null)
+    {
+        name = (string) data;
+        X.free(data);
+    }
+    return name;
 }
 
 
@@ -116,12 +116,12 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property)
  */
 public Gdk.X11.Window? get_net_wm_check_window()
 {
-	var window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
-	if (window == null)
-		return null;
-	if (get_window_property_as_win(window, "_NET_SUPPORTING_WM_CHECK").get_xid() != window.get_xid())
-		return null;
-	return window;
+    var window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
+    if (window == null)
+    return null;
+    if (get_window_property_as_win(window, "_NET_SUPPORTING_WM_CHECK").get_xid() != window.get_xid())
+    return null;
+    return window;
 }
 
 } // namespace Drtgtk.X11

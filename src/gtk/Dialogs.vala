@@ -32,30 +32,30 @@ namespace Drtgtk
 public class ErrorDialog : Gtk.MessageDialog
 {
 
-	/**
-	 * Constructs new error dialog.
-	 *
-	 * @param title Title of the error message (not title of the dialog)
-	 * @param message Text of the error message
-	 * @param use_markup true if message uses Pango markup
-	 */
-	public ErrorDialog(string title, string message, bool use_markup=false)
-	{
-		Object(
-			title: "",
-			modal: true,
-			message_type: Gtk.MessageType.ERROR,
-			buttons: Gtk.ButtonsType.OK,
-			secondary_use_markup: use_markup
-		);
-		this.text = title;
-		this.secondary_text = message;
-	}
+    /**
+     * Constructs new error dialog.
+     *
+     * @param title Title of the error message (not title of the dialog)
+     * @param message Text of the error message
+     * @param use_markup true if message uses Pango markup
+     */
+    public ErrorDialog(string title, string message, bool use_markup=false)
+    {
+        Object(
+            title: "",
+            modal: true,
+            message_type: Gtk.MessageType.ERROR,
+            buttons: Gtk.ButtonsType.OK,
+            secondary_use_markup: use_markup
+        );
+        this.text = title;
+        this.secondary_text = message;
+    }
 
-	public override void response(int id)
-	{
-		this.destroy();
-	}
+    public override void response(int id)
+    {
+        this.destroy();
+    }
 }
 
 /**
@@ -64,30 +64,30 @@ public class ErrorDialog : Gtk.MessageDialog
 public class ConfirmDialog : Gtk.MessageDialog
 {
 
-	/**
-	 * Constructs new error dialog.
-	 *
-	 * @param title Title of the error message (not title of the dialog)
-	 * @param message Text of the error message
-	 * @param use_markup true if message uses Pango markup
-	 */
-	public ConfirmDialog(string title, string message, bool use_markup=false)
-	{
-		Object(
-			title: "",
-			modal: true,
-			message_type: Gtk.MessageType.QUESTION,
-			buttons: Gtk.ButtonsType.YES_NO,
-			secondary_use_markup: use_markup
-		);
-		this.text = title;
-		this.secondary_text = message;
-	}
+    /**
+     * Constructs new error dialog.
+     *
+     * @param title Title of the error message (not title of the dialog)
+     * @param message Text of the error message
+     * @param use_markup true if message uses Pango markup
+     */
+    public ConfirmDialog(string title, string message, bool use_markup=false)
+    {
+        Object(
+            title: "",
+            modal: true,
+            message_type: Gtk.MessageType.QUESTION,
+            buttons: Gtk.ButtonsType.YES_NO,
+            secondary_use_markup: use_markup
+        );
+        this.text = title;
+        this.secondary_text = message;
+    }
 
-	public override void response(int id)
-	{
-		this.destroy();
-	}
+    public override void response(int id)
+    {
+        this.destroy();
+    }
 }
 
 /**
@@ -96,30 +96,30 @@ public class ConfirmDialog : Gtk.MessageDialog
 public class InfoDialog : Gtk.MessageDialog
 {
 
-	/**
-	 * Constructs new error dialog.
-	 *
-	 * @param title Title of the error message (not title of the dialog)
-	 * @param message Text of the error message
-	 * @param use_markup true if message uses Pango markup
-	 */
-	public InfoDialog(string title, string message, bool use_markup=false)
-	{
-		Object(
-			title: "",
-			modal: true,
-			message_type: Gtk.MessageType.INFO,
-			buttons: Gtk.ButtonsType.OK,
-			secondary_use_markup: use_markup
-		);
-		this.text = title;
-		this.secondary_text = message;
-	}
+    /**
+     * Constructs new error dialog.
+     *
+     * @param title Title of the error message (not title of the dialog)
+     * @param message Text of the error message
+     * @param use_markup true if message uses Pango markup
+     */
+    public InfoDialog(string title, string message, bool use_markup=false)
+    {
+        Object(
+            title: "",
+            modal: true,
+            message_type: Gtk.MessageType.INFO,
+            buttons: Gtk.ButtonsType.OK,
+            secondary_use_markup: use_markup
+        );
+        this.text = title;
+        this.secondary_text = message;
+    }
 
-	public override void response(int id)
-	{
-		this.destroy();
-	}
+    public override void response(int id)
+    {
+        this.destroy();
+    }
 }
 
 } // namespace Drtgtk

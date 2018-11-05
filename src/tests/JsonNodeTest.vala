@@ -24,97 +24,97 @@ namespace Drt
 
 public class JsonNodeTest: Drt.TestCase
 {
-	public void test_null()
-	{
-		var node = (JsonNode) new JsonValue.@null();
-		expect_true(node.is_value(), "is value");
-		expect_true(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_null()
+    {
+        var node = (JsonNode) new JsonValue.@null();
+        expect_true(node.is_value(), "is value");
+        expect_true(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_bool()
-	{
-		var node = (JsonNode) new JsonValue.@bool(true);
-		expect_true(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_true(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_bool()
+    {
+        var node = (JsonNode) new JsonValue.@bool(true);
+        expect_true(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_true(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_int()
-	{
-		var node = (JsonNode) new JsonValue.@int(-1234);
-		expect_true(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_true(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_int()
+    {
+        var node = (JsonNode) new JsonValue.@int(-1234);
+        expect_true(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_true(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_double()
-	{
-		var node = (JsonNode) new JsonValue.@double(-12.34);
-		expect_true(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_true(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_double()
+    {
+        var node = (JsonNode) new JsonValue.@double(-12.34);
+        expect_true(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_true(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_string()
-	{
-		var str = "Test ";
-		var node = (JsonNode) new JsonValue.@string(str);
-		expect_true(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_true(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_string()
+    {
+        var str = "Test ";
+        var node = (JsonNode) new JsonValue.@string(str);
+        expect_true(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_true(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_object()
-	{
-		var node = (JsonNode) new JsonObject();
-		expect_false(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_true(node.is_object(), "is object");
-		expect_false(node.is_array(), "is array");
-	}
+    public void test_object()
+    {
+        var node = (JsonNode) new JsonObject();
+        expect_false(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_true(node.is_object(), "is object");
+        expect_false(node.is_array(), "is array");
+    }
 
-	public void test_array()
-	{
-		var node = (JsonNode) new JsonArray();
-		expect_false(node.is_value(), "is value");
-		expect_false(node.is_null(), "is null");
-		expect_false(node.is_bool(), "is bool");
-		expect_false(node.is_int(), "is int");
-		expect_false(node.is_double(), "is double");
-		expect_false(node.is_string(), "is string");
-		expect_false(node.is_object(), "is object");
-		expect_true(node.is_array(), "is array");
-	}
+    public void test_array()
+    {
+        var node = (JsonNode) new JsonArray();
+        expect_false(node.is_value(), "is value");
+        expect_false(node.is_null(), "is null");
+        expect_false(node.is_bool(), "is bool");
+        expect_false(node.is_int(), "is int");
+        expect_false(node.is_double(), "is double");
+        expect_false(node.is_string(), "is string");
+        expect_false(node.is_object(), "is object");
+        expect_true(node.is_array(), "is array");
+    }
 }
 
 } // namespace Drt

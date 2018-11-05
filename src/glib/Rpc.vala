@@ -25,92 +25,92 @@
 namespace Drt {
 
 public errordomain RpcError {
-	UNKNOWN,
-	REMOTE_ERROR,
-	UNSUPPORTED,
-	IOERROR,
-	INVALID_RESPONSE,
-	INVALID_REQUEST,
-	INVALID_ARGUMENTS,
-	NOT_READY;
+    UNKNOWN,
+    REMOTE_ERROR,
+    UNSUPPORTED,
+    IOERROR,
+    INVALID_RESPONSE,
+    INVALID_REQUEST,
+    INVALID_ARGUMENTS,
+    NOT_READY;
 
-	public extern static GLib.Quark quark();
+    public extern static GLib.Quark quark();
 }
 
 public errordomain ApiError {
-	UNKNOWN,
-	INVALID_REQUEST,
-	INVALID_PARAMS,
-	PRIVATE_FLAG,
-	READABLE_FLAG,
-	WRITABLE_FLAG,
-	SUBSCRIBE_FLAG,
-	API_TOKEN_REQUIRED;
+    UNKNOWN,
+    INVALID_REQUEST,
+    INVALID_PARAMS,
+    PRIVATE_FLAG,
+    READABLE_FLAG,
+    WRITABLE_FLAG,
+    SUBSCRIBE_FLAG,
+    API_TOKEN_REQUIRED;
 
-	public extern static GLib.Quark quark();
+    public extern static GLib.Quark quark();
 }
 
 [Flags]
 public enum RpcFlags {
-	PRIVATE,
-	READABLE,
-	WRITABLE,
-	SUBSCRIBE;
+    PRIVATE,
+    READABLE,
+    WRITABLE,
+    SUBSCRIBE;
 }
 
 public delegate void RpcHandler(RpcRequest request) throws GLib.Error;
 
 namespace Rpc {
-	public const string TYPE_STRING_ANY = "#ANY#";
-	public const string RESPONSE_OK = "OK";
-	public const string RESPONSE_ERROR = "ERROR";
+    public const string TYPE_STRING_ANY = "#ANY#";
+    public const string RESPONSE_OK = "OK";
+    public const string RESPONSE_ERROR = "ERROR";
 
-	public void check_type_string(Variant? data, string? type_string) throws GLib.Error {
-		if (type_string != null && type_string == TYPE_STRING_ANY){
-			return;
-		}
-		if (data == null && type_string != null) {
-			throw new RpcError.INVALID_ARGUMENTS("Invalid data type null, expected '%s'.", type_string);
-		}
-		if (data != null) {
-			unowned string data_type_string = data.get_type_string();
-			if (type_string == null) {
-				throw new RpcError.INVALID_ARGUMENTS(
-					"Invalid data type '%s', expected null.", data_type_string);
-			}
-			if (!data.check_format_string(type_string, false)) {
-				throw new RpcError.INVALID_ARGUMENTS(
-					"Invalid data type '%s', expected '%s'.", data_type_string, type_string);
-			}
-		}
-	}
+    public void check_type_string(Variant? data, string? type_string) throws GLib.Error {
+        if (type_string != null && type_string == TYPE_STRING_ANY){
+            return;
+        }
+        if (data == null && type_string != null) {
+            throw new RpcError.INVALID_ARGUMENTS("Invalid data type null, expected '%s'.", type_string);
+        }
+        if (data != null) {
+            unowned string data_type_string = data.get_type_string();
+            if (type_string == null) {
+                throw new RpcError.INVALID_ARGUMENTS(
+                    "Invalid data type '%s', expected null.", data_type_string);
+            }
+            if (!data.check_format_string(type_string, false)) {
+                throw new RpcError.INVALID_ARGUMENTS(
+                    "Invalid data type '%s', expected '%s'.", data_type_string, type_string);
+            }
+        }
+    }
 
-	public string get_params_type(GLib.Variant? params) throws RpcError {
-		if (params == null ) {
-			return "tuple";
-		}
-		var type = params.get_type();
-		if (type.is_tuple()) {
-			return "tuple";
-		}
-		if (type.is_array()){
+    public string get_params_type(GLib.Variant? params) throws RpcError {
+        if (params == null ) {
+            return "tuple";
+        }
+        var type = params.get_type();
+        if (type.is_tuple()) {
+            return "tuple";
+        }
+        if (type.is_array()){
 
-			return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
-		}
-		throw new RpcError.UNSUPPORTED("Param type %s is not supported.", params.get_type_string());
-	}
+            return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
+        }
+        throw new RpcError.UNSUPPORTED("Param type %s is not supported.", params.get_type_string());
+    }
 
-	private string create_path(string name) {
-		var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
-		try {
-			File.new_for_path(dir_path).make_directory_with_parents();
-		} catch (GLib.Error e) {
-			if (!(e is GLib.IOError.EXISTS)) {
-				critical("Failed to create directory '%s'. %s", dir_path, e.message);
-			}
-		}
-		return Path.build_filename(dir_path, name);
-	}
+    private string create_path(string name) {
+        var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
+        try {
+            File.new_for_path(dir_path).make_directory_with_parents();
+        } catch (GLib.Error e) {
+            if (!(e is GLib.IOError.EXISTS)) {
+                critical("Failed to create directory '%s'. %s", dir_path, e.message);
+            }
+        }
+        return Path.build_filename(dir_path, name);
+    }
 }
 
 } // namespace Drt

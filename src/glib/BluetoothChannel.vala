@@ -27,29 +27,29 @@ namespace Drt
 
 public class BluetoothChannel : Drt.DuplexChannel
 {
-	public BluetoothConnection connection {get; private set;}
+    public BluetoothConnection connection {get; private set;}
 
-	public BluetoothChannel(uint id, string name, BluetoothConnection connection, uint timeout)
-	{
-		base(id, name, connection.input, connection.output, timeout);
-		this.connection = connection;
-	}
+    public BluetoothChannel(uint id, string name, BluetoothConnection connection, uint timeout)
+    {
+        base(id, name, connection.input, connection.output, timeout);
+        this.connection = connection;
+    }
 
-	~BluetoothChannel()
-	{
-		try
-		{
-			close();
-		}
-		catch (GLib.Error e)
-		{
-		}
-	}
+    ~BluetoothChannel()
+    {
+        try
+        {
+            close();
+        }
+        catch (GLib.Error e)
+        {
+        }
+    }
 
-	public override void close() throws GLib.IOError
-	{
-		connection.close();
-	}
+    public override void close() throws GLib.IOError
+    {
+        connection.close();
+    }
 }
 
 } // namespace Drt

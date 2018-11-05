@@ -24,245 +24,245 @@ namespace Drtdb
 
 public class OrmManagerTest: Drt.TestCase
 {
-	private File db_file;
-	private Database db;
-	private OrmManager orm;
+    private File db_file;
+    private Database db;
+    private OrmManager orm;
 //~ 	private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
 
-	public override void set_up()
-	{
-		base.set_up();
-		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
-		delete_db_file();
-		db = new Database(db_file);
-		orm = db.orm;
-		try
-		{
-			query(TABLE_USERS_SQL).exec();
-			query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
-				.bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
-				.bind_blob(5, new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
-				.bind(6, true).bind_null(7).exec();
-		}
-		catch (GLib.Error e)
-		{
-			warning("%s", e.message);
-		}
-	}
+    public override void set_up()
+    {
+        base.set_up();
+        db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
+        delete_db_file();
+        db = new Database(db_file);
+        orm = db.orm;
+        try
+        {
+            query(TABLE_USERS_SQL).exec();
+            query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
+            .bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
+            .bind_blob(5, new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
+            .bind(6, true).bind_null(7).exec();
+        }
+        catch (GLib.Error e)
+        {
+            warning("%s", e.message);
+        }
+    }
 
-	public override void tear_down()
-	{
-		base.tear_down();
-		try
-		{
-			if (db.opened)
-				db.close();
-		}
-		catch (GLib.Error e)
-		{
-			warning("%s", e.message);
-		}
-		delete_db_file();
-	}
+    public override void tear_down()
+    {
+        base.tear_down();
+        try
+        {
+            if (db.opened)
+            db.close();
+        }
+        catch (GLib.Error e)
+        {
+            warning("%s", e.message);
+        }
+        delete_db_file();
+    }
 
-	private void delete_db_file()
-	{
-		if (db_file.query_exists())
-		{
-			try
-			{
-				db_file.delete();
-			}
-			catch (GLib.Error e)
-			{
-				warning("Cannot delete %s: %s", db_file.get_path(), e.message);
-			}
-		}
-	}
+    private void delete_db_file()
+    {
+        if (db_file.query_exists())
+        {
+            try
+            {
+                db_file.delete();
+            }
+            catch (GLib.Error e)
+            {
+                warning("Cannot delete %s: %s", db_file.get_path(), e.message);
+            }
+        }
+    }
 
-	private Query? query(string sql) throws GLib.Error, DatabaseError
-	{
+    private Query? query(string sql) throws GLib.Error, DatabaseError
+    {
 
-		if (!db.opened)
-			db.open();
+        if (!db.opened)
+        db.open();
 
-		return db.open_connection().query(sql);
-	}
+        return db.open_connection().query(sql);
+    }
 
-	private Result select_data()  throws GLib.Error, DatabaseError
-	{
-		return query("SELECT id, name, age, height, blob, alive, extra FROM %s WHERE id = ?".printf(TABLE_USERS_NAME))
-			.bind(1, 1).exec();
-	}
+    private Result select_data()  throws GLib.Error, DatabaseError
+    {
+        return query("SELECT id, name, age, height, blob, alive, extra FROM %s WHERE id = ?".printf(TABLE_USERS_NAME))
+        .bind(1, 1).exec();
+    }
 
-	public void test_create_object()
-	{
-		try
-		{
-			var result = select_data();
-			/* All fields */
-			try
-			{
-				orm.create_object<User>(result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "no ospec");
-			}
+    public void test_create_object()
+    {
+        try
+        {
+            var result = select_data();
+            /* All fields */
+            try
+            {
+                orm.create_object<User>(result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "no ospec");
+            }
 
 
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
-				orm.create_object<User>(result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-				orm.create_object<User>(result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
+                orm.create_object<User>(result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+            }
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+                orm.create_object<User>(result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+            }
 
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-				var user = orm.create_object<User>(result);
-				expect_int64_equals(1, user.id, "id");
-				expect_str_equals("George", user.name, "name");
-				expect_int_equals(30, user.age, "age");
-				expect_double_equals(1.72, user.height, "height");
-				expect_true(user.alive, "alive");
-				expect_bytes_equal(
-					new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-					user.blob, "blob");
-				expect(null == user.extra, "extra");
-				expect_int_equals(1024, user.not_in_db, "not_in_db");
-			}
-			catch (GLib.Error e)
-			{
-				expectation_failed("Unexpected error: %s", e.message);
-			}
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
-				var user = orm.create_object<User>(result);
-				expect_int64_equals(1, user.id, "id");
-				expect_str_equals("George", user.name, "name");
-				expect_int_equals(30, user.age, "age");
-				expect_double_equals(1.72, user.height, "height");
-				expect_true(user.alive, "alive");
-				expect_bytes_equal(
-					new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-					user.blob, "blob");
-				expect(null == user.extra, "extra");
-				expect_int_equals(1024, user.not_in_db, "not_in_db");
-			}
-			catch (GLib.Error e)
-			{
-				expectation_failed("Unexpected error: %s", e.message);
-			}
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
+                var user = orm.create_object<User>(result);
+                expect_int64_equals(1, user.id, "id");
+                expect_str_equals("George", user.name, "name");
+                expect_int_equals(30, user.age, "age");
+                expect_double_equals(1.72, user.height, "height");
+                expect_true(user.alive, "alive");
+                expect_bytes_equal(
+                    new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                    user.blob, "blob");
+                expect(null == user.extra, "extra");
+                expect_int_equals(1024, user.not_in_db, "not_in_db");
+            }
+            catch (GLib.Error e)
+            {
+                expectation_failed("Unexpected error: %s", e.message);
+            }
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
+                var user = orm.create_object<User>(result);
+                expect_int64_equals(1, user.id, "id");
+                expect_str_equals("George", user.name, "name");
+                expect_int_equals(30, user.age, "age");
+                expect_double_equals(1.72, user.height, "height");
+                expect_true(user.alive, "alive");
+                expect_bytes_equal(
+                    new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                    user.blob, "blob");
+                expect(null == user.extra, "extra");
+                expect_int_equals(1024, user.not_in_db, "not_in_db");
+            }
+            catch (GLib.Error e)
+            {
+                expectation_failed("Unexpected error: %s", e.message);
+            }
 
-			/* Not GObject */
-			try
-			{
-				orm.create_object<SimpleUser>(result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
-			}
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
+            /* Not GObject */
+            try
+            {
+                orm.create_object<SimpleUser>(result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
+            }
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("%s", e.message);
+        }
+    }
 
-	public void test_fill_object()
-	{
-		try
-		{
-			var result = select_data();
-			User user;
+    public void test_fill_object()
+    {
+        try
+        {
+            var result = select_data();
+            User user;
 
-			try
-			{
-				user = new User(2, "Lololo", 45, 2.25, false);
-				orm.fill_object(user, result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "mismatch, all fields");
-			}
+            try
+            {
+                user = new User(2, "Lololo", 45, 2.25, false);
+                orm.fill_object(user, result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "mismatch, all fields");
+            }
 
-			orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
+            orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
 
-			try
-			{
-				user = new User(2, "Lololo", 45, 2.25, false);
-				orm.fill_object(user, result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
-			}
+            try
+            {
+                user = new User(2, "Lololo", 45, 2.25, false);
+                orm.fill_object(user, result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
+            }
 
-			/* Matches */
-			user = new User(1, "Lololo", 45, 2.25, false);
-			orm.fill_object(user, result);
-			expect_int64_equals(1, user.id, "id");
-			expect_str_equals("George", user.name, "name");
-			expect_int_equals(30, user.age, "age");
-			expect_double_equals(1.72, user.height, "height");
-			expect_true(user.alive, "alive");
-			expect_bytes_equal(
-				new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
-				user.blob, "blob");
-			expect(null == user.extra, "extra");
-			expect_int_equals(1024, user.not_in_db, "not_in_db");
+            /* Matches */
+            user = new User(1, "Lololo", 45, 2.25, false);
+            orm.fill_object(user, result);
+            expect_int64_equals(1, user.id, "id");
+            expect_str_equals("George", user.name, "name");
+            expect_int_equals(30, user.age, "age");
+            expect_double_equals(1.72, user.height, "height");
+            expect_true(user.alive, "alive");
+            expect_bytes_equal(
+                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                user.blob, "blob");
+            expect(null == user.extra, "extra");
+            expect_int_equals(1024, user.not_in_db, "not_in_db");
 
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
-				user = new User(1, "Lololo", 45, 2.25, false);
-				orm.fill_object(user, result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
+                user = new User(1, "Lololo", 45, 2.25, false);
+                orm.fill_object(user, result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+            }
 
-			try
-			{
-				orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
-				user = new User(1, "Lololo", 45, 2.25, false);
-				orm.fill_object(user, result);
-				expectation_failed("Expected error");
-			}
-			catch (GLib.Error e)
-			{
-				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
-			}
-		}
-		catch (GLib.Error e)
-		{
-			expectation_failed("%s", e.message);
-		}
-	}
+            try
+            {
+                orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
+                user = new User(1, "Lololo", 45, 2.25, false);
+                orm.fill_object(user, result);
+                expectation_failed("Expected error");
+            }
+            catch (GLib.Error e)
+            {
+                expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
+            }
+        }
+        catch (GLib.Error e)
+        {
+            expectation_failed("%s", e.message);
+        }
+    }
 }
 
 } // namespace Drtdb

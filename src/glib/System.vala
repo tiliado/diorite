@@ -271,7 +271,7 @@ public int[] find_pid_by_basename(string basename) {
                 try {
                     var target = FileUtils.read_link(path);
                     if (Path.get_basename(target) == basename)
-                        result += pid;
+                    result += pid;
                 } catch (FileError e) {
                     if (pid > 1) {
                         warning("readlink error: %s.", e.message);

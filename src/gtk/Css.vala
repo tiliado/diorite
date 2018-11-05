@@ -115,10 +115,10 @@ button.badge-ok:hover {
  */
 public Gtk.CssProvider apply_custom_styles(Gdk.Screen screen) throws GLib.Error
 {
-	var provider = new Gtk.CssProvider();
-	provider.load_from_data(CUSTOM_CSS, -1);
-	Gtk.StyleContext.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-	return provider;
+    var provider = new Gtk.CssProvider();
+    provider.load_from_data(CUSTOM_CSS, -1);
+    Gtk.StyleContext.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+    return provider;
 }
 
 } // namespace Drt.Css

@@ -25,10 +25,10 @@
 namespace Drt.Flatpak {
 
 public async void check_desktop_portal_available(Cancellable? cancellable = null) throws GLib.Error {
-	var bus = yield Bus.get(BusType.SESSION, cancellable);
-	var portal = yield Drt.Dbus.introspect(bus, "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop");
-	portal.assert_method("org.freedesktop.portal.OpenURI", "OpenURI");
-	portal.assert_method("org.freedesktop.portal.ProxyResolver", "Lookup");
+    var bus = yield Bus.get(BusType.SESSION, cancellable);
+    var portal = yield Drt.Dbus.introspect(bus, "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop");
+    portal.assert_method("org.freedesktop.portal.OpenURI", "OpenURI");
+    portal.assert_method("org.freedesktop.portal.ProxyResolver", "Lookup");
 }
 
 } //namespace Drt.Flatpak

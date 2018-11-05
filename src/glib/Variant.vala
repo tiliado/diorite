@@ -27,97 +27,97 @@ namespace Drt
 
 public bool variant_equal(Variant? a, Variant? b)
 {
-	if (a == null && b == null)
-		return true;
-	if (a == null || b == null)
-		return false;
-	return a.equal(b);
+    if (a == null && b == null)
+    return true;
+    if (a == null || b == null)
+    return false;
+    return a.equal(b);
 }
 
 public string[] variant_to_strv(Variant variant)
 {
-	string[] result;
-	if (variant.is_container() && variant.n_children() > 0)
-	{
-		var size = variant.n_children();
-		result = new string[size];
-		for (size_t i = 0; i < size; i++)
-		{
-			var child = variant.get_child_value(i);
-			string? str;
-			if (!variant_string(child, out str) || str == null)
-			{
-				warning("Wrong child type %s: %s", child.get_type_string(), child.print(true));
-				str = child.print(false);
-			}
-			result[i] = str;
-		}
-	}
-	else
-	{
-		if (!variant.is_container())
-			warning("Variant is not a container: %s: %s", variant.get_type_string(), variant.print(true));
+    string[] result;
+    if (variant.is_container() && variant.n_children() > 0)
+    {
+        var size = variant.n_children();
+        result = new string[size];
+        for (size_t i = 0; i < size; i++)
+        {
+            var child = variant.get_child_value(i);
+            string? str;
+            if (!variant_string(child, out str) || str == null)
+            {
+                warning("Wrong child type %s: %s", child.get_type_string(), child.print(true));
+                str = child.print(false);
+            }
+            result[i] = str;
+        }
+    }
+    else
+    {
+        if (!variant.is_container())
+        warning("Variant is not a container: %s: %s", variant.get_type_string(), variant.print(true));
 
-		result = {};
-	}
-	return result;
+        result = {};
+    }
+    return result;
 }
 
 public Variant[] variant_to_array(Variant variant)
 {
-	Variant[] result;
-	if (variant.is_container() && variant.n_children() > 0)
-	{
+    Variant[] result;
+    if (variant.is_container() && variant.n_children() > 0)
+    {
 
-		var size = variant.n_children();
-		result = new Variant[size];
-		for (size_t i = 0; i < size; i++)
-		{
-			var val = variant.get_child_value(i);
-			if (val.is_of_type(VariantType.VARIANT))
-				val = val.get_variant();
-			result[i] = val;
-		}
-	}
-	else
-	{
-		result = {};
-	}
-	return result;
+        var size = variant.n_children();
+        result = new Variant[size];
+        for (size_t i = 0; i < size; i++)
+        {
+            var val = variant.get_child_value(i);
+            if (val.is_of_type(VariantType.VARIANT))
+            val = val.get_variant();
+            result[i] = val;
+        }
+    }
+    else
+    {
+        result = {};
+    }
+    return result;
 }
 
 public HashTable<string, Variant> variant_to_hashtable(Variant? variant)
 {
-	var result = new HashTable<string, Variant>(str_hash, str_equal);
-	if (variant != null && variant.is_of_type(VariantType.DICTIONARY))
-	{
-		var iter = variant.iterator();
-		Variant? val = null;
-		string? key = null;
-		while (iter.next("{s*}", &key, &val))
-			if (key != null)
-			{
+    var result = new HashTable<string, Variant>(str_hash, str_equal);
+    if (variant != null && variant.is_of_type(VariantType.DICTIONARY))
+    {
+        var iter = variant.iterator();
+        Variant? val = null;
+        string? key = null;
+        while (iter.next("{s*}", &key, &val))
+        if (key != null)
+        {
 
-				if (val.is_of_type(VariantType.MAYBE))
-					val = val.get_maybe();
-				if (val.is_of_type(VariantType.VARIANT))
-					val = val.get_variant();
-				result.insert(key, val);
-			}
-	}
-	else if (variant != null)
-	{
-		critical("Wrong type: %s %s", variant.get_type_string(), variant.print(true));
-	}
-	return result;
+            if (val.is_of_type(VariantType.MAYBE))
+            val = val.get_maybe();
+            if (val.is_of_type(VariantType.VARIANT))
+            val = val.get_variant();
+            result.insert(key, val);
+        }
+    }
+    else if (variant != null)
+    {
+        critical("Wrong type: %s %s", variant.get_type_string(), variant.print(true));
+    }
+    return result;
 }
 
 public Variant variant_from_hashtable(HashTable<string, Variant> hashtable)
 {
-	var builder = new VariantBuilder(new VariantType("a{sv}"));
-	foreach (var key in hashtable.get_keys())
-		builder.add("{sv}", key, hashtable.get(key));
-	return builder.end ();
+    var builder = new VariantBuilder(new VariantType("a{sv}"));
+    foreach (var key in hashtable.get_keys())
+    builder.add("{sv}", key, hashtable.get(key));
+    return builder.end ();
 }
 
 /**
@@ -125,93 +125,93 @@ public Variant variant_from_hashtable(HashTable<string, Variant> hashtable)
  */
 public bool variant_string(Variant variant, out string? data)
 {
-	if (variant.is_of_type(VariantType.STRING))
-	{
-		data = variant.get_string();
-		return true;
-	}
+    if (variant.is_of_type(VariantType.STRING))
+    {
+        data = variant.get_string();
+        return true;
+    }
 
-	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
-	{
-		Variant? maybe_variant = null;
-		variant.get("m*", &maybe_variant);
-		if (maybe_variant == null)
-		{
-			data = null;
-			return true;
-		}
-		return variant_string(maybe_variant, out data);
-	}
+    if (variant.get_type().is_subtype_of(VariantType.MAYBE))
+    {
+        Variant? maybe_variant = null;
+        variant.get("m*", &maybe_variant);
+        if (maybe_variant == null)
+        {
+            data = null;
+            return true;
+        }
+        return variant_string(maybe_variant, out data);
+    }
 
-	if (variant.is_of_type(VariantType.VARIANT))
-		return variant_string(variant.get_variant(), out data);
+    if (variant.is_of_type(VariantType.VARIANT))
+    return variant_string(variant.get_variant(), out data);
 
-	data = null;
-	return false;
+    data = null;
+    return false;
 }
 
 public bool variant_bool(Variant? variant, ref bool result)
 {
-	if (variant == null)
-		return false;
+    if (variant == null)
+    return false;
 
-	if (variant.is_of_type(VariantType.BOOLEAN))
-	{
-		result = variant.get_boolean();
-		return true;
-	}
+    if (variant.is_of_type(VariantType.BOOLEAN))
+    {
+        result = variant.get_boolean();
+        return true;
+    }
 
-	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
-	{
-		Variant? maybe_variant = null;
-		variant.get("m*", &maybe_variant);
-		return variant_bool(maybe_variant, ref result);
-	}
+    if (variant.get_type().is_subtype_of(VariantType.MAYBE))
+    {
+        Variant? maybe_variant = null;
+        variant.get("m*", &maybe_variant);
+        return variant_bool(maybe_variant, ref result);
+    }
 
-	if (variant.is_of_type(VariantType.VARIANT))
-		return variant_bool(variant.get_variant(), ref result);
+    if (variant.is_of_type(VariantType.VARIANT))
+    return variant_bool(variant.get_variant(), ref result);
 
-	return false;
+    return false;
 }
 
 public static string? variant_dict_str(Variant dict, string key)
 {
-	var val = dict.lookup_value(key, null);
-	if (val == null)
-		return null;
+    var val = dict.lookup_value(key, null);
+    if (val == null)
+    return null;
 
-	if (val.is_of_type(VariantType.MAYBE))
-	{
-		val = val.get_maybe();
-		if (val == null)
-			return null;
-	}
+    if (val.is_of_type(VariantType.MAYBE))
+    {
+        val = val.get_maybe();
+        if (val == null)
+        return null;
+    }
 
-	if (val.is_of_type(VariantType.VARIANT))
-		val = val.get_variant();
-	if (val.is_of_type(VariantType.STRING))
-		return val.get_string();
-	return null;
+    if (val.is_of_type(VariantType.VARIANT))
+    val = val.get_variant();
+    if (val.is_of_type(VariantType.STRING))
+    return val.get_string();
+    return null;
 }
 
 public static double variant_dict_double(Variant dict, string key, double default_value)
 {
-	var val = dict.lookup_value(key, null);
-	if (val == null)
-		return default_value;
+    var val = dict.lookup_value(key, null);
+    if (val == null)
+    return default_value;
 
-	if (val.is_of_type(VariantType.MAYBE))
-	{
-		val = val.get_maybe();
-		if (val == null)
-			return default_value;
-	}
+    if (val.is_of_type(VariantType.MAYBE))
+    {
+        val = val.get_maybe();
+        if (val == null)
+        return default_value;
+    }
 
-	if (val.is_of_type(VariantType.VARIANT))
-		val = val.get_variant();
-	if (val.is_of_type(VariantType.DOUBLE))
-		return val.get_double();
-	return default_value;
+    if (val.is_of_type(VariantType.VARIANT))
+    val = val.get_variant();
+    if (val.is_of_type(VariantType.DOUBLE))
+    return val.get_double();
+    return default_value;
 }
 
 /**
@@ -225,20 +225,20 @@ public static double variant_dict_double(Variant dict, string key, double defaul
  */
 public Variant? unbox_variant(Variant? value)
 {
-	if (value == null)
-		return null;
+    if (value == null)
+    return null;
 
-	if (value.get_type().is_subtype_of(VariantType.MAYBE))
-	{
-		Variant? maybe_variant = null;
-		value.get("m*", &maybe_variant);
-		return unbox_variant(maybe_variant);
-	}
+    if (value.get_type().is_subtype_of(VariantType.MAYBE))
+    {
+        Variant? maybe_variant = null;
+        value.get("m*", &maybe_variant);
+        return unbox_variant(maybe_variant);
+    }
 
-	if (value.is_of_type(VariantType.VARIANT))
-		return unbox_variant(value.get_variant());
+    if (value.is_of_type(VariantType.VARIANT))
+    return unbox_variant(value.get_variant());
 
-	return value;
+    return value;
 }
 
 /**
@@ -249,10 +249,10 @@ public Variant? unbox_variant(Variant? value)
  */
 public bool variant_to_bool(Variant? value)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN))
-		return unboxed.get_boolean();
-	return false;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN))
+    return unboxed.get_boolean();
+    return false;
 }
 
 /**
@@ -263,10 +263,10 @@ public bool variant_to_bool(Variant? value)
  */
 public int64 variant_to_int64(Variant? value)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.INT64))
-		return unboxed.get_int64();
-	return (int64) 0;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null && unboxed.is_of_type(VariantType.INT64))
+    return unboxed.get_int64();
+    return (int64) 0;
 }
 
 /**
@@ -277,12 +277,12 @@ public int64 variant_to_int64(Variant? value)
  */
 public int variant_to_int(Variant? value)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.INT32))
-		return (int) unboxed.get_int32();
-	if (unboxed != null && unboxed.is_of_type(VariantType.INT64))
-		return (int) unboxed.get_int64();
-	return 0;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null && unboxed.is_of_type(VariantType.INT32))
+    return (int) unboxed.get_int32();
+    if (unboxed != null && unboxed.is_of_type(VariantType.INT64))
+    return (int) unboxed.get_int64();
+    return 0;
 }
 
 /**
@@ -293,12 +293,12 @@ public int variant_to_int(Variant? value)
  */
 public uint variant_to_uint(Variant? value)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.UINT32))
-		return (uint) unboxed.get_uint32();
-	if (unboxed != null && unboxed.is_of_type(VariantType.UINT64))
-		return (uint) unboxed.get_uint64();
-	return 0;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null && unboxed.is_of_type(VariantType.UINT32))
+    return (uint) unboxed.get_uint32();
+    if (unboxed != null && unboxed.is_of_type(VariantType.UINT64))
+    return (uint) unboxed.get_uint64();
+    return 0;
 }
 
 /**
@@ -309,16 +309,16 @@ public uint variant_to_uint(Variant? value)
  */
 public double variant_to_double(Variant? value)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null)
-	{
-		if (unboxed.is_of_type(VariantType.DOUBLE))
-			return unboxed.get_double();
-		/* double value that happens to be integer may be actually stored as integer */
-		if (unboxed.is_of_type(VariantType.INT64))
-			return (double) unboxed.get_int64();
-	}
-	return 0.0;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null)
+    {
+        if (unboxed.is_of_type(VariantType.DOUBLE))
+        return unboxed.get_double();
+        /* double value that happens to be integer may be actually stored as integer */
+        if (unboxed.is_of_type(VariantType.INT64))
+        return (double) unboxed.get_int64();
+    }
+    return 0.0;
 }
 
 /**
@@ -330,10 +330,10 @@ public double variant_to_double(Variant? value)
  */
 public string? variant_to_string(Variant? value, string? default_val=null)
 {
-	var unboxed = unbox_variant(value);
-	if (unboxed != null && unboxed.is_of_type(VariantType.STRING))
-		return unboxed.get_string();
-	return default_val;
+    var unboxed = unbox_variant(value);
+    if (unboxed != null && unboxed.is_of_type(VariantType.STRING))
+    return unboxed.get_string();
+    return default_val;
 }
 
 /**
@@ -344,14 +344,14 @@ public string? variant_to_string(Variant? value, string? default_val=null)
  */
 public inline string? variant_dump(Variant? value)
 {
-	return value == null ? null : value.print(true);
+    return value == null ? null : value.print(true);
 }
 
 public Variant? new_variant_string_or_null(string? str)
 {
-	if (str == null)
-		return null;
-	return new Variant.string(str);
+    if (str == null)
+    return null;
+    return new Variant.string(str);
 }
 
 /**
@@ -374,19 +374,19 @@ public Variant? new_variant_string_or_null(string? str)
  */
 public Variant? strv_to_variant_dict(string[]? args, int offset=0)
 {
-	if (args == null || offset < 0 || offset >= args.length)
-		return null;
+    if (args == null || offset < 0 || offset >= args.length)
+    return null;
 
-	var builder = new VariantBuilder(new VariantType("a{smv}"));
-	for (var i = offset; i < args.length; i++)
-	{
-		var arg = args[i];
-		var arg_parts = arg.split("=", 2);
-		unowned string? key = arg_parts[0];
-		unowned string? value = arg_parts.length == 2 ? arg_parts[1] : null;
-		variant_dict_add_param(builder, key, value);
-	}
-	return builder.end();
+    var builder = new VariantBuilder(new VariantType("a{smv}"));
+    for (var i = offset; i < args.length; i++)
+    {
+        var arg = args[i];
+        var arg_parts = arg.split("=", 2);
+        unowned string? key = arg_parts[0];
+        unowned string? value = arg_parts.length == 2 ? arg_parts[1] : null;
+        variant_dict_add_param(builder, key, value);
+    }
+    return builder.end();
 }
 
 /**
@@ -406,60 +406,60 @@ public Variant? strv_to_variant_dict(string[]? args, int offset=0)
  */
 public Variant? str_table_to_variant_dict(HashTable<string, string>? args)
 {
-	if (args == null)
-		return null;
+    if (args == null)
+    return null;
 
-	var builder = new VariantBuilder(new VariantType("a{smv}"));
-	var iter = HashTableIter<string, string>(args);
-	unowned string key;
-	unowned string value;
-	while (iter.next(out key, out value))
-		variant_dict_add_param(builder, key, value);
-	return builder.end();
+    var builder = new VariantBuilder(new VariantType("a{smv}"));
+    var iter = HashTableIter<string, string>(args);
+    unowned string key;
+    unowned string value;
+    while (iter.next(out key, out value))
+    variant_dict_add_param(builder, key, value);
+    return builder.end();
 }
 
 private void variant_dict_add_param(VariantBuilder dict_builder, string key, string value)
 {
-	string param_type;
-	string param_key;
-	Variant? param_value = null;
-	var parts = key.split(":", 2);
-	if (parts.length < 2)
-	{
-		param_type = "s";
-		param_key = key;
-	}
-	else
-	{
-		param_type = parts[0];
-		param_key = parts[1];
-	}
+    string param_type;
+    string param_key;
+    Variant? param_value = null;
+    var parts = key.split(":", 2);
+    if (parts.length < 2)
+    {
+        param_type = "s";
+        param_key = key;
+    }
+    else
+    {
+        param_type = parts[0];
+        param_key = parts[1];
+    }
 
-	if (value == null)
-	{
-		param_value = null;
-	}
-	else
-	{
-		switch (param_type)
-		{
-		case "d":
-			double d;
-			if (double.try_parse(value, out d))
-				param_value = new Variant.double(d);
-			break;
-		case "b":
-			bool b;
-			if (bool.try_parse(value, out b))
-				param_value = new Variant.boolean(b);
-			break;
-		case "s":
-		default:
-			param_value = new Variant.string(value);
-			break;
-		}
-	}
-	dict_builder.add("{smv}", param_key, param_value);
+    if (value == null)
+    {
+        param_value = null;
+    }
+    else
+    {
+        switch (param_type)
+        {
+        case "d":
+            double d;
+            if (double.try_parse(value, out d))
+            param_value = new Variant.double(d);
+            break;
+        case "b":
+            bool b;
+            if (bool.try_parse(value, out b))
+            param_value = new Variant.boolean(b);
+            break;
+        case "s":
+        default:
+            param_value = new Variant.string(value);
+            break;
+        }
+    }
+    dict_builder.add("{smv}", param_key, param_value);
 }
 
 /**
@@ -469,7 +469,7 @@ private void variant_dict_add_param(VariantBuilder dict_builder, string key, str
  * @return Printed value.
  */
 public string print_variant(Variant? variant) {
-	return variant != null ? variant.print(true) : "null";
+    return variant != null ? variant.print(true) : "null";
 }
 
 } // namespace Drt

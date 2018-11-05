@@ -25,31 +25,31 @@
 namespace Drtgtk {
 
 public class Entry: Gtk.Entry {
-	public Entry (string? text) {
-		if (text != null) {
-			this.text = text;
-		}
-	}
+    public Entry (string? text) {
+        if (text != null) {
+            this.text = text;
+        }
+    }
 
-	public signal void escape();
+    public signal void escape();
 
-	public bool copy_to_clipboard() {
-		var window = get_toplevel() as Gtk.Window;
-		if (window != null) {
-			var clipboard = Gtk.Clipboard.get_for_display(window.get_display(), Gdk.SELECTION_CLIPBOARD);
-			clipboard.set_text(this.text, -1);
-			return true;
-		}
-		return false;
-	}
+    public bool copy_to_clipboard() {
+        var window = get_toplevel() as Gtk.Window;
+        if (window != null) {
+            var clipboard = Gtk.Clipboard.get_for_display(window.get_display(), Gdk.SELECTION_CLIPBOARD);
+            clipboard.set_text(this.text, -1);
+            return true;
+        }
+        return false;
+    }
 
-	public override bool key_press_event(Gdk.EventKey event) {
-		if (event.keyval == Gdk.Key.Escape) {
-			escape();
-			return true;
-		}
-		return base.key_press_event(event);
-	}
+    public override bool key_press_event(Gdk.EventKey event) {
+        if (event.keyval == Gdk.Key.Escape) {
+            escape();
+            return true;
+        }
+        return base.key_press_event(event);
+    }
 }
 
 } // namespace Drtgtk

@@ -29,27 +29,27 @@ namespace Drtgtk.Labels
 
 public Gtk.Label plain(string? label, bool wrap=false, bool use_markup=false)
 {
-	return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
-		label: label, wrap: wrap, vexpand: false, hexpand: true, use_markup: use_markup,
-		halign: Gtk.Align.START, yalign: 0.0f, xalign: 0.0f);
+    return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
+        label: label, wrap: wrap, vexpand: false, hexpand: true, use_markup: use_markup,
+        halign: Gtk.Align.START, yalign: 0.0f, xalign: 0.0f);
 }
 
 
 public Gtk.Label markup(string? markup, ...)
 {
-	return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
-		label: markup != null ? Markup.vprintf_escaped(markup, va_list()) : markup,
-		use_markup: true, wrap: true, vexpand: false, hexpand: true,
-		halign: Gtk.Align.START, yalign: 0.0f, xalign: 0.0f);
+    return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
+        label: markup != null ? Markup.vprintf_escaped(markup, va_list()) : markup,
+        use_markup: true, wrap: true, vexpand: false, hexpand: true,
+        halign: Gtk.Align.START, yalign: 0.0f, xalign: 0.0f);
 }
 
 
 public Gtk.Label header(string text)
 {
-	return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
-		label: Markup.printf_escaped("<span size='large'><b>%s</b></span>", text),
-		use_markup: true, wrap: true, vexpand: false, hexpand: true,
-		halign: Gtk.Align.CENTER, yalign: 0.0f, xalign: 0.0f);
+    return (Gtk.Label) GLib.Object.@new(typeof(Gtk.Label),
+        label: Markup.printf_escaped("<span size='large'><b>%s</b></span>", text),
+        use_markup: true, wrap: true, vexpand: false, hexpand: true,
+        halign: Gtk.Align.CENTER, yalign: 0.0f, xalign: 0.0f);
 }
 
 } // namespace Drtgtk.Labels

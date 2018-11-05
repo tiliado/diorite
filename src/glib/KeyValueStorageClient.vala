@@ -24,31 +24,31 @@
 namespace Drt {
 
 public class KeyValueStorageClient: GLib.Object {
-	public Drt.RpcChannel channel {get; construct;}
+    public Drt.RpcChannel channel {get; construct;}
 
-	public KeyValueStorageClient(Drt.RpcChannel channel) {
-		GLib.Object(channel: channel);
-		channel.router.add_method("/diorite/keyvaluestorageserver/changed", Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
-			null, handle_changed, {
-			new Drt.StringParam("provider", true, false),
-			new Drt.StringParam("key", true, false),
-			new Drt.VariantParam("old_value", true, true),
-		});
-	}
+    public KeyValueStorageClient(Drt.RpcChannel channel) {
+        GLib.Object(channel: channel);
+        channel.router.add_method("/diorite/keyvaluestorageserver/changed", Drt.RpcFlags.PRIVATE|Drt.RpcFlags.WRITABLE,
+            null, handle_changed, {
+                new Drt.StringParam("provider", true, false),
+                new Drt.StringParam("key", true, false),
+                new Drt.VariantParam("old_value", true, true),
+            });
+    }
 
-	public signal void changed(string provider_name, string key, Variant? old_value);
+    public signal void changed(string provider_name, string key, Variant? old_value);
 
-	public KeyValueStorage get_proxy(string provider_name) {
-		return new KeyValueStorageProxy(this, provider_name);
-	}
+    public KeyValueStorage get_proxy(string provider_name) {
+        return new KeyValueStorageProxy(this, provider_name);
+    }
 
-	private void handle_changed(Drt.RpcRequest request) throws RpcError {
-		var provider_name = request.pop_string();
-		var key = request.pop_string();
-		var old_value = request.pop_variant();
-		changed(provider_name, key, old_value);
-		request.respond(new Variant.boolean(true));
-	}
+    private void handle_changed(Drt.RpcRequest request) throws RpcError {
+        var provider_name = request.pop_string();
+        var key = request.pop_string();
+        var old_value = request.pop_variant();
+        changed(provider_name, key, old_value);
+        request.respond(new Variant.boolean(true));
+    }
 }
 
 } // namespace Drt

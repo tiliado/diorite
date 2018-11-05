@@ -31,7 +31,7 @@ namespace Drt.String
  * @return true if string is empty, false otherwise
  */
 public inline bool is_empty(string? str) {
-	return str == null || ((uint8[]) str)[0] == 0;
+    return str == null || ((uint8[]) str)[0] == 0;
 }
 
 /**
@@ -41,7 +41,7 @@ public inline bool is_empty(string? str) {
  * @return original string if it isn't empty, null otherwise
  */
 public inline string? null_if_empty(owned string? str) {
-	return (str == null || ((uint8[]) str)[0] == 0) ? null : str;
+    return (str == null || ((uint8[]) str)[0] == 0) ? null : str;
 }
 
 /**
@@ -52,7 +52,7 @@ public inline string? null_if_empty(owned string? str) {
  * @return The first string if it is not empty, otherwise return the second one.
  */
 public unowned string not_empty_or(string? may_be_empty, string fallback) {
-	return is_empty(may_be_empty) ? fallback : may_be_empty;
+    return is_empty(may_be_empty) ? fallback : may_be_empty;
 }
 
 /**
@@ -68,11 +68,11 @@ public unowned string not_empty_or(string? may_be_empty, string fallback) {
  */
 public string? concat(string? initial, string? separator, owned string text)
 {
-	if (is_empty(initial))
-		return (owned) text;
-	if (is_empty(separator))
-		return initial + text;
-	return initial + separator + text;
+    if (is_empty(initial))
+    return (owned) text;
+    if (is_empty(separator))
+    return initial + text;
+    return initial + separator + text;
 }
 
 /**
@@ -86,7 +86,7 @@ public string? concat(string? initial, string? separator, owned string text)
  */
 public void append(ref string? initial, string? separator, owned string text)
 {
-	initial = concat(initial, separator, (owned) text);
+    initial = concat(initial, separator, (owned) text);
 }
 
 /**
@@ -104,9 +104,9 @@ public void append(ref string? initial, string? separator, owned string text)
  */
 public SList<string> split_strip(string? data, string delimiter, int max_tokens=0)
 {
-	if (is_empty(data))
-		return new SList<string>();
-	return array_to_slist(data.split(delimiter, max_tokens), true);
+    if (is_empty(data))
+    return new SList<string>();
+    return array_to_slist(data.split(delimiter, max_tokens), true);
 }
 
 
@@ -119,22 +119,22 @@ public SList<string> split_strip(string? data, string delimiter, int max_tokens=
  */
 public SList<string> array_to_slist(string[] array, bool strip=false)
 {
-	SList<string> result = null;
-	foreach (unowned string item in array)
-	{
-		if (!strip)
-		{
-			result.prepend(item);
-		}
-		else if (!is_empty(item))
-		{
-			var stripped_item = item.strip();
-			if (!is_empty(stripped_item))
-				result.prepend((owned) stripped_item);
-		}
-	}
-	result.reverse();
-	return (owned) result;
+    SList<string> result = null;
+    foreach (unowned string item in array)
+    {
+        if (!strip)
+        {
+            result.prepend(item);
+        }
+        else if (!is_empty(item))
+        {
+            var stripped_item = item.strip();
+            if (!is_empty(stripped_item))
+            result.prepend((owned) stripped_item);
+        }
+    }
+    result.reverse();
+    return (owned) result;
 }
 
 /**
@@ -145,47 +145,47 @@ public SList<string> array_to_slist(string[] array, bool strip=false)
  */
 public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercase)
 {
-	var result = new GenericSet<string>(str_hash, str_equal);
-	if (!is_empty(dataset))
-	{
-		var items = dataset.split(";");
-		foreach (var item in items)
-		{
-			item = item.strip();
-			if (item[0] != 0)
-				result.add(lowercase ? item.down() : item);
-		}
-	}
-	return result;
+    var result = new GenericSet<string>(str_hash, str_equal);
+    if (!is_empty(dataset))
+    {
+        var items = dataset.split(";");
+        foreach (var item in items)
+        {
+            item = item.strip();
+            if (item[0] != 0)
+            result.add(lowercase ? item.down() : item);
+        }
+    }
+    return result;
 }
 
 public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
 {
-	char* result = g_utf8_strchr((char*) str + start_index, len, c);
-	return result != null ? (int) (result - (char*) str) : -1;
+    char* result = g_utf8_strchr((char*) str + start_index, len, c);
+    return result != null ? (int) (result - (char*) str) : -1;
 }
 
 public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
 {
-	char* result = g_utf8_strrchr((char*) str + start_index, len, c);
-	return result != null ? (int) (result - (char*) str) : -1;
+    char* result = g_utf8_strrchr((char*) str + start_index, len, c);
+    return result != null ? (int) (result - (char*) str) : -1;
 }
 
 public string? unmask(uint8[] data)
 {
-	var length = data.length;
-	if (length < 2)
-		return null;
-	var shift = data[0];
-	var result = new uint8[length];
-	for (var i = 1; i < length; i++)
-	{
-		if (shift > data[i])
-			return null;
-		result[i - 1] = data[i] - shift;
-	}
-	result[length] = 0;
-	return (string) result;
+    var length = data.length;
+    if (length < 2)
+    return null;
+    var shift = data[0];
+    var result = new uint8[length];
+    for (var i = 1; i < length; i++)
+    {
+        if (shift > data[i])
+        return null;
+        result[i - 1] = data[i] - shift;
+    }
+    result[length] = 0;
+    return (string) result;
 }
 
 /**
@@ -198,14 +198,14 @@ public string? unmask(uint8[] data)
  */
 public int utf16_strlen(string? str)
 {
-	if (is_empty(str))
-		return 0;
-	int len = 0;
-	unichar c = 0;
-	int i = 0;
-	while (str.get_next_char(ref i, out c))
-		len += (uint) c <= 0xFFFF ? 1 : 2;
-	return len;
+    if (is_empty(str))
+    return 0;
+    int len = 0;
+    unichar c = 0;
+    int i = 0;
+    while (str.get_next_char(ref i, out c))
+    len += (uint) c <= 0xFFFF ? 1 : 2;
+    return len;
 }
 
 /**
@@ -217,10 +217,10 @@ public int utf16_strlen(string? str)
  */
 public unowned string offset(string str, int offset)
 {
-	assert(offset >= 0);
-	uint8* pointer = ((uint8*) str) + offset;
-	unowned string result = (string) pointer;
-	return result;
+    assert(offset >= 0);
+    uint8* pointer = ((uint8*) str) + offset;
+    unowned string result = (string) pointer;
+    return result;
 }
 
 } // namespace Drt.String
