@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,10 +27,10 @@ namespace Drtdb
 
 /**
  * Parser of SQL bind expressions.
- * 
+ *
  * SQL bind expressions are lik SQL statements but the '?' placeholders are accompanied with data type
  * specifiers:
- * 
+ *
  * * `?v` GLib.Value
  * * `?b` boolean
  * * `?i` int
@@ -39,14 +39,14 @@ namespace Drtdb
  * * `?s` string
  * * `?B` Bytes
  * * `?A` ByteArray
- * 
+ *
  * This way, it is possible to use a single var arg function to bind all placeholders.
  */
 public class BindExpression
 {
 	private SList<Value?> values;
 	private StringBuilder sql;
-	
+
 	/**
 	 * Create new bind expression parser
 	 */
@@ -54,7 +54,7 @@ public class BindExpression
 	{
 		reset();
 	}
-	
+
 	/**
 	 * Reset the parser to the initial state.
 	 */
@@ -66,30 +66,30 @@ public class BindExpression
 		else
 			sql.truncate();
 	}
-	
+
 	/**
 	 * Get parsed var args as a list of proper {@link GLib.Value} instances.
-	 * 
+	 *
 	 * @return data as {@link GLib.Value} instances
 	 */
 	public unowned SList<Value?> get_values()
 	{
 		return values;
 	}
-	
+
 	/**
 	 * Get final SQL query
-	 * 
+	 *
 	 * @return SQL query without data type specifiers
 	 */
 	public unowned string get_sql()
 	{
 		return sql.str;
 	}
-	
+
 	/**
 	 * Parse SQL bind expression
-	 * 
+	 *
 	 * @param sql_str    a sql string
 	 * @param ...        data corresponding to the placeholders in the sql string
 	 * @throws DatabaseError if the expression contains invalid data type or is incomplete
@@ -98,10 +98,10 @@ public class BindExpression
 	{
 		parse_va(sql_str, va_list());
 	}
-	
+
 	/**
 	 * Parse SQL bind expression
-	 * 
+	 *
 	 * @param sql_str    a sql string
 	 * @param args       data corresponding to the placeholders in the sql string
 	 * @throws DatabaseError if the expression contains invalid data type or is incomplete
@@ -162,8 +162,8 @@ public class BindExpression
 				values.prepend((owned) val);
 			}
 		}
-		
-		values.reverse();		
+
+		values.reverse();
 		if (pos > offset)
 			sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
 	}

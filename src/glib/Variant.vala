@@ -2,14 +2,14 @@
  * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -57,7 +57,7 @@ public string[] variant_to_strv(Variant variant)
 	{
 		if (!variant.is_container())
 			warning("Variant is not a container: %s: %s", variant.get_type_string(), variant.print(true));
-		
+
 		result = {};
 	}
 	return result;
@@ -68,7 +68,7 @@ public Variant[] variant_to_array(Variant variant)
 	Variant[] result;
 	if (variant.is_container() && variant.n_children() > 0)
 	{
-		
+
 		var size = variant.n_children();
 		result = new Variant[size];
 		for (size_t i = 0; i < size; i++)
@@ -97,7 +97,7 @@ public HashTable<string, Variant> variant_to_hashtable(Variant? variant)
 		while (iter.next("{s*}", &key, &val))
 			if (key != null)
 			{
-				
+
 				if (val.is_of_type(VariantType.MAYBE))
 					val = val.get_maybe();
 				if (val.is_of_type(VariantType.VARIANT))
@@ -130,7 +130,7 @@ public bool variant_string(Variant variant, out string? data)
 		data = variant.get_string();
 		return true;
 	}
-	
+
 	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
 	{
 		Variant? maybe_variant = null;
@@ -142,10 +142,10 @@ public bool variant_string(Variant variant, out string? data)
 		}
 		return variant_string(maybe_variant, out data);
 	}
-	
+
 	if (variant.is_of_type(VariantType.VARIANT))
 		return variant_string(variant.get_variant(), out data);
-	
+
 	data = null;
 	return false;
 }
@@ -154,23 +154,23 @@ public bool variant_bool(Variant? variant, ref bool result)
 {
 	if (variant == null)
 		return false;
-	
+
 	if (variant.is_of_type(VariantType.BOOLEAN))
 	{
 		result = variant.get_boolean();
 		return true;
 	}
-	
+
 	if (variant.get_type().is_subtype_of(VariantType.MAYBE))
 	{
 		Variant? maybe_variant = null;
 		variant.get("m*", &maybe_variant);
 		return variant_bool(maybe_variant, ref result);
 	}
-	
+
 	if (variant.is_of_type(VariantType.VARIANT))
 		return variant_bool(variant.get_variant(), ref result);
-	
+
 	return false;
 }
 
@@ -179,14 +179,14 @@ public static string? variant_dict_str(Variant dict, string key)
 	var val = dict.lookup_value(key, null);
 	if (val == null)
 		return null;
-	
+
 	if (val.is_of_type(VariantType.MAYBE))
 	{
 		val = val.get_maybe();
 		if (val == null)
 			return null;
 	}
-		
+
 	if (val.is_of_type(VariantType.VARIANT))
 		val = val.get_variant();
 	if (val.is_of_type(VariantType.STRING))
@@ -199,14 +199,14 @@ public static double variant_dict_double(Variant dict, string key, double defaul
 	var val = dict.lookup_value(key, null);
 	if (val == null)
 		return default_value;
-	
+
 	if (val.is_of_type(VariantType.MAYBE))
 	{
 		val = val.get_maybe();
 		if (val == null)
 			return default_value;
 	}
-		
+
 	if (val.is_of_type(VariantType.VARIANT))
 		val = val.get_variant();
 	if (val.is_of_type(VariantType.DOUBLE))
@@ -216,10 +216,10 @@ public static double variant_dict_double(Variant dict, string key, double defaul
 
 /**
  * Unboxes variant value.
- * 
+ *
  *  * Null maybe variant is converted to null.
  *  * Child value is returned for values of type variant.
- * 
+ *
  * @param value    value to unbox
  * @return unboxed value or null
  */
@@ -227,23 +227,23 @@ public Variant? unbox_variant(Variant? value)
 {
 	if (value == null)
 		return null;
-	
+
 	if (value.get_type().is_subtype_of(VariantType.MAYBE))
 	{
 		Variant? maybe_variant = null;
 		value.get("m*", &maybe_variant);
 		return unbox_variant(maybe_variant);
 	}
-	
+
 	if (value.is_of_type(VariantType.VARIANT))
 		return unbox_variant(value.get_variant());
-	
+
 	return value;
 }
 
 /**
  * Converts any Variant value to boolean.
- * 
+ *
  * @param value    value to convert
  * @return actual boolean value if the value is of type boolean, false otherwise
  */
@@ -257,7 +257,7 @@ public bool variant_to_bool(Variant? value)
 
 /**
  * Converts any Variant value to int64.
- * 
+ *
  * @param value    value to convert
  * @return actual int64 value if the value is of type int64, zero otherwise
  */
@@ -271,7 +271,7 @@ public int64 variant_to_int64(Variant? value)
 
 /**
  * Converts any Variant value to int.
- * 
+ *
  * @param value    value to convert
  * @return actual int value if the value is of type int, zero otherwise
  */
@@ -287,7 +287,7 @@ public int variant_to_int(Variant? value)
 
 /**
  * Converts any Variant value to uint.
- * 
+ *
  * @param value    value to convert
  * @return actual uint value if the value is of type uint, zero otherwise
  */
@@ -303,7 +303,7 @@ public uint variant_to_uint(Variant? value)
 
 /**
  * Converts any Variant value to double.
- * 
+ *
  * @param value    value to convert
  * @return actual double value if the value is of type double or int64, 0.0 otherwise
  */
@@ -323,7 +323,7 @@ public double variant_to_double(Variant? value)
 
 /**
  * Converts any Variant value to string.
- * 
+ *
  * @param value      value to convert
  * @param default_val    default value (usually null or empty string)
  * @return actual string value if the value is of type string, default value otherwise
@@ -338,7 +338,7 @@ public string? variant_to_string(Variant? value, string? default_val=null)
 
 /**
  * Dump variant as a string or return null.
- * 
+ *
  * @param value    Variant value.
  * @return null if `value` is null, the variant value as a string otherwise
  */
@@ -356,18 +356,18 @@ public Variant? new_variant_string_or_null(string? str)
 
 /**
  * Converts string array to Variant dictionary
- * 
+ *
  * The string array entries must follow this format: "[x:]key=value", where
  * `key` is the dictionary key, `x` is the type specifier and `value` is the dictionary value.
- * 
+ *
  * The type specifiers are:
- * 
+ *
  *   *  `d` - double
  *   *  `b` - boolean
  *   *  `s` - string
- * 
+ *
  * If the specifier is omitted, the default type is string.
- * 
+ *
  * @param args      array of `[x:]key=value` strings
  * @param offset    the offset of the first param
  * @return `null` if `args` is `null` or `offset` is invalid, Variant dict otherwise
@@ -376,7 +376,7 @@ public Variant? strv_to_variant_dict(string[]? args, int offset=0)
 {
 	if (args == null || offset < 0 || offset >= args.length)
 		return null;
-	
+
 	var builder = new VariantBuilder(new VariantType("a{smv}"));
 	for (var i = offset; i < args.length; i++)
 	{
@@ -391,16 +391,16 @@ public Variant? strv_to_variant_dict(string[]? args, int offset=0)
 
 /**
  * Converts a HashTable with both string keys and values to Variant dictionary
- * 
+ *
  * The table keys must follow this format: "[x:]key", where `key` is the dictionary key and `x` is the type
  * specifier:
- * 
+ *
  *   *  `d` - double
  *   *  `b` - boolean
  *   *  `s` - string
- * 
+ *
  * If the specifier is omitted, the default type is string.
- * 
+ *
  * @param args      hash table of `[x:]key` = `value` pairs
  * @return `null` if `args` is `null`, Variant dict otherwise
  */
@@ -408,7 +408,7 @@ public Variant? str_table_to_variant_dict(HashTable<string, string>? args)
 {
 	if (args == null)
 		return null;
-	
+
 	var builder = new VariantBuilder(new VariantType("a{smv}"));
 	var iter = HashTableIter<string, string>(args);
 	unowned string key;
@@ -434,7 +434,7 @@ private void variant_dict_add_param(VariantBuilder dict_builder, string key, str
 		param_type = parts[0];
 		param_key = parts[1];
 	}
-		
+
 	if (value == null)
 	{
 		param_value = null;
@@ -464,7 +464,7 @@ private void variant_dict_add_param(VariantBuilder dict_builder, string key, str
 
 /**
  * Print variant as string
- * 
+ *
  * @param variant    Variant to print.
  * @return Printed value.
  */

@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,10 +43,10 @@ public class JsonParser
 	private uint line = 0;
 	private uint column = 0;
 	private uint array_recursion = 0;
-	
+
 	/**
 	 * Parse JSON object from data.
-	 * 
+	 *
 	 * @param data    the data to parse
 	 * @throws JsonError if data is empty or invalid
 	 * @return a new JSON document
@@ -58,10 +58,10 @@ public class JsonParser
 			throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object.");
 		return (JsonObject) parser.root;
 	}
-	
+
 	/**
 	 * Parse JSON array from data.
-	 * 
+	 *
 	 * @param data    the data to parse
 	 * @throws JsonError if data is empty or invalid
 	 * @return a new JSON array
@@ -73,10 +73,10 @@ public class JsonParser
 			throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript array.");
 		return (JsonArray) parser.root;
 	}
-	
+
 	/**
 	 * Parse JSON document from data.
-	 * 
+	 *
 	 * @param data    the data to parse
 	 * @throws JsonError if data is empty or invalid
 	 * @return a new JSON array
@@ -88,15 +88,15 @@ public class JsonParser
 			throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object or array.");
 		return parser.root;
 	}
-	
+
 	/**
 	 * The root node of the parsed JSON document
 	 */
 	public JsonNode? root {get; private set; default = null;}
-	
+
 	/**
 	 * Create new parser and parse data
-	 * 
+	 *
 	 * @param data    data to parse
 	 * @throws JsonError if data is empty or invalid
 	 */
@@ -118,9 +118,9 @@ public class JsonParser
 				line, column, c);
 		if (root is JsonValue)
 			throw new JsonError.INVALID_DATA("The outermost value must be an object or array.");
-		this.root = root;	
+		this.root = root;
 	}
-	
+
 	private char get_char()
 	{
 		var c = data < data_end ? *(data++) : 0;
@@ -141,13 +141,13 @@ public class JsonParser
 		var pos = data + offset;
 		return pos >= data && pos < data_end ? *pos : 0;
 	}
-	
+
 	private void skip(uint offset)
 	{
 		while (offset-- > 0)
 			get_char();
 	}
-	
+
 	private void skip_whitespace()
 	{
 		char c;
@@ -166,7 +166,7 @@ public class JsonParser
 			}
 		}
 	}
-	
+
 	private void parse_one(out JsonNode node) throws JsonError
 	{
 		node = null;
@@ -220,7 +220,7 @@ public class JsonParser
 				line, column, c);
 		}
 	}
-	
+
 	private void parse_keyword(string keyword, out JsonValue node) throws JsonError
 	{
 		node = null;
@@ -253,7 +253,7 @@ public class JsonParser
 			throw new JsonError.PARSE_ERROR("Unknown keyword: '%s'", keyword);
 		}
 	}
-	
+
 	private void parse_number(out JsonValue node) throws JsonError
 	{
 		node = null;
@@ -343,7 +343,7 @@ public class JsonParser
 		else
 			node = new JsonValue.@double(double.parse(buf.str));
 	}
-	
+
 	private void parse_object(out JsonObject object) throws JsonError
 	{
 		object = new JsonObject();
@@ -377,7 +377,7 @@ public class JsonParser
 				throw new JsonError.PARSE_ERROR(
 					"%u:%u Unexpected character '%c'. A string expected.", line, column, c);
 			}
-			
+
 			/* Skip to ':' */
 			skip_whitespace();
 			c = get_char();
@@ -392,12 +392,12 @@ public class JsonParser
 				throw new JsonError.PARSE_ERROR(
 					"%u:%u Unexpected character '%c'. A ':' character expected.", line, column, c);
 			}
-			
+
 			/* Parse the value */
 			JsonNode node = null;
 			parse_one(out node);
 			object[key] = node;
-			
+
 			/* Look for a comma or the end of the object */
 			skip_whitespace();
 			c = get_char();
@@ -416,13 +416,13 @@ public class JsonParser
 			}
 		}
 	}
-	
+
 	private void parse_array(out JsonArray array) throws JsonError
 	{
 		if (++array_recursion >= 20)
 			throw new JsonError.PARSE_ERROR(
 				"%u:%u Maximal array recursion depth reached.", line, column);
-		
+
 		array = new JsonArray();
 		/* Look for the end of the array */
 		skip_whitespace();
@@ -452,7 +452,7 @@ public class JsonParser
 				array.append(node);
 				break;
 			}
-			
+
 			/* Look for a comma or the end of the array */
 			skip_whitespace();
 			var c = get_char();
@@ -472,7 +472,7 @@ public class JsonParser
 			}
 		}
 	}
-	
+
 	private void parse_string(out string? value) throws JsonError
 	{
 		value = null;
@@ -498,7 +498,7 @@ public class JsonParser
 		}
 		throw new JsonError.PARSE_ERROR("%u:%u Unexpected end of data. Incomplete string.", line, column);
 	}
-	
+
 	private void parse_escape_sequence(StringBuilder buf) throws JsonError
 	{
 		var c = get_char();
@@ -515,7 +515,7 @@ public class JsonParser
 		case 'b':
 			buf.append_c('\b');
 			break;
-		case 'f':		
+		case 'f':
 			buf.append_c('\f');
 			break;
 		case 'n':
@@ -532,7 +532,7 @@ public class JsonParser
 			if (utf16 == 0)
 				throw new JsonError.PARSE_ERROR(
 					"%u:%u Invalid unicode escape sequence.", line, column);
-			
+
 			if (utf16.type() == UnicodeType.SURROGATE)
 			{
 				if (get_char() != '\\' || get_char() != 'u')
@@ -544,7 +544,7 @@ public class JsonParser
 				if (utf16_pair[1] == 0)
 					throw new JsonError.PARSE_ERROR(
 						"%u:%u Invalid unicode escape sequence.", line, column);
-				
+
 				if (0xd800 > utf16_pair[0] || utf16_pair[0] > 0xdbff
 				|| 0xdc00 > utf16_pair[1] || utf16_pair[1] > 0xdfff)
 					throw new JsonError.PARSE_ERROR(
@@ -564,7 +564,7 @@ public class JsonParser
 					"%u:%u Invalid escape sequence.", line, column);
 		}
 	}
-	
+
 	private unichar parse_unichar()
 	{
 		unichar u = 0;

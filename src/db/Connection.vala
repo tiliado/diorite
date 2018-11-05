@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,10 +32,10 @@ public class Connection: GLib.Object, Queryable
 {
 	public OrmManager orm {get; private set;}
 	private Sqlite.Database db;
-	
+
 	/**
 	 * Create new SQLite database connection wrapper
-	 * 
+	 *
 	 * @param db     SQLite database connection
 	 * @param orm    ORM Manager for object queries. An empty one is created if it is not provided.
 	 */
@@ -44,10 +44,10 @@ public class Connection: GLib.Object, Queryable
 		this.orm = orm ?? new OrmManager();
 		this.db = (owned) db;
 	}
-	
+
 	/**
 	 * Execute a sql query on database conection
-	 * 
+	 *
 	 * @param sql            SQL query
 	 * @param cancellable    Cancellable object
 	 * @throws GLib.IOError when the operation is cancelled
@@ -58,12 +58,12 @@ public class Connection: GLib.Object, Queryable
 		throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
 		throw_on_error(db.exec(sql, null, null), sql);
 	}
-	
+
 	/**
 	 * Create new raw data query
-	 * 
+	 *
 	 * After query is created, primitive data types can be bound prior execution.
-	 * 
+	 *
 	 * @param sql            SQL query
 	 * @param cancellable    Cancellable object
 	 * @return new query object for further modifications prior execution
@@ -77,12 +77,12 @@ public class Connection: GLib.Object, Queryable
 		throw_on_error(db.prepare_v2(sql, sql.length, out statement), sql);
 		return new Query(this, (owned) statement);
 	}
-	
+
 	/**
 	 * Create new raw data query with values
-	 * 
+	 *
 	 * After query is created, primitive data types can still be bound prior execution.
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @param sql            SQL query with {@link BindExpression} syntax
 	 * @param ...            Values to be bound
@@ -95,12 +95,12 @@ public class Connection: GLib.Object, Queryable
 	{
 		return query_with_values_va(cancellable, sql, va_list());
 	}
-	
+
 	/**
 	 * Create new raw data query with values
-	 * 
+	 *
 	 * After query is created, primitive data types can still be bound prior execution.
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @param sql            SQL query with {@link BindExpression} syntax
 	 * @param args           Values to be bound
@@ -119,20 +119,20 @@ public class Connection: GLib.Object, Queryable
 		throw_on_error(db.prepare_v2(sql_query, sql_query.length, out statement), sql_query);
 		return new Query(this, (owned) statement).bind_values(1, bind_expr.get_values());
 	}
-	
+
 	/**
 	 * Return last error message
-	 * 
+	 *
 	 * @return the last error message
 	 */
 	public unowned string? get_last_error_message()
 	{
 		return db != null ? db.errmsg() : null;
 	}
-	
+
 	/**
 	 * Get ORM objects
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return new ORM query object
 	 * @throws GLib.IOError when the operation is cancelled
@@ -143,10 +143,10 @@ public class Connection: GLib.Object, Queryable
 	{
 		return query_objects<T>(cancellable, null);
 	}
-	
+
 	/**
 	 * Create new ORM query
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @param filter         SQL conditions for filtering of objects (with {@link BindExpression})
 	 * @param ...            Data to bind to the query placeholders
@@ -159,10 +159,10 @@ public class Connection: GLib.Object, Queryable
 	{
 		return query_objects_va<T>(cancellable, filter, va_list());
 	}
-	
+
 	/**
 	 * Create new ORM query
-	 * 
+	 *
 	 * @param filter         SQL conditions for filtering of objects (with {@link BindExpression})
 	 * @param cancellable    Cancellable object
 	 * @param args           Data to bind to the query placeholders
@@ -177,7 +177,7 @@ public class Connection: GLib.Object, Queryable
 		var type = typeof(T);
 		if (!type.is_object())
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		
+
 		var object_spec = orm.get_object_spec(type);
 		if (object_spec == null)
 			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
@@ -189,7 +189,7 @@ public class Connection: GLib.Object, Queryable
 			var param = param_specs[i];
 			if (param.value_type == typeof(void*) || !is_type_supported(param.value_type))
 				throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", param.value_type.name());
-			
+
 			if (i != 0)
 				sql.append_c(',');
 			/*
@@ -201,7 +201,7 @@ public class Connection: GLib.Object, Queryable
 				" \"%1$s\".\"%2$s\" AS \"%2$s\"", table_name_escaped, escape_sql_id(param.name));
 		}
 		sql.append_printf(" FROM \"%s\" ", table_name_escaped);
-		
+
 		BindExpression? bind_expr = (filter != null && filter != "") ? new BindExpression() : null;
 		if (bind_expr != null)
 		{
@@ -213,10 +213,10 @@ public class Connection: GLib.Object, Queryable
 			query.bind_values(1, bind_expr.get_values());
 		return new ObjectQuery<T>(orm, query);
 	}
-	
+
 	/**
 	 * Get a single ORM object
-	 * 
+	 *
 	 * @param pk             value of primary key
 	 * @param cancellable    Cancellable object
 	 * @return new ORM object
@@ -230,11 +230,11 @@ public class Connection: GLib.Object, Queryable
 		var type = typeof(T);
 		if (!type.is_object())
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		
+
 		var object_spec = orm.get_object_spec(type);
 		if (object_spec == null)
 			throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
-		
+
 		/* Full qualified column name with table name are used because SQLite treat non-existent
 		 * column names in quotes as string literals otherwise. */
 		var table_escaped = escape_sql_id(object_spec.table_name);
@@ -243,7 +243,7 @@ public class Connection: GLib.Object, Queryable
 			cancellable, "WHERE \"%s\".\"%s\" == ?v".printf(table_escaped, column_escaped), pk);
 		return query.get_one(cancellable);
 	}
-	
+
 	/**
 	 * Throw error on SQLite failure.
 	 */

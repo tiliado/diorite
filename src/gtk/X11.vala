@@ -2,14 +2,14 @@
  * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,7 +27,7 @@ namespace Drtgtk.X11
 
 /**
  * Retrieve window property of type window.
- * 
+ *
  * @param window      target window or ``null`` to use the default root window
  * @param property    name of the requested property
  * @return            the value of property as {@link Gdk.X11.Window} on success,
@@ -42,25 +42,25 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
 	else
 		win = Gdk.get_default_root_window() as Gdk.X11.Window;
 	var display = win.get_display() as Gdk.X11.Display;
-	
+
 	X.Atom type;
 	int format;
 	ulong n_items;
 	ulong bytes_after;
 	void* data;
-	
+
 	display.error_trap_push();
 	display.get_xdisplay().get_window_property(
 		win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property),
 		0, long.MAX, false, X.XA_WINDOW, out  type, out format, out n_items, out bytes_after, out data);
-	display.error_trap_pop_ignored();	
-	
+	display.error_trap_pop_ignored();
+
 	if (type == X.XA_WINDOW)
 	{
 		X.Window xwin = *(X.Window *) data;
 		result = new Gdk.X11.Window.foreign_for_display(display, xwin);
 	}
-	
+
 	if (data != null)
 		X.free(data);
 	return result;
@@ -69,7 +69,7 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
 
 /**
  * Retrieve window property of type UTF-8 string.
- * 
+ *
  * @param window      target window or ``null`` to use the default root window
  * @param property    name of the requested property
  * @return            the value of property as string on success,
@@ -83,21 +83,21 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property)
 	else
 		win = Gdk.get_default_root_window() as Gdk.X11.Window;
 	var display = win.get_display() as Gdk.X11.Display;
-	
+
 	X.Atom type;
 	int format;
 	ulong n_items;
 	ulong bytes_after;
 	void* data;
 	string? name = null;
-	
+
 	display.error_trap_push();
 	display.get_xdisplay().get_window_property(
 		win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property), 0, long.MAX, false,
 		Gdk.X11.get_xatom_by_name_for_display(display, "UTF8_STRING"),
 		out type, out format, out n_items, out bytes_after, out data);
 	display.error_trap_pop_ignored();
-	
+
 	if (data != null)
 	{
 		name = (string) data;
@@ -109,9 +109,9 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property)
 
 /**
  * Retrieve WM_CHECK Window of a compliant window manager
- * 
+ *
  * See [[http://standards.freedesktop.org/wm-spec/1.3/ar01s03.html|Extended Window Manager Hints]].
- * 
+ *
  * @return    WM_CHECK Window of a compliant window manager of null if there is not any
  */
 public Gdk.X11.Window? get_net_wm_check_window()

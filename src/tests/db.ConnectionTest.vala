@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -27,14 +27,14 @@ public class ConnectionTest: Drt.TestCase
 	private File db_file;
 	private Database db;
 	private Connection conn;
-	
+
 	public override void set_up()
 	{
 		base.set_up();
 		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
 		delete_db_file();
 		db = new Database(db_file);
-		
+
 		try
 		{
 			db.open();
@@ -51,11 +51,11 @@ public class ConnectionTest: Drt.TestCase
 		}
 		catch (GLib.Error e)
 		{
-			
+
 			warning("%s", e.message);
 		}
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -70,7 +70,7 @@ public class ConnectionTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -85,7 +85,7 @@ public class ConnectionTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	public void test_query()
 	{
 		try
@@ -97,7 +97,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such table: XX%sXX*".printf(TABLE_USERS_NAME), e.message, "");
 		}
-		
+
 		try
 		{
 			conn.query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)); // No exec();
@@ -107,7 +107,7 @@ public class ConnectionTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_get_objects()
 	{
 		try
@@ -119,7 +119,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*ObjectSpec for DrtdbUser has not been found.*", e.message, "missing ospec");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
@@ -130,7 +130,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
@@ -141,7 +141,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
@@ -152,7 +152,7 @@ public class ConnectionTest: Drt.TestCase
 			expectation_failed("Unexpected error: %s", e.message);
 		}
 	}
-	
+
 	public void test_query_with_values()
 	{
 		expect_no_error(() => conn.query_with_values(null,
@@ -160,7 +160,7 @@ public class ConnectionTest: Drt.TestCase
 			123, "George", 30, 1.72, new Bytes.take({7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
 			true, null).exec(), "q with values");
 	}
-	
+
 	public void test_get_object()
 	{
 		try
@@ -172,7 +172,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*type DrtdbSimpleUser is not supported*", e.message, "wrong type");
 		}
-		
+
 		try
 		{
 			conn.get_object<User>(1);
@@ -182,7 +182,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*ObjectSpec for DrtdbUser has not been found.*", e.message, "missing ospec");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));
@@ -193,7 +193,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid primary column");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
@@ -204,7 +204,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid column");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
@@ -215,7 +215,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*no such column: DrtdbUser.not-in-db.*", e.message, "invalid primary column");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
@@ -226,7 +226,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*No data has been returned for object query*", e.message, "id == 0");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
@@ -237,7 +237,7 @@ public class ConnectionTest: Drt.TestCase
 		{
 			expect_str_match("*No data has been returned for object query*", e.message, "id == hello");
 		}
-		
+
 		try
 		{
 			db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));

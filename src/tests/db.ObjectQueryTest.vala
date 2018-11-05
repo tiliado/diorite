@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -27,14 +27,14 @@ public class ObjectQueryTest: Drt.TestCase
 	private File db_file;
 	private Database db;
 	private Connection conn;
-	
+
 	public override void set_up()
 	{
 		base.set_up();
 		db_file = File.new_for_path("../build/tests/tmp/db.sqlite");
 		delete_db_file();
 		db = new Database(db_file);
-		
+
 		try
 		{
 			db.open();
@@ -54,7 +54,7 @@ public class ObjectQueryTest: Drt.TestCase
 			error("%s", e.message);
 		}
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -69,7 +69,7 @@ public class ObjectQueryTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -84,12 +84,12 @@ public class ObjectQueryTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	private Query? query(string sql) throws GLib.Error, DatabaseError
 	{
 		return conn.query(sql);
 	}
-	
+
 	public void test_get_cursor()
 	{
 		try
@@ -100,7 +100,7 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 		try
 		{
 			User[] users = {};
@@ -111,9 +111,9 @@ public class ObjectQueryTest: Drt.TestCase
 				users += user;
 				expect_uint_equals(++counter, cursor.counter, "cursor counter");
 			}
-			
+
 			expect_int_equals(2, users.length, "users.length");
-			
+
 			expect_int64_equals(1, users[0].id, "id");
 			expect_str_equals("George", users[0].name, "name");
 			expect_int_equals(30, users[0].age, "age");
@@ -124,7 +124,7 @@ public class ObjectQueryTest: Drt.TestCase
 				users[0].blob, "blob");
 			expect(null == users[0].extra, "extra");
 			expect_int_equals(1024, users[0].not_in_db, "not_in_db");
-			
+
 			expect_int64_equals(2, users[1].id, "id");
 			expect_str_equals("Jean", users[1].name, "name");
 			expect_int_equals(50, users[1].age, "age");
@@ -140,7 +140,7 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 		try
 		{
 			User[] users = {};
@@ -151,9 +151,9 @@ public class ObjectQueryTest: Drt.TestCase
 				users += user;
 				expect_uint_equals(++counter, cursor.counter, "cursor counter");
 			}
-			
+
 			expect_int_equals(1, users.length, "users.length");
-			
+
 			expect_int64_equals(2, users[0].id, "id");
 			expect_str_equals("Jean", users[0].name, "name");
 			expect_int_equals(50, users[0].age, "age");
@@ -170,8 +170,8 @@ public class ObjectQueryTest: Drt.TestCase
 			expectation_failed("Unexpected error: %s", e.message);
 		}
 	}
-		
-	public void test_iterator()	
+
+	public void test_iterator()
 	{
 		try
 		{
@@ -181,16 +181,16 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 		try
 		{
 			User[] users = {};
 			var q = conn.get_objects<User>(null);
 			foreach (var user in q.get_cursor())
 				users += user;
-			
+
 			expect_int_equals(2, users.length, "users.length");
-			
+
 			expect_int64_equals(1, users[0].id, "id");
 			expect_str_equals("George", users[0].name, "name");
 			expect_int_equals(30, users[0].age, "age");
@@ -201,7 +201,7 @@ public class ObjectQueryTest: Drt.TestCase
 				users[0].blob, "blob");
 			expect(null == users[0].extra, "extra");
 			expect_int_equals(1024, users[0].not_in_db, "not_in_db");
-			
+
 			expect_int64_equals(2, users[1].id, "id");
 			expect_str_equals("Jean", users[1].name, "name");
 			expect_int_equals(50, users[1].age, "age");
@@ -217,9 +217,9 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 	}
-	
+
 	public void test_get_one()
 	{
 		try
@@ -230,7 +230,7 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 		try
 		{
 			conn.get_objects<User>(null).get_one();
@@ -240,7 +240,7 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expect_str_match("*More than one object have been returned for object query*", e.message, "more than one");
 		}
-		
+
 		try
 		{
 			conn.query_objects<User>(null, "where id > 5").get_one();
@@ -250,10 +250,10 @@ public class ObjectQueryTest: Drt.TestCase
 		{
 			expect_str_match("*No data has been returned for object query*", e.message, "less than one");
 		}
-		
+
 		try
 		{
-			
+
 			var user = conn.query_objects<User>(null, "WHERE id=?i", 2).get_one();
 			expect_int64_equals(2, user.id, "id");
 			expect_str_equals("Jean", user.name, "name");

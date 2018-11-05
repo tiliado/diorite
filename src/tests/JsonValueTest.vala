@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -52,7 +52,7 @@ public class JsonValueTest: Drt.TestCase
 		expect_double_equals(0.0, double_val, "");
 		expect_str_equals("null", val.to_string(), "to string");
 	}
-	
+
 	public void test_bool()
 	{
 		var val = new JsonValue.@bool(true);
@@ -81,7 +81,7 @@ public class JsonValueTest: Drt.TestCase
 		expect_str_equals("true", new JsonValue.@bool(true).to_string(), "to string");
 		expect_str_equals("false", new JsonValue.@bool(false).to_string(), "to string");
 	}
-	
+
 	public void test_int()
 	{
 		var val = new JsonValue.@int(-1234);
@@ -110,7 +110,7 @@ public class JsonValueTest: Drt.TestCase
 		expect_str_equals("-1234", new JsonValue.@int(-1234).to_string(), "to string");
 		expect_str_equals("4567", new JsonValue.@int(4567).to_string(), "to string");
 	}
-	
+
 	public void test_double()
 	{
 		var val = new JsonValue.@double(-12.34);
@@ -139,7 +139,7 @@ public class JsonValueTest: Drt.TestCase
 		expect_str_equals("-12.34", new JsonValue.@double(-12.34).to_string(), "to string");
 		expect_str_equals("45.68", new JsonValue.@double(45.68).to_string(), "to string");
 	}
-	
+
 	public void test_string()
 	{
 		var str = "Test ";
@@ -169,7 +169,7 @@ public class JsonValueTest: Drt.TestCase
 		expect_str_equals("\"\\n\\r\\t \\\"\"", new JsonValue.@string("\n\r\t \"").to_string(), "to string");
 		expect_str_equals("\"string\"", new JsonValue.@string("string").to_string(), "to string");
 	}
-	
+
 	public void test_escape_string()
 	{
 		expect_str_equals("\\n\\r\\t\\b\\f \\\"", JsonValue.escape_string("\n\r\t\b\f \""), "");

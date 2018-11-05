@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,10 +35,10 @@ public class Query : GLib.Object
 	public Connection connection {get; private set;}
 	private Sqlite.Statement? statement = null;
 	protected int n_parameters = 0;
-	
+
 	/**
 	 * Create new database query wrapper
-	 * 
+	 *
 	 * @param connection      corresponding database connection
 	 * @param statement       corresponding sql query
 	 */
@@ -49,10 +49,10 @@ public class Query : GLib.Object
 		this.statement = (owned) statement;
 		this.n_parameters = this.statement.bind_parameter_count();
 	}
-	
+
 	/**
 	 * Execute SQL query
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return the result of the query
 	 * @throws GLib.IOError when the operation is cancelled
@@ -64,12 +64,12 @@ public class Query : GLib.Object
 		result.next(cancellable);
 		return result;
 	}
-	
+
 	/**
 	 * Executes a select SQL query
-	 * 
+	 *
 	 * Typical usage:
-	 * 
+	 *
 	 * {{{
 	 * Result result = query.select();
 	 * while (result.next())
@@ -77,7 +77,7 @@ public class Query : GLib.Object
 	 *        // process data
 	 * }
 	 * }}}
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return the result of the query
 	 * @throws GLib.IOError when the operation is cancelled
@@ -87,13 +87,13 @@ public class Query : GLib.Object
 	{
 		return get_result();
 	}
-	
+
 	/**
 	 * Get result of the query
-	 * 
+	 *
 	 * The query is not executed until {@link Result.next} is called.
 	 * It is more convenient to call {@link exec} or {@link select} instead.
-	 * 
+	 *
 	 * @return result wrapper
 	 * @throws DatabaseError if the query has already been executed
 	 */
@@ -104,10 +104,10 @@ public class Query : GLib.Object
 		statement = null;
 		return result;
 	}
-	
+
 	/**
 	 * Bind values to query
-	 * 
+	 *
 	 * @param index     the index of the first value placeholder in the SQL query
 	 * @param values    the values to bind
 	 * @return `this` query object for easier chaining
@@ -123,10 +123,10 @@ public class Query : GLib.Object
 		}
 		return this;
 	}
-	
+
 	/**
 	 * Bind value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -162,10 +162,10 @@ public class Query : GLib.Object
 
 		throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
 	}
-	
+
 	/**
 	 * Bind null value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @return `this` query object for easier chaining
 	 * @throws DatabaseError when operation fails
@@ -177,10 +177,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_null(index));
 		return this;
 	}
-	
+
 	/**
 	 * Bind boolean value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -190,10 +190,10 @@ public class Query : GLib.Object
 	{
 		return bind_int(index, value ? 1 : 0);
 	}
-	
+
 	/**
 	 * Bind integer value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -206,10 +206,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_int(index, value));
 		return this;
 	}
-	
+
 	/**
 	 * Bind 64bit integer value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -222,10 +222,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_int64(index, value));
 		return this;
 	}
-	
+
 	/**
 	 * Bind string value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -240,10 +240,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_text(index, value));
 		return this;
 	}
-	
+
 	/**
 	 * Bind double value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -256,10 +256,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_double(index, value));
 		return this;
 	}
-	
+
 	/**
 	 * Bind binary data value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -273,10 +273,10 @@ public class Query : GLib.Object
 		throw_on_error(statement.bind_blob(index, value, value.length, (DestroyNotify) SQLITE_TRANSIENT));
 		return this;
 	}
-	
+
 	/**
 	 * Bind {@link GLib.Bytes} value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -286,16 +286,16 @@ public class Query : GLib.Object
 	{
 		if (value == null)
 			return bind_null(index);
-		
+
 		check_index(index);
 		check_not_executed();
 		throw_on_error(statement.bind_blob(index, value.get_data(), (int) value.get_size(), null));
 		return this;
 	}
-	
+
 	/**
 	 * Bind {@link GLib.ByteArray} value to query
-	 * 
+	 *
 	 * @param index    the index of the value placeholder in the SQL query
 	 * @param value    the value to bind
 	 * @return `this` query object for easier chaining
@@ -305,13 +305,13 @@ public class Query : GLib.Object
 	{
 		if (value == null)
 			return bind_null(index);
-		
+
 		check_index(index);
 		check_not_executed();
 		throw_on_error(statement.bind_blob(index, value.data, (int) value.len, null));
 		return this;
 	}
-	
+
 	/**
 	 * Throw error if the query has already been executed.
 	 */
@@ -320,7 +320,7 @@ public class Query : GLib.Object
 		if (statement == null)
 			throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
 	}
-	
+
 	/**
 	 * Throw error if the index is out of bounds.
 	 */
@@ -333,7 +333,7 @@ public class Query : GLib.Object
 				"Index %d is not in range 1..%d. |%s|", index, n_parameters, statement.sql());
 		return index;
 	}
-	
+
 	/**
 	 * Throw error if statement fails.
 	 */

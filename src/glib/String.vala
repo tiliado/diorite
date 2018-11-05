@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,7 +26,7 @@ namespace Drt.String
 {
 /**
  * Check whether string is empty, i.e. `null` or `""`.
- * 
+ *
  * @param str    string to test
  * @return true if string is empty, false otherwise
  */
@@ -36,7 +36,7 @@ public inline bool is_empty(string? str) {
 
 /**
  * Ensure string is not empty but either non-empty or null
- * 
+ *
  * @param str    original string
  * @return original string if it isn't empty, null otherwise
  */
@@ -57,10 +57,10 @@ public unowned string not_empty_or(string? may_be_empty, string fallback) {
 
 /**
  * Concatenate two strings with an optional separator
- * 
+ *
  * If the first string is empty, the second string is returned.
  * Otherwise, the strings are joined with the separator if specified.
- * 
+ *
  * @param initial     Initial string.
  * @param separator   A separator to include between strings.
  * @param text        The second string.
@@ -77,9 +77,9 @@ public string? concat(string? initial, string? separator, owned string text)
 
 /**
  * Append string to the other string.
- * 
+ *
  * Separator is included if it is specified and the initial string is not empty.
- * 
+ *
  * @param initial      The initial string, which will be overwritten with the result.
  * @param separator    The separator which will be added if the initial string is not empty.
  * @param text         The text to append.
@@ -89,16 +89,16 @@ public void append(ref string? initial, string? separator, owned string text)
 	initial = concat(initial, separator, (owned) text);
 }
 
-/**	
+/**
  * Splits a string into a maximum of `max_tokens` pieces, using the given `delimiter` and ignoring
  * empty elements after stripping.
- * 
+ *
  * If `max_tokens` is reached, the remainder of string is appended to the last token.
- * 
+ *
  * @param data          a string to split
  * @param delimiter     a string which specifies the places at which to split the string. The delimiter is not
  *                      included in any of the resulting strings, unless `max_tokens` is reached.
- * @param max_tokens    the maximum number of pieces to split string into. If this is less than 1, the string 
+ * @param max_tokens    the maximum number of pieces to split string into. If this is less than 1, the string
  *                      is split completely.
  * @return resulting list of strings
  */
@@ -112,7 +112,7 @@ public SList<string> split_strip(string? data, string delimiter, int max_tokens=
 
 /**
  * Creates list from array of strings
- * 
+ *
  * @param array    string array
  * @param strip    strip array elements and ignore empty elements
  * @return resulting list of strings
@@ -139,7 +139,7 @@ public SList<string> array_to_slist(string[] array, bool strip=false)
 
 /**
  * Parse a string containing semicolon-separated set of items
- * 
+ *
  * @param dataset    semicolon-separated set of items
  * @return a set data structurecontaining all unique items from data set
  */
@@ -158,7 +158,7 @@ public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercas
 	}
 	return result;
 }
-	
+
 public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
 {
 	char* result = g_utf8_strchr((char*) str + start_index, len, c);
@@ -190,9 +190,9 @@ public string? unmask(uint8[] data)
 
 /**
  * Return the number of UTF-16 code points to store given string.
- * 
+ *
  * It corresponds to JavaScript's String.length.
- * 
+ *
  * @param str    a string
  * @return a number of UTF-16 code points
  */
@@ -210,7 +210,7 @@ public int utf16_strlen(string? str)
 
 /**
  * Create unowned string at the given offset
- * 
+ *
  * @param str       the parent string
  * @param offset    starting offset
  * @return unowned substring starting at given offset

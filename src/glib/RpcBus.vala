@@ -2,14 +2,14 @@
  * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,14 +37,14 @@ public class RpcBus: GLib.Object {
 	protected HashTable<void*, RpcChannel?> clients = null;
 	uint last_client_id = 0;
 	protected static bool log_comunication;
-	
+
 	static construct {
 		log_comunication = Environment.get_variable("DIORITE_LOG_API_BUS_BUS") == "yes";
 	}
-	
+
 	/**
 	 * Create new RpcBus.
-	 * 
+	 *
 	 * @param name       Bus name.
 	 * @param router     RPC router defining callback for RPC calls.
 	 * @param timeout    Timeout for requests.
@@ -53,29 +53,29 @@ public class RpcBus: GLib.Object {
 		GLib.Object(router: router, timeout: timeout, name: name);
 		this.path = Rpc.create_path(name);
 		clients = new HashTable<void*, RpcChannel>(direct_hash, direct_equal);
-		local = new RpcLocalConnection(0, router); 
+		local = new RpcLocalConnection(0, router);
 	}
-	
+
 	/**
 	 * Emitted when there is a new incoming connection.
-	 * 
+	 *
 	 * @param channel    New RpcChannel.
 	 */
 	public signal void incoming(RpcChannel channel);
-	
+
 	/**
 	 * Start RPC Bus.
-	 * 
+	 *
 	 * @throws IOError on failure.
 	 */
 	public void start() throws IOError {
 		create_service();
 		service.start();
 	}
-	
+
 	/**
 	 * Add new channel to the bus.
-	 * 
+	 *
 	 * @param name       Channel name.
 	 * @param timeout    Request timeout.
 	 * @return New RpcChannel.
@@ -88,10 +88,10 @@ public class RpcBus: GLib.Object {
 		clients[id.to_pointer()] = channel;
 		return channel;
 	}
-	
+
 	/**
 	 * Add new channel from a socket connection.
-	 * 
+	 *
 	 * @param socket    Socket connection
 	 * @param timeout   Request timeout.
 	 * @return New RpcChannel.
@@ -104,10 +104,10 @@ public class RpcBus: GLib.Object {
 		clients[id.to_pointer()] = channel;
 		return channel;
 	}
-	
+
 	/**
 	 * Create new socket service for this bus.
-	 * 
+	 *
 	 * @throws IOError on failure.
 	 */
 	private void create_service() throws IOError {
@@ -118,7 +118,7 @@ public class RpcBus: GLib.Object {
 			File.new_for_path(path).delete();
 		} catch (GLib.Error e) 	{
 		}
-		
+
 		var address = new UnixSocketAddress(path);
 		service = new SocketService();
 		SocketAddress effective_address;
@@ -129,10 +129,10 @@ public class RpcBus: GLib.Object {
 		}
 		service.incoming.connect(on_incoming);
 	}
-	
+
 	/**
 	 * Get id for the next client.
-	 * 
+	 *
 	 * @return The next client id.
 	 */
 	protected uint get_next_client_id() {
@@ -149,10 +149,10 @@ public class RpcBus: GLib.Object {
 		last_client_id = id;
 		return id;
 	}
-	
+
 	/**
 	 * Called when there is a new incoming client socket connection.
-	 * 
+	 *
 	 * @param connection       Incoming socket connection.
 	 * @param source_object    The source of the connection.
 	 */
@@ -165,10 +165,10 @@ public class RpcBus: GLib.Object {
 		incoming(channel);
 		return true;
 	}
-	
+
 	/**
 	 * Called when channel is closed.
-	 * 
+	 *
 	 * @param source   RpcChannel.
 	 * @param param    Param spec.
 	 */

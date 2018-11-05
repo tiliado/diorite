@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,7 +37,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 		changed.connect(on_changed);
 		update.begin(select_current, select_theme, (o, res) => update.end(res));
 	}
-	
+
 	~GtkThemeSelector() {
 		changed.disconnect(on_changed);
 	}
@@ -50,7 +50,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 	 * "deepin-dark" → "Deepin Dark", "HighContrast" → "High Contrast".
 	 *
 	 * The label for empty label is "Default".
-	 * 
+	 *
 	 * @param name    Theme name.
 	 * @return Human label.
 	 */
@@ -96,7 +96,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 		}
 		return pretty.str;
 	}
-	
+
 	private async void update(bool select_current, string? select_theme) {
 		remove_all();
 		var themes = yield DesktopShell.list_gtk_themes();
@@ -116,7 +116,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 			active_id = "";
 		}
 	}
-	
+
 	private void on_changed() {
 		var theme_name = active_id;
 		if (theme_name == "") {
@@ -125,7 +125,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 			DesktopShell.set_gtk_theme(theme_name);
 		}
 	}
-	
+
 }
 
 } // namespace Drtgtk

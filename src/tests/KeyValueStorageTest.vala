@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -25,7 +25,7 @@ namespace Drt
 public abstract class KeyValueStorageTest: Drt.TestCase
 {
 	protected KeyValueStorage storage = null;
-	
+
 	public void test_get_null_for_empty_keys() throws Drt.TestError
 	{
 		assert(storage != null, "");
@@ -36,81 +36,81 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		expect(storage.get_value("key4.subkey2") == null, "");
 		expect(storage.get_value("key4.subkey3") == null, "");
 	}
-	
+
 	public void test_set_get_default_value() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant v;
 		string key;
-		
+
 		key = "key1";
 		v = new Variant.int32(int32.MAX);
 		storage.set_default_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key2";
 		v = new Variant.string("hello");
 		storage.set_default_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key3";
 		v = new Variant.double(3.14);
 		storage.set_default_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey1";
 		v = new Variant.int64(int64.MAX);
 		storage.set_default_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey2";
 		v = new Variant.boolean(true);
 		storage.set_default_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
 	}
-	
+
 	public void test_set_get_value_no_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant v;
 		string key;
-		
+
 		key = "key1";
 		v = new Variant.int32(int32.MAX);
 		storage.set_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key2";
 		v = new Variant.string("hello");
 		storage.set_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key3";
 		v = new Variant.double(3.14);
 		storage.set_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey1";
 		v = new Variant.int64(int64.MAX);
 		storage.set_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey2";
 		v = new Variant.boolean(true);
 		storage.set_value(key, v);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
 	}
-	
+
 	public void test_set_get_value_with_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
@@ -118,7 +118,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		Variant d2 = new Variant.string("default2");
 		Variant v;
 		string key;
-		
+
 		key = "key1";
 		v = new Variant.int32(int32.MAX);
 		storage.set_default_value(key, d1);
@@ -128,7 +128,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.set_default_value(key, d2);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key2";
 		v = new Variant.string("hello");
 		storage.set_default_value(key, d1);
@@ -138,7 +138,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.set_default_value(key, d2);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key3";
 		v = new Variant.double(3.14);
 		storage.set_default_value(key, d1);
@@ -148,7 +148,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.set_default_value(key, d2);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey1";
 		v = new Variant.int64(int64.MAX);
 		storage.set_default_value(key, d1);
@@ -158,7 +158,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.set_default_value(key, d2);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
-		
+
 		key = "key4.subkey2";
 		v = new Variant.boolean(true);
 		storage.set_default_value(key, d1);
@@ -169,14 +169,14 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(v), "");
 	}
-	
+
 	public void test_unset_with_default() throws Drt.TestError
 	{
 		assert(storage != null, "");
 		Variant d1 = new Variant.string("default1");
 		Variant v;
 		string key;
-		
+
 		key = "key1";
 		v = new Variant.int32(int32.MAX);
 		storage.set_default_value(key, d1);
@@ -184,7 +184,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.unset(key);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(d1), "");
-		
+
 		key = "key2";
 		v = new Variant.string("hello");
 		storage.set_default_value(key, d1);
@@ -192,7 +192,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.unset(key);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(d1), "");
-		
+
 		key = "key3";
 		v = new Variant.double(3.14);
 		storage.set_default_value(key, d1);
@@ -200,7 +200,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.unset(key);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(d1), "");
-		
+
 		key = "key4.subkey1";
 		v = new Variant.int64(int64.MAX);
 		storage.set_default_value(key, d1);
@@ -208,7 +208,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
 		storage.unset(key);
 		expect(storage.get_value(key) != null, "");
 		expect(storage.get_value(key).equal(d1), "");
-		
+
 		key = "key4.subkey2";
 		v = new Variant.boolean(true);
 		storage.set_default_value(key, d1);

@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -24,10 +24,10 @@ namespace Drtdb
 
 public class DatabaseTest: Drt.TestCase
 {
-	
+
 	private File db_file;
 	private Database db;
-	
+
 	public override void set_up()
 	{
 		base.set_up();
@@ -35,7 +35,7 @@ public class DatabaseTest: Drt.TestCase
 		delete_db_file();
 		db = new Database(db_file);
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -50,7 +50,7 @@ public class DatabaseTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -65,7 +65,7 @@ public class DatabaseTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	public void test_open_close() throws Drt.TestError
 	{
 		assert(!db_file.query_exists(), "");
@@ -80,7 +80,7 @@ public class DatabaseTest: Drt.TestCase
 		}
 		assert(db_file.query_exists(), "");
 	}
-	
+
 	public void test_exec() throws Drt.TestError
 	{
 		try

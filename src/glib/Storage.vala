@@ -2,14 +2,14 @@
  * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,7 +33,7 @@ public class Storage: GLib.Object
 {
 	[Description(nick = "User data dir", blurb = "Directory used to store user-specific data. Read-write access may be available.")]
 	public GLib.File user_data_dir {get; protected set;}
-	
+
 	protected File[] _data_dirs;
 	public GLib.File[] data_dirs() {
 		File[] dirs = {};
@@ -44,16 +44,16 @@ public class Storage: GLib.Object
 		}
 		return dirs;
 	}
-	
+
 	[Description(nick = "User cache dir", blurb = "Directory used to store user-specific cached data. Read-write access may be available.")]
 	public GLib.File user_cache_dir {get; protected set;}
-	
+
 	[Description(nick = "User configuration dir", blurb = "Directory used to store user-specific configuration data. Read-write access may be available.")]
 	public GLib.File user_config_dir {get; protected set;}
-	
+
 	/**
 	 * Creates new storage
-	 * 
+	 *
 	 * @param user_data_dir      Directory for user's data
 	 * @param data_dirs          System data directories
 	 * @param user_config_dir    Directory for user's configuration
@@ -65,34 +65,34 @@ public class Storage: GLib.Object
 		this.user_data_dir = File.new_for_path(user_data_dir);
 		this.user_config_dir = File.new_for_path(user_config_dir);
 		this.user_cache_dir = File.new_for_path(user_cache_dir);
-		
+
 		File[] _data_dirs = {};
 		foreach (string path in data_dirs)
 			_data_dirs += File.new_for_path(path);
-		
+
 		this._data_dirs = _data_dirs;
 	}
-	
+
 	/**
 	 * Returns new child storage.
-	 * 
+	 *
 	 * @param id    child storage id
-	 * @return      child storage 
+	 * @return      child storage
 	 */
 	public Storage get_child(string id)
 	{
 		string[] data_dirs = {};
 		foreach (var dir in this._data_dirs)
 			data_dirs += dir.get_child(id).get_path();
-		
+
 		return new Storage(user_data_dir.get_child(id).get_path(), data_dirs,
 			user_config_dir.get_child(id).get_path(),
 			user_cache_dir.get_child(id).get_path());
 	}
-	
+
 	/**
 	 * Returns the default path of configuration file/directory with given name
-	 * 
+	 *
 	 * @param path Name of configuration file/directory
 	 * @return default configuration path
 	 */
@@ -100,10 +100,10 @@ public class Storage: GLib.Object
 	{
 		return user_config_dir.get_child(path);
 	}
-	
+
 	/**
 	 * Returns the default path of cache file/directory with given name
-	 * 
+	 *
 	 * @param path    The path relative to base cache directory.
 	 * @return default cache path
 	 */
@@ -111,10 +111,10 @@ public class Storage: GLib.Object
 	{
 		return user_cache_dir.get_child(path);
 	}
-	
+
 	/**
 	 * Returns the default path of cache subdir with given name, create it if it doesn't exist.
-	 * 
+	 *
 	 * @param path    Subdirectory path.
 	 * @return cache subdirectory
 	 */
@@ -131,10 +131,10 @@ public class Storage: GLib.Object
 		}
 		return dir;
 	}
-	
+
 	/**
 	 * Returns the default path of data dir/file with given name
-	 * 
+	 *
 	 * @param path    child file/dir path
 	 * @return default data path
 	 */
@@ -142,10 +142,10 @@ public class Storage: GLib.Object
 	{
 		return user_data_dir.get_child(path);
 	}
-	
+
 	/**
 	 * Returns the default path of data subdir with given name, create it if it doesn't exist.
-	 * 
+	 *
 	 * @param path    Subdirectory path.
 	 * @return data subdirectory
 	 */
@@ -162,14 +162,14 @@ public class Storage: GLib.Object
 		}
 		return dir;
 	}
-	
+
 	/**
 	 * Looks for a file in data directories.
-	 * 
+	 *
 	 * User's data directory has a precedence over system data directories.
-	 * 
+	 *
 	 * See also require_data_file().
-	 * 
+	 *
 	 * @param name name of the file
 	 * @return file instance or null if no file has been found
 	 */
@@ -186,15 +186,15 @@ public class Storage: GLib.Object
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Looks for a required file in data directories.
-	 * 
+	 *
 	 * User's data directory has a precedence over system data directories.
 	 * If the required data file is not found, application aborts with an error message.
-	 * 
+	 *
 	 * See also get_data_file().
-	 * 
+	 *
 	 * @param name name of the file
 	 * @return file instance, never null
 	 */
@@ -203,21 +203,21 @@ public class Storage: GLib.Object
 		var data_file = get_data_file(name);
 		if (data_file != null)
 			return data_file;
-		
+
 		var paths = user_data_dir.get_path();
 		foreach (File dir in data_dirs())
 			paths += ":" + dir.get_path();
 		error("Required data file '%s' not found in '%s'.", name, paths);
 	}
-	
+
 	/**
 	 * Make sure a required file exists in any of data directories.
-	 * 
+	 *
 	 * User's data directory has a precedence over system data directories.
 	 * If the required data file is not found, application aborts with an error message.
-	 * 
+	 *
 	 * See also require_data_file().
-	 * 
+	 *
 	 * @param name name of the file
 	 */
 	public void assert_data_file(string name)
@@ -238,14 +238,14 @@ public class XdgStorage: Storage
 	 */
 	public XdgStorage()
 	{
-		
+
 		base(Environment.get_user_data_dir(), Environment.get_system_data_dirs(),
 		Environment.get_user_config_dir(), Environment.get_user_cache_dir());
 	}
-	
+
 	/**
 	 * Creates new storage with XGD paths for a project.
-	 * 
+	 *
 	 * @param id identifier of the project
 	 */
 	public XdgStorage.for_project(string id, string user_suffix="")
@@ -254,7 +254,7 @@ public class XdgStorage: Storage
 		this.user_data_dir = user_data_dir.get_child(id + user_suffix);
 		this.user_config_dir = user_config_dir.get_child(id + user_suffix);
 		this.user_cache_dir = user_cache_dir.get_child(id + user_suffix);
-		
+
 		File[] data_dirs = {};
 		foreach (var dir in this._data_dirs)
 			data_dirs += dir.get_child(id);

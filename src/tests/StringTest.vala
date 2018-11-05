@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -46,26 +46,26 @@ public class StringTest: Drt.TestCase
 			expect_true(result.contains(s), "item: %s", s);
 		expect_false(result.contains("Bye"), "item: %s", "Bye");
 	}
-	
+
 	public void test_concat()
 	{
 		expect_str_equals("bar", Drt.String.concat(null, "foo", "bar"), "");
 		expect_str_equals("bar", Drt.String.concat("", "foo", "bar"), "");
 		expect_str_equals("xfoobar", Drt.String.concat("x", "foo", "bar"), "");
-		
+
 		expect_str_equals("bar", Drt.String.concat(null, null, "bar"), "");
 		expect_str_equals("bar", Drt.String.concat("", null, "bar"), "");
 		expect_str_equals("xbar", Drt.String.concat("x", null, "bar"), "");
-		
+
 		expect_str_equals("bar", Drt.String.concat(null, "", "bar"), "");
 		expect_str_equals("bar", Drt.String.concat("", "", "bar"), "");
 		expect_str_equals("xbar", Drt.String.concat("x", "", "bar"), "");
 	}
-	
+
 	public void test_append()
 	{
 		string? buffer = null;
-		
+
 		buffer = null;
 		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("bar", buffer, "");
@@ -75,7 +75,7 @@ public class StringTest: Drt.TestCase
 		buffer = null;
 		Drt.String.append(ref buffer, "", "bar");
 		expect_str_equals("bar", buffer, "");
-		
+
 		buffer = "";
 		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("bar", buffer, "");
@@ -85,7 +85,7 @@ public class StringTest: Drt.TestCase
 		buffer = "";
 		Drt.String.append(ref buffer, "", "bar");
 		expect_str_equals("bar", buffer, "");
-		
+
 		buffer = "x";
 		Drt.String.append(ref buffer, "foo", "bar");
 		expect_str_equals("xfoobar", buffer, "");

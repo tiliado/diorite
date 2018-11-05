@@ -2,14 +2,14 @@
  * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,7 +31,7 @@ public class SocketChannel : Drt.DuplexChannel
 	public bool can_read {get; private set; default = false;}
 	public bool can_write {get; private set; default = false;}
 	private SocketSource socket_source;
-	
+
 	public static SocketConnection create_socket_from_name(string name) throws GLib.Error
 	{
 		var path = Rpc.create_path(name);
@@ -41,7 +41,7 @@ public class SocketChannel : Drt.DuplexChannel
 		connection.connect(address, null);
 		return connection;
 	}
-	
+
 	public SocketChannel(uint id, string name, SocketConnection connection, uint timeout)
 	{
 		base(id, name, connection.input_stream, connection.output_stream, timeout);
@@ -51,7 +51,7 @@ public class SocketChannel : Drt.DuplexChannel
 		check_io_condition();
 		connection.notify["closed"].connect_after(on_connection_closed);
 	}
-	
+
 	public SocketChannel.from_name(uint id, string name, uint timeout) throws IOError {
 		try {
 			var connection = create_socket_from_name(name);
@@ -60,31 +60,31 @@ public class SocketChannel : Drt.DuplexChannel
 			throw new IOError.CONN_FAILED("Failed to create socket channel from name '%s'. %s", name, e.message);
 		}
 	}
-	
+
 	public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError {
 		var name = "fd:%d".printf(socket.get_fd());
 		var connection = SocketConnection.factory_create_connection(socket);
 		this(id, name, connection, timeout);
 	}
-	
+
 	~SocketChannel()
 	{
 		connection.notify["closed"].disconnect(on_connection_closed);
 	}
-	
+
 	public override void close() throws GLib.IOError
 	{
 		closed = true;
 		connection.close();
 	}
-	
+
 	private void check_io_condition()
 	{
 		var condition = connection.socket.condition_check(IOCondition.IN|IOCondition.OUT);
 		set_condition(condition);
 		socket_source.attach(MainContext.@default());
 	}
-	
+
 	private void set_condition(IOCondition condition)
 	{
 		var read = Flags.is_set(condition, IOCondition.IN);
@@ -94,13 +94,13 @@ public class SocketChannel : Drt.DuplexChannel
 		if (can_write != write)
 			can_write = write;
 	}
-	
+
 	private bool on_socket_source(Socket socket, IOCondition condition)
 	{
 		set_condition(condition);
 		return false;
 	}
-	
+
 	private void on_connection_closed(GLib.Object o, ParamSpec p)
 	{
 		if (closed != connection.closed)

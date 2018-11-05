@@ -2,14 +2,14 @@
  * Copyright 2016 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,13 +35,13 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 	public int key_start {get; private set; default = -1;}
 	public int key_end {get; private set; default = -1;}
 	public int cursor {get; private set; default = -1;}
-	
+
 	public EntryMultiCompletion(Gtk.Entry entry, Gtk.TreeModel? model = null, int text_column = -1)
 	{
 		GLib.Object(model: model, minimum_key_length: 1);
 		if (text_column >= 0)
 			this.text_column = text_column;
-			
+
 		entry.set_completion(this);
 		entry.notify["cursor-position"].connect_after(on_cursor_position_changed);
 		set_match_func(search_match_func);
@@ -49,7 +49,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 		cursor_on_match.connect(on_cursor_on_match);
 		insert_prefix.connect(on_insert_prefix);
 	}
-	
+
 	public void complete_inline()
 	{
 		if (key_valid && cursor == key_end)
@@ -60,7 +60,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 				insert_match(prefix, true);
 		}
 	}
-	
+
 	protected virtual void parse_key()
 	{
 		var text = entry.text;
@@ -81,9 +81,9 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 				if (!String.is_empty(key.strip()))
 					key_valid = true;
 			}
-		}	
+		}
 	}
-	
+
 	private bool search_match_func(Gtk.EntryCompletion completion, string text, Gtk.TreeIter iter)
 	{
 		if (!key_valid)
@@ -95,7 +95,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 			return false;
 		return candidate.down().has_prefix(prefix);
 	}
-	
+
 	private void insert_match(string match, bool select)
 	{
 		return_if_fail(key_valid);
@@ -110,7 +110,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 			entry.set_position(match_end_cursor);
 		thaw_notify();
 	}
-	
+
 	private void on_cursor_position_changed(GLib.Object emitter, ParamSpec property)
 	{
 		parse_key();
@@ -120,21 +120,21 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 		if (inline_completion)
 			complete_inline();
 	}
-	
+
 	private bool on_match_selected(
 		Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter)
 	{
 		set_text_from_match(model, iter, false);
 		return true;
 	}
-	
+
 	private bool on_cursor_on_match(
 		Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter)
 	{
 		set_text_from_match(model, iter, true);
 		return true;
 	}
-	
+
 	private void set_text_from_match(Gtk.TreeModel model, Gtk.TreeIter iter, bool select)
 	{
 		return_if_fail(key_valid);
@@ -143,12 +143,12 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
 		model.get(iter, text_column, out match);
 		insert_match(match, select);
 	}
-	
+
 	private bool on_insert_prefix(Gtk.EntryCompletion completion, string prefix)
 	{
 		/* We use complete_inline() method.*/
 		return true;
-	}	
+	}
 }
 
 } // namespace Drtgtk

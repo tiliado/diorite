@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -28,7 +28,7 @@ public class JsonParserTest: Drt.TestCase
 	{
 		return Drt.System.read_file(File.new_for_path("src/tests/data/json/%s%d.json".printf(name, i)));
 	}
-	
+
 	public void test_pass()
 	{
 		int i;
@@ -40,13 +40,13 @@ public class JsonParserTest: Drt.TestCase
 			expect_error(() => JsonParser.load_object(load_data("pass", i)),
 				"The data doesn't represent a JavaScript object.", "pass%d.json", i);
 		}
-		
+
 		i = 3;
 		expect_no_error(() => JsonParser.load_object(load_data("pass", i)), "pass%d.json", i);
 		expect_error(() => JsonParser.load_array(load_data("pass", i)),
 			"The data doesn't represent a JavaScript array.", "pass%d.json", i);
 	}
-	
+
 	public void test_fail()
 	{
 		int i = 0;

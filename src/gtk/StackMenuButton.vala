@@ -2,14 +2,14 @@
  * Copyright 2014-2015 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,7 +34,7 @@ public class StackMenuButton : Gtk.MenuButton
 		{
 			return _stack;
 		}
-		
+
 		set
 		{
 			if (_stack != null)
@@ -55,15 +55,15 @@ public class StackMenuButton : Gtk.MenuButton
 			update_label();
 		}
 	}
-	
+
 	private new Gtk.Label label;
 	private Gtk.Menu? menu = null;
-	
+
 	public StackMenuButton(Gtk.Stack stack)
 	{
 		no_show_all = true;
 		relief = Gtk.ReliefStyle.NONE;
-		
+
 		label = new Gtk.Label(null);
 		label.hexpand = true;
 		label.halign = Gtk.Align.CENTER;
@@ -71,20 +71,20 @@ public class StackMenuButton : Gtk.MenuButton
 		var text_attrs = new Pango.AttrList();
 		text_attrs.change(Pango.attr_weight_new(Pango.Weight.BOLD));
 		label.set_attributes(text_attrs);
-		
+
 		var arrow = new Gtk.Image.from_icon_name("go-down-symbolic", Gtk.IconSize.BUTTON);
 		arrow.margin = 2;
 		arrow.show();
-		
+
 		var box = new Gtk.Grid();
 		box.show();
 		box.add(label);
 		box.add(arrow);
 		add(box);
-		
+
 		this.stack = stack;
 	}
-	
+
 	private void append_item(Gtk.Widget child)
 	{
 		string name;
@@ -96,29 +96,29 @@ public class StackMenuButton : Gtk.MenuButton
 		item.activate.connect(on_item_activated);
 		menu.add(item);
 	}
-	
+
 	private void disconnect_item(Gtk.Widget child)
 	{
 		var item  = child as Gtk.MenuItem;
 		if (item != null)
 			item.activate.disconnect(on_item_activated);
 	}
-	
+
 	private void on_stack_child_notify(GLib.Object o, ParamSpec p)
 	{
 		Idle.add(() => {update_label(); return false;});
 	}
-	
+
 	private void on_stack_updated(Gtk.Widget child)
 	{
 		Idle.add(rebuild_cb);
 	}
-	
+
 	private void on_item_activated(Gtk.MenuItem item)
 	{
 		stack.visible_child_name = item.get_data<string>("page-name");
 	}
-	
+
 	private bool rebuild_cb()
 	{
 		if (menu != null)
@@ -128,7 +128,7 @@ public class StackMenuButton : Gtk.MenuButton
 		popup = menu;
 		return false;
 	}
-	
+
 	private void update_label()
 	{
 		if (stack != null && stack.visible_child != null)

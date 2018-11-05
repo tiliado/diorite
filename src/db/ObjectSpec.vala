@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,10 +34,10 @@ public class ObjectSpec
 	public string table_name {get{ return object_type.name(); }}
 	public unowned ParamSpec primary_key {get; private set;}
 	public (unowned ParamSpec)[] properties {get; private set;}
-	
+
 	/**
 	 * Creates new ORM object specification
-	 * 
+	 *
 	 * @param type           object type
 	 * @param primary_key    primary key of the corresponding database table
 	 * @param properties     properties to serialize into database
@@ -53,10 +53,10 @@ public class ObjectSpec
 			throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
 		this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
 	}
-	
+
 	/**
 	 * Creates new ORM object specification
-	 * 
+	 *
 	 * @param type           object type
 	 * @param primary_key    primary key of the corresponding database table
 	 * @param properties     properties to serialize into database

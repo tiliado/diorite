@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -24,7 +24,7 @@ namespace Drt
 
 public class JsonObjectTest: Drt.TestCase
 {
-	
+
 	private JsonObject load_object() throws GLib.Error
 	{
 		return JsonParser.load_object("""
@@ -44,7 +44,7 @@ public class JsonObjectTest: Drt.TestCase
 			}
 			""");
 	}
-	
+
 	public void test_set_remove_take() throws GLib.Error
 	{
 		var object = new JsonObject();
@@ -54,7 +54,7 @@ public class JsonObjectTest: Drt.TestCase
 		expect_true(null_val == object["aa"], "member equals");
 		object["bb"] = null_val;
 		expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
-		
+
 		var int_val = new JsonValue.@int(5);
 		object["aa"] = int_val;
 		expect_true(int_val == object["aa"], "member equals");
@@ -63,13 +63,13 @@ public class JsonObjectTest: Drt.TestCase
 		expect_true(object.take("aa") == int_val, "parent");
 		expect_null(int_val.parent, "parent");
 		expect_null(object["aa"], "member null");
-		
+
 		object["aa"] = int_val;
 		expect_true(object.remove("aa"), "remove");
-		expect_null(int_val.parent, "parent");	
+		expect_null(int_val.parent, "parent");
 		expect_false(object.remove("aa"), "remove");
 	}
-	
+
 	public void test_get() throws GLib.Error
 	{
 		var object = load_object();
@@ -130,7 +130,7 @@ public class JsonObjectTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	public void test_dotget() throws GLib.Error
 	{
 		var object = load_object();
@@ -192,7 +192,7 @@ public class JsonObjectTest: Drt.TestCase
 				break;
 			}
 		}
-		
+
 		for (i = 0; i < results.length; i++)
 		{
 			key = "i.%c".printf((char)('a' + i));
@@ -235,7 +235,7 @@ public class JsonObjectTest: Drt.TestCase
 				break;
 			}
 		}
-		
+
 		string[,] results2 = {
 			{"", ""},
 			{".", "*assertion*!= 0*failed*"},
@@ -252,7 +252,7 @@ public class JsonObjectTest: Drt.TestCase
 				expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
 		}
 	}
-	
+
 	public void test_get_bool() throws GLib.Error
 	{
 		var object = load_object();
@@ -277,7 +277,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
 		}
 	}
-	
+
 	public void test_dotget_bool() throws GLib.Error
 	{
 		var object = load_object();
@@ -310,7 +310,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect(results[i, 0] == object.dotget_bool(key, out val), "get_bool('%s')", key);
 			expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
 		}
-		
+
 		GLib.Value[,] results2 = {
 			{"", false, "", false},
 			{".", false, "*assertion*!= 0*failed*", false},
@@ -328,7 +328,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect(results2[i, 3] == val, "['%s'] == %s", ukey, results2[i, 3].get_boolean().to_string());
 		}
 	}
-	
+
 	public void test_get_bool_or() throws GLib.Error
 	{
 		var object = load_object();
@@ -351,7 +351,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect(results[i] == object.get_bool_or(key, false), "get_bool_or('%s')", key);
 		}
 	}
-	
+
 	public void test_get_int() throws GLib.Error
 	{
 		var object = load_object();
@@ -377,7 +377,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
 		}
 	}
-	
+
 	public void test_dotget_int() throws GLib.Error
 	{
 		var object = load_object();
@@ -412,7 +412,7 @@ public class JsonObjectTest: Drt.TestCase
 			var exp_val = results[i, 1].get_int();
 			expect_int_equals(exp_val, val, "[%s] == %d", key, exp_val);
 		}
-		
+
 		GLib.Value[,] results2 = {
 			{"", false, "", 0},
 			{".", false, "*assertion*!= 0*failed*", 0},
@@ -431,7 +431,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_int_equals(exp_val, val, "['%s'] == %d", ukey, exp_val);
 		}
 	}
-	
+
 	public void test_get_int_or() throws GLib.Error
 	{
 		var object = load_object();
@@ -454,7 +454,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_int_equals(results[i], object.get_int_or(key, -7), "get_int_or('%s')", key);
 		}
 	}
-	
+
 	public void test_get_double() throws GLib.Error
 	{
 		var object = load_object();
@@ -480,7 +480,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
 		}
 	}
-	
+
 	public void test_dotget_double() throws GLib.Error
 	{
 		var object = load_object();
@@ -515,7 +515,7 @@ public class JsonObjectTest: Drt.TestCase
 			var exp_val = results[i, 1].get_double();
 			expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
 		}
-		
+
 		GLib.Value[,] results2 = {
 			{"", false, "", 0.0},
 			{".", false, "*assertion*!= 0*failed*", 0.0},
@@ -534,7 +534,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_double_equals(exp_val, val, "['%s'] == %f", ukey, exp_val);
 		}
 	}
-	
+
 	public void test_get_double_or() throws GLib.Error
 	{
 		var object = load_object();
@@ -557,7 +557,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_double_equals(results[i], object.get_double_or(key, -5.6), "get_double_or('%s')", key);
 		}
 	}
-	
+
 	public void test_get_string() throws GLib.Error
 	{
 		var object = load_object();
@@ -583,7 +583,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
 		}
 	}
-	
+
 	public void test_dotget_string() throws GLib.Error
 	{
 		var object = load_object();
@@ -618,7 +618,7 @@ public class JsonObjectTest: Drt.TestCase
 			var exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
 			expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
 		}
-		
+
 		GLib.Value[,] results2 = {
 			{"", false, ""},
 			{".", false, "*assertion*!= 0*failed*"},
@@ -636,7 +636,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_null(val, "['%s'] == null", ukey);
 		}
 	}
-	
+
 	public void test_get_string_or() throws GLib.Error
 	{
 		var object = load_object();
@@ -659,7 +659,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect_str_equals(results[i], object.get_string_or(key, "abc"), "get_string_or('%s')", key);
 		}
 	}
-	
+
 	public void test_get_null() throws GLib.Error
 	{
 		var object = load_object();
@@ -682,7 +682,7 @@ public class JsonObjectTest: Drt.TestCase
 			expect(results[i] == object.get_null(key), "get_null('%s')", key);
 		}
 	}
-	
+
 	public void test_get_array() throws GLib.Error
 	{
 		var object = load_object();
@@ -696,7 +696,7 @@ public class JsonObjectTest: Drt.TestCase
 				expect_not_null(object.get_array(key), "get_array('%s')", key);
 		}
 	}
-	
+
 	public void test_get_object() throws GLib.Error
 	{
 		var object = load_object();
@@ -710,7 +710,7 @@ public class JsonObjectTest: Drt.TestCase
 				expect_not_null(object.get_object(key), "get_object('%s')", key);
 		}
 	}
-	
+
 	public void test_to_string() throws GLib.Error
 	{
 		var object = load_object();

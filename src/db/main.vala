@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -42,7 +42,7 @@ public errordomain DatabaseError
 
 /**
  * Check whether data type is supported
- * 
+ *
  * @param type    the type to check
  * @return `true` if the given type is supported, `false` otherwise
  */
@@ -64,7 +64,7 @@ public bool is_type_supported(Type? type)
 
 /**
  * Create a list of property specifications of a given ObjectClass
- * 
+ *
  * @param class_spec    object class to retrieve property specifications from
  * @param properties    properties to retrieve specification for or `null` to use all properties
  * @return array of requested property specifications
@@ -92,12 +92,12 @@ private (unowned ParamSpec)[] create_param_spec_list(ObjectClass class_spec, str
 
 /**
  * Convert SQLite error code to DatabaseError
- * 
+ *
  * SQLite error codes: [[http://www.sqlite.org/rescode.html]]
- * 
+ *
  * Parameters `message`, `sql` and `stm` are optional but add more information
  * to the resulting error message.
- * 
+ *
  * @param errno      sqlite error code
  * @param message    error message
  * @param sql        executed sql query
@@ -117,7 +117,7 @@ private DatabaseError convert_sqlite_error(int errno, string? message, string? s
 
 /**
  * Check whether sqlite result code is an error code
- * 
+ *
  * @param result_code    sqlite result code
  * @return `true` if the code corresponds to an error, `false` otherwise
  */
@@ -136,13 +136,13 @@ private inline bool is_sql_error(int result_code)
 
 /**
  * Throw {@link GLib.IOError} if an operation has been cancelled.
- * 
+ *
  * Typical usage:
- * 
+ *
  * {{{
  * throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
  * }}}
- * 
+ *
  * @param cancellable    Cancellation object.
  * @param method         Called method
  * @param file           Source code file
@@ -157,7 +157,7 @@ private void throw_if_cancelled(Cancellable? cancellable, string? method=null, s
 
 /**
  * Escape SQL identifier
- * 
+ *
  * @param sql_id    SQL id to escape
  * @return escaped id
  */

@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,7 +35,7 @@ public abstract class Action: GLib.Object
 	public const string SCOPE_NONE = "none";
 	public const string SCOPE_APP = "app";
 	public const string SCOPE_WIN = "win";
-	
+
 	protected GLib.SimpleAction action;
 	protected ActionCallback? callback;
 	protected ActionCallbackWithParam? param_callback;
@@ -57,7 +57,7 @@ public abstract class Action: GLib.Object
 		owned get {return action.state;}
 		set {action.set_state(value);}
 	}
-	
+
 	public virtual signal void activated(Variant? parameter)
 	{
 		if (param_callback != null)
@@ -65,7 +65,7 @@ public abstract class Action: GLib.Object
 		else if (callback != null)
 			callback();
 	}
-	
+
 	public virtual void activate(Variant? parameter)
 	{
 		if (enabled)
@@ -73,12 +73,12 @@ public abstract class Action: GLib.Object
 		else
 			warning("Cannot activate action '%s', because it is disabled.", name);
 	}
-	
+
 	public void add_to_map(ActionMap map)
 	{
 		map.add_action(action);
 	}
-	
+
 	protected void on_action_activated(Variant? parameter)
 	{
 		if (!enabled)
@@ -112,7 +112,7 @@ public class ToggleAction : Action
 		action.activate.connect(on_action_activated);
 		action.change_state.connect(on_action_activated);
 	}
-	
+
 	public override void activate(Variant? parameter)
 	{
 		if (parameter == null)
@@ -127,7 +127,7 @@ public class ToggleAction : Action
 public class RadioAction: Action
 {
 	private RadioOption[] options;
-	
+
 	public RadioAction(string group, string scope, string name, owned ActionCallbackWithParam? callback, Variant state, RadioOption[] options)
 	{
 		Object(group: group, scope: scope, label: null, icon: null, keybinding: null, mnemo_label: null);
@@ -137,12 +137,12 @@ public class RadioAction: Action
 		action.activate.connect(on_action_activated);
 		action.change_state.connect(on_action_activated);
 	}
-	
+
 	public unowned RadioOption[] get_options()
 	{
 		return options;
 	}
-	
+
 	public RadioOption get_option(int i)
 	{
 		return options[i];
@@ -156,7 +156,7 @@ public class RadioOption
 	public string? mnemo_label {get; private set;}
 	public string? icon {get; private set;}
 	public string? keybinding {get; private set;}
-	
+
 	public RadioOption(Variant parameter, string? label, string? mnemo_label, string? icon, string? keybinding)
 	{
 		this.parameter = parameter;

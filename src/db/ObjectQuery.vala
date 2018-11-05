@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,7 +27,7 @@ namespace Drtdb
 
 /**
  * ObjectQuery class
- * 
+ *
  * Used for ORM queries.
  */
 public class ObjectQuery<T> : GLib.Object
@@ -35,10 +35,10 @@ public class ObjectQuery<T> : GLib.Object
 	// Query to retrieve objects.
 	private Query query;
 	private OrmManager orm;
-	
+
 	/**
 	 * Creates new ObjectQuery object.
-	 * 
+	 *
 	 * @param orm      ORM manager
 	 * @param query    the corresponding {@link Query} to retrieve object data
 	 */
@@ -47,10 +47,10 @@ public class ObjectQuery<T> : GLib.Object
 		this.orm = orm;
 		this.query = query;
 	}
-	
+
 	/**
 	 * Retrieve a single object.
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return db record as a requested object
 	 * @throws GLib.IOError when the operation is cancelled
@@ -69,10 +69,10 @@ public class ObjectQuery<T> : GLib.Object
 			throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
 		return object;
 	}
-	
+
 	/**
 	 * Get cursor to browse resulting set of objects.
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return data set cursor
 	 * @throws GLib.IOError when the operation is cancelled

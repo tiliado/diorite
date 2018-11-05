@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -27,7 +27,7 @@ public class ResultTest: Drt.TestCase
 	private File db_file;
 	private Database db;
 	private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
-	
+
 	public override void set_up()
 	{
 		base.set_up();
@@ -47,7 +47,7 @@ public class ResultTest: Drt.TestCase
 			warning("%s", e.message);
 		}
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -62,7 +62,7 @@ public class ResultTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -77,22 +77,22 @@ public class ResultTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	private Query? query(string sql) throws GLib.Error, DatabaseError
 	{
-		
+
 		if (!db.opened)
 			db.open();
-		
+
 		return db.open_connection().query(sql);
 	}
-	
+
 	private Result select_data()  throws GLib.Error, DatabaseError
 	{
 		return query("SELECT id, name, age, height, blob, alive, extra FROM %s WHERE id = ?".printf(TABLE_USERS_NAME))
 			.bind(1, 1).exec();
 	}
-	
+
 	public void test_get_column_name()
 	{
 		try
@@ -108,7 +108,7 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_get_column_index()
 	{
 		try
@@ -124,13 +124,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_is_null()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_false(result.fetch_is_null(0), "id");
 			expect_false(result.fetch_is_null(1), "name");
@@ -139,7 +139,7 @@ public class ResultTest: Drt.TestCase
 			expect_false(result.fetch_is_null(4), "blob");
 			expect_false(result.fetch_is_null(5), "alive");
 			expect_true(result.fetch_is_null(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -159,13 +159,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_int()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_int_equals(1, result.fetch_int(0), "id");
 			expect_int_equals(0, result.fetch_int(1), "name");
@@ -174,7 +174,7 @@ public class ResultTest: Drt.TestCase
 			expect_int_equals(0, result.fetch_int(4), "blob");
 			expect_int_equals(1, result.fetch_int(5), "alive");
 			expect_int_equals(0, result.fetch_int(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -194,13 +194,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_int64()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_int64_equals((int64) 1, result.fetch_int64(0), "id");
 			expect_int64_equals((int64) 0, result.fetch_int64(1), "name");
@@ -209,7 +209,7 @@ public class ResultTest: Drt.TestCase
 			expect_int64_equals((int64) 0, result.fetch_int64(4), "blob");
 			expect_int64_equals((int64) 1, result.fetch_int64(5), "alive");
 			expect_int64_equals((int64) 0, result.fetch_int64(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -229,13 +229,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_bool()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_true(result.fetch_bool(0), "id");
 			expect_false(result.fetch_bool(1), "name");
@@ -244,7 +244,7 @@ public class ResultTest: Drt.TestCase
 			expect_false(result.fetch_bool(4), "blob");
 			expect_true(result.fetch_bool(5), "alive");
 			expect_false(result.fetch_bool(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -258,20 +258,20 @@ public class ResultTest: Drt.TestCase
 					expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
 				}
 			}
-			
+
 		}
 		catch (GLib.Error e)
 		{
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_double()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_double_equals(1.0, result.fetch_double(0), "id");
 			expect_double_equals(0.0, result.fetch_double(1), "name");
@@ -280,7 +280,7 @@ public class ResultTest: Drt.TestCase
 			expect_double_equals(0.0, result.fetch_double(4), "blob");
 			expect_double_equals(1.0, result.fetch_double(5), "alive");
 			expect_double_equals(0.0, result.fetch_double(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -294,20 +294,20 @@ public class ResultTest: Drt.TestCase
 					expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
 				}
 			}
-			
+
 		}
 		catch (GLib.Error e)
 		{
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_string()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_str_equals("1", result.fetch_string(0), "id");
 			expect_str_equals("George", result.fetch_string(1), "name");
@@ -319,7 +319,7 @@ public class ResultTest: Drt.TestCase
 				"blob warning");
 			expect_str_equals("1", result.fetch_string(5), "alive");
 			expect_str_equals(null, result.fetch_string(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -339,13 +339,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_blob()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_blob_equal("1".data, result.fetch_blob(0), "id");
 			expect_blob_equal("George".data, result.fetch_blob(1), "name");
@@ -356,7 +356,7 @@ public class ResultTest: Drt.TestCase
 				result.fetch_blob(4), "blob");
 			expect_blob_equal("1".data, result.fetch_blob(5), "alive");
 			expect_blob_equal(null, result.fetch_blob(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -376,13 +376,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_bytes()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_bytes_equal(new GLib.Bytes.take("1".data), result.fetch_bytes(0), "id");
 			expect_bytes_equal(new GLib.Bytes.take("George".data), result.fetch_bytes(1), "name");
@@ -393,7 +393,7 @@ public class ResultTest: Drt.TestCase
 				result.fetch_bytes(4), "blob");
 			expect_bytes_equal(new GLib.Bytes.take("1".data), result.fetch_bytes(5), "alive");
 			expect_bytes_equal(null, result.fetch_bytes(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -413,13 +413,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_byte_array()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test data type conversions */
 			expect_byte_array_equal(new GLib.ByteArray.take("1".data), result.fetch_byte_array(0), "id");
 			expect_byte_array_equal(new GLib.ByteArray.take("George".data), result.fetch_byte_array(1), "name");
@@ -430,7 +430,7 @@ public class ResultTest: Drt.TestCase
 				result.fetch_byte_array(4), "blob");
 			expect_byte_array_equal(new GLib.ByteArray.take("1".data), result.fetch_byte_array(5), "alive");
 			expect_byte_array_equal(null, result.fetch_byte_array(6), "extra");
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -450,13 +450,13 @@ public class ResultTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fetch_value_of_type()
 	{
 		try
 		{
 			var result = select_data();
-			
+
 			/* Test index check */
 			foreach (var i in new int[]{-int.MAX, -1, 7, 8, int.MAX})
 			{
@@ -470,7 +470,7 @@ public class ResultTest: Drt.TestCase
 					expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
 				}
 			}
-			
+
 			/* Supported types */
 			expect_value_equal(1.72, result.fetch_value_of_type(3, typeof(double)), "double");
 			expect_value_equal((float)1.72, result.fetch_value_of_type(3, typeof(float)), "float");
@@ -481,7 +481,7 @@ public class ResultTest: Drt.TestCase
 			uint8[] blob = {7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7};
 			expect_value_equal(new GLib.Bytes(blob), result.fetch_value_of_type(4, typeof(GLib.Bytes)), "bytes");
 			expect_value_equal(new GLib.ByteArray.take(blob), result.fetch_value_of_type(4, typeof(GLib.ByteArray)), "byte array");
-			
+
 			/* Null value */
 			expect_value_equal(null, result.fetch_value_of_type(6, typeof(bool)), "bool - null");
 			expect_value_equal(null, result.fetch_value_of_type(6, typeof(int)), "int - null");
@@ -491,7 +491,7 @@ public class ResultTest: Drt.TestCase
 			expect_value_equal(null, result.fetch_value_of_type(6, typeof(string)), "string - null");
 			expect_value_equal(null, result.fetch_value_of_type(6, typeof(GLib.Bytes)), "bytes - null");
 			expect_value_equal(null, result.fetch_value_of_type(6, typeof(GLib.ByteArray)), "byte array - null");
-			
+
 			/* Unsupported types */
 			foreach (var t in new Type[]{typeof(uint), typeof(uint8), typeof(uint8[]), this.get_type(), typeof(void*)})
 			{

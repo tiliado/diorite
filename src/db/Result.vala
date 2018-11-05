@@ -2,14 +2,14 @@
  * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,10 +36,10 @@ public class Result : GLib.Object
 	private Sqlite.Statement statement;
 	private HashTable<unowned string, int> column_indexes;
 	private (unowned string)[]? column_names;
-	
+
 	/**
 	 * Creates new database query result wrapper
-	 * 
+	 *
 	 * @param connection    database conection
 	 * @param statement     prepared SQLite statement to execute
 	 */
@@ -50,10 +50,10 @@ public class Result : GLib.Object
 		column_indexes = new HashTable<unowned string, int>(str_hash, str_equal);
 		column_names = null;
 	}
-	
+
 	/**
 	 * Proceed to the next record
-	 * 
+	 *
 	 * @param cancellable    Cancellable object
 	 * @return `true` if there is a next record, `false` if query data has been exhausted
 	 * @throws GLib.IOError when the operation is cancelled
@@ -76,12 +76,12 @@ public class Result : GLib.Object
 		column_names = null;
 		return !done;
 	}
-	
+
 	/**
 	 * Return column index by name
-	 * 
+	 *
 	 * @param name    column name
-	 * @return the index of the column if it exists, `-1` otherwise 
+	 * @return the index of the column if it exists, `-1` otherwise
 	 */
 	public int get_column_index(string name)
 	{
@@ -91,10 +91,10 @@ public class Result : GLib.Object
 			return index;
 		return -1;
 	}
-	
+
 	/**
 	 * Get column name by index
-	 * 
+	 *
 	 * @param index the index of a column
 	 * @return the name of the column if index is valid, `null` otherwise
 	 */
@@ -105,10 +105,10 @@ public class Result : GLib.Object
 			return null;
 		return column_names[index];
 	}
-	
+
 	/**
 	 * Fetch value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @param type     value data type
 	 * @return the requested value
@@ -118,10 +118,10 @@ public class Result : GLib.Object
 	{
 		if (fetch_is_null(index))
 			return null;
-		
+
 		if (type == typeof(void*) || !is_type_supported(type))
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		
+
 		var value = GLib.Value(type);
 		if (type == typeof(bool))
 			value.set_boolean(fetch_bool(index));
@@ -141,13 +141,13 @@ public class Result : GLib.Object
 			value.set_boxed(fetch_byte_array(index));
 		else
 			throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
-		
+
 		return value;
 	}
-	
+
 	/**
 	 * Fetch null value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return true if value is null
 	 * @throws DatabaseError if index is invalid
@@ -157,10 +157,10 @@ public class Result : GLib.Object
 		check_index(index);
 		return statement.column_type(index) == Sqlite.NULL;
 	}
-	
+
 	/**
 	 * Fetch integer value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the integer value
 	 * @throws DatabaseError if index is invalid
@@ -170,10 +170,10 @@ public class Result : GLib.Object
 		check_index(index);
 		return statement.column_int(index);
 	}
-	
+
 	/**
 	 * Fetch 64bit integer value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the 64bit integer value
 	 * @throws DatabaseError if index is invalid
@@ -183,10 +183,10 @@ public class Result : GLib.Object
 		check_index(index);
 		return statement.column_int64(index);
 	}
-	
+
 	/**
 	 * Fetch boolean value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the boolean value
 	 * @throws DatabaseError if index is invalid
@@ -195,10 +195,10 @@ public class Result : GLib.Object
 	{
 		return fetch_int(index) != 0;
 	}
-	
+
 	/**
 	 * Fetch double value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the double value
 	 * @throws DatabaseError if index is invalid
@@ -208,10 +208,10 @@ public class Result : GLib.Object
 		check_index(index);
 		return statement.column_double(index);
 	}
-	
+
 	/**
 	 * Fetch string value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the string value
 	 * @throws DatabaseError if index is invalid
@@ -230,10 +230,10 @@ public class Result : GLib.Object
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Fetch binary blob value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the binary blob value
 	 * @throws DatabaseError if index is invalid
@@ -245,13 +245,13 @@ public class Result : GLib.Object
 		blob.length =  statement.column_bytes(index);
 		if (blob == null || blob.length == 0)
 			return null;
-		
+
 		return blob; // dup array
 	}
-	
+
 	/**
 	 * Fetch GLib.Bytes value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the binary blob as GLib.Bytes value
 	 * @throws DatabaseError if index is invalid
@@ -261,10 +261,10 @@ public class Result : GLib.Object
 		var blob = fetch_blob(index);
 		return blob != null ? new GLib.Bytes.take((owned) blob) : null;
 	}
-	
+
 	/**
 	 * Fetch GLib.ByteArray value from current database record
-	 * 
+	 *
 	 * @param index    column index
 	 * @return the binary blob as GLib.ByteArray value
 	 * @throws DatabaseError if index is invalid
@@ -274,10 +274,10 @@ public class Result : GLib.Object
 		var blob = fetch_blob(index);
 		return blob != null ? new GLib.ByteArray.take((owned) blob) : null;
 	}
-	
+
 	/**
 	 * Check whether index is valid
-	 * 
+	 *
 	 * @param index    column index
 	 * @throws DatabaseError if index is invalid
 	 */
@@ -289,7 +289,7 @@ public class Result : GLib.Object
 			throw new DatabaseError.RANGE(
 				"Index %d is not in range 0..%d. |%s|", index, n_columns - 1, statement.sql());
 	}
-	
+
 	/**
 	 * Throw an error on SQLite failure.
 	 */
@@ -299,7 +299,7 @@ public class Result : GLib.Object
 			throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
 		return result;
 	}
-	
+
 	/**
 	 * Map column names to indexes and vice versa.
 	 */
@@ -309,7 +309,7 @@ public class Result : GLib.Object
 		 * name -> index mapping is created because SQLite doesn't offer API to get column index for name.
 		 * index -> name mapping is created because SQLite invalidates the previously returned column name
 		 *     if sqlite3_column_name() is called again for the same column index.
-		 * 
+		 *
 		 * http://sqlite.org/c3ref/column_name.html
 		 */
 		if (column_names == null || column_indexes.length == 0)

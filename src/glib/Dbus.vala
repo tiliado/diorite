@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,7 +26,7 @@ namespace Drt.Dbus {
 
 /**
  * Get XDG DBus root object.
- * 
+ *
  * @param bus            The bus to get the root object from.
  * @param cancellable    Cancellable object.
  * @return XDG DBus root object.
@@ -38,7 +38,7 @@ public async XdgDbus get_xdg_dbus(DBusConnection bus, Cancellable? cancellable =
 
 /**
  * Ensure that given service is running and start it when necessary.
- * 
+ *
  * @param bus            The bus to find the service at.
  * @param name           A well-known service name to search for.
  * @param cancellable    Cancellable object.
@@ -54,7 +54,7 @@ throws GLib.Error {
 
 /**
  * Introspect DBus object.
- * 
+ *
  * @param bus            The bus to find the object at.
  * @param name           A well-known service name to search for.
  * @param path           An object path.
@@ -82,7 +82,7 @@ Cancellable? cancellable = null) throws GLib.Error {
 
 /**
  * Introspect DBus object.
- * 
+ *
  * @param bus            The bus to find the object at.
  * @param name           A well-known service name to search for.
  * @param path           An object path.
@@ -103,10 +103,10 @@ public class Introspection {
 	public string name {get; private set;}
 	public string path {get; private set;}
 	public DBusNodeInfo node_info {get; private set;}
-	
+
 	/**
 	 * Creates new DBus introspection container.
-	 * 
+	 *
 	 * @param name         A well-known service name to search for.
 	 * @param path         An object path.
 	 * @param node_info    Introspection data.
@@ -116,10 +116,10 @@ public class Introspection {
 		this.path = path;
 		this.node_info = node_info;
 	}
-	
+
 	/**
 	 * Get interface info.
-	 * 
+	 *
 	 * @param name    Interface name.
 	 * @return Interface info if the interface exists, null otherwise.
 	 */
@@ -131,20 +131,20 @@ public class Introspection {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Check the existence of an interface.
-	 * 
+	 *
 	 * @param name    Interface name.
 	 * @return True if the interface exists, false otherwise.
 	 */
 	public bool has_interface(string name) {
 		return get_interface(name) != null;
 	}
-	
+
 	/**
 	 * Get method info.
-	 * 
+	 *
 	 * @param ifce_name    Interface name.
 	 * @param method       Method name.
 	 * @return Method info if the interface and method exist, null otherwise.
@@ -153,10 +153,10 @@ public class Introspection {
 		var ifce = get_interface(ifce_name);
 		return ifce != null ? ifce.lookup_method(method): null;
 	}
-	
+
 	/**
 	 * Check the existence of interface method.
-	 * 
+	 *
 	 * @param ifce_name    Interface name.
 	 * @param method       Method name.
 	 * @return True if the interface and method exist, false otherwise.
@@ -164,10 +164,10 @@ public class Introspection {
 	public bool has_method(string ifce_name, string method) {
 		return get_method(ifce_name, method) != null;
 	}
-	
+
 	/**
 	 * Assert the existence of interface method.
-	 * 
+	 *
 	 * @param ifce_name    Interface name.
 	 * @param method       Method name.
 	 * @throws GLib.IOError if the interface and method don't exist.
@@ -184,24 +184,24 @@ public class Introspection {
 public interface XdgDbus: GLib.Object {
 	/**
 	 * Checks if the specified name exists (currently has an owner).
-	 * 
+	 *
 	 * @param name    Name to check
 	 * @return true if the name exists, false otherwise.
 	 */
 	public abstract async bool name_has_owner(string name) throws GLib.Error;
-	
+
 	/**
 	 * Tries to launch the executable associated with a name (service activation), as an explicit request.
-	 * 
+	 *
 	 * @param name     Name of the service to start
 	 * @param flags    Flags (currently not used)
 	 * @return 1 when the service was successfully started, 2 when a connection already owns the given name.
 	 */
 	public abstract async uint32 start_service_by_name(string name, uint32 flags) throws GLib.Error;
-	
+
 	/**
 	 * Returns a list of all names that can be activated on the bus.
-	 * 
+	 *
 	 * @return Array of strings where each string is a bus name.
 	 * @throws GLib.Error on failure.
 	 */
@@ -213,7 +213,7 @@ public interface XdgDbusIntrospectable: GLib.Object {
 	/**
 	 * Returns an XML description of the object, including its interfaces (with signals and methods), objects below
 	 * it in the object path tree, and its properties.
-	 * 
+	 *
 	 * @return XML description.
 	 */
 	public abstract async string introspect() throws GLib.Error;

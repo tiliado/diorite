@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -35,17 +35,17 @@ public class ValueTest: Drt.TestCase
 		expect_str_equals("false", Value.to_string(false), "false");
 		expect_str_equals("1024.25", Value.to_string((double)1024.25), "double");
 		expect_str_equals("1024.25", Value.to_string((float)1024.25), "float");
-		
+
 		expect_str_equals("%p".printf(this), Value.to_string(this), "object");
 		var dummy = new DummyObject();
 		expect_str_equals("%p".printf(dummy), Value.to_string(dummy), "simple object");
-		
+
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		expect_str_equals("01020304050607", Value.to_string(bytes), "bytes");
 		var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		expect_str_equals("01020304050607", Value.to_string(byte_array), "byte array");
 	}
-	
+
 	public void test_describe()
 	{
 		expect_str_equals("<gchararray:string>", Value.describe("string"), "string");
@@ -57,17 +57,17 @@ public class ValueTest: Drt.TestCase
 		expect_str_equals("<gboolean:false>", Value.describe(false), "false");
 		expect_str_equals("<gdouble:1024.25>", Value.describe((double)1024.25), "double");
 		expect_str_equals("<gfloat:1024.25>", Value.describe((float)1024.25), "float");
-		
+
 		expect_str_equals("<DrtValueTest:%p>".printf(this), Value.describe(this), "object");
 		var dummy = new DummyObject();
 		expect_str_equals("<DrtValueTestDummyObject:%p>".printf(dummy), Value.describe(dummy), "simple object");
-		
+
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		expect_str_equals("<GBytes:01020304050607>", Value.describe(bytes), "bytes");
 		var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		expect_str_equals("<GByteArray:01020304050607>", Value.describe(byte_array), "byte array");
 	}
-	
+
 	public void test_equal()
 	{
 		expect_true(Value.equal(null, null), "both null");
@@ -75,7 +75,7 @@ public class ValueTest: Drt.TestCase
 		expect_false(Value.equal(null, "string"), "(null, \"string\")");
 		expect_true(Value.equal("string", "string"), "(\"string\", \"string\")");
 		expect_false(Value.equal("string", "another string"), "(\"string\", \"another string\")");
-		
+
 		expect_false(Value.equal((int)1024, "string"), "(1024, \"string\")");
 		expect_true(Value.equal((int)1024, (int)1024), "int == int");
 		expect_false(Value.equal((int)1024, (int)1000), "int != int");
@@ -91,17 +91,17 @@ public class ValueTest: Drt.TestCase
 		expect_false(Value.equal((double)1024.25, (double)1024.26), "double != double");
 		expect_true(Value.equal((float)1024.25, (float)1024.25), "float == float");
 		expect_false(Value.equal((float)1024.25, (float)1024.26), "float != float");
-		
+
 		expect_true(Value.equal(this, this), "object == object");
 		expect_false(Value.equal(this, new DummyObject()), "object != object");
-		
+
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var bytes2 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var bytes3 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
 		expect_true(Value.equal(bytes, bytes), "bytes == bytes");
 		expect_true(Value.equal(bytes, bytes2), "bytes == bytes");
 		expect_false(Value.equal(bytes, bytes3), "bytes != bytes");
-		
+
 		var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var byte_array2 = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var byte_array3 = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
@@ -109,7 +109,7 @@ public class ValueTest: Drt.TestCase
 		expect_true(Value.equal(byte_array, byte_array2), "byte_array == byte_array");
 		expect_false(Value.equal(byte_array, byte_array3), "byte_array != byte_array");
 	}
-	
+
 	public void test_equal_verbose()
 	{
 		string description;
@@ -123,7 +123,7 @@ public class ValueTest: Drt.TestCase
 		expect_str_equals("equal <gchararray:string>", description, "(\"string\", \"string\")");
 		expect_false(Value.equal_verbose("string", "another string", out description), "(\"string\", \"another string\")");
 		expect_str_equals("<gchararray:string> != <gchararray:another string>", description, "(\"string\", \"another string\")");
-		
+
 		expect_false(Value.equal_verbose((int)1024, "string", out description), "(1024, \"string\")");
 		expect_str_equals("<gint:1024> != <gchararray:string>", description, "(1024, \"string\")");
 		expect_true(Value.equal_verbose((int)1024, (int)1024, out description), "int == int");
@@ -154,13 +154,13 @@ public class ValueTest: Drt.TestCase
 		expect_str_equals("equal <gfloat:1024.25>", description, "float == float");
 		expect_false(Value.equal_verbose((float)1024.25, (float)1024.26, out description), "float != float");
 		expect_str_equals("<gfloat:1024.25> != <gfloat:1024.26>", description, "float != float");
-		
+
 		expect_true(Value.equal_verbose(this, this, out description), "object == object");
 		expect_str_equals("equal <DrtValueTest:%p>".printf(this), description, "object == object");
 		var dummy = new DummyObject();
 		expect_false(Value.equal_verbose(this, dummy, out description), "object != simple object");
 		expect_str_equals("<DrtValueTest:%p> != <DrtValueTestDummyObject:%p>".printf(this, dummy), description, "object != simple object");
-		
+
 		var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var bytes2 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
 		var bytes3 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
@@ -171,7 +171,7 @@ public class ValueTest: Drt.TestCase
 		expect_false(Value.equal_verbose(bytes, bytes3, out description), "bytes != bytes");
 		expect_str_equals("<GBytes:01020304050607> != <GBytes:0102030405060708>", description, "bytes != bytes");
 	}
-	
+
 	private class DummyObject
 	{
 	}

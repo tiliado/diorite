@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -28,7 +28,7 @@ public class OrmManagerTest: Drt.TestCase
 	private Database db;
 	private OrmManager orm;
 //~ 	private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
-	
+
 	public override void set_up()
 	{
 		base.set_up();
@@ -49,7 +49,7 @@ public class OrmManagerTest: Drt.TestCase
 			warning("%s", e.message);
 		}
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -64,7 +64,7 @@ public class OrmManagerTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -79,22 +79,22 @@ public class OrmManagerTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	private Query? query(string sql) throws GLib.Error, DatabaseError
 	{
-		
+
 		if (!db.opened)
 			db.open();
-		
+
 		return db.open_connection().query(sql);
 	}
-	
+
 	private Result select_data()  throws GLib.Error, DatabaseError
 	{
 		return query("SELECT id, name, age, height, blob, alive, extra FROM %s WHERE id = ?".printf(TABLE_USERS_NAME))
 			.bind(1, 1).exec();
 	}
-	
+
 	public void test_create_object()
 	{
 		try
@@ -110,8 +110,8 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "no ospec");
 			}
-			
-			
+
+
 			try
 			{
 				orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
@@ -132,7 +132,7 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
 			}
-			
+
 			try
 			{
 				orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
@@ -171,7 +171,7 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expectation_failed("Unexpected error: %s", e.message);
 			}
-			
+
 			/* Not GObject */
 			try
 			{
@@ -188,14 +188,14 @@ public class OrmManagerTest: Drt.TestCase
 			expectation_failed("%s", e.message);
 		}
 	}
-	
+
 	public void test_fill_object()
 	{
 		try
 		{
 			var result = select_data();
 			User user;
-			
+
 			try
 			{
 				user = new User(2, "Lololo", 45, 2.25, false);
@@ -206,9 +206,9 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expect_str_match("*ObjectSpec for DrtdbUser has not been found*", e.message, "mismatch, all fields");
 			}
-			
+
 			orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
-			
+
 			try
 			{
 				user = new User(2, "Lololo", 45, 2.25, false);
@@ -219,7 +219,7 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
 			}
-			
+
 			/* Matches */
 			user = new User(1, "Lololo", 45, 2.25, false);
 			orm.fill_object(user, result);
@@ -233,7 +233,7 @@ public class OrmManagerTest: Drt.TestCase
 				user.blob, "blob");
 			expect(null == user.extra, "extra");
 			expect_int_equals(1024, user.not_in_db, "not_in_db");
-			
+
 			try
 			{
 				orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
@@ -245,7 +245,7 @@ public class OrmManagerTest: Drt.TestCase
 			{
 				expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
 			}
-			
+
 			try
 			{
 				orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db"));

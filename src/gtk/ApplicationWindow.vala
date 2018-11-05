@@ -2,14 +2,14 @@
  * Copyright 2011-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,7 +36,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 	protected unowned Application app;
 	private Gtk.MenuButton menu_button = null;
 	private string[]? menu_button_items = null;
-	
+
 	public ApplicationWindow(Application app, bool collapsible_header_bar)
 	{
 		GLib.Object(application: app);
@@ -54,10 +54,10 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		/* Don't show fallback menubar, because all significant actions should be already provided
 		 * by a toolbar. Actually, menu bar model is used only for Unity. */
 		show_menubar = Environment.get_variable("DIORITE_SHOW_MENUBAR") == "true";
-		
+
 		header_bar = new Gtk.HeaderBar();
 		header_bar.show();
-		
+
 		if (app.shell.client_side_decorations)
 		{
 			header_bar.show_close_button = true;
@@ -81,7 +81,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		{
 			top_grid.attach_next_to(header_bar, null, Gtk.PositionType.TOP, 1, 1);
 		}
-		
+
 		menu_button = new Gtk.MenuButton();
 		var image = new Gtk.Image.from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON);
 		menu_button.image = image;
@@ -91,18 +91,18 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		update_menu_button();
 		app.shell.app_menu_changed.connect(on_app_menu_changed);
 	}
-	
+
 	~ApplicationWindow()
 	{
 		app.shell.app_menu_changed.disconnect(on_app_menu_changed);
 	}
-	
+
 	public void set_menu_button_items(string[]? items)
 	{
 		menu_button_items = items;
 		update_menu_button();
 	}
-	
+
 	private void update_menu_button()
 	{
 		var actions = app.actions;
@@ -121,25 +121,25 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 			else
 				warning("Failed to create %s item.", toggle_toolbar_action);
 		}
-		
+
 		var app_menu = app.shell.app_menu;
 		if (app_menu != null)
 			menu.append_section(null, Actions.copy_menu_model(app_menu));
 		menu_button.menu_model = menu;
 		menu_button.visible = menu.get_n_items() > 0;
 	}
-	
+
 	private void on_app_menu_changed(DesktopShell shell)
 	{
 		update_menu_button();
 	}
-	
+
 	public void create_toolbar(string[] items)
 	{
 		var children = header_bar.get_children();
 		foreach (var child in children)
 			header_bar.remove(child);
-		
+
 		if (items.length == 0)
 		{
 			header_bar.pack_end(menu_button);
@@ -162,7 +162,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		header_bar.show_all();
 	}
-	
+
 	public Gtk.Button? get_toolbar_button(string action_name)
 	{
 		var action = app.actions.get_action(action_name);
@@ -177,7 +177,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		return null;
 	}
-	
+
 	private bool toolbar_pack_start(string action)
 	{
 		return_val_if_fail(header_bar != null, false);
@@ -189,7 +189,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		return false;
 	}
-	
+
 	private bool toolbar_pack_end(string action)
 	{
 		return_val_if_fail(header_bar != null, false);
@@ -201,25 +201,25 @@ public class ApplicationWindow: Gtk.ApplicationWindow
 		}
 		return false;
 	}
-	
+
 	private void on_header_bar_revealer_expanded_changed(GLib.Object o, ParamSpec p)
 	{
 		var revelaed = header_bar_revealer.revealer.reveal_child;
 		header_bar_revealer.button.visible = !revelaed;
 	}
-	
+
 	private void on_header_bar_checkbox_toggled()
 	{
 		header_bar_revealer.revealer.reveal_child = !header_bar_revealer.revealer.reveal_child;
 	}
-	
+
 	private void on_title_changed(GLib.Object o, ParamSpec p)
 	{
 		/* Beware of infinite loop: Newer GTK versions seem to set header bar title automatically. */
 		if (header_bar.title != title)
 			header_bar.title = title;
 	}
-	
+
 	private void on_action_added(Action action)
 	{
 		if (action.scope == Action.SCOPE_WIN)

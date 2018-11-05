@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -36,7 +36,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_false(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_bool()
 	{
 		var node = (JsonNode) new JsonValue.@bool(true);
@@ -49,7 +49,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_false(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_int()
 	{
 		var node = (JsonNode) new JsonValue.@int(-1234);
@@ -62,7 +62,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_false(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_double()
 	{
 		var node = (JsonNode) new JsonValue.@double(-12.34);
@@ -75,7 +75,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_false(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_string()
 	{
 		var str = "Test ";
@@ -89,7 +89,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_false(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_object()
 	{
 		var node = (JsonNode) new JsonObject();
@@ -102,7 +102,7 @@ public class JsonNodeTest: Drt.TestCase
 		expect_true(node.is_object(), "is object");
 		expect_false(node.is_array(), "is array");
 	}
-	
+
 	public void test_array()
 	{
 		var node = (JsonNode) new JsonArray();

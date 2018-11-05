@@ -2,14 +2,14 @@
  * Copyright 2014-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,7 +33,7 @@ public errordomain RpcError {
 	INVALID_REQUEST,
 	INVALID_ARGUMENTS,
 	NOT_READY;
-	
+
 	public extern static GLib.Quark quark();
 }
 
@@ -46,7 +46,7 @@ public errordomain ApiError {
 	WRITABLE_FLAG,
 	SUBSCRIBE_FLAG,
 	API_TOKEN_REQUIRED;
-	
+
 	public extern static GLib.Quark quark();
 }
 
@@ -64,7 +64,7 @@ namespace Rpc {
 	public const string TYPE_STRING_ANY = "#ANY#";
 	public const string RESPONSE_OK = "OK";
 	public const string RESPONSE_ERROR = "ERROR";
-	
+
 	public void check_type_string(Variant? data, string? type_string) throws GLib.Error {
 		if (type_string != null && type_string == TYPE_STRING_ANY){
 			return;
@@ -84,22 +84,22 @@ namespace Rpc {
 			}
 		}
 	}
-	
+
 	public string get_params_type(GLib.Variant? params) throws RpcError {
 		if (params == null ) {
 			return "tuple";
-		} 
+		}
 		var type = params.get_type();
 		if (type.is_tuple()) {
 			return "tuple";
 		}
 		if (type.is_array()){
-			
+
 			return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
 		}
 		throw new RpcError.UNSUPPORTED("Param type %s is not supported.", params.get_type_string());
 	}
-	
+
 	private string create_path(string name) {
 		var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
 		try {

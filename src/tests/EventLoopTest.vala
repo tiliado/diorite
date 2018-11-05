@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -36,7 +36,7 @@ public class EventLoopTest: Drt.TestCase
 		});
 		loop.run();
 		expect_true(MainContext.@default() == ctx, "Current context is global");
-		
+
 		var thread = new Thread<MainContext>(null, () => {
 			var thread_ctx = new MainContext();
 			thread_ctx.push_thread_default();
@@ -54,7 +54,7 @@ public class EventLoopTest: Drt.TestCase
 		expect_true(thread.join() == ctx, "Current context is thread-local");
 		expect_true(MainContext.@default() != ctx, "Current context is not global");
 	}
-	
+
 	public void test_add_timeout_ms()
 	{
 		var loop = new MainLoop();
@@ -67,7 +67,7 @@ public class EventLoopTest: Drt.TestCase
 		});
 		loop.run();
 		expect_true(MainContext.@default() == ctx, "Current context is global");
-		
+
 		var thread = new Thread<MainContext>(null, () => {
 			var thread_ctx = new MainContext();
 			thread_ctx.push_thread_default();
@@ -85,7 +85,7 @@ public class EventLoopTest: Drt.TestCase
 		expect_true(thread.join() == ctx, "Current context is thread-local");
 		expect_true(MainContext.@default() != ctx, "Current context is not global");
 	}
-	
+
 	public void test_resume_later()
 	{
 		var loop = new MainLoop();
@@ -100,7 +100,7 @@ public class EventLoopTest: Drt.TestCase
 		expect_true(after == before, "Before and after contexts are same.");
 		expect_true(MainContext.@default() == before, "Before context is global");
 		expect_true(MainContext.@default() == after, "After context is global");
-		
+
 		before = null;
 		after = null;
 		var thread = new Thread<MainContext>(null, () => {
@@ -121,15 +121,15 @@ public class EventLoopTest: Drt.TestCase
 		expect_true(MainContext.@default() != after, "After context is not global");
 		expect_true(ctx2 == before, "Before context is thread-local.");
 		expect_true(ctx2 == after, "After context is thread-local.");
-		
+
 	}
-	
+
 	private async void run_resume_later(out MainContext? before, out MainContext? after)
 	{
 		before = MainContext.ref_thread_default();
 		yield Drt.EventLoop.resume_later();
 		after = MainContext.ref_thread_default();
-		
+
 	}
 }
 

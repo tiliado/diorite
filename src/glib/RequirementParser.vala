@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -60,12 +60,12 @@ public enum RequirementState {
 
 /**
  * Parser and evaluator of a list of requirements.
- * 
+ *
  * A requirement consist of a name and optional parameters in square brackets.
- * Requirements are separated with whitespace or a semicolon. 
- * Example: "webkitgtk[2.15.3] codec[mp3] codec[h264] feature[mse]" 
- */ 
- 
+ * Requirements are separated with whitespace or a semicolon.
+ * Example: "webkitgtk[2.15.3] codec[mp3] codec[h264] feature[mse]"
+ */
+
 public class RequirementParser {
     [Description(nick = "Conditional expression", blurb = "A data string containing Requirement expression.")]
     public string? data  {get; private set;}
@@ -84,10 +84,10 @@ public class RequirementParser {
     private int len;
     private Regex patterns;
     private int peeked_token_len;
-    
+
     /**
      * Creates new requirements parser and evaluator.
-     * It can be reused for more calls of {@link eval}. 
+     * It can be reused for more calls of {@link eval}.
      */
     public RequirementParser() {
         peeked_token_len = -1;
@@ -103,13 +103,13 @@ public class RequirementParser {
             error("Failed to compile regex patterns. %s", e.message);
         }
     }
-    
+
     /**
      * Print the parser expression with the given position marked.
-     * 
+     *
      * @param start    The position to mark.
      * @param len      The size of the mark.
-     * @return marked string 
+     * @return marked string
      */
     public string mark_pos(int start, int len=1) {
         var buf = new StringBuilder(data);
@@ -125,10 +125,10 @@ public class RequirementParser {
         buf.append_c('\n');
         return buf.str;
     }
-    
+
     /**
      * Evaluate a list of requirements
-     * 
+     *
      * @param requirements           The list of requirements  to parse and evaluate.
      * @throws RequirementError on failure
      */
@@ -141,17 +141,17 @@ public class RequirementParser {
             throw error_object;
 		}
     }
-    
+
     /**
      * Returns true if there has been an error.
      */
     public bool is_error_set() {
         return error_pos >= 0;
     }
-    
+
     /**
      * Perform an identifier call
-     * 
+     *
      * @param pos       the position of the identifier
      * @param ident     the name of the identifier
      * @param parameters    the parameters
@@ -163,7 +163,7 @@ public class RequirementParser {
 		}
         return parameters == null && ident != "false" ? RequirementState.SUPPORTED : RequirementState.UNSUPPORTED;
     }
-    
+
     /**
      * Reset the inner state before parsing and evaluation of a new expression.
      */
@@ -178,12 +178,12 @@ public class RequirementParser {
 		failed_requirements = null;
 		unknown_requirements = null;
 	}
-    
+
     /**
      * Set parse error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -194,12 +194,12 @@ public class RequirementParser {
             set_error(new RequirementError.PARSE("%d: %s", pos, error_text), pos, error_text);
         }
     }
-    
+
     /**
      * Set syntax error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -210,12 +210,12 @@ public class RequirementParser {
             set_error(new RequirementError.SYNTAX("%d: %s", pos, error_text), pos, error_text);
         }
     }
-    
+
     /**
      * Set evaluation error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -226,13 +226,13 @@ public class RequirementParser {
             set_error(new RequirementError.EVAL("%d: %s", pos, error_text), pos, error_text);
         }
     }
-    
+
     private void set_error(RequirementError err, int pos, string text) {
         error_object = err;
         error_pos = pos;
         error_text = text;
     }
-    
+
     private void wrong_token(int pos, Toks found, string? expected) {
         switch (found) {
         case Toks.NONE:
@@ -246,7 +246,7 @@ public class RequirementParser {
             break;
         }
     }
-    
+
     private bool next(out Toks tok, out string? val, out int position) {
         if (peek(out tok, out val, out position)) {
             return skip();
@@ -254,7 +254,7 @@ public class RequirementParser {
             return false;
 		}
     }
-    
+
     private bool skip() {
         if (peeked_token_len >= 0) {
             pos += peeked_token_len;
@@ -263,7 +263,7 @@ public class RequirementParser {
         }
         return next(null, null, null);
     }
-    
+
     private void add_failed(string rule) {
 		if (failed_requirements == null) {
 			failed_requirements = "";
@@ -272,7 +272,7 @@ public class RequirementParser {
 		}
 		failed_requirements += rule;
 	}
-	
+
     private void add_unknown(string rule) {
 		if (unknown_requirements == null) {
 			unknown_requirements = "";
@@ -281,7 +281,7 @@ public class RequirementParser {
 		}
 		unknown_requirements += rule;
 	}
-    
+
     private bool peek(out Toks tok, out string? val, out int position) {
         val = null;
         position = pos;
@@ -316,7 +316,7 @@ public class RequirementParser {
         tok = Toks.EOF;
         return false;
     }
-    
+
     private void parse_all() {
         Toks tok = Toks.NONE;
         string? val = null;
@@ -352,7 +352,7 @@ public class RequirementParser {
 			wrong_token(pos, tok, "EOF token");
 		}
     }
-    
+
     private RequirementState parse_rule(int pos, string ident) {
         Toks tok = Toks.NONE;
         string? parameters;
@@ -368,7 +368,7 @@ public class RequirementParser {
         }
         return parse_call(pos, ident, null);
     }
-    
+
     private RequirementState parse_call(int pos, string ident, string? parameters) {
         var result = call(pos, ident, parameters);
         if (result == RequirementState.UNSUPPORTED) {
@@ -378,7 +378,7 @@ public class RequirementParser {
 		}
 		return result;
     }
-    
+
     private enum Toks {
         NONE,
         SPACE,
@@ -386,7 +386,7 @@ public class RequirementParser {
         IDENT,
         PARAMS,
         EOF;
-        
+
         public string to_str() {
             return to_string().substring(Toks.NONE.to_string().length - 4);
         }

@@ -2,14 +2,14 @@
  * Copyright 2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -50,7 +50,7 @@ public class PropertyBinding
 	public unowned ParamSpec property {get; private set;}
 	public PropertyBindingFlags flags {get; private set;}
 	private bool has_gone = false;
-	
+
 	public PropertyBinding(KeyValueStorage storage, string key, GLib.Object object, ParamSpec property, PropertyBindingFlags flags)
 	{
 		if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0
@@ -63,14 +63,14 @@ public class PropertyBinding
 		this.flags = flags;
 		if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0)
 			object.notify[property.name].connect_after(on_property_changed);
-		
+
 		if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0)
 			storage.changed.connect(on_key_changed);
-		
+
 		object.weak_ref(gone);
 		storage.weak_ref(gone);
 	}
-	
+
 	~PropertyBinding()
 	{
 		if (!has_gone)
@@ -79,14 +79,14 @@ public class PropertyBinding
 			storage.weak_unref(gone);
 			has_gone = true;
 		}
-		
+
 		if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0)
 			object.notify[property.name].disconnect(on_property_changed);
-		
+
 		if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0)
 			storage.changed.disconnect(on_key_changed);
 	}
-	
+
 	public string to_string()
 	{
 		string relation;
@@ -101,11 +101,11 @@ public class PropertyBinding
 		return "%s['%s'] %s %s['%s'] (type %s)".printf(storage.get_type().name(), key, relation,
 			object.get_type().name(), property.name, property.value_type.name());
 	}
-	
+
 	public void update_key()
 	{
 		toggle_changed_notify_handler(false);
-		
+
 		if (property.value_type == typeof(string))
 		{
 			string? str_value = null;
@@ -122,14 +122,14 @@ public class PropertyBinding
 		{
 			critical("Unsupported type for property binding. %s.", to_string());
 		}
-		
+
 		toggle_changed_notify_handler(true);
 	}
-	
+
 	public bool update_property()
 	{
 		toggle_property_notify_handler(false);
-		
+
 		bool result = false;
 		if (property.value_type == typeof(string))
 		{
@@ -157,21 +157,21 @@ public class PropertyBinding
 		{
 			critical("Unsupported type for property binding. %s.", to_string());
 		}
-		
+
 		toggle_property_notify_handler(true);
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Set default value of the associated key.
-	 * 
+	 *
 	 * Useful for chaining
-	 * 
+	 *
 	 * {{{
 	 * binding.set_default(true).update_property()
 	 * }}}
-	 * 
+	 *
 	 * @param default_value    default value to set
 	 * @return self
 	 */
@@ -180,7 +180,7 @@ public class PropertyBinding
 		storage.set_default_value(key, default_value);
 		return this;
 	}
-	
+
 	private void toggle_property_notify_handler(bool enabled)
 	{
 		uint signal_id;
@@ -196,7 +196,7 @@ public class PropertyBinding
 				object, SignalMatchType.ID | SignalMatchType.DATA,
 				signal_id, detail, null, null, this);
 	}
-	
+
 	private void toggle_changed_notify_handler(bool enabled)
 	{
 		uint signal_id;
@@ -211,18 +211,18 @@ public class PropertyBinding
 				storage, SignalMatchType.ID | SignalMatchType.DATA,
 				signal_id, 0, null, null, this);
 	}
-	
+
 	private void on_property_changed(GLib.Object o, ParamSpec p)
 	{
 		update_key();
 	}
-	
+
 	private void on_key_changed(string key, Variant? old_value)
 	{
 		if (key == this.key)
 			update_property();
 	}
-	
+
 	private void gone(GLib.Object o)
 	{
 		has_gone = true;
@@ -230,7 +230,7 @@ public class PropertyBinding
 			object.weak_unref(gone);
 		if (o != storage)
 			storage.weak_unref(gone);
-		
+
 		if (storage != null)
 			storage.remove_property_binding(this);
 	}

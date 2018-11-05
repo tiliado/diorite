@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -26,7 +26,7 @@ public class ObjectSpecTest: Drt.TestCase
 {
 	private File db_file;
 	private Database db;
-	
+
 	public override void set_up()
 	{
 		base.set_up();
@@ -34,7 +34,7 @@ public class ObjectSpecTest: Drt.TestCase
 		delete_db_file();
 		db = new Database(db_file);
 	}
-	
+
 	public override void tear_down()
 	{
 		base.tear_down();
@@ -49,7 +49,7 @@ public class ObjectSpecTest: Drt.TestCase
 		}
 		delete_db_file();
 	}
-	
+
 	private void delete_db_file()
 	{
 		if (db_file.query_exists())
@@ -64,7 +64,7 @@ public class ObjectSpecTest: Drt.TestCase
 			}
 		}
 	}
-	
+
 	public void test_new()
 	{
 		try
@@ -76,7 +76,7 @@ public class ObjectSpecTest: Drt.TestCase
 		{
 			expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
 		}
-		
+
 		try
 		{
 			new ObjectSpec(typeof(User), "");
@@ -86,7 +86,7 @@ public class ObjectSpecTest: Drt.TestCase
 		{
 			expect_str_match("*no property named ''*", e.message, "empty primary key");
 		}
-		
+
 		try
 		{
 			new ObjectSpec(typeof(User), "foo");
@@ -96,7 +96,7 @@ public class ObjectSpecTest: Drt.TestCase
 		{
 			expect_str_match("*no property named 'foo'*", e.message, "invalid primary key");
 		}
-		
+
 		try
 		{
 			new ObjectSpec(typeof(User), "id", {"foo", "bar", "baz"});
@@ -106,7 +106,7 @@ public class ObjectSpecTest: Drt.TestCase
 		{
 			expect_str_match("*no property named 'foo'.*", e.message, "invalid property");
 		}
-		
+
 		try
 		{
 			new ObjectSpec(typeof(User), "id", User.all_props());
@@ -115,7 +115,7 @@ public class ObjectSpecTest: Drt.TestCase
 		{
 			expectation_failed("Unexpected error: %s", e.message);
 		}
-		
+
 		try
 		{
 			new ObjectSpec(typeof(User), "id");

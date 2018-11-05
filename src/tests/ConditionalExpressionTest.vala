@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -39,7 +39,7 @@ public class ConditionalExpressionTest: Drt.TestCase
 	        "not false and false",
 	        "not (false and false)",
 	        "false or not false",
-	        
+
 	    };
 	    bool[] results = {
 	        true,
@@ -65,7 +65,7 @@ public class ConditionalExpressionTest: Drt.TestCase
 			expect_true(results[i] == res, "'%s'", data);
 		}
 	}
-	
+
 	public void test_invalid_expressions()
 	{
 		string[] entries = {
@@ -84,7 +84,7 @@ public class ConditionalExpressionTest: Drt.TestCase
 	        "*Unexpected token IDENT. EOF token expected*",
 	        "*Unexpected token LPAREN. EOF token expected*",
 	    };
-	    
+
 		var expr = new ConditionalExpression();
 		for (var i = 0; i < entries.length; i++)
 		{
@@ -92,8 +92,8 @@ public class ConditionalExpressionTest: Drt.TestCase
 			expect_error(() => expr.eval(data), errors[i], "'%s'", data);
 		}
 	}
-	
-	
+
+
 }
 
 } // namespace Drt

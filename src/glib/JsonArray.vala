@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,7 +33,7 @@ public class JsonArray: JsonNode
 	[Description(nick = "The length of the array", blurb = "The length of the array.")]
 	public uint length {get{return nodes.length;}}
 	private GLib.Array<JsonNode?> nodes;
-	
+
 	/**
 	 * Creates a new empty JSON Array object.
 	 */
@@ -41,10 +41,10 @@ public class JsonArray: JsonNode
 	{
 		nodes = new GLib.Array<JsonNode?>(false, false);
 	}
-	
+
 	/**
 	 * Set a node at index
-	 * 
+	 *
 	 * @param index    The index of a node to set
 	 * @param node     {@link JsonNode} to set
 	 */
@@ -65,10 +65,10 @@ public class JsonArray: JsonNode
 		}
 		node.parent = this;
 	}
-	
+
 	/**
 	 * Adds the node on to the end of the array.
-	 * 
+	 *
 	 * @param node    the node to append
 	 */
 	public void append(JsonNode node)
@@ -77,10 +77,10 @@ public class JsonArray: JsonNode
 		nodes.append_val(node);
 		node.parent = this;
 	}
-	
+
 	/**
 	 * Adds the node on to the start of the array.
-	 * 
+	 *
 	 * @param node    the node to prepend
 	 */
 	public void prepend(JsonNode node)
@@ -89,10 +89,10 @@ public class JsonArray: JsonNode
 		nodes.prepend_val(node);
 		node.parent = this;
 	}
-	
+
 	/**
 	 * Inserts a node into the array at the given index.
-	 * 
+	 *
 	 * @param index    the index to place the node at
 	 * @param node     the node to insert into the array
 	 */
@@ -106,10 +106,10 @@ public class JsonArray: JsonNode
 			nodes.insert_val(index, node);
 		node.parent = this;
 	}
-	
+
 	/**
 	 * Remove a node at given position
-	 * 
+	 *
 	 * @param index    index to remove node at
 	 */
 	public void remove_at(uint index)
@@ -119,10 +119,10 @@ public class JsonArray: JsonNode
 		nodes.remove_index(index);
 		node.parent = null;
 	}
-	
+
 	/**
-	 * Remove a node 
-	 * 
+	 * Remove a node
+	 *
 	 * @param node   The node to remove
 	 * @return `true` if the node has been found and removed
 	 */
@@ -136,10 +136,10 @@ public class JsonArray: JsonNode
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Return the index of a node
-	 * 
+	 *
 	 * @param node     The node to find
 	 * @param index    The index of the node if it has been found
 	 * @return `true` if the node if it has been found and so the `index` is valid
@@ -158,30 +158,30 @@ public class JsonArray: JsonNode
 		index = 0;
 		return false;
 	}
-	
+
 	/**
 	 * Sort the array
-	 * 
+	 *
 	 * @param compare_func    A comparison function
 	 */
 	public void sort(CompareFunc<JsonNode> compare_func)
 	{
 		nodes.sort(compare_func);
 	}
-	
+
 	/**
 	 * Sort the array
-	 * 
+	 *
 	 * @param compare_func    A comparison function with user data
 	 */
 	public void sort_with_data(CompareDataFunc<JsonNode> compare_func)
 	{
 		nodes.sort_with_data(compare_func);
 	}
-	
+
 	/**
 	 * Get a node at index
-	 * 
+	 *
 	 * @param index    The index of a node to get
 	 * @return {@link JsonNode} at given `index` or `null`
 	 */
@@ -189,13 +189,13 @@ public class JsonArray: JsonNode
 	{
 		return index < nodes.length ? nodes.data[index] : null;
 	}
-	
+
 	/**
 	 * Gets a node at the given dot-path
-	 * 
+	 *
 	 * The dot-path consists of dot-separated object member names and array element indexes, e.g.
 	 * `cars.0.color` corresponds to the JavaScript notation `this.cars[0].color`.
-	 * 
+	 *
 	 * @param path    the dot-path of the node to get
 	 * @return the requested node if found else `null`
 	 */
@@ -225,10 +225,10 @@ public class JsonArray: JsonNode
 		else
 			return null;
 	}
-	
+
 	/**
 	 * Gets a boolean value at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @param result   the obtained value
 	 * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN} and so the `result` is valid
@@ -243,13 +243,13 @@ public class JsonArray: JsonNode
 		}
 		return node.try_bool(out result);
 	}
-	
+
 	/**
 	 * Gets a boolean value at the given dot-path
-	 * 
+	 *
 	 * The dot-path consists of dot-separated object member names and array element indexes, e.g.
 	 * `cars.0.color` corresponds to the JavaScript notation `this.cars[0].color`.
-	 * 
+	 *
 	 * @param path    the dot-path of the node to get
 	 * @param result   the obtained value
 	 * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN} and so the `result` is valid
@@ -264,10 +264,10 @@ public class JsonArray: JsonNode
 		}
 		return node.try_bool(out result);
 	}
-	
+
 	/**
 	 * Gets an integer number value at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @param result   the obtained value
 	 * @return `true` if the node is found and  is of type {@link JsonValueType.INTEGER}
@@ -283,13 +283,13 @@ public class JsonArray: JsonNode
 		}
 		return node.try_int(out result);
 	}
-	
+
 	/**
 	 * Gets an integer number value at the given dot-path
-	 * 
+	 *
 	 * The dot-path consists of dot-separated object member names and array element indexes, e.g.
 	 * `cars.0.color` corresponds to the JavaScript notation `this.cars[0].color`.
-	 * 
+	 *
 	 * @param path      the dot-path of the node to get
 	 * @param result    the obtained value
 	 * @return `true` if the node is found and is of type {@link JsonValueType.INTEGER} and so the `result` is valid
@@ -304,10 +304,10 @@ public class JsonArray: JsonNode
 		}
 		return node.try_int(out result);
 	}
-	
+
 	/**
 	 * Gets a floating point number value at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @param result   the obtained value
 	 * @return `true` if the node is found and  is of type {@link JsonValueType.DOUBLE}
@@ -323,13 +323,13 @@ public class JsonArray: JsonNode
 		}
 		return node.try_double(out result);
 	}
-	
+
 	/**
 	 * Gets a floating point number value at the given dot-path
-	 * 
+	 *
 	 * The dot-path consists of dot-separated object member names and array element indexes, e.g.
 	 * `cars.0.color` corresponds to the JavaScript notation `this.cars[0].color`.
-	 * 
+	 *
 	 * @param path      the dot-path of the node to get
 	 * @param result    the obtained value
 	 * @return `true` if the node is found and is of type {@link JsonValueType.DOUBLE} and so the `result` is valid
@@ -344,10 +344,10 @@ public class JsonArray: JsonNode
 		}
 		return node.try_double(out result);
 	}
-	
+
 	/**
 	 * Gets a string value at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @param result   the obtained value
 	 * @return `true` if the node is found and  is of type {@link JsonValueType.STRING}
@@ -363,13 +363,13 @@ public class JsonArray: JsonNode
 		}
 		return node.try_string(out result);
 	}
-	
+
 	/**
 	 * Gets a string value at the given dot-path
-	 * 
+	 *
 	 * The dot-path consists of dot-separated object member names and array element indexes, e.g.
 	 * `cars.0.color` corresponds to the JavaScript notation `this.cars[0].color`.
-	 * 
+	 *
 	 * @param path      the dot-path of the node to get
 	 * @param result    the obtained value
 	 * @return `true` if the node is found and is of type {@link JsonValueType.STRING} and so the `result` is valid
@@ -384,10 +384,10 @@ public class JsonArray: JsonNode
 		}
 		return node.try_string(out result);
 	}
-	
+
 	/**
 	 * Gets a null value at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @return `true` if the node is found and is of type {@link JsonValueType.NULL}, `false` otherwise
 	 */
@@ -396,10 +396,10 @@ public class JsonArray: JsonNode
 		var node = get(index) as JsonValue;
 		return node == null ? false : node.is_null();
 	}
-	
+
 	/**
 	 * Gets a JSON array at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @return a {@link JsonArray} if the node is found and is an array, `null` otherwise
 	 */
@@ -407,10 +407,10 @@ public class JsonArray: JsonNode
 	{
 		return get(index) as JsonArray;
 	}
-	
+
 	/**
 	 * Gets a JSON object at given index
-	 * 
+	 *
 	 * @param index    the index of the node to get
 	 * @return a {@link JsonObject} if the node is found and is an object, `null` otherwise
 	 */
@@ -418,10 +418,10 @@ public class JsonArray: JsonNode
 	{
 		return get(index) as JsonObject;
 	}
-	
+
 	/**
 	 * Returns content as a boolean array
-	 * 
+	 *
 	 * @param result    the resulting boolean array
 	 * @return `true` if all array members are of type {@link JsonValueType.BOOLEAN} and thus `result` is valid,
 	 *     `false` otherwise
@@ -442,10 +442,10 @@ public class JsonArray: JsonNode
 		result = (owned) array;
 		return true;
 	}
-	
+
 	/**
 	 * Returns content as an integer array
-	 * 
+	 *
 	 * @param result    the resulting integer array
 	 * @return `true` if all array members are of type {@link JsonValueType.INTEGER} and thus `result` is valid,
 	 *     `false` otherwise
@@ -466,10 +466,10 @@ public class JsonArray: JsonNode
 		result = (owned) array;
 		return true;
 	}
-	
+
 	/**
 	 * Returns content as a double array
-	 * 
+	 *
 	 * @param result    the resulting double array
 	 * @return `true` if all array members are of type {@link JsonValueType.DOUBLE} and thus `result` is valid,
 	 *     `false` otherwise
@@ -490,10 +490,10 @@ public class JsonArray: JsonNode
 		result = (owned) array;
 		return true;
 	}
-	
+
 	/**
 	 * Returns content as a string array
-	 * 
+	 *
 	 * @param result    the resulting string array
 	 * @return `true` if all array members are of type {@link JsonValueType.STRING} and thus `result` is valid,
 	 *     `false` otherwise
@@ -514,46 +514,46 @@ public class JsonArray: JsonNode
 		result = (owned) array;
 		return true;
 	}
-	
+
 	/**
 	 * Return string representation of the node.
-	 * 
+	 *
 	 * A convenience alias for `dump(null, false, 0). See {@link dump},
-	 * 
+	 *
 	 * @return a string representation of the node
 	 */
 	public override string to_string()
 	{
 		return dump(null, false, 0);
 	}
-	
+
 	/**
 	 * Return a pretty string representation of the node.
-	 * 
+	 *
 	 * A convenience alias for `dump("    ", false, 0). See {@link dump},
-	 * 
+	 *
 	 * @return a string representation of the node
 	 */
 	public string to_pretty_string()
 	{
 		return dump("    ", false, 0);
 	}
-	
+
 	/**
 	 * Return a compact string representation of the node.
-	 * 
+	 *
 	 * A convenience alias for `dump(null, true, 0). See {@link dump},
-	 * 
+	 *
 	 * @return a string representation of the node
 	 */
 	public string to_compact_string()
 	{
 		return dump(null, true, 0);
 	}
-	
+
 	/**
 	 * Return a string representation of the node.
-	 * 
+	 *
 	 * @param indent     A string to indent lines. If empty or null, no new lines and no indentation is used.
 	 * @param compact    If `true`, no space after a comma or a colon is added.
 	 * @param level      An initial indentation level.
@@ -565,10 +565,10 @@ public class JsonArray: JsonNode
 		dump_to_buffer(buffer, indent, compact, level);
 		return buffer.str;
 	}
-	
+
 	/**
 	 * Create a string representation of the node.
-	 * 
+	 *
 	 * @param buffer     A bufer to dump the string representation to.
 	 * @param indent     A string to indent lines. If empty or null, no new lines and no indentation is used.
 	 * @param compact    If `true`, no space after a comma or a colon is added.
@@ -587,7 +587,7 @@ public class JsonArray: JsonNode
 			if (nl)
 				for (var j = 0; j <= level; j++)
 					buffer.append(indent);
-			
+
 			unowned JsonNode node = nodes.data[i];
 			if (node is JsonArray)
 				((JsonArray) node).dump_to_buffer(buffer, indent, compact, level + 1);

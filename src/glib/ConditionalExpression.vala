@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,20 +43,20 @@ public errordomain ConditionalExpressionError
 
 /**
  * Parser and evaluator of simple conditional expressions.
- * 
+ *
  * Grammar:
- * 
+ *
  *  result := expr [op expr]*
  *  op := "and" | "or"
- *  expr :=  ["(" ] bool [op bool]* [")"]  
- *  bool := [not] call 
+ *  expr :=  ["(" ] bool [op bool]* [")"]
+ *  bool := [not] call
  *  call :=  ident [parameters]
  *  ident := "\\w"
  *  parameters := "\\[.*?\\]"
- * 
- * Example: "webkitgtk[2.15.3] and codec[mp3] and codec[h264] and mse" 
- */ 
- 
+ *
+ * Example: "webkitgtk[2.15.3] and codec[mp3] and codec[h264] and mse"
+ */
+
 public class ConditionalExpression
 {
     [Description(nick = "Conditional expression", blurb = "A data string containing conditional expression.")]
@@ -71,10 +71,10 @@ public class ConditionalExpression
     private int len;
     private Regex patterns;
     private int peeked_token_len;
-    
+
     /**
      * Creates new simple conditional expression parser and evaluator.
-     * It can be reused for more calls of {@link eval}. 
+     * It can be reused for more calls of {@link eval}.
      */
     public ConditionalExpression()
     {
@@ -94,13 +94,13 @@ public class ConditionalExpression
             error("Failed to compile regex patterns. %s", e.message);
         }
     }
-    
+
     /**
      * Print the parser expression with the given position marked.
-     * 
+     *
      * @param start    The position to mark.
      * @param len      The size of the mark.
-     * @return marked string 
+     * @return marked string
      */
     public string mark_pos(int start, int len=1)
     {
@@ -117,10 +117,10 @@ public class ConditionalExpression
         buf.append_c('\n');
         return buf.str;
     }
-    
+
     /**
      * Evaluate expression
-     * 
+     *
      * @param expression    The conditional expression to parse and evaluate.
      * @return the result of the expression evaluation.
      * @throws ConditionalExpressionError on failure
@@ -140,7 +140,7 @@ public class ConditionalExpression
         else
             return result;
     }
-    
+
     /**
      * Returns true if there has been an error.
      */
@@ -148,10 +148,10 @@ public class ConditionalExpression
     {
         return error_pos >= 0;
     }
-    
+
     /**
      * Perform an identifier call
-     * 
+     *
      * @param pos       the position of the identifier
      * @param ident     the name of the identifier
      * @param parameters    the parameters
@@ -163,19 +163,19 @@ public class ConditionalExpression
             set_eval_error(pos, "Parameteres are not supported.");
         return parameters == null && ident != "false";
     }
-    
+
     /**
      * Reset the inner state before parsing and evaluation of a new expression.
      */
     protected virtual void reset()
     {
 	}
-    
+
     /**
      * Set parse error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -190,12 +190,12 @@ public class ConditionalExpression
         }
         return false;
     }
-    
+
     /**
      * Set syntax error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -210,12 +210,12 @@ public class ConditionalExpression
         }
         return false;
     }
-    
+
     /**
      * Set evaluation error
-     * 
+     *
      * No identifier calls are evaluated when error is set.
-     * 
+     *
      * @param pos     the position of the error
      * @param text    the text of the error
      * @param ...     Printf parameters
@@ -230,14 +230,14 @@ public class ConditionalExpression
         }
         return false;
     }
-    
+
     private void set_error(ConditionalExpressionError err, int pos, string text)
     {
         error_object = err;
         error_pos = pos;
         error_text = text;
     }
-    
+
     private bool wrong_token(int pos, Toks found, string? expected)
     {
         switch (found)
@@ -254,7 +254,7 @@ public class ConditionalExpression
         }
         return false;
     }
-    
+
     private bool next(out Toks tok, out string? val, out int position)
     {
         if (peek(out tok, out val, out position))
@@ -262,7 +262,7 @@ public class ConditionalExpression
         else
             return false;
     }
-    
+
     private bool skip()
     {
         if (peeked_token_len >= 0)
@@ -273,7 +273,7 @@ public class ConditionalExpression
         }
         return next(null, null, null);
     }
-    
+
     private bool peek(out Toks tok, out string? val, out int position)
     {
         val = null;
@@ -316,7 +316,7 @@ public class ConditionalExpression
         tok = Toks.EOF;
         return false;
     }
-    
+
     private bool parse_block(Toks end_tok)
     {
         var result = parse_expr(Toks.EOF);
@@ -329,7 +329,7 @@ public class ConditionalExpression
         else
             return wrong_token(pos, tok, end_tok.to_str() + " token");
     }
-        
+
     private bool parse_expr(Toks bind)
     {
         Toks tok = Toks.NONE;
@@ -351,13 +351,13 @@ public class ConditionalExpression
             lvalue = parse_block(Toks.RPAREN);
             break;
         }
-        
+
         while (true)
         {
             peek(out tok, out val, null);
             if (tok > bind)
                 return lvalue;
-            
+
             switch (tok)
             {
             default:
@@ -373,7 +373,7 @@ public class ConditionalExpression
             }
         }
     }
-    
+
     private bool parse_ident(int pos, string ident)
     {
         Toks tok = Toks.NONE;
@@ -390,31 +390,31 @@ public class ConditionalExpression
         }
         return parse_call(pos, ident, null);
     }
-    
+
     private bool parse_call(int pos, string ident, string? parameters)
     {
         if (is_error_set())
             return false;
         return call(pos, ident, parameters);
     }
-    
+
     private bool parse_and(bool lvalue)
     {
         var rvalue = parse_expr(Toks.AND);
         return lvalue && rvalue;
     }
-    
+
     private bool parse_or(bool lvalue)
     {
         var rvalue = parse_expr(Toks.OR);
         return lvalue || rvalue;
     }
-    
+
     private bool parse_not()
     {
         return !parse_expr(Toks.NOT);
     }
-    
+
     private enum Toks
     {
         NONE,
@@ -427,7 +427,7 @@ public class ConditionalExpression
         LPAREN,
         RPAREN,
         EOF;
-        
+
         public string to_str()
         {
             return to_string().substring(Toks.NONE.to_string().length - 4);

@@ -2,14 +2,14 @@
  * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,10 +29,10 @@ namespace Drt {
  */
 public class RpcNotification : RpcCallable {
 	private SList<RpcConnection> subscribers = null;
-	
+
 	/**
 	 * Creates new Rpcnotification handler
-	 * 
+	 *
 	 * @param path           Notification path.
 	 * @param flags          Notification flags.
 	 * @param description    Notification description for API index.
@@ -42,10 +42,10 @@ public class RpcNotification : RpcCallable {
 		this.flags = flags;
 		this.description = description;
 	}
-	
+
 	/**
 	 * Parse raw data of (un)subscribe request.
-	 * 
+	 *
 	 * @param path         Request path.
 	 * @param data         Raw request data.
 	 * @param subscribe    Whether to subscribe or unsubscribe.
@@ -90,19 +90,19 @@ public class RpcNotification : RpcCallable {
 		} else {
 			if (data.get_type_string() != "(a{smv})")
 			Rpc.check_type_string(data, "a{smv}");
-			
+
 			var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
 			var entry = unbox_variant(dict.lookup_value("subscribe", null));
 			if (entry == null)
 				throw new ApiError.INVALID_PARAMS(
 						"Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
 						path);
-			
+
 			if (!variant_bool(entry, ref subscribe))
 				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
 					path, entry.get_type_string());
-			
+
 			entry = unbox_variant(dict.lookup_value("detail", null));
 			if (entry != null && !variant_string(entry, out detail))
 				throw new ApiError.INVALID_PARAMS(
@@ -110,10 +110,10 @@ public class RpcNotification : RpcCallable {
 					path, entry.get_type_string());
 		}
 	}
-	
+
 	/**
 	 * Parse raw data of notification.
-	 * 
+	 *
 	 * @param data         Raw notification data.
 	 * @param detail       Unused, reserved for future.
 	 * @param parameters       Notification parameters
@@ -161,10 +161,10 @@ public class RpcNotification : RpcCallable {
 			parameters = unbox_variant(dict.lookup_value("params", null));
 		}
 	}
-	
+
 	/**
 	 * Subscribe or unsubscribe from notification.
-	 * 
+	 *
 	 * @param conn      RpcConnection to (un)subscribe.
 	 * @param detail    Unused, reserved for future.
 	 * @throws GLib.Error on failure.
@@ -176,10 +176,10 @@ public class RpcNotification : RpcCallable {
 			subscribers.remove(conn);
 		}
 	}
-	
+
 	/**
 	 * Emit notification.
-	 * 
+	 *
 	 * @param detail    Unused, reserved for future.
 	 * @param data      Notification body.
 	 * @return true if there have been no errors.
@@ -196,7 +196,7 @@ public class RpcNotification : RpcCallable {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Run callable object with data from RPC request.
 	 * @param conn    Request connection.

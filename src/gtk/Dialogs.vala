@@ -2,14 +2,14 @@
  * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,10 +31,10 @@ namespace Drtgtk
  */
 public class ErrorDialog : Gtk.MessageDialog
 {
-	
+
 	/**
 	 * Constructs new error dialog.
-	 * 
+	 *
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
 	 * @param use_markup true if message uses Pango markup
@@ -51,7 +51,7 @@ public class ErrorDialog : Gtk.MessageDialog
 		this.text = title;
 		this.secondary_text = message;
 	}
-	
+
 	public override void response(int id)
 	{
 		this.destroy();
@@ -63,10 +63,10 @@ public class ErrorDialog : Gtk.MessageDialog
  */
 public class ConfirmDialog : Gtk.MessageDialog
 {
-	
+
 	/**
 	 * Constructs new error dialog.
-	 * 
+	 *
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
 	 * @param use_markup true if message uses Pango markup
@@ -83,7 +83,7 @@ public class ConfirmDialog : Gtk.MessageDialog
 		this.text = title;
 		this.secondary_text = message;
 	}
-	
+
 	public override void response(int id)
 	{
 		this.destroy();
@@ -95,10 +95,10 @@ public class ConfirmDialog : Gtk.MessageDialog
  */
 public class InfoDialog : Gtk.MessageDialog
 {
-	
+
 	/**
 	 * Constructs new error dialog.
-	 * 
+	 *
 	 * @param title Title of the error message (not title of the dialog)
 	 * @param message Text of the error message
 	 * @param use_markup true if message uses Pango markup
@@ -115,7 +115,7 @@ public class InfoDialog : Gtk.MessageDialog
 		this.text = title;
 		this.secondary_text = message;
 	}
-	
+
 	public override void response(int id)
 	{
 		this.destroy();

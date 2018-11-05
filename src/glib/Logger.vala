@@ -2,14 +2,14 @@
  * Copyright 2011-2014 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,7 +37,7 @@ public class Logger
 	private static string? hint;
 	private static DateTime? time_ref;
 	private static PatternSpec? fatal_string;
-	
+
 	public const int COLOR_FOREGROUND = 30;
 	public const int COLOR_BACKGROUND = 40;
 	public const int COLOR_BLACK = 0;
@@ -48,16 +48,16 @@ public class Logger
 	public const int COLOR_MAGENTA = 5;
 	public const int COLOR_CYAN = 6;
 	public const int COLOR_WHITE = 7;
-	
-	
+
+
 	public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
 	{
 		init(stderr, display_level, time, hint);
 	}
-	
+
 	/**
 	 * Initializes new logger for GLib
-	 * 
+	 *
 	 * @param output           output to write logger messages to (e. g. sys.stderr)
 	 * @param display_level    lowest log level to log
 	 */
@@ -81,24 +81,24 @@ public class Logger
 			// For subprocesses (they might have redirected output)
 			Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
 		}
-		
+
 		time_ref = time ? new DateTime.now_local() : null;
-		
+
 		var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
 		if (fatal_string != null && fatal_string[0] != '\0')
 			Logger.fatal_string = new PatternSpec(fatal_string);
-		
+
 		GLib.Log.set_default_handler(Logger.log_handler);
 	}
-	
+
 	public static bool colors_supported()
 	{
 		return Posix.isatty(output.fileno());
 	}
-	
+
 	/**
 	 * Prints message to log without any hint
-	 * 
+	 *
 	 * @param format    message format
 	 */
 	[PrintfFormat]
@@ -110,10 +110,10 @@ public class Logger
 			output.flush();
 		}
 	}
-	
+
 	/**
 	 * Prints line to log without any hint
-	 * 
+	 *
 	 * @param line    line to log
 	 */
 	public static void puts(string line)
@@ -124,10 +124,10 @@ public class Logger
 			output.flush();
 		}
 	}
-	
+
 	/**
 	 * Prints message to log with hint if specified
-	 * 
+	 *
 	 * @param format    message format
 	 */
 	[PrintfFormat]
@@ -140,15 +140,15 @@ public class Logger
 				output.puts(hint);
 				output.putc(' ');
 			}
-			
+
 			output.vprintf(format, va_list());
 			output.flush();
 		}
 	}
-	
+
 	/**
 	 * Prints line to log with hint if specified
-	 * 
+	 *
 	 * @param line    line to log
 	 */
 	public static void log(string line)
@@ -160,20 +160,20 @@ public class Logger
 				output.puts(hint);
 				output.putc(' ');
 			}
-			
+
 			output.puts(line);
 			output.flush();
 		}
 	}
-	
+
 	private static void log_handler(string? domain, LogLevelFlags level, string message)
 	{
 		var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
 		if (!is_fatal_string && level > Logger.display_level)
 			return;
-		
+
 		print(domain ?? "<unknown>", level, message);
-		
+
 		switch ((int)level)
 		{
 		case LogLevelFlags.LEVEL_ERROR:
@@ -184,14 +184,14 @@ public class Logger
 			print(domain ?? "<unknown>", level, "Application will not function properly.");
 			break;
 		}
-		
+
 		if (is_fatal_string)
 		{
 			print(domain ?? "<unknown>", LogLevelFlags.LEVEL_ERROR, "Will abort because of fatal string match.");
 			Process.abort();
 		}
 	}
-	
+
 	private static void print(string domain, LogLevelFlags level, string message)
 	{
 		string name = "";
@@ -233,9 +233,9 @@ public class Logger
 			name = "Unknown";
 			break;
 		}
-		
+
 		var hint = Logger.hint ?? "";
-			
+
 		lock (output)
 		{
 			if (time_ref != null)

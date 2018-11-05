@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 #if FIXME
@@ -27,7 +27,7 @@ public class KeyValueProxyTest: KeyValueStorageTest
 	private KeyValueTree tree;
 	private KeyValueStorageClient storage_client;
 	private KeyValueStorageServer storage_server;
-	
+
 	public override void set_up()
 	{
 		tree = new KeyValueTree();
@@ -57,7 +57,7 @@ public class KeyValueProxyTest: KeyValueStorageTest
 		var proxy = storage_client.get_proxy("tree", 15);
 		storage = proxy;
 	}
-	
+
 	public override void tear_down()
 	{
 		tree = null;

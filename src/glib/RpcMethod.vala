@@ -2,14 +2,14 @@
  * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,10 +30,10 @@ namespace Drt {
 public class RpcMethod : RpcCallable {
 	public RpcParam[]? params {get; protected set;}
 	private RpcHandler handler;
-	
+
 	/**
 	 * Create new RPC method.
-	 * 
+	 *
 	 * @param path    Method path.
 	 * @param flags   Method flags.
 	 * @param parameters    The specification of method parameters.
@@ -48,7 +48,7 @@ public class RpcMethod : RpcCallable {
 		this.handler = (owned) handler;
 		this.description = description;
 	}
-	
+
 	/**
 	 * Run callable object with data from RPC request.
 	 * @param conn    Request connection.
@@ -59,13 +59,13 @@ public class RpcMethod : RpcCallable {
 	public override void run(RpcConnection conn, uint id, Variant? data) throws GLib.Error {
 		Variant?[] handler_params = null;
 		if (params != null && params.length > 0) {
-			
+
 			if (data == null) {
 				throw new ApiError.INVALID_PARAMS(
 					"Method '%s' requires %d parameters but no parameters have been provided.",
 					path, params.length);
 			}
-			
+
 			var params_type = Rpc.get_params_type(data);
 			var data_type = data.get_type();
 			if (params_type == "tuple") {
@@ -79,7 +79,7 @@ public class RpcMethod : RpcCallable {
 						"Method '%s' requires %d parameters but %d parameters have been provided.",
 						path, params.length, (int) data.n_children());
 				}
-						
+
 				handler_params = new Variant?[params.length];
 				for (var i = 0; i < params.length; i++) {
 					var param = params[i];
@@ -100,7 +100,7 @@ public class RpcMethod : RpcCallable {
 							"Method '%s' requires the '%s' parameter of type '%s', but it has been omitted.",
 							path, param.name, param.type_string);
 					}
-					
+
 					if (entry == null) {
 						entry = param.default_value;
 					}

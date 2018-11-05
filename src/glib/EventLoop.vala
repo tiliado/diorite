@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,10 +46,10 @@ public async void sleep(uint interval_ms) {
 
 /**
  * Attach an idle callback to the thread-default {@link GLib.MainContext}.
- * 
+ *
  * Similar to {@link GLib.Idle.add} but uses the thread-default {@link GLib.MainContext} instead of the global
  * {@link GLib.MainContext} if context is not specified.
- * 
+ *
  * @param function    The idle callback function.
  * @param priority    The priority of the callback.
  * @param context        The context to use instead of the thread-default one.
@@ -65,10 +65,10 @@ MainContext? context=null) {
 
 /**
  * Attach a timeout callback to the thread-default {@link GLib.MainContext}.
- * 
+ *
  * Similar to {@link GLib.Timeout.add} but uses the thread-default {@link GLib.MainContext} instead of the global
  * {@link GLib.MainContext} if context is not specified.
- * 
+ *
  * @param interval_ms    The number of miliseconds to wait before the callback is called.
  * @param function       The callback function.
  * @param priority       The priority of the callback.
@@ -85,10 +85,10 @@ MainContext? context=null) {
 
 /**
  * Attach a timeout callback to the thread-default {@link GLib.MainContext}.
- * 
+ *
  * Similar to {@link GLib.Timeout.add_seconds} but uses the thread-default {@link GLib.MainContext} instead
  * of the global {@link GLib.MainContext} if context is not specified.
- * 
+ *
  * @param interval_s    The number of seconds to wait before the callback is called.
  * @param function      The callback function.
  * @param priority      The priority of the callback.

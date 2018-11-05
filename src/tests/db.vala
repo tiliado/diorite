@@ -1,4 +1,4 @@
-/* 
+/*
  * Author: Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * To the extent possible under law, author has waived all
@@ -15,7 +15,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Tests are under public domain because they might contain useful sample code.
  */
 
@@ -45,7 +45,7 @@ private class User : GLib.Object
 	public bool alive {get; construct set;}
 	public ByteArray? extra {get; construct set;}
 	public int not_in_db {get; set; default = 1024;}
-	
+
 	public User(int64 id, string name, int age, double height, bool alive)
 	{
 		GLib.Object(id: id);
@@ -54,7 +54,7 @@ private class User : GLib.Object
 		this.height = height;
 		this.alive = alive;
 	}
-	
+
 	public static string[] all_props()
 	{
 		return {"id", "name", "age", "height", "alive", "blob", "extra"};
@@ -71,7 +71,7 @@ private class SimpleUser
 	public bool alive {get; set;}
 	public ByteArray? extra {get; set;}
 	public int not_in_db {get; set; default = 1024;}
-	
+
 	public SimpleUser(int64 id, string name, int age, double height, bool alive)
 	{
 		this.id = id;

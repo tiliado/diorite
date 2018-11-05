@@ -2,14 +2,14 @@
  * Copyright 2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,19 +36,19 @@ public class JsonBuilder
 	private JsonObject? object = null;
 	private JsonArray? array = null;
 	private string? member = null;
-	
+
 	/**
 	 * Creates a new empty JsonBuilder object
 	 */
 	public JsonBuilder()
 	{
 	}
-	
+
 	/**
 	 * Start a new object at the current context
-	 * 
+	 *
 	 * Calls of {@link begin_object} and {@link end_object} must match.
-	 * 
+	 *
 	 * @return this JsonBuilder object for easier chaining
 	 */
 	public unowned JsonBuilder begin_object()
@@ -58,13 +58,13 @@ public class JsonBuilder
 			set_cursor(new_object);
 		return this;
 	}
-	
+
 	/**
 	 * Close an object at current cursor.
-	 * 
+	 *
 	 * Cannot be called anfter {@link set_member}.
 	 * Calls of {@link begin_object} and {@link end_object} must match.
-	 * 
+	 *
 	 * @return this JsonBuilder object for easier chaining
 	 */
 	public unowned JsonBuilder end_object()
@@ -77,12 +77,12 @@ public class JsonBuilder
 			set_cursor(object.parent);
 		return this;
 	}
-	
+
 	/**
 	 * Start a new array at the current context
-	 * 
+	 *
 	 * Calls of {@link begin_array} and {@link end_array} must match.
-	 * 
+	 *
 	 * @return this JsonBuilder object for easier chaining
 	 */
 	public unowned JsonBuilder begin_array()
@@ -92,12 +92,12 @@ public class JsonBuilder
 			set_cursor(new_array);
 		return this;
 	}
-	
+
 	/**
 	 * Close an array at current cursor.
-	 * 
+	 *
 	 * Calls of {@link begin_array} and {@link end_array} must match.
-	 * 
+	 *
 	 * @return this JsonBuilder object for easier chaining
 	 */
 	public unowned JsonBuilder end_array()
@@ -108,12 +108,12 @@ public class JsonBuilder
 			set_cursor(array.parent);
 		return this;
 	}
-	
+
 	/**
 	 * Set member name of an object.
-	 * 
+	 *
 	 * If called inside an object, sets the name of the member to be added next.
-	 * 
+	 *
 	 * @param name    the member name
 	 * @return this JsonBuilder object for easier chaining
 	 */
@@ -125,10 +125,10 @@ public class JsonBuilder
 			member = name;
 		return this;
 	}
-	
+
 	/**
 	 * Add a new node to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new node to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new node as the member.
@@ -141,10 +141,10 @@ public class JsonBuilder
 		try_add(node);
 		return this;
 	}
-	
+
 	/**
 	 * Add a new boolean value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new boolean value to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new boolean value as the member.
@@ -156,10 +156,10 @@ public class JsonBuilder
 	{
 		return add(new JsonValue.@bool(bool_value));
 	}
-	
+
 	/**
 	 * Add a new integer value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new integer value to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new integer value as the member.
@@ -170,11 +170,11 @@ public class JsonBuilder
 	public unowned JsonBuilder add_int(int int_value)
 	{
 		return add(new JsonValue.@int(int_value));
-	}	
-	
+	}
+
 	/**
 	 * Add a new double value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new double value to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new double value as the member.
@@ -185,11 +185,11 @@ public class JsonBuilder
 	public unowned JsonBuilder add_double(double double_value)
 	{
 		return add(new JsonValue.@double(double_value));
-	}	
-	
+	}
+
 	/**
 	 * Add a new string value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new string value to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new string value as the member.
@@ -201,10 +201,10 @@ public class JsonBuilder
 	{
 		return add(new JsonValue.@string(string_value));
 	}
-	
+
 	/**
 	 * Add a new formatted string value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new string value to the end of it.
 	 * If it is called inside and object after the member name has been set,
 	 * sets a new string value as the member.
@@ -218,10 +218,10 @@ public class JsonBuilder
 	{
 		return add(new JsonValue.@string(format.vprintf(va_list())));
 	}
-	
+
 	/**
 	 * Add `null` value to an array or object.
-	 * 
+	 *
 	 * If it is called inside an array, appends a new `null` value to the end of it.
 	 * If it is called inside and object after the member name has been set, sets `null` as the member.
 	 *
@@ -231,10 +231,10 @@ public class JsonBuilder
 	{
 		return add(new JsonValue.@null());
 	}
-	
+
 	/**
 	 * Add a new member to an object.
-	 * 
+	 *
 	 * @param node    the node to add
 	 * @return this JsonBuilder object for easier chaining
 	 */
@@ -244,10 +244,10 @@ public class JsonBuilder
 		try_add(node);
 		return this;
 	}
-	
+
 	/**
 	 * Add a new boolean value member to an object.
-	 * 
+	 *
 	 * @param member_name    the name of a member to add
 	 * @param bool_value     the boolean value to add
 	 * @return this JsonBuilder object for easier chaining
@@ -257,10 +257,10 @@ public class JsonBuilder
 		set_member(member_name);
 		return add(new JsonValue.@bool(bool_value));
 	}
-	
+
 	/**
 	 * Add a new integer value member to an object.
-	 * 
+	 *
 	 * @param member_name    the name of a member to add
 	 * @param int_value      the integer value to add
 	 * @return this JsonBuilder object for easier chaining
@@ -269,11 +269,11 @@ public class JsonBuilder
 	{
 		set_member(member_name);
 		return add(new JsonValue.@int(int_value));
-	}	
-	
+	}
+
 	/**
 	 * Add a new double value member to an object.
-	 * 
+	 *
 	 * @param member_name     the name of a member to add
 	 * @param double_value    the double value to add
 	 * @return this JsonBuilder object for easier chaining
@@ -282,11 +282,11 @@ public class JsonBuilder
 	{
 		set_member(member_name);
 		return add(new JsonValue.@double(double_value));
-	}	
-	
+	}
+
 	/**
 	 * Add a new string value member to an object.
-	 * 
+	 *
 	 * @param member_name     the name of a member to add
 	 * @param string_value    the string value to add
 	 * @return this JsonBuilder object for easier chaining
@@ -299,7 +299,7 @@ public class JsonBuilder
 
 	/**
 	 * Add a new string value member to an object.
-	 * 
+	 *
 	 * @param member_name     the name of a member to add
 	 * @param string_value    the string value to add, or null to add null
 	 * @return this JsonBuilder object for easier chaining
@@ -309,10 +309,10 @@ public class JsonBuilder
 		set_member(member_name);
 		return add(string_value != null ? new JsonValue.@string(string_value) : new JsonValue.@null());
 	}
-	
+
 	/**
 	 * Add a new formatted string value member to an object.
-	 * 
+	 *
 	 * @param member_name    the name of a member to add
 	 * @param format         the format string of the value to add
 	 * @param ...            Printf parameters
@@ -324,10 +324,10 @@ public class JsonBuilder
 		set_member(member_name);
 		return add(new JsonValue.@string(format.vprintf(va_list())));
 	}
-	
+
 	/**
 	 * Add `null` value member to an object.
-	 * 
+	 *
 	 * @param member_name    the name of a member to add
 	 * @return this JsonBuilder object for easier chaining
 	 */
@@ -336,7 +336,7 @@ public class JsonBuilder
 		set_member(member_name);
 		return add(new JsonValue.@null());
 	}
-	
+
 	/**
 	 * Reset the builder to the initial state
 	 */
@@ -348,10 +348,10 @@ public class JsonBuilder
 		array = null;
 		member = null;
 	}
-	
+
 	/**
 	 * Return string representation of the root node.
-	 * 
+	 *
 	 * @return a string representation of the root node
 	 */
 	public string to_string()
@@ -360,10 +360,10 @@ public class JsonBuilder
 			return "";
 		return root.to_string();
 	}
-	
+
 	/**
 	 * Return a pretty string representation of the root node.
-	 * 
+	 *
 	 * @return a string representation of the root node
 	 */
 	public string to_pretty_string()
@@ -378,10 +378,10 @@ public class JsonBuilder
 			return object.to_pretty_string();
 		return root.to_string();
 	}
-	
+
 	/**
 	 * Return a compact string representation of the root node.
-	 * 
+	 *
 	 * @return a string representation of the root node
 	 */
 	public string to_compact_string()
@@ -395,8 +395,8 @@ public class JsonBuilder
 		if (object != null)
 			return object.to_compact_string();
 		return root.to_string();
-	}	
-	
+	}
+
 	private bool try_add(JsonNode node)
 	{
 		if (root == null)
@@ -429,7 +429,7 @@ public class JsonBuilder
 		}
 		return true;
 	}
-	
+
 	private void set_cursor(JsonNode? node)
 	{
 		cursor = node;

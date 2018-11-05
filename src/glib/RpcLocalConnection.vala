@@ -2,14 +2,14 @@
  * Copyright 2016-2017 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,14 +31,14 @@ public class RpcLocalConnection: RpcConnection{
 	private static bool log_comunication;
 	private uint last_payload_id = 0;
 	private HashTable<void*, Response?> pending_requests;
-	
+
 	static construct {
 		log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_CHANNEL") == "yes";
 	}
-	
+
 	/**
 	 * Create new RpcLocalConnection.
-	 * 
+	 *
 	 * @param id    Channel id.
 	 * @param router    RpcRouter for requests to perform.
 	 * @param api_token    The token to sign requests.
@@ -47,10 +47,10 @@ public class RpcLocalConnection: RpcConnection{
 		GLib.Object(id: id, router: router ?? new RpcRouter(), api_token: api_token);
 		pending_requests = new HashTable<void*, Response?>(direct_hash, direct_equal);
 	}
-		
+
 	/**
 	 * Send remote request asynchronously (non-blocking) with additional options.
-	 * 
+	 *
 	 * @param method           Remote method name.
 	 * @param parameters       Remote method parameters.
 	 * @param allow_private    Allow calling private methods.
@@ -68,10 +68,10 @@ public class RpcLocalConnection: RpcConnection{
 		assert(ctx.is_owner());
 		return get_response(id);
 	}
-	
+
 	/**
 	 * Send remote request synchronously (blocking) with additional options..
-	 * 
+	 *
 	 * @param method        Remote method name.
 	 * @param parameters    Remote method parameters.
 	 * @param allow_private    Allow calling private methods.
@@ -88,10 +88,10 @@ public class RpcLocalConnection: RpcConnection{
 		loop.run();
 		return get_response(id);
 	}
-	
+
 	/**
 	 * Dispatch local request
-	 * 
+	 *
 	 * @param method      RPC method to call.
 	 * @param parameters  Method parameters.
 	 * @param callback    The callback to call when response is received.
@@ -129,10 +129,10 @@ public class RpcLocalConnection: RpcConnection{
 		}
 		return id;
 	}
-	
+
 	/**
 	 * Send a response to remote call.
-	 * 
+	 *
 	 * @param id          Request id.
 	 * @param response    The response.
 	 */
@@ -142,10 +142,10 @@ public class RpcLocalConnection: RpcConnection{
 		resp.response = response;
 		resp.schedule_callback();
 	}
-	
+
 	/**
 	 * Send an error to remote call.
-	 * 
+	 *
 	 * @param id    Request id.
 	 * @param e     The error.
 	 */
@@ -155,7 +155,7 @@ public class RpcLocalConnection: RpcConnection{
 		resp.error = e;
 		resp.schedule_callback();
 	}
-	
+
 	private string create_full_method_name(string name, bool allow_private, string flags,
 	string params_format) {
 		return "%s::%s%s,%s,%s".printf(
@@ -163,10 +163,10 @@ public class RpcLocalConnection: RpcConnection{
 			flags, params_format,
 			allow_private && api_token != null ? api_token : "");
 	}
-	
+
 	/**
 	 * Find response by id.
-	 * 
+	 *
 	 * @param id    Response id.
 	 * @return Response if it is found, null otherwise.
 	 */
@@ -177,10 +177,10 @@ public class RpcLocalConnection: RpcConnection{
 		}
 		return resp;
 	}
-	
+
 	/**
 	 * Get response by id and remove it from queue.
-	 * 
+	 *
 	 * @param id    Response id.
 	 * @return Data of the response if it is found.
 	 * @throws GLib.Error if the response has not been found or it ended with an error.
@@ -199,19 +199,19 @@ public class RpcLocalConnection: RpcConnection{
 			return resp.response;
 		}
 	}
-	
+
 	/**
 	 * Callback to be called when response is received.
 	 */
 	public delegate void ResumeCallback();
-	
+
 	private class Response {
 		public uint id;
 		public Variant? response = null;
 		public GLib.Error? error = null;
 		private ResumeCallback? callback = null;
 		private MainContext? ctx;
-		
+
 		public Response(uint id, owned ResumeCallback? callback, MainContext? ctx) {
 			this.id = id;
 			this.response = null;
@@ -219,12 +219,12 @@ public class RpcLocalConnection: RpcConnection{
 			this.ctx = ctx;
 			assert(callback == null || ctx != null);
 		}
-		
+
 		public void schedule_callback() {
 			assert(this.callback != null);
 			EventLoop.add_idle(idle_callback, Priority.HIGH_IDLE, ctx);
 		}
-		
+
 		private bool idle_callback() {
 			this.callback();
 			return false;
