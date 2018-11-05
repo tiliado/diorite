@@ -57,8 +57,9 @@ public class BluetoothConnection: GLib.Object, GLib.FileDescriptorBased {
 
     public void close() throws GLib.IOError {
         try {
-            if (!socket.is_closed())
-            socket.close();
+            if (!socket.is_closed()) {
+                socket.close();
+            }
         } catch (GLib.Error e) {
             throw ((GLib.IOError) e);
         }

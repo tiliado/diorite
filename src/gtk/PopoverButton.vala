@@ -36,8 +36,9 @@ public class PopoverButton : Gtk.Button {
      */
     public PopoverButton(string? label=null) {
         GLib.Object();
-        if (label != null)
-        this.label = label;
+        if (label != null) {
+            this.label = label;
+        }
     }
 
     construct {

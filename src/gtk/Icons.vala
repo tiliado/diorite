@@ -46,8 +46,9 @@ public static Gdk.Pixbuf? load_theme_icon(string[] names, int size) {
     foreach (var name in names) {
         try {
             var icon = Gtk.IconTheme.get_default().load_icon(name, size, 0);
-            if (icon != null)
-            return icon;
+            if (icon != null) {
+                return icon;
+            }
         } catch (GLib.Error e) {
             warning("Failed to load icon '%s': %s", name, e.message);
         }

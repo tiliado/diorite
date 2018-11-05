@@ -75,8 +75,9 @@ throws DatabaseError {
         properties_list = new (unowned ParamSpec)[properties.length];
         for (var i = 0; i < properties.length; i++) {
             properties_list[i] = class_spec.find_property(properties[i]);
-            if (properties_list[i] == null)
-            throw new DatabaseError.NAME("There is no property named '%s'.", properties[i]);
+            if (properties_list[i] == null) {
+                throw new DatabaseError.NAME("There is no property named '%s'.", properties[i]);
+            }
         }
     }
     return properties_list;
@@ -139,8 +140,9 @@ private inline bool is_sql_error(int result_code) {
  */
 private void throw_if_cancelled(Cancellable? cancellable, string? method=null, string? file=null, int line=0)
 throws IOError {
-    if (cancellable != null && cancellable.is_cancelled())
-    throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
+    if (cancellable != null && cancellable.is_cancelled()) {
+        throw new IOError.CANCELLED("Operation was cancelled in %s (%s:%d).", method, file, line);
+    }
 }
 
 /**

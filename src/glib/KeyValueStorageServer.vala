@@ -87,8 +87,9 @@ public class KeyValueStorageServer: GLib.Object {
 
     public bool add_listener(string provider_name, Drt.RpcConnection listener) {
         unowned Provider? provider = providers[provider_name];
-        if (provider == null)
-        return false;
+        if (provider == null) {
+            return false;
+        }
 
         provider.listeners.prepend(listener);
         return true;
@@ -96,8 +97,9 @@ public class KeyValueStorageServer: GLib.Object {
 
     public bool remove_listener(string provider_name, Drt.RpcConnection listener) {
         unowned Provider? provider = providers[provider_name];
-        if (provider == null)
-        return false;
+        if (provider == null) {
+            return false;
+        }
 
         provider.listeners.remove(listener);
         return true;
@@ -105,9 +107,10 @@ public class KeyValueStorageServer: GLib.Object {
 
     private unowned Provider get_provider(string name) throws RpcError {
         unowned Provider? provider = providers[name];
-        if (provider == null)
-        throw new RpcError.INVALID_REQUEST(
-            "No key-value storage provider named '%s' has been found.", name);
+        if (provider == null) {
+            throw new RpcError.INVALID_REQUEST(
+                "No key-value storage provider named '%s' has been found.", name);
+        }
         return provider;
     }
 
@@ -176,9 +179,10 @@ public class KeyValueStorageServer: GLib.Object {
                         new Variant("(ssmv)", name, key, old_value));
                     if (response == null
                     || !response.is_of_type(VariantType.BOOLEAN)
-                    || !response.get_boolean())
-                    warning("Invalid response to %s: %s", METHOD_CHANGED,
-                        response == null ? "null" : response.print(false));
+                    || !response.get_boolean()) {
+                        warning("Invalid response to %s: %s", METHOD_CHANGED,
+                            response == null ? "null" : response.print(false));
+                    }
                 } catch (GLib.Error e) {
                     critical("%s client error: %s", METHOD_CHANGED, e.message);
                 }

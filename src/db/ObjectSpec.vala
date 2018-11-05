@@ -42,12 +42,14 @@ public class ObjectSpec {
      * @throws DatabaseError if data type is invalid or primary key is not found
      */
     public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError {
-        if (!type.is_object())
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (!type.is_object()) {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
         var class_spec = (ObjectClass) type.class_ref();
         var primary_pspec = class_spec.find_property(primary_key);
-        if (primary_pspec == null)
-        throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
+        if (primary_pspec == null) {
+            throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
+        }
         this.with_pspecs(type, primary_pspec, create_param_spec_list(class_spec, properties));
     }
 
@@ -60,8 +62,9 @@ public class ObjectSpec {
      * @throws DatabaseError if data type is invalid or primary key is not found
      */
     public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError {
-        if (!type.is_object())
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (!type.is_object()) {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
         this.object_type = type;
         this.properties = properties;
         this.primary_key = primary_key;

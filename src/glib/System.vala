@@ -269,8 +269,9 @@ public int[] find_pid_by_basename(string basename) {
             if (pid > 0 && FileUtils.test(path, FileTest.IS_SYMLINK)) {
                 try {
                     var target = FileUtils.read_link(path);
-                    if (Path.get_basename(target) == basename)
-                    result += pid;
+                    if (Path.get_basename(target) == basename) {
+                        result += pid;
+                    }
                 } catch (FileError e) {
                     if (pid > 1) {
                         warning("readlink error: %s.", e.message);

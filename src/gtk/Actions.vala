@@ -52,8 +52,9 @@ public class Actions : GLib.Object {
 
     public static int append_from_menu_model(GLib.Menu menu, GLib.MenuModel model) {
         var size = model.get_n_items();
-        for (var i = 0; i < size; i++)
-        menu.append_item(new MenuItem.from_model(model, i));
+        for (var i = 0; i < size; i++) {
+            menu.append_item(new MenuItem.from_model(model, i));
+        }
         return size;
     }
 
@@ -62,8 +63,9 @@ public class Actions : GLib.Object {
     public signal void action_changed(Action action, ParamSpec p);
 
     public void add_actions(Action[] actions) {
-        foreach (var action in actions)
-        add_action(action);
+        foreach (var action in actions) {
+            add_action(action);
+        }
     }
 
     public void add_action(Action action, bool prepend=false) {
@@ -86,8 +88,9 @@ public class Actions : GLib.Object {
                 GLib.Action.print_detailed_name(action.scope + "." + action.name, null), {keybinding});
         }
         action.notify.connect_after(on_action_changed);
-        if (action.scope == Action.SCOPE_APP)
-        action.add_to_map(app);
+        if (action.scope == Action.SCOPE_APP) {
+            action.add_to_map(app);
+        }
 
         action_added(action);
     }
@@ -95,8 +98,9 @@ public class Actions : GLib.Object {
     public void remove_action(Action action) {
         var group_name = action.group;
         GenericArray<Action?>? group = groups[group_name];
-        if (group != null)
-        group.remove(action);
+        if (group != null) {
+            group.remove(action);
+        }
 
         if (actions.remove(action.name)) {
             action.activated.disconnect(on_action_activated);
@@ -107,8 +111,9 @@ public class Actions : GLib.Object {
 
     public bool activate_action(string name, Variant? param=null) {
         var action = get_action(name);
-        if (action == null)
-        return false;
+        if (action == null) {
+            return false;
+        }
         action.activate(param);
         return true;
     }
@@ -140,8 +145,9 @@ public class Actions : GLib.Object {
         string? detailed_name = null;
         Action? action = null;
         RadioOption? option = null;
-        if (!find_and_parse_action(action_name, out detailed_name, out action, out option))
-        return null;
+        if (!find_and_parse_action(action_name, out detailed_name, out action, out option)) {
+            return null;
+        }
 
         string? label;
         string? icon;
@@ -157,8 +163,9 @@ public class Actions : GLib.Object {
         var item = new MenuItem(label, action.scope + "." + detailed_name);
         item.set_attribute_value(ATTRIBUTE_ITEM_ID, action_name);
         if (use_icons) {
-            if (icon != null)
-            item.set_icon(new ThemedIcon(icon));
+            if (icon != null) {
+                item.set_icon(new ThemedIcon(icon));
+            }
         }
         return item;
     }
@@ -172,14 +179,16 @@ public class Actions : GLib.Object {
     public void append_to_menu(Menu menu, string[] actions, bool use_mnemonic=true, bool use_icons=true) {
         foreach (var full_name in actions) {
             // TODO: Support separators in build_menu()
-            if (full_name == "|")
-            continue;
+            if (full_name == "|") {
+                continue;
+            }
 
             var item = create_menu_item(full_name, use_mnemonic, use_icons);
-            if (item != null)
-            menu.append_item(item);
-            else
-            warning("Action '%s' not found in registry.", full_name);
+            if (item != null) {
+                menu.append_item(item);
+            } else {
+                warning("Action '%s' not found in registry.", full_name);
+            }
         }
     }
 
@@ -190,13 +199,15 @@ public class Actions : GLib.Object {
         int option_index = -1;
         string name = Actions.parse_full_name(full_name, out option_index);
         action = this.actions.get(name);
-        if (action == null)
-        return false;
+        if (action == null) {
+            return false;
+        }
 
         if (option_index >= 0) {
             var radio = action as RadioAction;
-            if (radio == null)
-            return false;
+            if (radio == null) {
+                return false;
+            }
 
             option = radio.get_option(option_index);
             detailed_name = GLib.Action.print_detailed_name(name, option.parameter);
@@ -279,8 +290,9 @@ public class Actions : GLib.Object {
 
                 var button = new Gtk.ToolButton(null, label);
                 button.set_action_name(action.scope + "." + detailed_name);
-                if (icon != null)
-                button.set_icon_name(icon);
+                if (icon != null) {
+                    button.set_icon_name(icon);
+                }
                 t.add(button);
             }
         }
@@ -288,16 +300,19 @@ public class Actions : GLib.Object {
     }
 
     public void add_to_map_by_scope(string scope, ActionMap map) {
-        foreach (var action in actions.get_values())
-        if (action.scope == scope)
-        action.add_to_map(map);
+        foreach (var action in actions.get_values()) {
+            if (action.scope == scope) {
+                action.add_to_map(map);
+            }
+        }
     }
 
     public void add_to_map_by_name(string[] names, ActionMap map) {
         foreach (var name in names) {
             var action = actions.get(name);
-            if (action != null)
-            action.add_to_map(map);
+            if (action != null) {
+                action.add_to_map(map);
+            }
         }
     }
 
@@ -326,10 +341,11 @@ public class Actions : GLib.Object {
                 Gdk.ModifierType mods = 0;
                 if (keybinding != null) {
                     Gtk.accelerator_parse(keybinding, out key, out mods);
-                    if (key == 0)
-                    warning("Failed to parse accelerator: '%s'\n", keybinding);
-                    else
-                    Gtk.AccelMap.change_entry(accel_name, key, mods, true);
+                    if (key == 0) {
+                        warning("Failed to parse accelerator: '%s'\n", keybinding);
+                    } else {
+                        Gtk.AccelMap.change_entry(accel_name, key, mods, true);
+                    }
                 } else {
                     Gtk.AccelMap.change_entry(accel_name, key, mods, true);
                 }

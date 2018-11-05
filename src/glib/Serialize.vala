@@ -52,8 +52,9 @@ public bool serialize_variant(Variant variant, uint8[] buffer, uint offset=0) {
 public uint8[] serialize_message(string name, Variant? parameters, uint offset=0) {
     string type_str = parameters != null ? parameters.get_type_string() : "";
     uint variant_offset = (uint) (offset + name.length + 1 + type_str.length + 1);
-    if (variant_offset % SERIALIZE_ALIGN != 0)
-    variant_offset += SERIALIZE_ALIGN - (variant_offset % SERIALIZE_ALIGN);
+    if (variant_offset % SERIALIZE_ALIGN != 0) {
+        variant_offset += SERIALIZE_ALIGN - (variant_offset % SERIALIZE_ALIGN);
+    }
 
     uint32 buffer_size = (uint32) (variant_offset + (parameters != null ? parameters.get_size() : 0));
     uint8[] buffer = new uint8[buffer_size];
@@ -67,8 +68,9 @@ public uint8[] serialize_message(string name, Variant? parameters, uint offset=0
     Memory.copy(p + offset, (void*) type_str, size);
     offset += size;
 
-    if (parameters != null)
-    assert(serialize_variant(parameters, buffer, variant_offset));
+    if (parameters != null) {
+        assert(serialize_variant(parameters, buffer, variant_offset));
+    }
     return buffer;
 }
 
@@ -123,8 +125,9 @@ public bool deserialize_message(owned uint8[] buffer, out string name, out Varia
     string type_str = (string) Memory.dup(p, size);
     offset += size;
 
-    if (offset % SERIALIZE_ALIGN != 0)
-    offset += SERIALIZE_ALIGN - offset % SERIALIZE_ALIGN;
+    if (offset % SERIALIZE_ALIGN != 0) {
+        offset += SERIALIZE_ALIGN - offset % SERIALIZE_ALIGN;
+    }
 
     if (type_str != "") {
         parameters = deserialize_variant(type_str, (owned) buffer, offset);

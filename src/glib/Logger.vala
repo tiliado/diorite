@@ -76,8 +76,9 @@ public class Logger {
         time_ref = time ? new DateTime.now_local() : null;
 
         var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
-        if (fatal_string != null && fatal_string[0] != '\0')
-        Logger.fatal_string = new PatternSpec(fatal_string);
+        if (fatal_string != null && fatal_string[0] != '\0') {
+            Logger.fatal_string = new PatternSpec(fatal_string);
+        }
 
         GLib.Log.set_default_handler(Logger.log_handler);
     }
@@ -148,8 +149,9 @@ public class Logger {
 
     private static void log_handler(string? domain, LogLevelFlags level, string message) {
         var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
-        if (!is_fatal_string && level > Logger.display_level)
-        return;
+        if (!is_fatal_string && level > Logger.display_level) {
+            return;
+        }
 
         print(domain ?? "<unknown>", level, message);
 
@@ -237,10 +239,11 @@ public class Logger {
                 }
                 name += "%06dus".printf((int) diff);
             }
-            if (Logger.colorful && color >= 0)
-            output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
-            else
-            output.printf("%s[%-8s %5s] %s\n", hint, name, domain, message);
+            if (Logger.colorful && color >= 0) {
+                output.printf("%s\x1b[%dm[%-8s %5s]\x1b[0m %s\n", hint, COLOR_FOREGROUND + color, name, domain, message);
+            } else {
+                output.printf("%s[%-8s %5s] %s\n", hint, name, domain, message);
+            }
             output.flush();
         }
     }

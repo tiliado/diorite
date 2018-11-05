@@ -50,8 +50,9 @@ public class JsonParser {
      */
     public static JsonObject load_object(string? data) throws JsonError {
         var parser = new JsonParser(data);
-        if (parser.root == null || !(parser.root is JsonObject))
-        throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object.");
+        if (parser.root == null || !(parser.root is JsonObject)) {
+            throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object.");
+        }
         return (JsonObject) parser.root;
     }
 
@@ -64,8 +65,9 @@ public class JsonParser {
      */
     public static JsonArray load_array(string? data) throws JsonError {
         var parser = new JsonParser(data);
-        if (parser.root == null || !(parser.root is JsonArray))
-        throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript array.");
+        if (parser.root == null || !(parser.root is JsonArray)) {
+            throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript array.");
+        }
         return (JsonArray) parser.root;
     }
 
@@ -78,8 +80,9 @@ public class JsonParser {
      */
     public static JsonNode load(string? data) throws JsonError {
         var parser = new JsonParser(data);
-        if (parser.root == null || !(parser.root is JsonArray || parser.root is JsonObject))
-        throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object or array.");
+        if (parser.root == null || !(parser.root is JsonArray || parser.root is JsonObject)) {
+            throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object or array.");
+        }
         return parser.root;
     }
 
@@ -95,8 +98,9 @@ public class JsonParser {
      * @throws JsonError if data is empty or invalid
      */
     public JsonParser(string? data) throws JsonError {
-        if (data == null || data[0] == 0)
-        throw new JsonError.EMPTY_DATA("Data is empty.");
+        if (data == null || data[0] == 0) {
+            throw new JsonError.EMPTY_DATA("Data is empty.");
+        }
         this.data = data;
         this.data_end = this.data + data.length;
         this.line = 1;
@@ -105,12 +109,14 @@ public class JsonParser {
         parse_one(out root);
         skip_whitespace();
         var c = get_char();
-        if (c != 0)
-        throw new JsonError.EXTRA_DATA(
-            "%u:%u Extra data has been found after a parsed JSON document. The first character is '%c'.",
-            line, column, c);
-        if (root is JsonValue)
-        throw new JsonError.INVALID_DATA("The outermost value must be an object or array.");
+        if (c != 0) {
+            throw new JsonError.EXTRA_DATA(
+                "%u:%u Extra data has been found after a parsed JSON document. The first character is '%c'.",
+                line, column, c);
+        }
+        if (root is JsonValue) {
+            throw new JsonError.INVALID_DATA("The outermost value must be an object or array.");
+        }
         this.root = root;
     }
 
@@ -131,8 +137,9 @@ public class JsonParser {
     }
 
     private void skip(uint offset) {
-        while (offset-- > 0)
-        get_char();
+        while (offset-- > 0) {
+            get_char();
+        }
     }
 
     private void skip_whitespace() {
@@ -209,14 +216,16 @@ public class JsonParser {
         unowned uint8[] buf = keyword.data;
         for (var i = 0; i < len; i++) {
             var c = get_char();
-            if (c == '\0')
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Unexpected end of data. The '%c' character of '%s' expected.",
-                line, column, buf[i], keyword);
-            if (c != buf[i])
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Unexpected character '%c'. The '%c' character of '%s' expected.",
-                line, column, c, buf[i], keyword);
+            if (c == '\0') {
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Unexpected end of data. The '%c' character of '%s' expected.",
+                    line, column, buf[i], keyword);
+            }
+            if (c != buf[i]) {
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Unexpected character '%c'. The '%c' character of '%s' expected.",
+                    line, column, c, buf[i], keyword);
+            }
         }
         switch (keyword) {
         case "true":
@@ -249,9 +258,10 @@ public class JsonParser {
             switch (c) {
             case '-':
             case '+':
-                if (sign_set)
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Invalid number: A digit expected but '%c' found.", line, column + i, c);
+                if (sign_set) {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Invalid number: A digit expected but '%c' found.", line, column + i, c);
+                }
                 buf.append_c(c);
                 sign_set = true;
                 break;
@@ -266,28 +276,32 @@ public class JsonParser {
             case '8':
             case '9':
                 if (!decimal_point) {
-                    if (c == '0' && !valid_number)
-                    leading_zero = true;
-                    if (c != '0' && leading_zero)
-                    throw new JsonError.PARSE_ERROR(
-                        "%u:%u Invalid number: Numbers cannot have leading zeroes.", line, column + i);
+                    if (c == '0' && !valid_number) {
+                        leading_zero = true;
+                    }
+                    if (c != '0' && leading_zero) {
+                        throw new JsonError.PARSE_ERROR(
+                            "%u:%u Invalid number: Numbers cannot have leading zeroes.", line, column + i);
+                    }
                 }
                 buf.append_c(c);
                 valid_number = true;
                 sign_set = true;
                 break;
             case '.':
-                if (decimal_point)
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Invalid number: A decimal point can be set only once.", line, column + i);
+                if (decimal_point) {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Invalid number: A decimal point can be set only once.", line, column + i);
+                }
                 integer = false;
                 decimal_point = true;
                 buf.append_c(c);
                 break;
             case 'e':
             case 'E':
-                if (exponent)
-                throw new JsonError.PARSE_ERROR("%u:%u Invalid number: Cannot set exponent again.", line, column + i);
+                if (exponent) {
+                    throw new JsonError.PARSE_ERROR("%u:%u Invalid number: Cannot set exponent again.", line, column + i);
+                }
                 exponent = true;
                 valid_number = false;
                 leading_zero = false;
@@ -305,17 +319,19 @@ public class JsonParser {
         }
         skip(i);
         if (!valid_number) {
-            if (c == 0)
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Unexpected end of data. A number character expected.", line, column);
-            else
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Unexpected character '%c'. A number character expected", line, column, c);
+            if (c == 0) {
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Unexpected end of data. A number character expected.", line, column);
+            } else {
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Unexpected character '%c'. A number character expected", line, column, c);
+            }
         }
-        if (integer)
-        node = new JsonValue.@int(int.parse(buf.str));
-        else
-        node = new JsonValue.@double(double.parse(buf.str));
+        if (integer) {
+            node = new JsonValue.@int(int.parse(buf.str));
+        } else {
+            node = new JsonValue.@double(double.parse(buf.str));
+        }
     }
 
     private void parse_object(out JsonObject object) throws JsonError {
@@ -386,9 +402,10 @@ public class JsonParser {
     }
 
     private void parse_array(out JsonArray array) throws JsonError {
-        if (++array_recursion >= 20)
-        throw new JsonError.PARSE_ERROR(
-            "%u:%u Maximal array recursion depth reached.", line, column);
+        if (++array_recursion >= 20) {
+            throw new JsonError.PARSE_ERROR(
+                "%u:%u Maximal array recursion depth reached.", line, column);
+        }
 
         array = new JsonArray();
         /* Look for the end of the array */
@@ -441,9 +458,10 @@ public class JsonParser {
         var buf = new StringBuilder();
         char c;
         while ((c = get_char()) != 0) {
-            if (c < 32u) // the control characters U+0000 to U+001F
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Invalid control character (%02X) in a string.", line, column, c);
+            if (c < 32u) {  // the control characters U+0000 to U+001F
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Invalid control character (%02X) in a string.", line, column, c);
+            }
             switch (c) {
             case '\\':
                 parse_escape_sequence(buf);
@@ -487,32 +505,37 @@ public class JsonParser {
             break;
         case 'u':
             unichar utf16 = parse_unichar();
-            if (utf16 == 0)
-            throw new JsonError.PARSE_ERROR(
-                "%u:%u Invalid unicode escape sequence.", line, column);
+            if (utf16 == 0) {
+                throw new JsonError.PARSE_ERROR(
+                    "%u:%u Invalid unicode escape sequence.", line, column);
+            }
 
             if (utf16.type() == UnicodeType.SURROGATE) {
-                if (get_char() != '\\' || get_char() != 'u')
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Incomplete unicode escape sequence pair.", line, column);
+                if (get_char() != '\\' || get_char() != 'u') {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Incomplete unicode escape sequence pair.", line, column);
+                }
                 unichar utf16_pair[2];
                 utf16_pair[0] = utf16;
                 utf16_pair[1] = parse_unichar();
-                if (utf16_pair[1] == 0)
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Invalid unicode escape sequence.", line, column);
+                if (utf16_pair[1] == 0) {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Invalid unicode escape sequence.", line, column);
+                }
 
                 if (0xd800 > utf16_pair[0] || utf16_pair[0] > 0xdbff
-                || 0xdc00 > utf16_pair[1] || utf16_pair[1] > 0xdfff)
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Invalid unicode escape sequence.", line, column);
+                || 0xdc00 > utf16_pair[1] || utf16_pair[1] > 0xdfff) {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Invalid unicode escape sequence.", line, column);
+                }
 
                 utf16 = 0x10000;
                 utf16 += (utf16_pair[0] & 0x3ff) << 10;
                 utf16 += (utf16_pair[1] & 0x3ff);
-                if (!utf16.validate())
-                throw new JsonError.PARSE_ERROR(
-                    "%u:%u Invalid unicode escape sequence.", line, column);
+                if (!utf16.validate()) {
+                    throw new JsonError.PARSE_ERROR(
+                        "%u:%u Invalid unicode escape sequence.", line, column);
+                }
             }
             buf.append_unichar(utf16);
             break;
@@ -526,10 +549,11 @@ public class JsonParser {
         unichar u = 0;
         for (var i = 0; i < 4; i++) {
             var c = get_char();
-            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-            u += ((unichar) (c <= '9' ? c - '0' : (c & 7) + 9) << ((3 - i) * 4));
-            else
-            return 0;
+            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+                u += ((unichar) (c <= '9' ? c - '0' : (c & 7) + 9) << ((3 - i) * 4));
+            } else {
+                return 0;
+            }
         }
         return u.validate() || u.type() == UnicodeType.SURROGATE ? u : 0;
     }

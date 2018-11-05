@@ -35,8 +35,9 @@ public class KeyValueTree: KeyValueStorage {
 
     public override bool has_key(string key) {
         unowned Node<Item?> node = nodes[key];
-        if (node == null || node.data == null)
-        return false;
+        if (node == null || node.data == null) {
+            return false;
+        }
 
         return node.data.value_set;
     }
@@ -48,8 +49,9 @@ public class KeyValueTree: KeyValueStorage {
 
     public override Variant? get_value(string key) {
         unowned Node<Item?> node = nodes[key];
-        if (node == null || node.data == null)
-        return null;
+        if (node == null || node.data == null) {
+            return null;
+        }
 
         return node.data.get();
     }
@@ -85,8 +87,9 @@ public class KeyValueTree: KeyValueStorage {
 
     protected unowned Node<Item?> get_or_create_node(string key) {
         unowned Node<Item?> node = nodes[key];
-        if (node != null)
-        return node;
+        if (node != null) {
+            return node;
+        }
 
         var index = key.last_index_of_char('.');
         unowned Node<Item?> parent = index > 0 ? get_or_create_node(key.substring(0, index)) : root;
@@ -107,8 +110,9 @@ public class KeyValueTree: KeyValueStorage {
         var old_value = node.data.get();
         node.data.set(value);
 
-        if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
-        changed(key, old_value);
+        if (old_value != value && (old_value == null || value == null || !old_value.equal(value))) {
+            changed(key, old_value);
+        }
     }
 
     protected override async void set_value_unboxed_async(string key, Variant? value) {
@@ -124,8 +128,9 @@ public class KeyValueTree: KeyValueStorage {
         var new_value = node.data.get();
 
         if (old_value != new_value
-        && (old_value == null || new_value == null || !old_value.equal(new_value)))
-        changed(key, old_value);
+        && (old_value == null || new_value == null || !old_value.equal(new_value))) {
+            changed(key, old_value);
+        }
     }
 
     protected override async void set_default_value_unboxed_async(string key, Variant? value) {
@@ -179,14 +184,16 @@ public class KeyValueTree: KeyValueStorage {
         }
 
         private bool print_node(Node<Item?> node) {
-            if (node.is_root())
-            return false;
+            if (node.is_root()) {
+                return false;
+            }
 
             unowned Item? item = node.data;
             if (item != null) {
                 var indent = node.depth() - 2;
-                if (indent > 0)
-                buffer.append(string.nfill(space_len * indent, ' '));
+                if (indent > 0) {
+                    buffer.append(string.nfill(space_len * indent, ' '));
+                }
                 buffer.append(bullet);
                 var value = item.get();
                 buffer.append_printf("%s: %s\n", item.name, value != null ? value.print(false) : "(null)");

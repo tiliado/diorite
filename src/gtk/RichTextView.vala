@@ -72,8 +72,9 @@ public class RichTextView: Gtk.TextView {
      */
     public virtual signal void link_clicked(string uri) {
         debug("Open link: %s", uri);
-        if (_link_opener != null)
-        _link_opener(uri);
+        if (_link_opener != null) {
+            _link_opener(uri);
+        }
     }
 
     /**
@@ -84,8 +85,9 @@ public class RichTextView: Gtk.TextView {
      */
     public virtual signal void image_clicked(string path) {
         debug("Open image: %s", path);
-        if (_image_opener != null)
-        _image_opener(path);
+        if (_image_opener != null) {
+            _image_opener(path);
+        }
     }
 
     public override void realize() {
@@ -95,15 +97,17 @@ public class RichTextView: Gtk.TextView {
 
     public override void style_updated() {
         base.style_updated();
-        if (get_realized())
-        set_link_color();
+        if (get_realized()) {
+            set_link_color();
+        }
     }
 
     private void set_link_color() {
         Gdk.RGBA? link_color = null;
         var doc_buffer = buffer as RichTextBuffer;
-        if (doc_buffer == null)
-        return;
+        if (doc_buffer == null) {
+            return;
+        }
 
         if (!get_style_context().lookup_color("link-color", out link_color)
         && !get_style_context().lookup_color("link_color", out link_color)) {
@@ -112,13 +116,15 @@ public class RichTextView: Gtk.TextView {
             if (prop != null) {
                 unowned Gdk.Color? color = null;
                 style_get("link-color", out color);
-                if (!prop.value_type.is_a(typeof(Gdk.Color)) && color != null) // See tiliado/nuvolaplayer#197
-                link_color = {color.red / 65535.0, color.green / 65535.0, color.blue / 65535.0, 1.0};
+                if (!prop.value_type.is_a(typeof(Gdk.Color)) && color != null) { // See tiliado/nuvolaplayer#197
+                    link_color = {color.red / 65535.0, color.green / 65535.0, color.blue / 65535.0, 1.0};
+                }
             }
         }
 
-        if (link_color != null)
-        doc_buffer.set_link_color(link_color);
+        if (link_color != null) {
+            doc_buffer.set_link_color(link_color);
+        }
     }
 
     public override bool button_release_event(Gdk.EventButton event) {
@@ -133,8 +139,9 @@ public class RichTextView: Gtk.TextView {
                 var pixbuf = get_pixbuf_at_pos(x, y);
                 if (pixbuf != null) {
                     var path = pixbuf.get_data<string?>(RichTextBuffer.IMAGE_PATH);
-                    if (path != null)
-                    image_clicked(path);
+                    if (path != null) {
+                        image_clicked(path);
+                    }
                 }
             }
         }
@@ -189,8 +196,9 @@ public class RichTextView: Gtk.TextView {
         Gtk.TextIter iter;
         get_iter_at_location(out iter, x, y);
         var pixbuf = iter.get_pixbuf();
-        if (pixbuf != null && is_in_iter_area(iter, x, y))
-        return pixbuf;
+        if (pixbuf != null && is_in_iter_area(iter, x, y)) {
+            return pixbuf;
+        }
 
         /* When mouse cursor in over the second half of a pixbuf, iter on the right hand side
          * is returned instead the right one, so we have to go backward and
@@ -198,8 +206,9 @@ public class RichTextView: Gtk.TextView {
 
         iter.backward_char();
         pixbuf = iter.get_pixbuf();
-        if (pixbuf != null && is_in_iter_area(iter, x, y))
-        return pixbuf;
+        if (pixbuf != null && is_in_iter_area(iter, x, y)) {
+            return pixbuf;
+        }
 
         return null;
     }

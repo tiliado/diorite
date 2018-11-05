@@ -166,8 +166,9 @@ public class JsonValueTest: Drt.TestCase {
     public void test_escape_string() {
         expect_str_equals("\\n\\r\\t\\b\\f \\\"", JsonValue.escape_string("\n\r\t\b\f \""), "");
         var buf = new uint8[32]; // the control characters U+0000 to U+001F
-        for (uint8 c = 0; c < 31; c++)
-        buf[c] = c + 1;
+        for (uint8 c = 0; c < 31; c++) {
+            buf[c] = c + 1;
+        }
         buf[31] = 0;
         unowned string str = (string) buf;
         expect_str_equals("       \\b\\t\\n \\f\\r                  ", JsonValue.escape_string(str), "");

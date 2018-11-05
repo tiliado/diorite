@@ -81,10 +81,12 @@ public class SocketChannel : Drt.DuplexChannel {
     private void set_condition(IOCondition condition) {
         var read = Flags.is_set(condition, IOCondition.IN);
         var write = Flags.is_set(condition, IOCondition.OUT);
-        if (can_read != read)
-        can_read = read;
-        if (can_write != write)
-        can_write = write;
+        if (can_read != read) {
+            can_read = read;
+        }
+        if (can_write != write) {
+            can_write = write;
+        }
     }
 
     private bool on_socket_source(Socket socket, IOCondition condition) {
@@ -93,8 +95,9 @@ public class SocketChannel : Drt.DuplexChannel {
     }
 
     private void on_connection_closed(GLib.Object o, ParamSpec p) {
-        if (closed != connection.closed)
-        closed = connection.closed;
+        if (closed != connection.closed) {
+            closed = connection.closed;
+        }
     }
 }
 

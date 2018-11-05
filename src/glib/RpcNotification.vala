@@ -88,26 +88,30 @@ public class RpcNotification : RpcCallable {
                 }
             }
         } else {
-            if (data.get_type_string() != "(a{smv})")
-            Rpc.check_type_string(data, "a{smv}");
+            if (data.get_type_string() != "(a{smv})") {
+                Rpc.check_type_string(data, "a{smv}");
+            }
 
             var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
             var entry = unbox_variant(dict.lookup_value("subscribe", null));
-            if (entry == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
-                path);
+            if (entry == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
+                    path);
+            }
 
-            if (!variant_bool(entry, ref subscribe))
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
-                path, entry.get_type_string());
+            if (!variant_bool(entry, ref subscribe)) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
+                    path, entry.get_type_string());
+            }
 
             entry = unbox_variant(dict.lookup_value("detail", null));
-            if (entry != null && !variant_string(entry, out detail))
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
-                path, entry.get_type_string());
+            if (entry != null && !variant_string(entry, out detail)) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
+                    path, entry.get_type_string());
+            }
         }
     }
 

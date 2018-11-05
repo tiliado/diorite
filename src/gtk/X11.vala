@@ -35,10 +35,11 @@ namespace Drtgtk.X11 {
  */
 public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string property) {
     Gdk.X11.Window? win, result = null;
-    if (window != null)
-    win = window as Gdk.X11.Window;
-    else
-    win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    if (window != null) {
+        win = window as Gdk.X11.Window;
+    } else {
+        win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    }
     var display = win.get_display() as Gdk.X11.Display;
 
     X.Atom type;
@@ -58,8 +59,9 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
         result = new Gdk.X11.Window.foreign_for_display(display, xwin);
     }
 
-    if (data != null)
-    X.free(data);
+    if (data != null) {
+        X.free(data);
+    }
     return result;
 }
 
@@ -74,10 +76,11 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
  */
 public string? get_window_property_as_utf8(Gdk.Window? window, string property) {
     Gdk.X11.Window win;
-    if (window != null)
-    win = window as Gdk.X11.Window;
-    else
-    win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    if (window != null) {
+        win = window as Gdk.X11.Window;
+    } else {
+        win = Gdk.get_default_root_window() as Gdk.X11.Window;
+    }
     var display = win.get_display() as Gdk.X11.Display;
 
     X.Atom type;
@@ -111,10 +114,12 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property) 
  */
 public Gdk.X11.Window? get_net_wm_check_window() {
     var window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
-    if (window == null)
-    return null;
-    if (get_window_property_as_win(window, "_NET_SUPPORTING_WM_CHECK").get_xid() != window.get_xid())
-    return null;
+    if (window == null) {
+        return null;
+    }
+    if (get_window_property_as_win(window, "_NET_SUPPORTING_WM_CHECK").get_xid() != window.get_xid()) {
+        return null;
+    }
     return window;
 }
 

@@ -44,8 +44,9 @@ public abstract class DesktopShell: GLib.Object {
     private GLib.Menu _app_menu = null;
 
     public static DesktopShell get_default() {
-        if (DesktopShell.default_shell == null)
-        DesktopShell.default_shell = new DefaultDesktopShell();
+        if (DesktopShell.default_shell == null) {
+            DesktopShell.default_shell = new DefaultDesktopShell();
+        }
         return DesktopShell.default_shell;
     }
 
@@ -57,8 +58,9 @@ public abstract class DesktopShell: GLib.Object {
                 debug("Shell: %s = %s", variable, shell);
                 if (shell != null) {
                     var parts = String.split_strip(shell.down(), ":");
-                    foreach (var part in parts)
-                    shells.add(part);
+                    foreach (var part in parts) {
+                        shells.add(part);
+                    }
                 }
             }
         }
@@ -172,8 +174,9 @@ public abstract class DesktopShell: GLib.Object {
     }
 
     public void set_app_menu_from_model(GLib.MenuModel model) {
-        if (_app_menu == null)
-        _app_menu = new Menu();
+        if (_app_menu == null) {
+            _app_menu = new Menu();
+        }
         Actions.replace_from_menu_model(_app_menu, model);
         app_menu_changed();
     }
@@ -185,8 +188,9 @@ public abstract class DesktopShell: GLib.Object {
         var net_wm_check_window = X11.get_net_wm_check_window();
         if (net_wm_check_window != null) {
             wm_name_exact = X11.get_window_property_as_utf8(net_wm_check_window, "_NET_WM_NAME");
-            if (wm_name_exact != null)
-            wm_name = wm_name_exact.down();
+            if (wm_name_exact != null) {
+                wm_name = wm_name_exact.down();
+            }
 
             switch (wm_name) {
             case "gnome shell":

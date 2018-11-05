@@ -55,14 +55,17 @@ public class ObjectQuery<T> : GLib.Object {
      */
     public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         var result = query.get_result();
-        if (!result.next(cancellable))
-        throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
+        if (!result.next(cancellable)) {
+            throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
+        }
         var object = orm.create_object<T>(result);
         var initable = object as GLib.Initable;
-        if (initable != null)
-        initable.init(cancellable);
-        if (result.next(cancellable))
-        throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
+        if (initable != null) {
+            initable.init(cancellable);
+        }
+        if (result.next(cancellable)) {
+            throw new DatabaseError.TOO_MANY_RESULTS("More than one object have been returned for object query.");
+        }
         return object;
     }
 

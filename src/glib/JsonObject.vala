@@ -48,8 +48,9 @@ public class JsonObject: JsonNode {
         var old_node = get(name);
         nodes[name] = node;
         node.parent = this;
-        if (old_node != null)
-        old_node.parent = null;
+        if (old_node != null) {
+            old_node.parent = null;
+        }
     }
 
     /**
@@ -70,8 +71,9 @@ public class JsonObject: JsonNode {
      */
     public JsonNode? take(string name) {
         var node = nodes.take(name, null);
-        if (node != null)
-        node.parent = null;
+        if (node != null) {
+            node.parent = null;
+        }
         return node;
     }
 
@@ -97,18 +99,21 @@ public class JsonObject: JsonNode {
     public unowned JsonNode? dotget(string path) {
         var dot = path.index_of_char('.');
         return_val_if_fail(dot != 0, null);
-        if (dot < 0)
-        return path[0] != 0 ? get(path) : null;
+        if (dot < 0) {
+            return path[0] != 0 ? get(path) : null;
+        }
         unowned JsonNode? node = get(path.substring(0, dot));
-        if (node == null)
-        return null;
+        if (node == null) {
+            return null;
+        }
         unowned string subpath = (string) (((char*) path) + dot + 1);
-        if (node is JsonObject)
-        return ((JsonObject) node).dotget(subpath);
-        else if (node is JsonArray)
-        return ((JsonArray) node).dotget(subpath);
-        else
-        return null;
+        if (node is JsonObject) {
+            return ((JsonObject) node).dotget(subpath);
+        } else if (node is JsonArray) {
+            return ((JsonArray) node).dotget(subpath);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -462,35 +467,44 @@ public class JsonObject: JsonNode {
         var item_sep = (nl || compact) ? "," : ", ";
         var key_sep = compact ? ":" : ": ";
         buffer.append_c('{');
-        if (nl)
-        buffer.append_c('\n');
+        if (nl) {
+            buffer.append_c('\n');
+        }
         var iter =  HashTableIter<string, JsonNode?>(nodes);
         unowned string? key = null;
         unowned JsonNode? node = null;
         var next = (iter.next(out key, out node) && key != null && node != null);
         while (next) {
-            if (nl)
-            for (var i = 0; i <= level; i++)
-            buffer.append(indent);
+            if (nl) {
+                for (var i = 0; i <= level; i++) {
+                    buffer.append(indent);
+                }
+            }
             buffer.append_printf("\"%s\"%s", JsonValue.escape_string(key), key_sep);
-            if (node is JsonArray)
-            ((JsonArray) node).dump_to_buffer(buffer, indent, compact, level + 1);
-            else if (node is JsonObject)
-            ((JsonObject) node).dump_to_buffer(buffer, indent, compact, level + 1);
-            else
-            buffer.append(node.to_string());
+            if (node is JsonArray) {
+                ((JsonArray) node).dump_to_buffer(buffer, indent, compact, level + 1);
+            } else if (node is JsonObject) {
+                ((JsonObject) node).dump_to_buffer(buffer, indent, compact, level + 1);
+            } else {
+                buffer.append(node.to_string());
+            }
             next = iter.next(out key, out node) && key != null && node != null;
-            if (next)
-            buffer.append(item_sep);
-            if (nl)
+            if (next) {
+                buffer.append(item_sep);
+            }
+            if (nl) {
+                buffer.append_c('\n');
+            }
+        }
+        if (nl) {
+            for (var i = 0; i < level; i++) {
+                buffer.append(indent);
+            }
+        }
+        buffer.append_c('}');
+        if (nl && level == 0) {
             buffer.append_c('\n');
         }
-        if (nl)
-        for (var i = 0; i < level; i++)
-        buffer.append(indent);
-        buffer.append_c('}');
-        if (nl && level == 0)
-        buffer.append_c('\n');
     }
 }
 

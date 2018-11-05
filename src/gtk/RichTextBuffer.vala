@@ -212,8 +212,9 @@ public class RichTextBuffer: Gtk.TextBuffer {
      * @param height    image height
      */
     public virtual signal void image_requested(string uri, int width, int height) {
-        if (_image_locator != null)
-        insert_image_at_cursor(_image_locator(uri), width, height);
+        if (_image_locator != null) {
+            insert_image_at_cursor(_image_locator(uri), width, height);
+        }
     }
 
     public string default_image_locator(string uri) {
@@ -374,8 +375,9 @@ public class RichTextBuffer: Gtk.TextBuffer {
             if (in_paragraph) {
                 int i;
                 for (i = 0; i < attr_names.length; i++) {
-                    if (attr_names[i] == LINK_TARGET)
-                    break;
+                    if (attr_names[i] == LINK_TARGET) {
+                        break;
+                    }
                 }
                 if (i >= attr_values.length) {
                     throw new MarkupError.MISSING_ATTRIBUTE("Missing attribute '%s' for element '%s'.", LINK_TARGET, INPUT_TAG_LINK);
@@ -430,8 +432,9 @@ public class RichTextBuffer: Gtk.TextBuffer {
                 }
             }
 
-            if (src != null)
-            image_requested(src, width, height);
+            if (src != null) {
+                image_requested(src, width, height);
+            }
             break;
         default:
             if (in_paragraph) {
@@ -530,12 +533,14 @@ public class RichTextBuffer: Gtk.TextBuffer {
     }
 
     private void element_text(MarkupParseContext context, string text, size_t text_len) throws MarkupError {
-        if (text == "")
-        return;
+        if (text == "") {
+            return;
+        }
 
         var result = norm_whitespace(text);
-        if (result == " ")
-        return;
+        if (result == " ") {
+            return;
+        }
 
         if (ignore_text || !in_paragraph) {
             warning("Ignored text: '%s'", text);
@@ -547,8 +552,9 @@ public class RichTextBuffer: Gtk.TextBuffer {
             strip_left = false;
         }
 
-        if (result.has_suffix(" "))
-        strip_left = true;
+        if (result.has_suffix(" ")) {
+            strip_left = true;
+        }
         insert_at_cursor(result, -1);
     }
 
@@ -564,8 +570,9 @@ public class RichTextBuffer: Gtk.TextBuffer {
     }
 
     private void find_link_and_set_color(Gtk.TextTag tag) {
-        if (tag is RichTextLink)
-        tag.foreground_rgba = _link_color;
+        if (tag is RichTextLink) {
+            tag.foreground_rgba = _link_color;
+        }
     }
 
     private Gdk.Pixbuf get_missing_image_pixbuf() {

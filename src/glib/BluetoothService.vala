@@ -42,11 +42,13 @@ public class BluetoothService {
     public signal void incoming(BluetoothConnection connection);
 
     public void listen() throws GLib.Error {
-        if (profile_manager == null)
-        profile_manager = Bus.get_proxy_sync(BusType.SYSTEM, "org.bluez", "/org/bluez");
+        if (profile_manager == null) {
+            profile_manager = Bus.get_proxy_sync(BusType.SYSTEM, "org.bluez", "/org/bluez");
+        }
 
-        if (profile != null)
-        return;
+        if (profile != null) {
+            return;
+        }
 
         profile = new BluetoothProfile1(this);
         profile_path = "/eu/tiliado/diorite/bluetooth/" + uuid.replace("-", "_");
@@ -111,8 +113,9 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
         ? "%s/%s".printf(parts[3], parts[4].substring(4).replace("_", ":")) : device;
         debug("New bluetooth connection from %s (%d).", address, fd.fd);
         GenericArray<GLib.Socket>? device_sockets = sockets[device];
-        if (device_sockets == null)
-        sockets[device] = device_sockets = new GenericArray<GLib.Socket>(1);
+        if (device_sockets == null) {
+            sockets[device] = device_sockets = new GenericArray<GLib.Socket>(1);
+        }
         device_sockets.add(fd);
         var connection = new BluetoothConnection(fd, address);
         uint8[] byte = {1};
@@ -127,8 +130,9 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
             for (int i = 0, size = device_sockets.length; i < size; i++) {
                 unowned GLib.Socket socket = device_sockets[i];
                 try {
-                    if (!socket.is_closed())
-                    socket.close();
+                    if (!socket.is_closed()) {
+                        socket.close();
+                    }
                 } catch (GLib.Error e) {
                     warning("Failed to close bluetooth socket %d of device %s. %s", socket.fd, device, e.message);
                 }

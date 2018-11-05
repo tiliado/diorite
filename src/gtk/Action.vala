@@ -55,17 +55,19 @@ public abstract class Action: GLib.Object {
     }
 
     public virtual signal void activated(Variant? parameter) {
-        if (param_callback != null)
-        param_callback(parameter);
-        else if (callback != null)
-        callback();
+        if (param_callback != null) {
+            param_callback(parameter);
+        } else if (callback != null) {
+            callback();
+        }
     }
 
     public virtual void activate(Variant? parameter) {
-        if (enabled)
-        action.activate(parameter);
-        else
-        warning("Cannot activate action '%s', because it is disabled.", name);
+        if (enabled) {
+            action.activate(parameter);
+        } else {
+            warning("Cannot activate action '%s', because it is disabled.", name);
+        }
     }
 
     public void add_to_map(ActionMap map) {
@@ -73,12 +75,13 @@ public abstract class Action: GLib.Object {
     }
 
     protected void on_action_activated(Variant? parameter) {
-        if (!enabled)
-        warning("Cannot activate action '%s', because it is disabled.", name);
-        else if (parameter == null && this is ToggleAction)
-        activate(!this.state.get_boolean());
-        else if (parameter == null || !variant_equal(parameter, this.state))
-        activated(parameter);
+        if (!enabled) {
+            warning("Cannot activate action '%s', because it is disabled.", name);
+        } else if (parameter == null && this is ToggleAction) {
+            activate(!this.state.get_boolean());
+        } else if (parameter == null || !variant_equal(parameter, this.state)) {
+            activated(parameter);
+        }
     }
 }
 
@@ -102,12 +105,13 @@ public class ToggleAction : Action {
     }
 
     public override void activate(Variant? parameter) {
-        if (parameter == null)
-        base.activate(!this.state.get_boolean());
-        else if (parameter != null && state != null && parameter.equal(state))
-        debug("Toggle action '%s' not activated because of the same state '%s'.", name, parameter.print(false));
-        else
-        base.activate(parameter);
+        if (parameter == null) {
+            base.activate(!this.state.get_boolean());
+        } else if (parameter != null && state != null && parameter.equal(state)) {
+            debug("Toggle action '%s' not activated because of the same state '%s'.", name, parameter.print(false));
+        } else {
+            base.activate(parameter);
+        }
     }
 }
 

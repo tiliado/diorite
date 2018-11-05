@@ -72,8 +72,9 @@ public class StringEntry : FormEntry, ValueEntry {
     }
 
     private void on_icon_press(Gtk.EntryIconPosition position, Gdk.Event event) {
-        if (position == Gtk.EntryIconPosition.SECONDARY)
-        entry.set_text("");
+        if (position == Gtk.EntryIconPosition.SECONDARY) {
+            entry.set_text("");
+        }
     }
 }
 
@@ -186,20 +187,23 @@ public class Form : Gtk.Grid {
 
     public void add_entries(Variant entries_spec) throws FormError {
         var array = variant_to_array(entries_spec);
-        foreach (unowned Variant entry_spec in array)
-        add_entry(variant_to_array(entry_spec));
+        foreach (unowned Variant entry_spec in array) {
+            add_entry(variant_to_array(entry_spec));
+        }
     }
 
     public void add_values(HashTable<string, Variant> values) {
-        foreach (var key in values.get_keys())
-        this.values.replace(key, values.get(key));
+        foreach (var key in values.get_keys()) {
+            this.values.replace(key, values.get(key));
+        }
     }
 
     public static string print_entry_spec(Variant[] entry_spec) {
         var buffer = new StringBuilder("[");
         for (var i = 0; i < entry_spec.length; i++) {
-            if (i > 0)
-            buffer.append(", ");
+            if (i > 0) {
+                buffer.append(", ");
+            }
             buffer.append(entry_spec[i].print(true));
         }
         buffer.append_c(']');
@@ -207,9 +211,10 @@ public class Form : Gtk.Grid {
     }
 
     public static void check_entry_spec_length(Variant[] entry_spec, int min_length) throws FormError {
-        if (entry_spec.length < min_length)
-        throw new FormError.INVALID_ENTRY("Entry spec has missing fields. %s",
-            print_entry_spec(entry_spec));
+        if (entry_spec.length < min_length) {
+            throw new FormError.INVALID_ENTRY("Entry spec has missing fields. %s",
+                print_entry_spec(entry_spec));
+        }
     }
 
     public void add_entry(Variant[] entry_spec) throws FormError {
@@ -218,27 +223,31 @@ public class Form : Gtk.Grid {
         check_entry_spec_length(entry_spec, 2);
 
         string? type;
-        if (!variant_string(entry_spec[0], out type) || type == null)
-        throw new FormError.INVALID_DATA("Invalid data type for field 0. %s",
-            print_entry_spec(entry_spec));
+        if (!variant_string(entry_spec[0], out type) || type == null) {
+            throw new FormError.INVALID_DATA("Invalid data type for field 0. %s",
+                print_entry_spec(entry_spec));
+        }
 
         switch (type) {
         case "string":
             // [type, id, label?]
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[1], out id) || id == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             string? e_label = null;
-            if (entry_spec.length >= 3 && !variant_string(entry_spec[2], out e_label))
-            throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
-                print_entry_spec(entry_spec));
+            if (entry_spec.length >= 3 && !variant_string(entry_spec[2], out e_label)) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             string? e_value = null;
             var value = values.get(id);
-            if (value != null && value.is_of_type(VariantType.STRING))
-            e_value = value.get_string();
+            if (value != null && value.is_of_type(VariantType.STRING)) {
+                e_value = value.get_string();
+            }
             var entry = new StringEntry(e_label, e_value);
             label = entry.label;
             widget = entry.widget;
@@ -249,29 +258,34 @@ public class Form : Gtk.Grid {
             check_entry_spec_length(entry_spec, 3);
 
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[1], out id) || id == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             string e_label;
-            if (!variant_string(entry_spec[2], out e_label) || e_label == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[2], out e_label) || e_label == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             bool e_value = false;
             var value = values.get(id);
-            if (value != null && value.is_of_type(VariantType.BOOLEAN))
-            e_value = value.get_boolean();
+            if (value != null && value.is_of_type(VariantType.BOOLEAN)) {
+                e_value = value.get_boolean();
+            }
             string[] e_enables;
-            if (entry_spec.length > 3)
-            e_enables = variant_to_strv(entry_spec[3]);
-            else
-            e_enables = {};
+            if (entry_spec.length > 3) {
+                e_enables = variant_to_strv(entry_spec[3]);
+            } else {
+                e_enables = {};
+            }
             string[] e_disables;
-            if (entry_spec.length > 4)
-            e_disables = variant_to_strv(entry_spec[4]);
-            else
-            e_disables = {};
+            if (entry_spec.length > 4) {
+                e_disables = variant_to_strv(entry_spec[4]);
+            } else {
+                e_disables = {};
+            }
             var entry = new BoolEntry(e_label, e_enables, e_disables);
             entry.state = e_value;
             entry.toggled.connect(on_entry_toggled);
@@ -284,53 +298,60 @@ public class Form : Gtk.Grid {
             check_entry_spec_length(entry_spec, 4);
 
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[1], out id) || id == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             string e_target;
-            if (!variant_string(entry_spec[2], out e_target) || e_target == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[2], out e_target) || e_target == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             string e_label;
-            if (!variant_string(entry_spec[3], out e_label) || e_label == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 3. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[3], out e_label) || e_label == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 3. %s",
+                    print_entry_spec(entry_spec));
+            }
 
 
             var full_id = "%s:%s".printf(id, e_target);
             var value = values.get(id);
             bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
             string[] e_enables;
-            if (entry_spec.length > 4)
-            e_enables = variant_to_strv(entry_spec[4]);
-            else
-            e_enables = {};
+            if (entry_spec.length > 4) {
+                e_enables = variant_to_strv(entry_spec[4]);
+            } else {
+                e_enables = {};
+            }
             string[] e_disables;
-            if (entry_spec.length > 5)
-            e_disables = variant_to_strv(entry_spec[5]);
-            else
-            e_disables = {};
+            if (entry_spec.length > 5) {
+                e_disables = variant_to_strv(entry_spec[5]);
+            } else {
+                e_disables = {};
+            }
             var entry = new OptionEntry(e_label, e_enables, e_disables);
 
             label = entry.label;
             widget = entry.widget;
             entries.set(full_id, entry);
             var group = radios.get(id);
-            if (group == null)
-            radios.set(id, entry.group);
-            else
-            entry.group = group;
+            if (group == null) {
+                radios.set(id, entry.group);
+            } else {
+                entry.group = group;
+            }
             entry.state = e_checked;
             entry.toggled.connect(on_entry_toggled);
             break;
         case "label":
             // [type, text]
             string text;
-            if (!variant_string(entry_spec[1], out text) || text == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[1], out text) || text == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             var l = new Gtk.Label(text);
             l.halign = Gtk.Align.START;
@@ -339,9 +360,10 @@ public class Form : Gtk.Grid {
         case "header":
             // [type, text]
             string text;
-            if (!variant_string(entry_spec[1], out text) || text == null)
-            throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
-                print_entry_spec(entry_spec));
+            if (!variant_string(entry_spec[1], out text) || text == null) {
+                throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
+                    print_entry_spec(entry_spec));
+            }
 
             var l = new Gtk.Label(text);
             l.halign = Gtk.Align.CENTER;
@@ -375,8 +397,9 @@ public class Form : Gtk.Grid {
         var entries = this.entries.get_values();
         foreach (var entry in entries) {
             var toggle = entry as ToggleEntry;
-            if (toggle != null)
-            entry_toggled(toggle);
+            if (toggle != null) {
+                entry_toggled(toggle);
+            }
         }
     }
 
@@ -397,8 +420,9 @@ public class Form : Gtk.Grid {
                     result.insert(key, new Variant.boolean(toggle_entry.state));
                 } else if (toggle_entry is OptionEntry && toggle_entry.state) {
                     var i = key.index_of(":");
-                    if (i > 0)
-                    result.insert(key.substring(0, i), new Variant.string(key.substring(i + 1)));
+                    if (i > 0) {
+                        result.insert(key.substring(0, i), new Variant.string(key.substring(i + 1)));
+                    }
                 }
             }
         }
@@ -410,13 +434,15 @@ public class Form : Gtk.Grid {
         var state = entry.state;
         foreach (var key in entry.get_enables()) {
             var target = entries.get(key);
-            if (target != null)
-            target.sensitive = state;
+            if (target != null) {
+                target.sensitive = state;
+            }
         }
         foreach (var key in entry.get_disables()) {
             var target = entries.get(key);
-            if (target != null)
-            target.sensitive = !state;
+            if (target != null) {
+                target.sensitive = !state;
+            }
         }
     }
 

@@ -34,13 +34,15 @@ public class StringTest: Drt.TestCase {
         var dataset = " hello ; Bye;;1234;byE;;;";
         result = Drt.String.semicolon_separated_set(dataset, false);
         expect_uint_equals(4, result.length, "original set");
-        foreach (var s in new string[] {"hello", "Bye", "1234", "byE"})
-        expect_true(result.contains(s), "item: %s", s);
+        foreach (var s in new string[] {"hello", "Bye", "1234", "byE"}) {
+            expect_true(result.contains(s), "item: %s", s);
+        }
         expect_false(result.contains("bye"), "item: %s", "bye");
         result = Drt.String.semicolon_separated_set(dataset, true);
         expect_uint_equals(3, result.length, "lowercase set");
-        foreach (var s in new string[] {"hello", "bye", "1234"})
-        expect_true(result.contains(s), "item: %s", s);
+        foreach (var s in new string[] {"hello", "bye", "1234"}) {
+            expect_true(result.contains(s), "item: %s", s);
+        }
         expect_false(result.contains("Bye"), "item: %s", "Bye");
     }
 

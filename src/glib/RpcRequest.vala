@@ -167,8 +167,9 @@ public class RpcRequest {
         var array = next(typeof(StringArrayParam));
         var iter = array.iterator();
         unowned string str = null;
-        while (iter.next("s", &str))
-        list.prepend(str);
+        while (iter.next("s", &str)) {
+            list.prepend(str);
+        }
         list.reverse();
         return list;
     }

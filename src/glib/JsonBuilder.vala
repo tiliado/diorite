@@ -50,8 +50,9 @@ public class JsonBuilder {
      */
     public unowned JsonBuilder begin_object() {
         var new_object = new JsonObject();
-        if (try_add(new_object))
-        set_cursor(new_object);
+        if (try_add(new_object)) {
+            set_cursor(new_object);
+        }
         return this;
     }
 
@@ -64,12 +65,13 @@ public class JsonBuilder {
      * @return this JsonBuilder object for easier chaining
      */
     public unowned JsonBuilder end_object() {
-        if (object == null)
-        critical("Cursor is not at an object.");
-        else if (member != null)
-        critical("There is a member without any value.");
-        else
-        set_cursor(object.parent);
+        if (object == null) {
+            critical("Cursor is not at an object.");
+        } else if (member != null) {
+            critical("There is a member without any value.");
+        } else {
+            set_cursor(object.parent);
+        }
         return this;
     }
 
@@ -82,8 +84,9 @@ public class JsonBuilder {
      */
     public unowned JsonBuilder begin_array() {
         var new_array = new JsonArray();
-        if (try_add(new_array))
-        set_cursor(new_array);
+        if (try_add(new_array)) {
+            set_cursor(new_array);
+        }
         return this;
     }
 
@@ -95,10 +98,11 @@ public class JsonBuilder {
      * @return this JsonBuilder object for easier chaining
      */
     public unowned JsonBuilder end_array() {
-        if (array == null)
-        critical("Cursor is not at an array.");
-        else
-        set_cursor(array.parent);
+        if (array == null) {
+            critical("Cursor is not at an array.");
+        } else {
+            set_cursor(array.parent);
+        }
         return this;
     }
 
@@ -111,10 +115,11 @@ public class JsonBuilder {
      * @return this JsonBuilder object for easier chaining
      */
     public unowned JsonBuilder set_member(string name) {
-        if (object == null)
-        critical("Cannot set member name for non-object node.");
-        else
-        member = name;
+        if (object == null) {
+            critical("Cannot set member name for non-object node.");
+        } else {
+            member = name;
+        }
         return this;
     }
 
@@ -331,8 +336,9 @@ public class JsonBuilder {
      * @return a string representation of the root node
      */
     public string to_string() {
-        if (root == null)
-        return "";
+        if (root == null) {
+            return "";
+        }
         return root.to_string();
     }
 
@@ -342,14 +348,17 @@ public class JsonBuilder {
      * @return a string representation of the root node
      */
     public string to_pretty_string() {
-        if (root == null)
-        return "";
+        if (root == null) {
+            return "";
+        }
         var array = root as JsonArray;
-        if (array != null)
-        return array.to_pretty_string();
+        if (array != null) {
+            return array.to_pretty_string();
+        }
         var object = root as JsonObject;
-        if (object != null)
-        return object.to_pretty_string();
+        if (object != null) {
+            return object.to_pretty_string();
+        }
         return root.to_string();
     }
 
@@ -359,14 +368,17 @@ public class JsonBuilder {
      * @return a string representation of the root node
      */
     public string to_compact_string() {
-        if (root == null)
-        return "";
+        if (root == null) {
+            return "";
+        }
         var array = root as JsonArray;
-        if (array != null)
-        return array.to_compact_string();
+        if (array != null) {
+            return array.to_compact_string();
+        }
         var object = root as JsonObject;
-        if (object != null)
-        return object.to_compact_string();
+        if (object != null) {
+            return object.to_compact_string();
+        }
         return root.to_string();
     }
 

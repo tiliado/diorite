@@ -37,8 +37,9 @@ public class SlideInRevealer: Gtk.Box {
             revealer: revealer ?? new Gtk.Revealer(),
             orientation: Gtk.Orientation.VERTICAL,
             spacing: 0, margin: 0, border_width: 0);
-        if (revealer == null)
-        this.revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        if (revealer == null) {
+            this.revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        }
     }
 
     construct {
@@ -73,10 +74,11 @@ public class SlideInRevealer: Gtk.Box {
     }
 
     public override void remove(Gtk.Widget child) {
-        if (revealer.get_child() == child)
-        revealer.remove(child);
-        else
-        base.remove(child);
+        if (revealer.get_child() == child) {
+            revealer.remove(child);
+        } else {
+            base.remove(child);
+        }
     }
 
     public void toggle() {

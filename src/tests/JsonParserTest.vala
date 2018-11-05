@@ -28,8 +28,9 @@ public class JsonParserTest: Drt.TestCase {
 
     public void test_pass() {
         int i;
-        for (i = 1; i <= 3; i++)
-        expect_no_error(() => JsonParser.load(load_data("pass", i)), "pass%d.json", i);
+        for (i = 1; i <= 3; i++) {
+            expect_no_error(() => JsonParser.load(load_data("pass", i)), "pass%d.json", i);
+        }
         for (i = 1; i <= 2; i++) {
             expect_no_error(() => JsonParser.load_array(load_data("pass", i)), "pass%d.json", i);
             expect_error(() => JsonParser.load_object(load_data("pass", i)),

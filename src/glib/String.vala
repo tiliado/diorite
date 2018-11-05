@@ -66,10 +66,12 @@ public unowned string not_empty_or(string? may_be_empty, string fallback) {
  * @return Joined string.
  */
 public string? concat(string? initial, string? separator, owned string text) {
-    if (is_empty(initial))
-    return (owned) text;
-    if (is_empty(separator))
-    return initial + text;
+    if (is_empty(initial)) {
+        return (owned) text;
+    }
+    if (is_empty(separator)) {
+        return initial + text;
+    }
     return initial + separator + text;
 }
 
@@ -100,8 +102,9 @@ public void append(ref string? initial, string? separator, owned string text) {
  * @return resulting list of strings
  */
 public SList<string> split_strip(string? data, string delimiter, int max_tokens=0) {
-    if (is_empty(data))
-    return new SList<string>();
+    if (is_empty(data)) {
+        return new SList<string>();
+    }
     return array_to_slist(data.split(delimiter, max_tokens), true);
 }
 
@@ -120,8 +123,9 @@ public SList<string> array_to_slist(string[] array, bool strip=false) {
             result.prepend(item);
         } else if (!is_empty(item)) {
             var stripped_item = item.strip();
-            if (!is_empty(stripped_item))
-            result.prepend((owned) stripped_item);
+            if (!is_empty(stripped_item)) {
+                result.prepend((owned) stripped_item);
+            }
         }
     }
     result.reverse();
@@ -140,8 +144,9 @@ public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercas
         var items = dataset.split(";");
         foreach (var item in items) {
             item = item.strip();
-            if (item[0] != 0)
-            result.add(lowercase ? item.down() : item);
+            if (item[0] != 0) {
+                result.add(lowercase ? item.down() : item);
+            }
         }
     }
     return result;
@@ -159,13 +164,15 @@ public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_
 
 public string? unmask(uint8[] data) {
     var length = data.length;
-    if (length < 2)
-    return null;
+    if (length < 2) {
+        return null;
+    }
     var shift = data[0];
     var result = new uint8[length];
     for (var i = 1; i < length; i++) {
-        if (shift > data[i])
-        return null;
+        if (shift > data[i]) {
+            return null;
+        }
         result[i - 1] = data[i] - shift;
     }
     result[length] = 0;
@@ -181,13 +188,15 @@ public string? unmask(uint8[] data) {
  * @return a number of UTF-16 code points
  */
 public int utf16_strlen(string? str) {
-    if (is_empty(str))
-    return 0;
+    if (is_empty(str)) {
+        return 0;
+    }
     int len = 0;
     unichar c = 0;
     int i = 0;
-    while (str.get_next_char(ref i, out c))
-    len += (uint) c <= 0xFFFF ? 1 : 2;
+    while (str.get_next_char(ref i, out c)) {
+        len += (uint) c <= 0xFFFF ? 1 : 2;
+    }
     return len;
 }
 

@@ -77,11 +77,13 @@ public class Database: GLib.Object, Queryable {
         return_if_fail(!opened);
 
         var db_dir = db_file.get_parent();
-        if (!db_dir.query_exists(cancellable))
-        db_dir.make_directory_with_parents(cancellable);
+        if (!db_dir.query_exists(cancellable)) {
+            db_dir.make_directory_with_parents(cancellable);
+        }
 
-        if (db_file.query_exists(cancellable) && db_file.query_file_type(0, cancellable) != FileType.REGULAR)
-        throw new DatabaseError.IOERROR("'%s' exists, but is not a file.", db_file.get_path());
+        if (db_file.query_exists(cancellable) && db_file.query_file_type(0, cancellable) != FileType.REGULAR) {
+            throw new DatabaseError.IOERROR("'%s' exists, but is not a file.", db_file.get_path());
+        }
 
         master_connection = open_connection_internal(cancellable, true);
         opened = true;
@@ -249,14 +251,16 @@ public class Database: GLib.Object, Queryable {
      */
     protected Connection open_connection_internal(Cancellable? cancellable, bool master) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-        if (!master)
-        throw_if_not_opened();
+        if (!master) {
+            throw_if_not_opened();
+        }
 
         Sqlite.Database db;
         var result = Sqlite.Database.open_v2(
             db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null);
-        if (Drtdb.is_sql_error(result))
-        throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
+        if (Drtdb.is_sql_error(result)) {
+            throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
+        }
         return new Connection((owned) db, orm);
     }
 
@@ -266,8 +270,9 @@ public class Database: GLib.Object, Queryable {
      * @throws DatabaseError if database is closed
      */
     private inline void throw_if_not_opened() throws DatabaseError {
-        if (!opened)
-        throw new DatabaseError.DATABASE_NOT_OPENED("Database '%s' is not opened.", db_file.get_path());
+        if (!opened) {
+            throw new DatabaseError.DATABASE_NOT_OPENED("Database '%s' is not opened.", db_file.get_path());
+        }
     }
 }
 

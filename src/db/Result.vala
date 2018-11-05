@@ -79,8 +79,9 @@ public class Result : GLib.Object {
     public int get_column_index(string name) {
         map_column_names();
         int index;
-        if (column_indexes.lookup_extended(name, null, out index))
-        return index;
+        if (column_indexes.lookup_extended(name, null, out index)) {
+            return index;
+        }
         return -1;
     }
 
@@ -92,8 +93,9 @@ public class Result : GLib.Object {
      */
     public unowned string? get_column_name(int index) {
         map_column_names();
-        if (index < 0 || index >= n_columns)
-        return null;
+        if (index < 0 || index >= n_columns) {
+            return null;
+        }
         return column_names[index];
     }
 
@@ -106,31 +108,34 @@ public class Result : GLib.Object {
      * @throws DatabaseError if data type is not supported or index is invalid
      */
     public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError {
-        if (fetch_is_null(index))
-        return null;
+        if (fetch_is_null(index)) {
+            return null;
+        }
 
-        if (type == typeof(void*) || !is_type_supported(type))
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (type == typeof(void*) || !is_type_supported(type)) {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
 
         var value = GLib.Value(type);
-        if (type == typeof(bool))
-        value.set_boolean(fetch_bool(index));
-        else if (type == typeof(int))
-        value.set_int(fetch_int(index));
-        else if (type == typeof(int64))
-        value.set_int64(fetch_int64(index));
-        else if (type == typeof(string))
-        value.set_string(fetch_string(index));
-        else if (type == typeof(double))
-        value.set_double(fetch_double(index));
-        else if (type == typeof(float))
-        value.set_float((float) fetch_double(index));
-        else if (type == typeof(GLib.Bytes))
-        value.set_boxed(fetch_bytes(index));
-        else if (type == typeof(GLib.ByteArray))
-        value.set_boxed(fetch_byte_array(index));
-        else
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (type == typeof(bool)) {
+            value.set_boolean(fetch_bool(index));
+        } else if (type == typeof(int)) {
+            value.set_int(fetch_int(index));
+        } else if (type == typeof(int64)) {
+            value.set_int64(fetch_int64(index));
+        } else if (type == typeof(string)) {
+            value.set_string(fetch_string(index));
+        } else if (type == typeof(double)) {
+            value.set_double(fetch_double(index));
+        } else if (type == typeof(float)) {
+            value.set_float((float) fetch_double(index));
+        } else if (type == typeof(GLib.Bytes)) {
+            value.set_boxed(fetch_bytes(index));
+        } else if (type == typeof(GLib.ByteArray)) {
+            value.set_boxed(fetch_byte_array(index));
+        } else {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
 
         return value;
     }
@@ -207,9 +212,10 @@ public class Result : GLib.Object {
         var n_bytes =  statement.column_bytes(index);
         if (result != null) {
             var result_len = result.length;
-            if (result_len != n_bytes)
-            warning("Fetch string: Result may be truncated. Original blob size was %d, but string size is %d.",
-                n_bytes, result_len);
+            if (result_len != n_bytes) {
+                warning("Fetch string: Result may be truncated. Original blob size was %d, but string size is %d.",
+                    n_bytes, result_len);
+            }
         }
         return result;
     }
@@ -225,8 +231,9 @@ public class Result : GLib.Object {
         check_index(index);
         unowned uint8[]? blob = (uint8[]?) statement.column_blob(index);
         blob.length =  statement.column_bytes(index);
-        if (blob == null || blob.length == 0)
-        return null;
+        if (blob == null || blob.length == 0) {
+            return null;
+        }
 
         return blob; // dup array
     }
@@ -262,19 +269,22 @@ public class Result : GLib.Object {
      * @throws DatabaseError if index is invalid
      */
     protected void check_index(int index) throws DatabaseError {
-        if (n_columns == 0)
-        throw new DatabaseError.RANGE("Result doesn't have any columns. |%s|", statement.sql());
-        if (index < 0 || index >= n_columns)
-        throw new DatabaseError.RANGE(
-            "Index %d is not in range 0..%d. |%s|", index, n_columns - 1, statement.sql());
+        if (n_columns == 0) {
+            throw new DatabaseError.RANGE("Result doesn't have any columns. |%s|", statement.sql());
+        }
+        if (index < 0 || index >= n_columns) {
+            throw new DatabaseError.RANGE(
+                "Index %d is not in range 0..%d. |%s|", index, n_columns - 1, statement.sql());
+        }
     }
 
     /**
      * Throw an error on SQLite failure.
      */
     protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
-        if (Drtdb.is_sql_error(result))
-        throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
+        if (Drtdb.is_sql_error(result)) {
+            throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
+        }
         return result;
     }
 

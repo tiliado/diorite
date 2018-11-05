@@ -45,8 +45,9 @@ public class ResultTest: Drt.TestCase {
     public override void tear_down() {
         base.tear_down();
         try {
-            if (db.opened)
-            db.close();
+            if (db.opened) {
+                db.close();
+            }
         } catch (GLib.Error e) {
             warning("%s", e.message);
         }
@@ -65,8 +66,9 @@ public class ResultTest: Drt.TestCase {
 
     private Query? query(string sql) throws GLib.Error, DatabaseError {
 
-        if (!db.opened)
-        db.open();
+        if (!db.opened) {
+            db.open();
+        }
 
         return db.open_connection().query(sql);
     }
@@ -79,10 +81,12 @@ public class ResultTest: Drt.TestCase {
     public void test_get_column_name() {
         try {
             var result = select_data();
-            foreach (var index in new int[] {-int.MAX, -1, 7, 8, int.MAX})
-            expect_str_equals(null, result.get_column_name(index), "index %d", index);
-            for (var index = 0; index < column_names.length; index++)
-            expect_str_equals(column_names[index], result.get_column_name(index), "index %d", index);
+            foreach (var index in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
+                expect_str_equals(null, result.get_column_name(index), "index %d", index);
+            }
+            for (var index = 0; index < column_names.length; index++) {
+                expect_str_equals(column_names[index], result.get_column_name(index), "index %d", index);
+            }
         } catch (GLib.Error e) {
             expectation_failed("%s", e.message);
         }
@@ -91,10 +95,12 @@ public class ResultTest: Drt.TestCase {
     public void test_get_column_index() {
         try {
             var result = select_data();
-            foreach (var name in new string[] {"hello", "", "baby"})
-            expect_int_equals(-1, result.get_column_index(name), "column '%s'", name);
-            for (var index = 0; index < column_names.length; index++)
-            expect_int_equals(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
+            foreach (var name in new string[] {"hello", "", "baby"}) {
+                expect_int_equals(-1, result.get_column_index(name), "column '%s'", name);
+            }
+            for (var index = 0; index < column_names.length; index++) {
+                expect_int_equals(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
+            }
         } catch (GLib.Error e) {
             expectation_failed("%s", e.message);
         }

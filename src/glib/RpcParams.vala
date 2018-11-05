@@ -44,18 +44,21 @@ public abstract class RpcParam {
 
     public virtual Variant? get_value(string path, Variant? value) throws ApiError {
         if (value == null) {
-            if (nullable)
-            return null;
-            if (default_value == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
-                path, name, type_string);
+            if (nullable) {
+                return null;
+            }
+            if (default_value == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+                    path, name, type_string);
+            }
             return default_value;
         }
-        if (!value.is_of_type(new VariantType(type_string)))
-        throw new ApiError.INVALID_PARAMS(
-            "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' has been provided.",
-            path, name, type_string, value.get_type_string());
+        if (!value.is_of_type(new VariantType(type_string))) {
+            throw new ApiError.INVALID_PARAMS(
+                "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' has been provided.",
+                path, name, type_string, value.get_type_string());
+        }
         return value;
     }
 }
@@ -181,33 +184,39 @@ public class StringArrayParam: RpcParam {
 
     public override Variant? get_value(string path, Variant? value) throws ApiError {
         if (value == null) {
-            if (nullable)
-            return null;
-            if (default_value == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
-                path, name, type_string);
+            if (nullable) {
+                return null;
+            }
+            if (default_value == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+                    path, name, type_string);
+            }
             return default_value;
         }
 
-        if (value.is_of_type(new VariantType(type_string)))
-        return value;
+        if (value.is_of_type(new VariantType(type_string))) {
+            return value;
+        }
 
-        if (!value.is_of_type(new VariantType("av")))
-        throw new ApiError.INVALID_PARAMS(
-            "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
-            path, name, type_string, value.get_type_string());
+        if (!value.is_of_type(new VariantType("av"))) {
+            throw new ApiError.INVALID_PARAMS(
+                "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
+                path, name, type_string, value.get_type_string());
+        }
 
         var builder = new VariantBuilder(VariantType.STRING_ARRAY);
         var size = value.n_children();
         for (var i = 0; i < size; i++) {
             var child = unbox_variant(value.get_child_value(i));
-            if (child == null)
-            child = new Variant.string("");
-            if (!child.is_of_type(VariantType.STRING))
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but the child value of type '%s' have been provided.",
-                path, name, type_string, child.get_type_string());
+            if (child == null) {
+                child = new Variant.string("");
+            }
+            if (!child.is_of_type(VariantType.STRING)) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but the child value of type '%s' have been provided.",
+                    path, name, type_string, child.get_type_string());
+            }
             builder.add_value(child);
         }
         return builder.end();
@@ -239,19 +248,22 @@ public class DictParam: RpcParam {
 
     public override Variant? get_value(string path, Variant? value) throws ApiError {
         if (value == null) {
-            if (nullable)
-            return null;
-            if (default_value == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
-                path, name, type_string);
+            if (nullable) {
+                return null;
+            }
+            if (default_value == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+                    path, name, type_string);
+            }
             return default_value;
         }
 
-        if (!value.is_of_type(new VariantType(type_string)))
-        throw new ApiError.INVALID_PARAMS(
-            "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
-            path, name, type_string, value.get_type_string());
+        if (!value.is_of_type(new VariantType(type_string))) {
+            throw new ApiError.INVALID_PARAMS(
+                "Method '%s' requires the '%s' parameter of type '%s', but value of type '%s' have been provided.",
+                path, name, type_string, value.get_type_string());
+        }
         return value;
     }
 }
@@ -286,12 +298,14 @@ public class VariantParam: RpcParam {
 
     public override Variant? get_value(string path, Variant? value) throws ApiError {
         if (value == null) {
-            if (nullable)
-            return null;
-            if (default_value == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
-                path, name, type_string);
+            if (nullable) {
+                return null;
+            }
+            if (default_value == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+                    path, name, type_string);
+            }
             return default_value;
         }
         return value;
@@ -328,12 +342,14 @@ public class VarArrayParam: RpcParam {
 
     public override Variant? get_value(string path, Variant? value) throws ApiError {
         if (value == null) {
-            if (nullable)
-            return null;
-            if (default_value == null)
-            throw new ApiError.INVALID_PARAMS(
-                "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
-                path, name, type_string);
+            if (nullable) {
+                return null;
+            }
+            if (default_value == null) {
+                throw new ApiError.INVALID_PARAMS(
+                    "Method '%s' requires the '%s' parameter of type '%s', but null value has been provided.",
+                    path, name, type_string);
+            }
             return default_value;
         }
         return value;

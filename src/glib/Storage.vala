@@ -64,8 +64,9 @@ public class Storage: GLib.Object {
         this.user_cache_dir = File.new_for_path(user_cache_dir);
 
         File[] _data_dirs = {};
-        foreach (string path in data_dirs)
-        _data_dirs += File.new_for_path(path);
+        foreach (string path in data_dirs) {
+            _data_dirs += File.new_for_path(path);
+        }
 
         this._data_dirs = _data_dirs;
     }
@@ -78,8 +79,9 @@ public class Storage: GLib.Object {
      */
     public Storage get_child(string id) {
         string[] data_dirs = {};
-        foreach (var dir in this._data_dirs)
-        data_dirs += dir.get_child(id).get_path();
+        foreach (var dir in this._data_dirs) {
+            data_dirs += dir.get_child(id).get_path();
+        }
 
         return new Storage(user_data_dir.get_child(id).get_path(), data_dirs,
             user_config_dir.get_child(id).get_path(),
@@ -160,12 +162,14 @@ public class Storage: GLib.Object {
      */
     public File? get_data_file(string name) {
         File f = user_data_dir.get_child(name);
-        if (f.query_file_type(0) == FileType.REGULAR)
-        return f;
+        if (f.query_file_type(0) == FileType.REGULAR) {
+            return f;
+        }
         foreach (File dir in data_dirs()) {
             f = dir.get_child(name);
-            if (f.query_file_type(0) == FileType.REGULAR)
-            return f;
+            if (f.query_file_type(0) == FileType.REGULAR) {
+                return f;
+            }
         }
         return null;
     }
@@ -183,12 +187,14 @@ public class Storage: GLib.Object {
      */
     public File require_data_file(string name) {
         var data_file = get_data_file(name);
-        if (data_file != null)
-        return data_file;
+        if (data_file != null) {
+            return data_file;
+        }
 
         var paths = user_data_dir.get_path();
-        foreach (File dir in data_dirs())
-        paths += ":" + dir.get_path();
+        foreach (File dir in data_dirs()) {
+            paths += ":" + dir.get_path();
+        }
         error("Required data file '%s' not found in '%s'.", name, paths);
     }
 
@@ -234,8 +240,9 @@ public class XdgStorage: Storage {
         this.user_cache_dir = user_cache_dir.get_child(id + user_suffix);
 
         File[] data_dirs = {};
-        foreach (var dir in this._data_dirs)
-        data_dirs += dir.get_child(id);
+        foreach (var dir in this._data_dirs) {
+            data_dirs += dir.get_child(id);
+        }
         this._data_dirs = data_dirs;
     }
 }

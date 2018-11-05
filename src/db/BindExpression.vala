@@ -57,10 +57,11 @@ public class BindExpression {
      */
     public void reset() {
         values = null;
-        if (sql == null)
-        sql = new StringBuilder("");
-        else
-        sql.truncate();
+        if (sql == null) {
+            sql = new StringBuilder("");
+        } else {
+            sql.truncate();
+        }
     }
 
     /**
@@ -109,8 +110,9 @@ public class BindExpression {
             if (c == '?') {
                 pos++;
                 sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
-                if (pos >= len)
-                throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
+                if (pos >= len) {
+                    throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
+                }
                 offset = pos + 1;
                 Value? val = null;
                 switch (data[pos]) {
@@ -153,8 +155,9 @@ public class BindExpression {
         }
 
         values.reverse();
-        if (pos > offset)
-        sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
+        if (pos > offset) {
+            sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
+        }
     }
 }
 

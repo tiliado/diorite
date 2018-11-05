@@ -47,8 +47,9 @@ public class OrmManagerTest: Drt.TestCase {
     public override void tear_down() {
         base.tear_down();
         try {
-            if (db.opened)
-            db.close();
+            if (db.opened) {
+                db.close();
+            }
         } catch (GLib.Error e) {
             warning("%s", e.message);
         }
@@ -67,8 +68,9 @@ public class OrmManagerTest: Drt.TestCase {
 
     private Query? query(string sql) throws GLib.Error, DatabaseError {
 
-        if (!db.opened)
-        db.open();
+        if (!db.opened) {
+            db.open();
+        }
 
         return db.open_connection().query(sql);
     }

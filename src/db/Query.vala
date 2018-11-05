@@ -125,28 +125,38 @@ public class Query : GLib.Object {
      * @throws DatabaseError when provided data type is not supported or operation fails
      */
     public Query bind(int index, GLib.Value? value) throws DatabaseError {
-        if (value == null)
-        return bind_null(index);
-        var type = value.type();
-        if (type == typeof(bool))
-        return bind_bool(index, value.get_boolean());
-        if (type == typeof(int))
-        return bind_int(index, value.get_int());
-        if (type == typeof(int64))
-        return bind_int64(index, value.get_int64());
-        if (type == typeof(string))
-        return bind_string(index, value.get_string());
-        if (type == typeof(double))
-        return bind_double(index, value.get_double());
-        if (type == typeof(float))
-        return bind_double(index, (double) value.get_float());
-        if (type == typeof(GLib.Bytes))
-        return bind_bytes(index, (GLib.Bytes) value.get_boxed());
-        if (type == typeof(GLib.ByteArray))
-        return bind_byte_array(index, (GLib.ByteArray) value.get_boxed());
-        if (type == typeof(void*)) {
-            if (value.get_pointer() == null)
+        if (value == null) {
             return bind_null(index);
+        }
+        var type = value.type();
+        if (type == typeof(bool)) {
+            return bind_bool(index, value.get_boolean());
+        }
+        if (type == typeof(int)) {
+            return bind_int(index, value.get_int());
+        }
+        if (type == typeof(int64)) {
+            return bind_int64(index, value.get_int64());
+        }
+        if (type == typeof(string)) {
+            return bind_string(index, value.get_string());
+        }
+        if (type == typeof(double)) {
+            return bind_double(index, value.get_double());
+        }
+        if (type == typeof(float)) {
+            return bind_double(index, (double) value.get_float());
+        }
+        if (type == typeof(GLib.Bytes)) {
+            return bind_bytes(index, (GLib.Bytes) value.get_boxed());
+        }
+        if (type == typeof(GLib.ByteArray)) {
+            return bind_byte_array(index, (GLib.ByteArray) value.get_boxed());
+        }
+        if (type == typeof(void*)) {
+            if (value.get_pointer() == null) {
+                return bind_null(index);
+            }
             throw new DatabaseError.DATA_TYPE("Data type %s is supported only with a null pointer.", type.name());
         }
 
@@ -218,8 +228,9 @@ public class Query : GLib.Object {
      * @throws DatabaseError when operation fails
      */
     public Query bind_string(int index, string? value) throws DatabaseError {
-        if (value == null)
-        return bind_null(index);
+        if (value == null) {
+            return bind_null(index);
+        }
         check_index(index);
         check_not_executed();
         throw_on_error(statement.bind_text(index, value));
@@ -266,8 +277,9 @@ public class Query : GLib.Object {
      * @throws DatabaseError when operation fails
      */
     public Query bind_bytes(int index, GLib.Bytes? value) throws DatabaseError {
-        if (value == null)
-        return bind_null(index);
+        if (value == null) {
+            return bind_null(index);
+        }
 
         check_index(index);
         check_not_executed();
@@ -284,8 +296,9 @@ public class Query : GLib.Object {
      * @throws DatabaseError when operation fails
      */
     public Query bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError {
-        if (value == null)
-        return bind_null(index);
+        if (value == null) {
+            return bind_null(index);
+        }
 
         check_index(index);
         check_not_executed();
@@ -297,19 +310,22 @@ public class Query : GLib.Object {
      * Throw error if the query has already been executed.
      */
     protected void check_not_executed() throws DatabaseError {
-        if (statement == null)
-        throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
+        if (statement == null) {
+            throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
+        }
     }
 
     /**
      * Throw error if the index is out of bounds.
      */
     protected int check_index(int index) throws DatabaseError {
-        if (n_parameters == 0)
-        throw new DatabaseError.RANGE("Query doesn't have parameters. |%s|", statement.sql());
-        if (index <= 0 || index > n_parameters)
-        throw new DatabaseError.RANGE(
-            "Index %d is not in range 1..%d. |%s|", index, n_parameters, statement.sql());
+        if (n_parameters == 0) {
+            throw new DatabaseError.RANGE("Query doesn't have parameters. |%s|", statement.sql());
+        }
+        if (index <= 0 || index > n_parameters) {
+            throw new DatabaseError.RANGE(
+                "Index %d is not in range 1..%d. |%s|", index, n_parameters, statement.sql());
+        }
         return index;
     }
 
@@ -317,8 +333,9 @@ public class Query : GLib.Object {
      * Throw error if statement fails.
      */
     protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
-        if (Drtdb.is_sql_error(result))
-        throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
+        if (Drtdb.is_sql_error(result)) {
+            throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
+        }
         return result;
     }
 }

@@ -52,8 +52,9 @@ public class JsonArray: JsonNode {
             nodes.append_val(node);
         } else {
             var current = get(index);
-            if (current != null)
-            current.parent = null;
+            if (current != null) {
+                current.parent = null;
+            }
             nodes.data[index] = node;
         }
         node.parent = this;
@@ -90,10 +91,11 @@ public class JsonArray: JsonNode {
     public void insert(uint index, JsonNode node) {
         return_if_fail(node.parent == null);
         return_if_fail(index <= nodes.length);
-        if (index == nodes.length)
-        nodes.append_val(node);
-        else
-        nodes.insert_val(index, node);
+        if (index == nodes.length) {
+            nodes.append_val(node);
+        } else {
+            nodes.insert_val(index, node);
+        }
         node.parent = this;
     }
 
@@ -188,21 +190,25 @@ public class JsonArray: JsonNode {
         var len = index_str.length;
         for (var i = 0; i < len; i++) {
             var c = index_str.data[i];
-            if (c < '0' || c > '9')
-            return null;
+            if (c < '0' || c > '9') {
+                return null;
+            }
         }
         unowned JsonNode? node = get((uint) int.parse(index_str));
-        if (node == null)
-        return null;
-        if (dot < 0)
-        return node;
+        if (node == null) {
+            return null;
+        }
+        if (dot < 0) {
+            return node;
+        }
         unowned string subpath = (string)(((char*) path) + dot + 1);
-        if (node is JsonObject)
-        return ((JsonObject) node).dotget(subpath);
-        else if (node is JsonArray)
-        return ((JsonArray) node).dotget(subpath);
-        else
-        return null;
+        if (node is JsonObject) {
+            return ((JsonObject) node).dotget(subpath);
+        } else if (node is JsonArray) {
+            return ((JsonArray) node).dotget(subpath);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -392,10 +398,11 @@ public class JsonArray: JsonNode {
         var array = new bool[size];
         for (uint i = 0; i < size; i++) {
             bool val;
-            if (get_bool(i, out val))
-            array[i] = val;
-            else
-            return false;
+            if (get_bool(i, out val)) {
+                array[i] = val;
+            } else {
+                return false;
+            }
         }
         result = (owned) array;
         return true;
@@ -414,10 +421,11 @@ public class JsonArray: JsonNode {
         var array = new int[size];
         for (uint i = 0; i < size; i++) {
             int val;
-            if (get_int(i, out val))
-            array[i] = val;
-            else
-            return false;
+            if (get_int(i, out val)) {
+                array[i] = val;
+            } else {
+                return false;
+            }
         }
         result = (owned) array;
         return true;
@@ -436,10 +444,11 @@ public class JsonArray: JsonNode {
         var array = new double[size];
         for (uint i = 0; i < size; i++) {
             double val;
-            if (get_double(i, out val))
-            array[i] = val;
-            else
-            return false;
+            if (get_double(i, out val)) {
+                array[i] = val;
+            } else {
+                return false;
+            }
         }
         result = (owned) array;
         return true;
@@ -458,10 +467,11 @@ public class JsonArray: JsonNode {
         var array = new string[size];
         for (uint i = 0; i < size; i++) {
             string? val;
-            if (get_string(i, out val))
-            array[i] = val;
-            else
-            return false;
+            if (get_string(i, out val)) {
+                array[i] = val;
+            } else {
+                return false;
+            }
         }
         result = (owned) array;
         return true;
@@ -526,32 +536,41 @@ public class JsonArray: JsonNode {
         var nl = !String.is_empty(indent);
         var item_sep = (nl || compact) ? "," : ", ";
         buffer.append_c('[');
-        if (nl)
-        buffer.append_c('\n');
-        var size = this.length;
-        for (uint i = 0; i < size; i++) {
-            if (nl)
-            for (var j = 0; j <= level; j++)
-            buffer.append(indent);
-
-            unowned JsonNode node = nodes.data[i];
-            if (node is JsonArray)
-            ((JsonArray) node).dump_to_buffer(buffer, indent, compact, level + 1);
-            else if (node is JsonObject)
-            ((JsonObject) node).dump_to_buffer(buffer, indent, compact, level + 1);
-            else
-            buffer.append(node.to_string());
-            if (i + 1 != size)
-            buffer.append(item_sep);
-            if (nl)
+        if (nl) {
             buffer.append_c('\n');
         }
-        if (nl)
-        for (var j = 0; j < level; j++)
-        buffer.append(indent);
+        var size = this.length;
+        for (uint i = 0; i < size; i++) {
+            if (nl) {
+                for (var j = 0; j <= level; j++) {
+                    buffer.append(indent);
+                }
+            }
+
+            unowned JsonNode node = nodes.data[i];
+            if (node is JsonArray) {
+                ((JsonArray) node).dump_to_buffer(buffer, indent, compact, level + 1);
+            } else if (node is JsonObject) {
+                ((JsonObject) node).dump_to_buffer(buffer, indent, compact, level + 1);
+            } else {
+                buffer.append(node.to_string());
+            }
+            if (i + 1 != size) {
+                buffer.append(item_sep);
+            }
+            if (nl) {
+                buffer.append_c('\n');
+            }
+        }
+        if (nl) {
+            for (var j = 0; j < level; j++) {
+                buffer.append(indent);
+            }
+        }
         buffer.append_c(']');
-        if (nl && level == 0)
-        buffer.append_c('\n');
+        if (nl && level == 0) {
+            buffer.append_c('\n');
+        }
     }
 }
 

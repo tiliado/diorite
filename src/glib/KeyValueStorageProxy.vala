@@ -39,16 +39,18 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     private void on_changed(string provider_name, string key, Variant? old_value) {
-        if (provider_name == name)
-        changed(key, old_value);
+        if (provider_name == name) {
+            changed(key, old_value);
+        }
     }
 
     public override bool has_key(string key) {
         var method = KeyValueStorageServer.METHOD_HAS_KEY;
         try {
             var response = client.channel.call_sync(method, new Variant("(ss)", name, key));
-            if (response.is_of_type(VariantType.BOOLEAN))
-            return response.get_boolean();
+            if (response.is_of_type(VariantType.BOOLEAN)) {
+                return response.get_boolean();
+            }
             critical("Invalid response to %s: %s", method,
                 response == null ? "null" : response.print(false));
         } catch (GLib.Error e) {

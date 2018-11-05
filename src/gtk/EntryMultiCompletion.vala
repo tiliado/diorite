@@ -36,8 +36,9 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
 
     public EntryMultiCompletion(Gtk.Entry entry, Gtk.TreeModel? model = null, int text_column = -1) {
         GLib.Object(model: model, minimum_key_length: 1);
-        if (text_column >= 0)
-        this.text_column = text_column;
+        if (text_column >= 0) {
+            this.text_column = text_column;
+        }
 
         entry.set_completion(this);
         entry.notify["cursor-position"].connect_after(on_cursor_position_changed);
@@ -51,8 +52,9 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
         if (key_valid && cursor == key_end) {
             complete(); // Update filter first
             var prefix = compute_prefix(key);
-            if (prefix != null)
-            insert_match(prefix, true);
+            if (prefix != null) {
+                insert_match(prefix, true);
+            }
         }
     }
 
@@ -66,24 +68,28 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
             key_start = String.last_index_of_char(text, ' ', 0, cursor) + 1;
             if (cursor > key_start) {
                 key_end = String.index_of_char(text, ' ', cursor);
-                if (key_end < 0)
-                key_end = text.length;
+                if (key_end < 0) {
+                    key_end = text.length;
+                }
                 key = text.slice(key_start, cursor);
 //~ 				debug("Text '%s', key '%s', %d→%d→%d", text, key, key_start, cursor, key_end);
-                if (!String.is_empty(key.strip()))
-                key_valid = true;
+                if (!String.is_empty(key.strip())) {
+                    key_valid = true;
+                }
             }
         }
     }
 
     private bool search_match_func(Gtk.EntryCompletion completion, string text, Gtk.TreeIter iter) {
-        if (!key_valid)
-        return false;
+        if (!key_valid) {
+            return false;
+        }
         string candidate;
         model.get(iter, text_column, out candidate);
         var prefix = key.strip().down();
-        if (String.is_empty(prefix))
-        return false;
+        if (String.is_empty(prefix)) {
+            return false;
+        }
         return candidate.down().has_prefix(prefix);
     }
 
@@ -94,10 +100,11 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
         var original_cursor = cursor;
         var match_end_cursor = key_start + match.length;
         entry.text = text.slice(0, cursor) + match.substring(cursor - key_start) + text.substring(key_end);
-        if (select)
-        entry.select_region(match_end_cursor, original_cursor);
-        else
-        entry.set_position(match_end_cursor);
+        if (select) {
+            entry.select_region(match_end_cursor, original_cursor);
+        } else {
+            entry.set_position(match_end_cursor);
+        }
         thaw_notify();
     }
 
@@ -106,8 +113,9 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
         /* Necessary for pop-up window to be shown */
         entry.changed();
         /* Built-in inline completion works only for a single word */
-        if (inline_completion)
-        complete_inline();
+        if (inline_completion) {
+            complete_inline();
+        }
     }
 
     private bool on_match_selected(

@@ -50,18 +50,21 @@ public class PropertyBinding {
 
     public PropertyBinding(KeyValueStorage storage, string key, GLib.Object object, ParamSpec property, PropertyBindingFlags flags) {
         if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0
-        && (flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0)
-        flags |= PropertyBindingFlags.BIDIRECTIONAL;
+        && (flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0) {
+            flags |= PropertyBindingFlags.BIDIRECTIONAL;
+        }
         this.storage = storage;
         this.key = key;
         this.object = object;
         this.property = property;
         this.flags = flags;
-        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0)
-        object.notify[property.name].connect_after(on_property_changed);
+        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0) {
+            object.notify[property.name].connect_after(on_property_changed);
+        }
 
-        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0)
-        storage.changed.connect(on_key_changed);
+        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0) {
+            storage.changed.connect(on_key_changed);
+        }
 
         object.weak_ref(gone);
         storage.weak_ref(gone);
@@ -74,23 +77,26 @@ public class PropertyBinding {
             has_gone = true;
         }
 
-        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0)
-        object.notify[property.name].disconnect(on_property_changed);
+        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.PROPERTY_TO_KEY)) != 0) {
+            object.notify[property.name].disconnect(on_property_changed);
+        }
 
-        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0)
-        storage.changed.disconnect(on_key_changed);
+        if ((flags & (PropertyBindingFlags.BIDIRECTIONAL|PropertyBindingFlags.KEY_TO_PROPERTY)) != 0) {
+            storage.changed.disconnect(on_key_changed);
+        }
     }
 
     public string to_string() {
         string relation;
-        if ((flags & PropertyBindingFlags.BIDIRECTIONAL) != 0)
-        relation = "<==>";
-        else if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0)
-        relation = "<==";
-        else if ((flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0)
-        relation = "==>";
-        else
-        relation = "=?=";
+        if ((flags & PropertyBindingFlags.BIDIRECTIONAL) != 0) {
+            relation = "<==>";
+        } else if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0) {
+            relation = "<==";
+        } else if ((flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0) {
+            relation = "==>";
+        } else {
+            relation = "=?=";
+        }
         return "%s['%s'] %s %s['%s'] (type %s)".printf(storage.get_type().name(), key, relation,
             object.get_type().name(), property.name, property.value_type.name());
     }
@@ -164,28 +170,30 @@ public class PropertyBinding {
         Quark detail;
         return_if_fail(Signal.parse_name(
             "notify::" + property.name, typeof(GLib.Object), out signal_id, out detail, true));
-        if (enabled)
-        SignalHandler.unblock_matched(
-            object, SignalMatchType.ID | SignalMatchType.DATA,
-            signal_id, detail, null, null, this);
-        else
-        SignalHandler.block_matched(
-            object, SignalMatchType.ID | SignalMatchType.DATA,
-            signal_id, detail, null, null, this);
+        if (enabled) {
+            SignalHandler.unblock_matched(
+                object, SignalMatchType.ID | SignalMatchType.DATA,
+                signal_id, detail, null, null, this);
+        } else {
+            SignalHandler.block_matched(
+                object, SignalMatchType.ID | SignalMatchType.DATA,
+                signal_id, detail, null, null, this);
+        }
     }
 
     private void toggle_changed_notify_handler(bool enabled) {
         uint signal_id;
         return_if_fail(Signal.parse_name(
             "changed", typeof(KeyValueStorage), out signal_id, null, false));
-        if (enabled)
-        SignalHandler.unblock_matched(
-            storage, SignalMatchType.ID | SignalMatchType.DATA,
-            signal_id, 0, null, null, this);
-        else
-        SignalHandler.block_matched(
-            storage, SignalMatchType.ID | SignalMatchType.DATA,
-            signal_id, 0, null, null, this);
+        if (enabled) {
+            SignalHandler.unblock_matched(
+                storage, SignalMatchType.ID | SignalMatchType.DATA,
+                signal_id, 0, null, null, this);
+        } else {
+            SignalHandler.block_matched(
+                storage, SignalMatchType.ID | SignalMatchType.DATA,
+                signal_id, 0, null, null, this);
+        }
     }
 
     private void on_property_changed(GLib.Object o, ParamSpec p) {
@@ -193,19 +201,23 @@ public class PropertyBinding {
     }
 
     private void on_key_changed(string key, Variant? old_value) {
-        if (key == this.key)
-        update_property();
+        if (key == this.key) {
+            update_property();
+        }
     }
 
     private void gone(GLib.Object o) {
         has_gone = true;
-        if (o != object)
-        object.weak_unref(gone);
-        if (o != storage)
-        storage.weak_unref(gone);
+        if (o != object) {
+            object.weak_unref(gone);
+        }
+        if (o != storage) {
+            storage.weak_unref(gone);
+        }
 
-        if (storage != null)
-        storage.remove_property_binding(this);
+        if (storage != null) {
+            storage.remove_property_binding(this);
+        }
     }
 }
 

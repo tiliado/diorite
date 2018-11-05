@@ -52,8 +52,9 @@ public class ObjectQueryTest: Drt.TestCase {
     public override void tear_down() {
         base.tear_down();
         try {
-            if (db.opened)
-            db.close();
+            if (db.opened) {
+                db.close();
+            }
         } catch (GLib.Error e) {
             error("%s", e.message);
         }
@@ -153,8 +154,9 @@ public class ObjectQueryTest: Drt.TestCase {
         try {
             User[] users = {};
             var q = conn.get_objects<User>(null);
-            foreach (var user in q.get_cursor())
-            users += user;
+            foreach (var user in q.get_cursor()) {
+                users += user;
+            }
 
             expect_int_equals(2, users.length, "users.length");
 

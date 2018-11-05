@@ -36,8 +36,9 @@ public class DatabaseTest: Drt.TestCase {
     public override void tear_down() {
         base.tear_down();
         try {
-            if (db.opened)
-            db.close();
+            if (db.opened) {
+                db.close();
+            }
         } catch (GLib.Error e) {
             warning("%s", e.message);
         }

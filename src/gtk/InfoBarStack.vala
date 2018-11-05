@@ -65,8 +65,9 @@ public class InfoBarStack: Gtk.Stack {
     }
 
     public override void remove(Gtk.Widget child) {
-        if (child == visible_child && !go_next())
-        go_previous();
+        if (child == visible_child && !go_next()) {
+            go_previous();
+        }
         base.remove(child);
         update_arrows();
     }
@@ -103,8 +104,9 @@ public class InfoBarStack: Gtk.Stack {
         for (var i = 0; cursor != null; i++) {
             next = cursor.next;
             if (cursor.data == visible_child) {
-                if (next == null)
-                return false;
+                if (next == null) {
+                    return false;
+                }
                 this.visible_child = next.data;
                 return true;
             }
@@ -142,10 +144,12 @@ public class InfoBarStack: Gtk.Stack {
 
     private void on_visible_child_changed(GLib.Object o, ParamSpec p) {
         Gtk.Container? parent;
-        if ((parent = left_button.get_parent() as Gtk.Container) != null)
-        parent.remove(left_button);
-        if ((parent = right_button.get_parent() as Gtk.Container) != null)
-        parent.remove(right_button);
+        if ((parent = left_button.get_parent() as Gtk.Container) != null) {
+            parent.remove(left_button);
+        }
+        if ((parent = right_button.get_parent() as Gtk.Container) != null) {
+            parent.remove(right_button);
+        }
         update_arrows();
         if (visible_child != null) {
             var info_bar = visible_child as Gtk.InfoBar;

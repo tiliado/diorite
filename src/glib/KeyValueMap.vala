@@ -45,8 +45,9 @@ public class KeyValueMap: KeyValueStorage {
 
     public override Variant? get_value(string key) {
         Variant? value = null;
-        if (values.lookup_extended(key, null, out value))
-        return value;
+        if (values.lookup_extended(key, null, out value)) {
+            return value;
+        }
         return default_values[key];
     }
 
@@ -57,8 +58,9 @@ public class KeyValueMap: KeyValueStorage {
 
     public override void unset(string key) {
         var old_value = get_value(key);
-        if (values.remove(key))
-        changed(key, old_value);
+        if (values.remove(key)) {
+            changed(key, old_value);
+        }
     }
 
     public override async void unset_async(string key) {
@@ -69,8 +71,9 @@ public class KeyValueMap: KeyValueStorage {
     protected override void set_value_unboxed(string key, Variant? value) {
         var old_value = get_value(key);
         values[key] = value;
-        if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
-        changed(key, old_value);
+        if (old_value != value && (old_value == null || value == null || !old_value.equal(value))) {
+            changed(key, old_value);
+        }
     }
 
     protected override async void set_value_unboxed_async(string key, Variant? value) {

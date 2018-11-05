@@ -164,22 +164,26 @@ public class Connection: GLib.Object, Queryable {
     throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         var type = typeof(T);
-        if (!type.is_object())
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (!type.is_object()) {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
 
         var object_spec = orm.get_object_spec(type);
-        if (object_spec == null)
-        throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+        if (object_spec == null) {
+            throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+        }
         unowned (unowned ParamSpec)[] param_specs = object_spec.properties;
         var sql = new StringBuilder("SELECT");
         var table_name_escaped = escape_sql_id(object_spec.table_name);
         for (var i = 0; i <  param_specs.length; i++) {
             var param = param_specs[i];
-            if (param.value_type == typeof(void*) || !is_type_supported(param.value_type))
-            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", param.value_type.name());
+            if (param.value_type == typeof(void*) || !is_type_supported(param.value_type)) {
+                throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", param.value_type.name());
+            }
 
-            if (i != 0)
-            sql.append_c(',');
+            if (i != 0) {
+                sql.append_c(',');
+            }
             /*
              * 1. AS clause is used because SQLite doesn't guarantee column names in result set otherwise
              * 2. Full qualified column names with table name are used because SQLite treat non-existent
@@ -196,8 +200,9 @@ public class Connection: GLib.Object, Queryable {
             sql.append(bind_expr.get_sql());
         }
         var query = this.query(sql.str, cancellable);
-        if (bind_expr != null)
-        query.bind_values(1, bind_expr.get_values());
+        if (bind_expr != null) {
+            query.bind_values(1, bind_expr.get_values());
+        }
         return new ObjectQuery<T>(orm, query);
     }
 
@@ -214,12 +219,14 @@ public class Connection: GLib.Object, Queryable {
     throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         var type = typeof(T);
-        if (!type.is_object())
-        throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        if (!type.is_object()) {
+            throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
+        }
 
         var object_spec = orm.get_object_spec(type);
-        if (object_spec == null)
-        throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+        if (object_spec == null) {
+            throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
+        }
 
         /* Full qualified column name with table name are used because SQLite treat non-existent
          * column names in quotes as string literals otherwise. */
@@ -234,8 +241,9 @@ public class Connection: GLib.Object, Queryable {
      * Throw error on SQLite failure.
      */
     protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
-        if (Drtdb.is_sql_error(result))
-        throw convert_sqlite_error(result, get_last_error_message(), sql);
+        if (Drtdb.is_sql_error(result)) {
+            throw convert_sqlite_error(result, get_last_error_message(), sql);
+        }
         return result;
     }
 }

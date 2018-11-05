@@ -90,8 +90,9 @@ public class StackMenuButton : Gtk.MenuButton {
 
     private void disconnect_item(Gtk.Widget child) {
         var item  = child as Gtk.MenuItem;
-        if (item != null)
-        item.activate.disconnect(on_item_activated);
+        if (item != null) {
+            item.activate.disconnect(on_item_activated);
+        }
     }
 
     private void on_stack_child_notify(GLib.Object o, ParamSpec p) {
@@ -107,8 +108,9 @@ public class StackMenuButton : Gtk.MenuButton {
     }
 
     private bool rebuild_cb() {
-        if (menu != null)
-        menu.@foreach(disconnect_item);
+        if (menu != null) {
+            menu.@foreach(disconnect_item);
+        }
         menu = new Gtk.Menu();
         _stack.@foreach(append_item);
         popup = menu;
