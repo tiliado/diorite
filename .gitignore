@@ -4,3 +4,4 @@ build
 examples/build
 Makefile
 __pycache__
+*~
