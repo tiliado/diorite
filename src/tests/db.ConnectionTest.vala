@@ -248,7 +248,7 @@ public class ConnectionTest: Drt.TestCase
             expect_double_equals(2.72, user.height, "height");
             expect_false(user.alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 user.blob, "blob");
             expect(null == user.extra, "extra");
             expect_int_equals(1024, user.not_in_db, "not_in_db");

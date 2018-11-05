@@ -352,7 +352,7 @@ public class ResultTest: Drt.TestCase
             expect_blob_equal("30".data, result.fetch_blob(2), "age");
             expect_blob_equal("1.72".data, result.fetch_blob(3), "height");
             expect_blob_equal(
-                new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7},
+                new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7},
                 result.fetch_blob(4), "blob");
             expect_blob_equal("1".data, result.fetch_blob(5), "alive");
             expect_blob_equal(null, result.fetch_blob(6), "extra");
@@ -389,7 +389,7 @@ public class ResultTest: Drt.TestCase
             expect_bytes_equal(new GLib.Bytes.take("30".data), result.fetch_bytes(2), "age");
             expect_bytes_equal(new GLib.Bytes.take("1.72".data), result.fetch_bytes(3), "height");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 result.fetch_bytes(4), "blob");
             expect_bytes_equal(new GLib.Bytes.take("1".data), result.fetch_bytes(5), "alive");
             expect_bytes_equal(null, result.fetch_bytes(6), "extra");
@@ -426,7 +426,7 @@ public class ResultTest: Drt.TestCase
             expect_byte_array_equal(new GLib.ByteArray.take("30".data), result.fetch_byte_array(2), "age");
             expect_byte_array_equal(new GLib.ByteArray.take("1.72".data), result.fetch_byte_array(3), "height");
             expect_byte_array_equal(
-                new GLib.ByteArray.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                new GLib.ByteArray.take(new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 result.fetch_byte_array(4), "blob");
             expect_byte_array_equal(new GLib.ByteArray.take("1".data), result.fetch_byte_array(5), "alive");
             expect_byte_array_equal(null, result.fetch_byte_array(6), "extra");
@@ -478,7 +478,7 @@ public class ResultTest: Drt.TestCase
             expect_value_equal((int64)1, result.fetch_value_of_type(3, typeof(int64)), "int64");
             expect_value_equal(true, result.fetch_value_of_type(3, typeof(bool)), "bool");
             expect_value_equal("1.72", result.fetch_value_of_type(3, typeof(string)), "string");
-            uint8[] blob = {7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7};
+            uint8[] blob = {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7};
             expect_value_equal(new GLib.Bytes(blob), result.fetch_value_of_type(4, typeof(GLib.Bytes)), "bytes");
             expect_value_equal(new GLib.ByteArray.take(blob), result.fetch_value_of_type(4, typeof(GLib.ByteArray)), "byte array");
 

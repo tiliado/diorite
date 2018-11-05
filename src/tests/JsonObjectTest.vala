@@ -75,16 +75,16 @@ public class JsonObjectTest: Drt.TestCase
         var object = load_object();
         unowned JsonNode? node;
         string[] results = {
-            "null",  // null
-            "bool",    // true
-            "bool",   // false
-            "int",   // -1234
-            "double",  // -12.34
-            "string",  // ""
-            "string",  // "string"
-            "array",  // array
-            "object",  // object
-            "nothing",   // nothing
+            "null", // null
+            "bool", // true
+            "bool", // false
+            "int", // -1234
+            "double", // -12.34
+            "string", // ""
+            "string", // "string"
+            "array", // array
+            "object", // object
+            "nothing", // nothing
         };
         for (uint i = 0; i < results.length; i++)
         {
@@ -138,16 +138,16 @@ public class JsonObjectTest: Drt.TestCase
         uint i;
         string key;
         string[] results = {
-            "null",  // null
-            "bool",    // true
-            "bool",   // false
-            "int",   // -1234
-            "double",  // -12.34
-            "string",  // ""
-            "string",  // "string"
-            "array",  // array
-            "object",  // object
-            "nothing",   // nothing
+            "null", // null
+            "bool", // true
+            "bool", // false
+            "int", // -1234
+            "double", // -12.34
+            "string", // ""
+            "string", // "string"
+            "array", // array
+            "object", // object
+            "nothing", // nothing
         };
         key = " ";
         for (i = 0; i < results.length; i++)
@@ -258,16 +258,16 @@ public class JsonObjectTest: Drt.TestCase
         var object = load_object();
         bool val = true;
         GLib.Value[,] results = {
-            {false, false},  // null
-            {true, true},    // true
-            {true, false},   // false
-            {false, true},   // -1234
-            {false, false},  // -12.34
-            {false, false},  // ""
-            {false, false},  // "string"
-            {false, false},  // array
-            {false, false},  // object
-            {false, false},   // nothing
+            {false, false}, // null
+            {true, true}, // true
+            {true, false}, // false
+            {false, true}, // -1234
+            {false, false}, // -12.34
+            {false, false}, // ""
+            {false, false}, // "string"
+            {false, false}, // array
+            {false, false}, // object
+            {false, false}, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++)
@@ -286,16 +286,16 @@ public class JsonObjectTest: Drt.TestCase
         bool val = true;
         uint i;
         GLib.Value[,] results = {
-            {false, false},  // null
-            {true, true},    // true
-            {true, false},   // false
-            {false, true},   // -1234
-            {false, false},  // -12.34
-            {false, false},  // ""
-            {false, false},  // "string"
-            {false, false},  // array
-            {false, false},  // object
-            {false, false},  // nothing
+            {false, false}, // null
+            {true, true}, // true
+            {true, false}, // false
+            {false, true}, // -1234
+            {false, false}, // -12.34
+            {false, false}, // ""
+            {false, false}, // "string"
+            {false, false}, // array
+            {false, false}, // object
+            {false, false}, // nothing
         };
         key = " ";
         for (i = 0; i < results.length[0]; i++)
@@ -333,16 +333,16 @@ public class JsonObjectTest: Drt.TestCase
     {
         var object = load_object();
         bool[] results = {
-            false,  // null
-            true,   // true
-            false,  // false
-            false,  // -1234
-            false,  // -12.34
-            false,  // ""
-            false,  // "string"
-            false,  // array
-            false,  // object
-            false,  // nothing
+            false, // null
+            true, // true
+            false, // false
+            false, // -1234
+            false, // -12.34
+            false, // ""
+            false, // "string"
+            false, // array
+            false, // object
+            false, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length; i++)
@@ -357,16 +357,16 @@ public class JsonObjectTest: Drt.TestCase
         var object = load_object();
         int val = -1;
         GLib.Value[,] results = {
-            {false, 0},     // null
-            {false, 1},     // true
-            {false, 0},     // false
-            {true, -1234},  // -1234
-            {false, 0},     // -12.34
-            {false, 0},     // ""
-            {false, 0},     // "string"
-            {false, 0},     // array
-            {false, 0},     // object
-            {false, 0},     // nothing
+            {false, 0}, // null
+            {false, 1}, // true
+            {false, 0}, // false
+            {true, -1234}, // -1234
+            {false, 0}, // -12.34
+            {false, 0}, // ""
+            {false, 0}, // "string"
+            {false, 0}, // array
+            {false, 0}, // object
+            {false, 0}, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++)
@@ -386,16 +386,16 @@ public class JsonObjectTest: Drt.TestCase
         int val = -1;
         uint i;
         GLib.Value[,] results = {
-            {false, 0},     // null
-            {false, 1},     // true
-            {false, 0},     // false
-            {true, -1234},  // -1234
-            {false, 0},     // -12.34
-            {false, 0},     // ""
-            {false, 0},     // "string"
-            {false, 0},     // array
-            {false, 0},     // object
-            {false, 0},     // nothing
+            {false, 0}, // null
+            {false, 1}, // true
+            {false, 0}, // false
+            {true, -1234}, // -1234
+            {false, 0}, // -12.34
+            {false, 0}, // ""
+            {false, 0}, // "string"
+            {false, 0}, // array
+            {false, 0}, // object
+            {false, 0}, // nothing
         };
         for (i = 0; i < results.length[0]; i++)
         {
@@ -436,16 +436,16 @@ public class JsonObjectTest: Drt.TestCase
     {
         var object = load_object();
         int[] results = {
-            -7,     // null
-            -7,     // true
-            -7,     // false
-            -1234,  // -1234
-            -7,     // -12.34
-            -7,     // ""
-            -7,     // "string"
-            -7,     // array
-            -7,     // object
-            -7,     // nothing
+            -7, // null
+            -7, // true
+            -7, // false
+            -1234, // -1234
+            -7, // -12.34
+            -7, // ""
+            -7, // "string"
+            -7, // array
+            -7, // object
+            -7, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length; i++)
@@ -460,16 +460,16 @@ public class JsonObjectTest: Drt.TestCase
         var object = load_object();
         double val = -1.0;
         GLib.Value[,] results = {
-            {false, 0.0},    // null
-            {false, 0.0},    // true
-            {false, 0.0},    // false
-            {false, 0.0},    // -1234
-            {true, -12.34},  // -12.34
-            {false, 0.0},    // ""
-            {false, 0.0},    // "string"
-            {false, 0.0},    // array
-            {false, 0.0},    // object
-            {false, 0.0},    // nothing
+            {false, 0.0}, // null
+            {false, 0.0}, // true
+            {false, 0.0}, // false
+            {false, 0.0}, // -1234
+            {true, -12.34}, // -12.34
+            {false, 0.0}, // ""
+            {false, 0.0}, // "string"
+            {false, 0.0}, // array
+            {false, 0.0}, // object
+            {false, 0.0}, // nothing
         };
         for (uint i = 0; i < results.length[0]; i++)
         {
@@ -489,16 +489,16 @@ public class JsonObjectTest: Drt.TestCase
         double val = -1;
         uint i;
         GLib.Value[,] results = {
-            {false, 0.0},    // null
-            {false, 0.0},    // true
-            {false, 0.0},    // false
-            {false, 0.0},    // -1234
-            {true, -12.34},  // -12.34
-            {false, 0.0},    // ""
-            {false, 0.0},    // "string"
-            {false, 0.0},    // array
-            {false, 0.0},    // object
-            {false, 0.0},    // nothing
+            {false, 0.0}, // null
+            {false, 0.0}, // true
+            {false, 0.0}, // false
+            {false, 0.0}, // -1234
+            {true, -12.34}, // -12.34
+            {false, 0.0}, // ""
+            {false, 0.0}, // "string"
+            {false, 0.0}, // array
+            {false, 0.0}, // object
+            {false, 0.0}, // nothing
         };
         key = " ";
         for (i = 0; i < results.length[0]; i++)
@@ -539,16 +539,16 @@ public class JsonObjectTest: Drt.TestCase
     {
         var object = load_object();
         double[] results = {
-            -5.6,    // null
-            -5.6,    // true
-            -5.6,    // false
-            -5.6,    // -1234
-            -12.34,  // -12.34
-            -5.6,    // ""
-            -5.6,    // "string"
-            -5.6,    // array
-            -5.6,    // object
-            -5.6,    // nothing
+            -5.6, // null
+            -5.6, // true
+            -5.6, // false
+            -5.6, // -1234
+            -12.34, // -12.34
+            -5.6, // ""
+            -5.6, // "string"
+            -5.6, // array
+            -5.6, // object
+            -5.6, // nothing
         };
         for (uint i = 0; i < results.length; i++)
         {
@@ -563,16 +563,16 @@ public class JsonObjectTest: Drt.TestCase
         var object = load_object();
         string? val = null;
         GLib.Value?[,] results = {
-            {false, null},     // null
-            {false, null},     // true
-            {false, null},     // false
-            {false, null},     // -1234
-            {false, null},     // -12.34
-            {true, ""},        // ""
-            {true, "string"},  // "string"
-            {false, null},     // array
-            {false, null},     // object
-            {false, null},     // nothing
+            {false, null}, // null
+            {false, null}, // true
+            {false, null}, // false
+            {false, null}, // -1234
+            {false, null}, // -12.34
+            {true, ""}, // ""
+            {true, "string"}, // "string"
+            {false, null}, // array
+            {false, null}, // object
+            {false, null}, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++)
@@ -592,16 +592,16 @@ public class JsonObjectTest: Drt.TestCase
         string? val = null;
         uint i;
         GLib.Value?[,] results = {
-            {false, null},     // null
-            {false, null},     // true
-            {false, null},     // false
-            {false, null},     // -1234
-            {false, null},     // -12.34
-            {true, ""},        // ""
-            {true, "string"},  // "string"
-            {false, null},     // array
-            {false, null},     // object
-            {false, null},     // nothing
+            {false, null}, // null
+            {false, null}, // true
+            {false, null}, // false
+            {false, null}, // -1234
+            {false, null}, // -12.34
+            {true, ""}, // ""
+            {true, "string"}, // "string"
+            {false, null}, // array
+            {false, null}, // object
+            {false, null}, // nothing
         };
         key = " ";
         for (i = 0; i < results.length[0]; i++)
@@ -641,16 +641,16 @@ public class JsonObjectTest: Drt.TestCase
     {
         var object = load_object();
         string[] results = {
-            "abc",     // "abc"
-            "abc",     // true
-            "abc",     // false
-            "abc",     // -1234
-            "abc",     // -12.34
-            "",        // ""
-            "string",  // "string"
-            "abc",     // array
-            "abc",     // object
-            "abc",     // nothing
+            "abc", // "abc"
+            "abc", // true
+            "abc", // false
+            "abc", // -1234
+            "abc", // -12.34
+            "", // ""
+            "string", // "string"
+            "abc", // array
+            "abc", // object
+            "abc", // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length; i++)
@@ -664,16 +664,16 @@ public class JsonObjectTest: Drt.TestCase
     {
         var object = load_object();
         bool[] results = {
-            true,   // null
-            false,  // true
-            false,  // false
-            false,  // -1234
-            false,  // -12.34
-            false,  // ""
-            false,  // "string"
-            false,  // array
-            false,  // object
-            false,  // nothing
+            true, // null
+            false, // true
+            false, // false
+            false, // -1234
+            false, // -12.34
+            false, // ""
+            false, // "string"
+            false, // array
+            false, // object
+            false, // nothing
         };
         var key = " ";
         for (uint i = 0; i < results.length; i++)

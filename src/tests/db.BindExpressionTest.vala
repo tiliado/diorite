@@ -96,13 +96,13 @@ public class BindExpressionTest: Drt.TestCase
         var binder = new BindExpression();
         expect_no_error(() => binder.parse("WHERE name = ?s", "John"), "binder.parse");
         var sql = binder.get_sql();
-        expect_str_equals("WHERE name = ?",	sql, "sql");
+        expect_str_equals("WHERE name = ?", sql, "sql");
         unowned SList<Value?> values = binder.get_values();
         expect_uint_equals(1, values.length(), "n values");
 
         binder.reset();
         sql = binder.get_sql();
-        expect_str_equals("",	sql, "sql");
+        expect_str_equals("", sql, "sql");
         values = binder.get_values();
         expect_uint_equals(0, values.length(), "n values");
     }

@@ -219,7 +219,7 @@ public void copy_tree(File source_dir, File dest_dir, Cancellable? cancellable=n
         var dest_item = dest_dir.get_child(name);
         if (source_item.query_file_type(0) == FileType.DIRECTORY) {
             copy_tree(source_item, dest_item, cancellable);
-        } else if(source_item.query_file_type(0) == FileType.REGULAR) {
+        } else if (source_item.query_file_type(0) == FileType.REGULAR) {
             source_item.copy(dest_item, 0, cancellable);
         } else {
             warning("Skipped: %s", source_item.get_path());

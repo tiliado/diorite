@@ -82,7 +82,7 @@ public class RpcRouter: GLib.Object {
             return false;
         }
         Idle.add(() => {
-            notification.emit.begin(detail, data , (o, res) => {notification.emit.end(res);});
+            notification.emit.begin(detail, data, (o, res) => {notification.emit.end(res);});
             return false;
         });
         return true;

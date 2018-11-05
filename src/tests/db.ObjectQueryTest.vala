@@ -120,7 +120,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(1.72, users[0].height, "height");
             expect_true(users[0].alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
             expect_int_equals(1024, users[0].not_in_db, "not_in_db");
@@ -131,7 +131,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(2.72, users[1].height, "height");
             expect_false(users[1].alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[1].blob, "blob");
             expect(null == users[1].extra, "extra");
             expect_int_equals(1024, users[1].not_in_db, "not_in_db");
@@ -160,7 +160,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(2.72, users[0].height, "height");
             expect_false(users[0].alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
             expect_int_equals(1024, users[0].not_in_db, "not_in_db");
@@ -197,7 +197,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(1.72, users[0].height, "height");
             expect_true(users[0].alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 5, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
             expect_int_equals(1024, users[0].not_in_db, "not_in_db");
@@ -208,7 +208,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(2.72, users[1].height, "height");
             expect_false(users[1].alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[1].blob, "blob");
             expect(null == users[1].extra, "extra");
             expect_int_equals(1024, users[1].not_in_db, "not_in_db");
@@ -261,7 +261,7 @@ public class ObjectQueryTest: Drt.TestCase
             expect_double_equals(2.72, user.height, "height");
             expect_false(user.alive, "alive");
             expect_bytes_equal(
-                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2 , 1, 0, 1, 2, 3, 4, 6, 6, 7}),
+                new GLib.Bytes.take(new uint8[]{7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 user.blob, "blob");
             expect(null == user.extra, "extra");
             expect_int_equals(1024, user.not_in_db, "not_in_db");

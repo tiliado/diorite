@@ -148,7 +148,7 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
             for (int i = 0, size = device_sockets.length; i < size; i++) {
                 unowned GLib.Socket socket = device_sockets[i];
                 try {
-                    if(!socket.is_closed())
+                    if (!socket.is_closed())
                     socket.close();
                 } catch (GLib.Error e) {
                     warning("Failed to close bluetooth socket %d of device %s. %s", socket.fd, device, e.message);
