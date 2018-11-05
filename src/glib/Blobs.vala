@@ -97,8 +97,7 @@ public string? blob_to_string(uint8[]? value) {
  * @param value    The binary blob to convert. It may be null.
  * @return Printable representation of the value if it is not null, `null` otherwise.
  */
-public string? bytes_to_string(GLib.Bytes? value)
-{
+public string? bytes_to_string(GLib.Bytes? value) {
     return blob_to_string(value != null ? value.get_data() : null);
 }
 
@@ -120,7 +119,7 @@ public string? byte_array_to_string(GLib.ByteArray? value) {
  * @param val       The value to convert.
  * @param result    The resulting binary representation (an array of 8 bytes).
  */
-public void int64_to_blob(int64 val, out uint8[] result)  {
+public void int64_to_blob(int64 val, out uint8[] result) {
     var size = (int) sizeof(int64);
     result = new uint8[size];
     for (int i = size - 1; i >= 0; i--) {

@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * Parser of SQL bind expressions.
@@ -42,24 +41,21 @@ namespace Drtdb
  *
  * This way, it is possible to use a single var arg function to bind all placeholders.
  */
-public class BindExpression
-{
+public class BindExpression {
     private SList<Value?> values;
     private StringBuilder sql;
 
     /**
      * Create new bind expression parser
      */
-    public BindExpression()
-    {
+    public BindExpression() {
         reset();
     }
 
     /**
      * Reset the parser to the initial state.
      */
-    public void reset()
-    {
+    public void reset() {
         values = null;
         if (sql == null)
         sql = new StringBuilder("");
@@ -72,8 +68,7 @@ public class BindExpression
      *
      * @return data as {@link GLib.Value} instances
      */
-    public unowned SList<Value?> get_values()
-    {
+    public unowned SList<Value?> get_values() {
         return values;
     }
 
@@ -82,8 +77,7 @@ public class BindExpression
      *
      * @return SQL query without data type specifiers
      */
-    public unowned string get_sql()
-    {
+    public unowned string get_sql() {
         return sql.str;
     }
 
@@ -94,8 +88,7 @@ public class BindExpression
      * @param ...        data corresponding to the placeholders in the sql string
      * @throws DatabaseError if the expression contains invalid data type or is incomplete
      */
-    public void parse(string sql_str, ...) throws DatabaseError
-    {
+    public void parse(string sql_str, ...) throws DatabaseError {
         parse_va(sql_str, va_list());
     }
 
@@ -106,25 +99,21 @@ public class BindExpression
      * @param args       data corresponding to the placeholders in the sql string
      * @throws DatabaseError if the expression contains invalid data type or is incomplete
      */
-    public void parse_va(string sql_str, va_list args) throws DatabaseError
-    {
+    public void parse_va(string sql_str, va_list args) throws DatabaseError {
         var offset = 0;
         var len = sql_str.length;
         unowned uint8[] data = sql_str.data;
         int pos;
-        for (pos = 0; pos < len; pos++)
-        {
+        for (pos = 0; pos < len; pos++) {
             uint8 c = data[pos];
-            if (c == '?')
-            {
+            if (c == '?') {
                 pos++;
                 sql.append_len(Drt.String.offset(sql_str, offset), pos - offset);
                 if (pos >= len)
                 throw new DatabaseError.MISUSE("Unexpected end of data at %d.", pos - 1);
                 offset = pos + 1;
                 Value? val = null;
-                switch (data[pos])
-                {
+                switch (data[pos]) {
                 case 'v':
                     val = args.arg();
                     break;

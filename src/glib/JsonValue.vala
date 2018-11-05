@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * Types of values the {@link JsonValue} object can hold.
  */
-public enum JsonValueType
-{
+public enum JsonValueType {
     /**
      * The value is `null`
      */
@@ -55,10 +53,8 @@ public enum JsonValueType
 /**
  * JSON Value holds boolean, integer, float, string and null values.
  */
-public class JsonValue: JsonNode
-{
-    public static string escape_string(string? str)
-    {
+public class JsonValue: JsonNode {
+    public static string escape_string(string? str) {
         if (str == null)
         return "";
         return_val_if_fail(str.validate(), "");
@@ -81,8 +77,7 @@ public class JsonValue: JsonNode
     /**
      * Creates a new null {@link JsonValue}.
      */
-    public JsonValue.@null()
-    {
+    public JsonValue.@null() {
         value_type = JsonValueType.NULL;
     }
 
@@ -91,8 +86,7 @@ public class JsonValue: JsonNode
      *
      * @param bool_value    Boolean value.
      */
-    public JsonValue.@bool(bool bool_value)
-    {
+    public JsonValue.@bool(bool bool_value) {
         value_type = JsonValueType.BOOLEAN;
         this.int_value = bool_value ? 1 : 0;
     }
@@ -102,8 +96,7 @@ public class JsonValue: JsonNode
      *
      * @param int_value    Integer value.
      */
-    public JsonValue.@int(int int_value)
-    {
+    public JsonValue.@int(int int_value) {
         value_type = JsonValueType.INTEGER;
         this.int_value = int_value;
     }
@@ -113,8 +106,7 @@ public class JsonValue: JsonNode
      *
      * @param double_value    Double value.
      */
-    public JsonValue.@double(double double_value)
-    {
+    public JsonValue.@double(double double_value) {
         value_type = JsonValueType.DOUBLE;
         this.double_value = double_value;
     }
@@ -124,8 +116,7 @@ public class JsonValue: JsonNode
      *
      * @param string_value    String value.
      */
-    public JsonValue.@string(string? string_value)
-    {
+    public JsonValue.@string(string? string_value) {
         value_type = JsonValueType.STRING;
         this.string_value = string_value;
     }
@@ -140,8 +131,7 @@ public class JsonValue: JsonNode
      * @return the actual string value if this is of type {@link JsonValueType.STRING},
      *     undefined result otherwise
      */
-    public unowned string? get_string()
-    {
+    public unowned string? get_string() {
         return_val_if_fail(value_type == JsonValueType.STRING, null);
         return string_value;
     }
@@ -156,8 +146,7 @@ public class JsonValue: JsonNode
      * @return the copy of the actual string value if this is of type {@link JsonValueType.STRING},
      *     undefined result otherwise
      */
-    public string? dup_string()
-    {
+    public string? dup_string() {
         return_val_if_fail(value_type == JsonValueType.STRING, null);
         return string_value;
     }
@@ -169,8 +158,7 @@ public class JsonValue: JsonNode
      * @return `true` if this holds {@link JsonValueType.STRING} and so `result` is valid,
      *     `false` otherwise
      */
-    public bool try_string(out string? result)
-    {
+    public bool try_string(out string? result) {
         result = string_value;
         return value_type == JsonValueType.STRING;
     }
@@ -185,8 +173,7 @@ public class JsonValue: JsonNode
      * @return the actual boolean value if this is of type {@link JsonValueType.BOOLEAN},
      *     undefined result otherwise
      */
-    public bool get_bool()
-    {
+    public bool get_bool() {
         return_val_if_fail(value_type == JsonValueType.BOOLEAN, false);
         return int_value != 0 ? true : false;
     }
@@ -198,8 +185,7 @@ public class JsonValue: JsonNode
      * @return `true` if this holds {@link JsonValueType.BOOLEAN} and so `result` is valid,
      *     `false` otherwise
      */
-    public bool try_bool(out bool result)
-    {
+    public bool try_bool(out bool result) {
         result = int_value != 0 ? true : false;
         return value_type == JsonValueType.BOOLEAN;
     }
@@ -214,8 +200,7 @@ public class JsonValue: JsonNode
      * @return the actual integer value if this is of type {@link JsonValueType.INTEGER},
      *     undefined result otherwise
      */
-    public int get_int()
-    {
+    public int get_int() {
         return_val_if_fail(value_type == JsonValueType.INTEGER, 0);
         return int_value;
     }
@@ -227,8 +212,7 @@ public class JsonValue: JsonNode
      * @return `true` if this holds {@link JsonValueType.INTEGER} and so `result` is valid,
      *     `false` otherwise
      */
-    public bool try_int(out int result)
-    {
+    public bool try_int(out int result) {
         result = int_value;
         return value_type == JsonValueType.INTEGER;
     }
@@ -243,8 +227,7 @@ public class JsonValue: JsonNode
      * @return the actual double value if this is of type {@link JsonValueType.DOUBLE},
      *     undefined result otherwise
      */
-    public double get_double()
-    {
+    public double get_double() {
         return_val_if_fail(value_type == JsonValueType.DOUBLE, 0.0);
         return double_value;
     }
@@ -256,8 +239,7 @@ public class JsonValue: JsonNode
      * @return `true` if this holds {@link JsonValueType.DOUBLE} and so `result` is valid,
      *     `false` otherwise
      */
-    public bool try_double(out double result)
-    {
+    public bool try_double(out double result) {
         result = double_value;
         return value_type == JsonValueType.DOUBLE;
     }
@@ -267,10 +249,8 @@ public class JsonValue: JsonNode
      *
      * @return a string representation of the node
      */
-    public override string to_string()
-    {
-        switch (value_type)
-        {
+    public override string to_string() {
+        switch (value_type) {
         case JsonValueType.NULL:
             return "null";
         case JsonValueType.BOOLEAN:

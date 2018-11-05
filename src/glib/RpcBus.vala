@@ -81,7 +81,7 @@ public class RpcBus: GLib.Object {
      * @return New RpcChannel.
      * @throws IOError on failure.
      */
-    public RpcChannel connect_channel(string name, uint timeout) throws IOError	{
+    public RpcChannel connect_channel(string name, uint timeout) throws IOError {
         var id = get_next_client_id();
         var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
             id: id, channel: new SocketChannel.from_name(id, name, timeout), router: router);
@@ -97,7 +97,7 @@ public class RpcBus: GLib.Object {
      * @return New RpcChannel.
      * @throws IOError on failure.
      */
-    public RpcChannel connect_channel_socket(Socket socket, uint timeout) throws IOError	{
+    public RpcChannel connect_channel_socket(Socket socket, uint timeout) throws IOError {
         var id = get_next_client_id();
         var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
             id: id, channel: new SocketChannel.from_socket(id, socket, timeout), router: router);
@@ -114,15 +114,15 @@ public class RpcBus: GLib.Object {
         if (service != null) {
             return;
         }
-        try	{
+        try {
             File.new_for_path(path).delete();
-        } catch (GLib.Error e) 	{
+        } catch (GLib.Error e) {
         }
 
         var address = new UnixSocketAddress(path);
         service = new SocketService();
         SocketAddress effective_address;
-        try	{
+        try {
             service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
         } catch (GLib.Error e) {
             throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);

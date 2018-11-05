@@ -19,21 +19,17 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class EventLoopTest: Drt.TestCase
-{
-    public void test_add_idle()
-    {
+public class EventLoopTest: Drt.TestCase {
+    public void test_add_idle() {
         var loop = new MainLoop();
         MainContext? ctx = null;
-        Drt.EventLoop.add_idle(() =>
-            {
-                ctx = MainContext.ref_thread_default();
-                loop.quit();
-                return false;
-            });
+        Drt.EventLoop.add_idle(() => {
+            ctx = MainContext.ref_thread_default();
+            loop.quit();
+            return false;
+        });
         loop.run();
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
@@ -42,12 +38,11 @@ public class EventLoopTest: Drt.TestCase
             thread_ctx.push_thread_default();
             var ctx2 = MainContext.ref_thread_default();
             var loop2 = new MainLoop(ctx2);
-            Drt.EventLoop.add_idle(() =>
-                {
-                    ctx = MainContext.get_thread_default();
-                    loop2.quit();
-                    return false;
-                });
+            Drt.EventLoop.add_idle(() => {
+                ctx = MainContext.get_thread_default();
+                loop2.quit();
+                return false;
+            });
             loop2.run();
             return thread_ctx;
         });
@@ -55,16 +50,14 @@ public class EventLoopTest: Drt.TestCase
         expect_true(MainContext.@default() != ctx, "Current context is not global");
     }
 
-    public void test_add_timeout_ms()
-    {
+    public void test_add_timeout_ms() {
         var loop = new MainLoop();
         MainContext? ctx = null;
-        Drt.EventLoop.add_timeout_ms(5, () =>
-            {
-                ctx = MainContext.ref_thread_default();
-                loop.quit();
-                return false;
-            });
+        Drt.EventLoop.add_timeout_ms(5, () => {
+            ctx = MainContext.ref_thread_default();
+            loop.quit();
+            return false;
+        });
         loop.run();
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
@@ -73,12 +66,11 @@ public class EventLoopTest: Drt.TestCase
             thread_ctx.push_thread_default();
             var ctx2 = MainContext.ref_thread_default();
             var loop2 = new MainLoop(ctx2);
-            Drt.EventLoop.add_timeout_ms(5, () =>
-                {
-                    ctx = MainContext.get_thread_default();
-                    loop2.quit();
-                    return false;
-                });
+            Drt.EventLoop.add_timeout_ms(5, () => {
+                ctx = MainContext.get_thread_default();
+                loop2.quit();
+                return false;
+            });
             loop2.run();
             return thread_ctx;
         });
@@ -86,16 +78,14 @@ public class EventLoopTest: Drt.TestCase
         expect_true(MainContext.@default() != ctx, "Current context is not global");
     }
 
-    public void test_resume_later()
-    {
+    public void test_resume_later() {
         var loop = new MainLoop();
         MainContext? before = null;
         MainContext? after = null;
-        run_resume_later.begin((o, res) =>
-            {
-                run_resume_later.end(res, out before, out after);
-                loop.quit();
-            });
+        run_resume_later.begin((o, res) => {
+            run_resume_later.end(res, out before, out after);
+            loop.quit();
+        });
         loop.run();
         expect_true(after == before, "Before and after contexts are same.");
         expect_true(MainContext.@default() == before, "Before context is global");
@@ -107,11 +97,10 @@ public class EventLoopTest: Drt.TestCase
             var thread_ctx = new MainContext();
             thread_ctx.push_thread_default();
             var loop2 = new MainLoop(thread_ctx);
-            run_resume_later.begin((o, res) =>
-                {
-                    run_resume_later.end(res, out before, out after);
-                    loop2.quit();
-                });
+            run_resume_later.begin((o, res) => {
+                run_resume_later.end(res, out before, out after);
+                loop2.quit();
+            });
             loop2.run();
             return thread_ctx;
         });
@@ -124,8 +113,7 @@ public class EventLoopTest: Drt.TestCase
 
     }
 
-    private async void run_resume_later(out MainContext? before, out MainContext? after)
-    {
+    private async void run_resume_later(out MainContext? before, out MainContext? after) {
         before = MainContext.ref_thread_default();
         yield Drt.EventLoop.resume_later();
         after = MainContext.ref_thread_default();

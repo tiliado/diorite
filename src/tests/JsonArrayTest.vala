@@ -21,14 +21,11 @@
 
 using Drt.Utils;
 
-namespace Drt
-{
+namespace Drt {
 
-public class JsonArrayTest: Drt.TestCase
-{
+public class JsonArrayTest: Drt.TestCase {
 
-    private JsonArray load_array() throws GLib.Error
-    {
+    private JsonArray load_array() throws GLib.Error {
         return JsonParser.load_array("""
 			[
 			null,
@@ -44,8 +41,7 @@ public class JsonArrayTest: Drt.TestCase
 			""");
     }
 
-    public void test_append_prepend_insert_remove() throws GLib.Error
-    {
+    public void test_append_prepend_insert_remove() throws GLib.Error {
         var array = new JsonArray();
         var null_val = new JsonValue.@null();
         array.append(null_val);
@@ -147,8 +143,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_critical_message("DioriteGlib", "*assertion '* != NULL' failed", "invalid index");
     }
 
-    public void test_set() throws GLib.Error
-    {
+    public void test_set() throws GLib.Error {
         var array = new JsonArray();
         var null_val = new JsonValue.@null();
         array[1] = null_val;
@@ -174,8 +169,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_true(array[1] == double_val, "item 1 equals");
     }
 
-    public void test_get() throws GLib.Error
-    {
+    public void test_get() throws GLib.Error {
         var array = load_array();
         unowned JsonNode? node;
         string[] results = {
@@ -190,11 +184,9 @@ public class JsonArrayTest: Drt.TestCase
             "object", // object
             "nothing", // nothing
         };
-        for (uint i = 0; i < results.length; i++)
-        {
+        for (uint i = 0; i < results.length; i++) {
             node = array.get(i);
-            switch (results[i])
-            {
+            switch (results[i]) {
             case "null":
                 if (expect_type_of<JsonValue>(node, "array[%u]", i))
                 expect_true(node.is_null(), "array[%u] is %s", i, results[i]);
@@ -233,8 +225,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_dotget() throws GLib.Error
-    {
+    public void test_dotget() throws GLib.Error {
         var array = load_array();
         unowned JsonNode? node;
         uint i;
@@ -252,11 +243,9 @@ public class JsonArrayTest: Drt.TestCase
             "nothing", // nothing
         };
 
-        for (i = 0; i < results.length; i++)
-        {
+        for (i = 0; i < results.length; i++) {
             node = array.dotget(i.to_string());
-            switch (results[i])
-            {
+            switch (results[i]) {
             case "null":
                 if (expect_type_of<JsonValue>(node, "array[%u]", i))
                 expect_true(node.is_null(), "array[%u] is %s", i, results[i]);
@@ -294,12 +283,10 @@ public class JsonArrayTest: Drt.TestCase
             }
         }
 
-        for (i = 0; i < results.length; i++)
-        {
+        for (i = 0; i < results.length; i++) {
             key = "7.%u".printf(i);
             node = array.dotget(key);
-            switch (results[i])
-            {
+            switch (results[i]) {
             case "null":
                 if (expect_type_of<JsonValue>(node, "array[%s]", key))
                 expect_true(node.is_null(), "array[%s] is %s", key, results[i]);
@@ -344,8 +331,7 @@ public class JsonArrayTest: Drt.TestCase
             {"7..", "*drt_json_array_dotget*assertion*!= 0*failed*"},
             {"a", ""},
         };
-        for (i = 0; i < results2.length[0]; i++)
-        {
+        for (i = 0; i < results2.length[0]; i++) {
             unowned string ukey = results2[i, 0];
             expect_null(array.dotget(ukey), "invalid key '%s'", ukey);
             unowned string msg = results2[i, 1];
@@ -354,8 +340,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_bool() throws GLib.Error
-    {
+    public void test_get_bool() throws GLib.Error {
         var array = load_array();
         bool val = true;
         GLib.Value[,] results = {
@@ -370,15 +355,13 @@ public class JsonArrayTest: Drt.TestCase
             {false, false}, // object
             {false, false}, // nothing
         };
-        for (uint i = 0; i < results.length[0]; i++)
-        {
+        for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.get_bool(i, out val), "get_bool(%u)", i);
             expect(results[i, 1] == val, "[%u] == %s", i, results[i, 1].get_boolean().to_string());
         }
     }
 
-    public void test_dotget_bool() throws GLib.Error
-    {
+    public void test_dotget_bool() throws GLib.Error {
         var array = load_array();
         string key;
         unowned string ukey;
@@ -396,13 +379,11 @@ public class JsonArrayTest: Drt.TestCase
             {false, false}, // object
             {false, false}, // nothing
         };
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.dotget_bool(i.to_string(), out val), "get_bool('%u')", i);
             expect(results[i, 1] == val, "['%u'] == %s", i, results[i, 1].get_boolean().to_string());
         }
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0] == array.dotget_bool(key, out val), "get_bool('%s')", key);
             expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
@@ -415,8 +396,7 @@ public class JsonArrayTest: Drt.TestCase
             {"7..", false, "*drt_json_array_dotget*assertion*!= 0*failed*", false},
             {"a", false, "", false},
         };
-        for (i = 0; i < results2.length[0]; i++)
-        {
+        for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
             expect(results2[i, 1] == array.dotget_bool(ukey, out val), "invalid key '%s'", ukey);
             unowned string msg = results2[i, 2].get_string();
@@ -426,8 +406,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_int() throws GLib.Error
-    {
+    public void test_get_int() throws GLib.Error {
         var array = load_array();
         int val = -1;
         GLib.Value[,] results = {
@@ -442,16 +421,14 @@ public class JsonArrayTest: Drt.TestCase
             {false, 0}, // object
             {false, 0}, // nothing
         };
-        for (uint i = 0; i < results.length[0]; i++)
-        {
+        for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.get_int(i, out val), "get_int(%u)", i);
             var exp_val = results[i, 1].get_int();
             expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
         }
     }
 
-    public void test_dotget_int() throws GLib.Error
-    {
+    public void test_dotget_int() throws GLib.Error {
         var array = load_array();
         string key;
         unowned string ukey;
@@ -469,14 +446,12 @@ public class JsonArrayTest: Drt.TestCase
             {false, 0}, // object
             {false, 0}, // nothing
         };
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.dotget_int(i.to_string(), out val), "dotget_int(%u)", i);
             var exp_val = results[i, 1].get_int();
             expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
         }
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0] == array.dotget_int(key, out val), "dotget_int('%s')", key);
             var exp_val = results[i, 1].get_int();
@@ -490,8 +465,7 @@ public class JsonArrayTest: Drt.TestCase
             {"7..", false, "*drt_json_array_dotget*assertion*!= 0*failed*", 0},
             {"a", false, "", 0},
         };
-        for (i = 0; i < results2.length[0]; i++)
-        {
+        for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
             expect(results2[i, 1] == array.dotget_int(ukey, out val), "invalid key '%s'", ukey);
             unowned string msg = results2[i, 2].get_string();
@@ -502,8 +476,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_double() throws GLib.Error
-    {
+    public void test_get_double() throws GLib.Error {
         var array = load_array();
         double val = -1.0;
         GLib.Value[,] results = {
@@ -518,16 +491,14 @@ public class JsonArrayTest: Drt.TestCase
             {false, 0.0}, // object
             {false, 0.0}, // nothing
         };
-        for (uint i = 0; i < results.length[0]; i++)
-        {
+        for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.get_double(i, out val), "get_double(%u)", i);
             var exp_val = results[i, 1].get_double();
             expect_double_equals(exp_val, val, "[%u] == %f", i, exp_val);
         }
     }
 
-    public void test_dotget_double() throws GLib.Error
-    {
+    public void test_dotget_double() throws GLib.Error {
         var array = load_array();
         string key;
         unowned string ukey;
@@ -545,14 +516,12 @@ public class JsonArrayTest: Drt.TestCase
             {false, 0.0}, // object
             {false, 0.0}, // nothing
         };
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.dotget_double(i.to_string(), out val), "dotget_double(%u)", i);
             var exp_val = results[i, 1].get_double();
             expect_double_equals(exp_val, val, "[%u] == %f", i, exp_val);
         }
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0] == array.dotget_double(key, out val), "dotget_double('%s')", key);
             var exp_val = results[i, 1].get_double();
@@ -566,8 +535,7 @@ public class JsonArrayTest: Drt.TestCase
             {"7..", false, "*drt_json_array_dotget*assertion*!= 0*failed*", 0.0},
             {"a", false, "", 0.0},
         };
-        for (i = 0; i < results2.length[0]; i++)
-        {
+        for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
             expect(results2[i, 1] == array.dotget_double(ukey, out val), "invalid key '%s'", ukey);
             unowned string msg = results2[i, 2].get_string();
@@ -578,8 +546,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_string() throws GLib.Error
-    {
+    public void test_get_string() throws GLib.Error {
         var array = load_array();
         string? val = null;
         GLib.Value?[,] results = {
@@ -594,16 +561,14 @@ public class JsonArrayTest: Drt.TestCase
             {false, null}, // object
             {false, null}, // nothing
         };
-        for (uint i = 0; i < results.length[0]; i++)
-        {
+        for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0].get_boolean() == array.get_string(i, out val), "get_string(%u)", i);
             unowned string? exp_val = results[i, 1] == null ? null : results[i, 1].get_string();
             expect_str_equals(exp_val, val, "[%u] == '%s'", i, exp_val);
         }
     }
 
-    public void test_dotget_string() throws GLib.Error
-    {
+    public void test_dotget_string() throws GLib.Error {
         var array = load_array();
         string key;
         unowned string ukey;
@@ -621,14 +586,12 @@ public class JsonArrayTest: Drt.TestCase
             {false, null}, // object
             {false, null}, // nothing
         };
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0].get_boolean() == array.dotget_string(i.to_string(), out val), "dotget_string(%u)", i);
             var exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
             expect_str_equals(exp_val, val, "[%u] == '%s'", i, exp_val);
         }
-        for (i = 0; i < results.length[0]; i++)
-        {
+        for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0].get_boolean() == array.dotget_string(key, out val), "dotget_string('%s')", key);
             var exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
@@ -642,8 +605,7 @@ public class JsonArrayTest: Drt.TestCase
             {"7..", false, "*drt_json_array_dotget*assertion*!= 0*failed*"},
             {"a", false, ""},
         };
-        for (i = 0; i < results2.length[0]; i++)
-        {
+        for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
             expect(results2[i, 1] == array.dotget_string(ukey, out val), "invalid key '%s'", ukey);
             unowned string msg = results2[i, 2].get_string();
@@ -653,8 +615,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_null() throws GLib.Error
-    {
+    public void test_get_null() throws GLib.Error {
         var array = load_array();
         bool[] results = {
             true, // null
@@ -672,11 +633,9 @@ public class JsonArrayTest: Drt.TestCase
         expect(results[i] == array.get_null(i), "get_null(%u)", i);
     }
 
-    public void test_get_array() throws GLib.Error
-    {
+    public void test_get_array() throws GLib.Error {
         var array = load_array();
-        for (uint i = 0; i < 10; i++)
-        {
+        for (uint i = 0; i < 10; i++) {
             if (i != 7)
             expect_null(array.get_array(i), "get_array(%u)", i);
             else
@@ -684,11 +643,9 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_get_object() throws GLib.Error
-    {
+    public void test_get_object() throws GLib.Error {
         var array = load_array();
-        for (uint i = 0; i < 10; i++)
-        {
+        for (uint i = 0; i < 10; i++) {
             if (i != 8)
             expect_null(array.get_object(i), "get_object(%u)", i);
             else
@@ -696,8 +653,7 @@ public class JsonArrayTest: Drt.TestCase
         }
     }
 
-    public void test_as_bool_array() throws GLib.Error
-    {
+    public void test_as_bool_array() throws GLib.Error {
         var array = load_array();
         bool[] empty = {};
         bool[] result;
@@ -716,8 +672,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_array(wrap_boolv({true, false, true}), wrap_boolv(result), bool_eq, "array eq");
     }
 
-    public void test_as_int_array() throws GLib.Error
-    {
+    public void test_as_int_array() throws GLib.Error {
         var array = load_array();
         int[] empty = {};
         int[] result;
@@ -736,8 +691,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_array(wrap_intv({0, 10, -5}), wrap_intv(result), int_eq, "array eq");
     }
 
-    public void test_as_double_array() throws GLib.Error
-    {
+    public void test_as_double_array() throws GLib.Error {
         var array = load_array();
         double[] empty = {};
         double[] result;
@@ -756,8 +710,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_array(wrap_doublev({0.5, 10.8, -5.7}), wrap_doublev(result), double_eq, "array eq");
     }
 
-    public void test_as_string_array() throws GLib.Error
-    {
+    public void test_as_string_array() throws GLib.Error {
         var array = load_array();
         string[] empty = {};
         string[] result;
@@ -776,8 +729,7 @@ public class JsonArrayTest: Drt.TestCase
         expect_array(wrap_strv({"", "str", "line1\nline2"}), wrap_strv(result), str_eq, "array eq");
     }
 
-    public void test_to_string() throws GLib.Error
-    {
+    public void test_to_string() throws GLib.Error {
         var array = load_array();
         const string one_line_json = (
             "[null, true, false, -1234, -12.34, \"\", \"string\", " +

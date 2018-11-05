@@ -152,7 +152,7 @@ public class RpcRequest {
      */
     public string[] pop_strv() {
         var variant = next(typeof(StringArrayParam));
-        return variant == null ? new string[]{} : variant.dup_strv();
+        return variant == null ? new string[] {} : variant.dup_strv();
     }
 
     /**

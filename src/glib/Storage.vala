@@ -22,15 +22,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * File storage abstraction that provides easy access to a set of common paths: user's data,
  * cache and configuration directories and system data directories.
  */
-public class Storage: GLib.Object
-{
+public class Storage: GLib.Object {
     [Description(nick = "User data dir", blurb = "Directory used to store user-specific data. Read-write access may be available.")]
     public GLib.File user_data_dir {get; protected set;}
 
@@ -60,8 +58,7 @@ public class Storage: GLib.Object
      * @param user_cache_dir     Directory for user's cached files
      */
     public Storage(string user_data_dir, string[] data_dirs, string user_config_dir,
-        string user_cache_dir)
-    {
+        string user_cache_dir) {
         this.user_data_dir = File.new_for_path(user_data_dir);
         this.user_config_dir = File.new_for_path(user_config_dir);
         this.user_cache_dir = File.new_for_path(user_cache_dir);
@@ -79,8 +76,7 @@ public class Storage: GLib.Object
      * @param id    child storage id
      * @return      child storage
      */
-    public Storage get_child(string id)
-    {
+    public Storage get_child(string id) {
         string[] data_dirs = {};
         foreach (var dir in this._data_dirs)
         data_dirs += dir.get_child(id).get_path();
@@ -96,8 +92,7 @@ public class Storage: GLib.Object
      * @param path Name of configuration file/directory
      * @return default configuration path
      */
-    public File? get_config_path(string path)
-    {
+    public File? get_config_path(string path) {
         return user_config_dir.get_child(path);
     }
 
@@ -107,8 +102,7 @@ public class Storage: GLib.Object
      * @param path    The path relative to base cache directory.
      * @return default cache path
      */
-    public File get_cache_path(string path)
-    {
+    public File get_cache_path(string path) {
         return user_cache_dir.get_child(path);
     }
 
@@ -118,15 +112,11 @@ public class Storage: GLib.Object
      * @param path    Subdirectory path.
      * @return cache subdirectory
      */
-    public File create_cache_subdir(string path)
-    {
+    public File create_cache_subdir(string path) {
         var dir = user_cache_dir.get_child(path);
-        try
-        {
+        try {
             System.make_dirs(dir);
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             warning("Failed to create directory '%s'. %s", dir.get_path(), e.message);
         }
         return dir;
@@ -138,8 +128,7 @@ public class Storage: GLib.Object
      * @param path    child file/dir path
      * @return default data path
      */
-    public File get_data_path(string path)
-    {
+    public File get_data_path(string path) {
         return user_data_dir.get_child(path);
     }
 
@@ -149,15 +138,11 @@ public class Storage: GLib.Object
      * @param path    Subdirectory path.
      * @return data subdirectory
      */
-    public File create_data_subdir(string path)
-    {
+    public File create_data_subdir(string path) {
         var dir = user_data_dir.get_child(path);
-        try
-        {
+        try {
             System.make_dirs(dir);
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             warning("Failed to create directory '%s'. %s", dir.get_path(), e.message);
         }
         return dir;
@@ -173,13 +158,11 @@ public class Storage: GLib.Object
      * @param name name of the file
      * @return file instance or null if no file has been found
      */
-    public File? get_data_file(string name)
-    {
+    public File? get_data_file(string name) {
         File f = user_data_dir.get_child(name);
         if (f.query_file_type(0) == FileType.REGULAR)
         return f;
-        foreach (File dir in data_dirs())
-        {
+        foreach (File dir in data_dirs()) {
             f = dir.get_child(name);
             if (f.query_file_type(0) == FileType.REGULAR)
             return f;
@@ -198,8 +181,7 @@ public class Storage: GLib.Object
      * @param name name of the file
      * @return file instance, never null
      */
-    public File require_data_file(string name)
-    {
+    public File require_data_file(string name) {
         var data_file = get_data_file(name);
         if (data_file != null)
         return data_file;
@@ -220,8 +202,7 @@ public class Storage: GLib.Object
      *
      * @param name name of the file
      */
-    public void assert_data_file(string name)
-    {
+    public void assert_data_file(string name) {
         require_data_file(name);
     }
 }
@@ -231,13 +212,11 @@ public class Storage: GLib.Object
  * cache and configuration directories and system data directories. This implementation
  * uses paths compliant with XDG specification.
  */
-public class XdgStorage: Storage
-{
+public class XdgStorage: Storage {
     /**
      * Creates new storage with XGD paths.
      */
-    public XdgStorage()
-    {
+    public XdgStorage() {
 
         base(Environment.get_user_data_dir(), Environment.get_system_data_dirs(),
             Environment.get_user_config_dir(), Environment.get_user_cache_dir());
@@ -248,8 +227,7 @@ public class XdgStorage: Storage
      *
      * @param id identifier of the project
      */
-    public XdgStorage.for_project(string id, string user_suffix="")
-    {
+    public XdgStorage.for_project(string id, string user_suffix="") {
         this();
         this.user_data_dir = user_data_dir.get_child(id + user_suffix);
         this.user_config_dir = user_config_dir.get_child(id + user_suffix);

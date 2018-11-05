@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class BluetoothService
-{
+public class BluetoothService {
     private static BluezProfileManager1? profile_manager = null;
     public string name {get; private set;}
     public string uuid {get; private set;}
@@ -35,8 +33,7 @@ public class BluetoothService
     private string? profile_path = null;
     private uint profile_id = 0;
 
-    public BluetoothService(string uuid, string name, uint8 channel=0)
-    {
+    public BluetoothService(string uuid, string name, uint8 channel=0) {
         this.name = name;
         this.uuid = uuid;
         this.channel = channel;
@@ -44,8 +41,7 @@ public class BluetoothService
 
     public signal void incoming(BluetoothConnection connection);
 
-    public void listen() throws GLib.Error
-    {
+    public void listen() throws GLib.Error {
         if (profile_manager == null)
         profile_manager = Bus.get_proxy_sync(BusType.SYSTEM, "org.bluez", "/org/bluez");
 
@@ -65,10 +61,8 @@ public class BluetoothService
         profile_manager.register_profile(new ObjectPath(profile_path), uuid, options);
     }
 
-    public void close() throws GLib.Error
-    {
-        if (profile != null)
-        {
+    public void close() throws GLib.Error {
+        if (profile != null) {
             profile_manager.unregister_profile(new ObjectPath(profile_path));
             Bus.get_sync(BusType.SYSTEM, null).unregister_object(profile_id);
             profile.unref(); // FIXME: hack, report upstream
@@ -78,53 +72,40 @@ public class BluetoothService
         }
     }
 
-    ~BluetoothService()
-    {
-        try
-        {
+    ~BluetoothService() {
+        try {
             close();
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
         }
     }
 }
 
 
 [DBus(name = "org.bluez.Profile1")]
-private class BluetoothProfile1 : GLib.Object, BluezProfile1
-{
+private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
     private weak BluetoothService service;
     private HashTable<ObjectPath, GenericArray<GLib.Socket>?> sockets;
 
-    public BluetoothProfile1(BluetoothService service)
-    {
+    public BluetoothProfile1(BluetoothService service) {
         this.service = service;
         sockets = new HashTable<ObjectPath, GenericArray<GLib.Socket>?>(str_hash, str_equal);
     }
 
-    ~BluetoothProfile1()
-    {
+    ~BluetoothProfile1() {
         var devices = sockets.get_keys();
-        foreach (unowned ObjectPath device in devices)
-        {
-            try
-            {
+        foreach (unowned ObjectPath device in devices) {
+            try {
                 request_disconnection(device);
-            }
-            catch (GLib.Error e)
-            {
+            } catch (GLib.Error e) {
             }
         }
     }
 
-    public void release() throws GLib.Error
-    {
+    public void release() throws GLib.Error {
         debug("Bluetooth service has been released.");
     }
 
-    public void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error
-    {
+    public void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error {
         var parts = device.split("/");
         var address = parts.length == 5
         ? "%s/%s".printf(parts[3], parts[4].substring(4).replace("_", ":")) : device;
@@ -139,12 +120,10 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1
         service.incoming(connection);
     }
 
-    public void request_disconnection(ObjectPath device) throws GLib.Error
-    {
+    public void request_disconnection(ObjectPath device) throws GLib.Error {
         debug("Bluetooth device disconnected: %s", device);
         GenericArray<GLib.Socket>? device_sockets = sockets[device];
-        if (device_sockets != null)
-        {
+        if (device_sockets != null) {
             for (int i = 0, size = device_sockets.length; i < size; i++) {
                 unowned GLib.Socket socket = device_sockets[i];
                 try {

@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public abstract class KeyValueStorage: GLib.Object
-{
+public abstract class KeyValueStorage: GLib.Object {
     protected SList<PropertyBinding> property_bindings = null;
 
     public signal void changed(string key, Variant? old_value);
@@ -55,8 +53,7 @@ public abstract class KeyValueStorage: GLib.Object
         yield set_value_unboxed_async(key, unbox_variant(value));
     }
 
-    public void set_value(string key, Variant? value)
-    {
+    public void set_value(string key, Variant? value) {
         set_value_unboxed(key, unbox_variant(value));
     }
 
@@ -64,54 +61,44 @@ public abstract class KeyValueStorage: GLib.Object
         yield set_default_value_unboxed_async(key, unbox_variant(value));
     }
 
-    public void set_default_value(string key, Variant? value)
-    {
+    public void set_default_value(string key, Variant? value) {
         set_default_value_unboxed(key, unbox_variant(value));
     }
 
-    public bool get_bool(string key)
-    {
+    public bool get_bool(string key) {
         return variant_to_bool(get_value(key));
     }
 
-    public int64 get_int64(string key)
-    {
+    public int64 get_int64(string key) {
         return variant_to_int64(get_value(key));
     }
 
-    public double get_double(string key)
-    {
+    public double get_double(string key) {
         return variant_to_double(get_value(key));
     }
 
-    public string? get_string(string key)
-    {
+    public string? get_string(string key) {
         return variant_to_string(get_value(key), null);
     }
 
-    public void set_string(string key, string? value)
-    {
+    public void set_string(string key, string? value) {
         set_value(key, value != null ? new Variant.string(value) : null);
     }
 
-    public void set_int64(string key, int64 value)
-    {
+    public void set_int64(string key, int64 value) {
         set_value(key, new Variant.int64(value));
     }
 
-    public void set_bool(string key, bool value)
-    {
+    public void set_bool(string key, bool value) {
         set_value(key, new Variant.boolean(value));
     }
 
-    public void set_double(string key, double value)
-    {
+    public void set_double(string key, double value) {
         set_value(key, new Variant.double(value));
     }
 
     public PropertyBinding? bind_object_property(string key, GLib.Object object, string property_name,
-        PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL)
-    {
+        PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL) {
         var property = object.get_class().find_property(property_name);
         return_val_if_fail(property != null, null);
         var binding = new PropertyBinding(this, make_full_key(key, property_name), object, property, flags);
@@ -119,16 +106,14 @@ public abstract class KeyValueStorage: GLib.Object
         return binding;
     }
 
-    public void unbind_object_property(string key, GLib.Object object, string property_name)
-    {
+    public void unbind_object_property(string key, GLib.Object object, string property_name) {
         var binding = get_property_binding(key, object, property_name);
         if (binding != null)
         remove_property_binding(binding);
     }
 
     public PropertyBinding? get_property_binding(string key, GLib.Object object,
-        string property_name)
-    {
+        string property_name) {
         var full_key = make_full_key(key, property_name);
         foreach (var binding in property_bindings)
         if (binding.object == object && binding.key == full_key
@@ -137,13 +122,11 @@ public abstract class KeyValueStorage: GLib.Object
         return null;
     }
 
-    public void remove_property_binding(PropertyBinding binding)
-    {
+    public void remove_property_binding(PropertyBinding binding) {
         property_bindings.remove(binding);
     }
 
-    private string make_full_key(string key, string property_name)
-    {
+    private string make_full_key(string key, string property_name) {
         return key[key.length -1 ] != '.' ? key : key + property_name.replace("-", "_");
     }
 }

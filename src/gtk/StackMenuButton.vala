@@ -22,31 +22,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
-public class StackMenuButton : Gtk.MenuButton
-{
+public class StackMenuButton : Gtk.MenuButton {
     private Gtk.Stack? _stack = null;
-    public Gtk.Stack? stack
-    {
-        get
-        {
+    public Gtk.Stack? stack {
+        get {
             return _stack;
         }
 
-        set
-        {
-            if (_stack != null)
-            {
+        set {
+            if (_stack != null) {
                 _stack.notify["visible-child"].disconnect(on_stack_child_notify);
                 _stack.add.disconnect(on_stack_updated);
                 _stack.remove.disconnect(on_stack_updated);
                 popup = null;
             }
             _stack = value;
-            if (_stack != null)
-            {
+            if (_stack != null) {
                 _stack.notify["visible-child"].connect_after(on_stack_child_notify);
                 _stack.add.connect_after(on_stack_updated);
                 _stack.remove.connect_after(on_stack_updated);
@@ -59,8 +52,7 @@ public class StackMenuButton : Gtk.MenuButton
     private new Gtk.Label label;
     private Gtk.Menu? menu = null;
 
-    public StackMenuButton(Gtk.Stack stack)
-    {
+    public StackMenuButton(Gtk.Stack stack) {
         no_show_all = true;
         relief = Gtk.ReliefStyle.NONE;
 
@@ -85,8 +77,7 @@ public class StackMenuButton : Gtk.MenuButton
         this.stack = stack;
     }
 
-    private void append_item(Gtk.Widget child)
-    {
+    private void append_item(Gtk.Widget child) {
         string name;
         string title;
         stack.child_get(child, "name", out name, "title", out title);
@@ -97,30 +88,25 @@ public class StackMenuButton : Gtk.MenuButton
         menu.add(item);
     }
 
-    private void disconnect_item(Gtk.Widget child)
-    {
+    private void disconnect_item(Gtk.Widget child) {
         var item  = child as Gtk.MenuItem;
         if (item != null)
         item.activate.disconnect(on_item_activated);
     }
 
-    private void on_stack_child_notify(GLib.Object o, ParamSpec p)
-    {
+    private void on_stack_child_notify(GLib.Object o, ParamSpec p) {
         Idle.add(() => {update_label(); return false;});
     }
 
-    private void on_stack_updated(Gtk.Widget child)
-    {
+    private void on_stack_updated(Gtk.Widget child) {
         Idle.add(rebuild_cb);
     }
 
-    private void on_item_activated(Gtk.MenuItem item)
-    {
+    private void on_item_activated(Gtk.MenuItem item) {
         stack.visible_child_name = item.get_data<string>("page-name");
     }
 
-    private bool rebuild_cb()
-    {
+    private bool rebuild_cb() {
         if (menu != null)
         menu.@foreach(disconnect_item);
         menu = new Gtk.Menu();
@@ -129,18 +115,14 @@ public class StackMenuButton : Gtk.MenuButton
         return false;
     }
 
-    private void update_label()
-    {
-        if (stack != null && stack.visible_child != null)
-        {
+    private void update_label() {
+        if (stack != null && stack.visible_child != null) {
             string text;
             var child = stack.visible_child;
             stack.child_get(child, "title", out text);
             label.label = text;
             show();
-        }
-        else
-        {
+        } else {
             label.label = null;
             hide();
         }

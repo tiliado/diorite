@@ -22,23 +22,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueMap: KeyValueStorage
-{
+public class KeyValueMap: KeyValueStorage {
     protected HashTable<string, Variant> values;
     protected HashTable<string, Variant> default_values;
 
     public KeyValueMap(HashTable<string, Variant>? default_values=null,
-        HashTable<string, Variant>? values=null)
-    {
+        HashTable<string, Variant>? values=null) {
         this.values = values ?? new HashTable<string, Variant>(str_hash, str_equal);
         this.default_values = default_values ?? new HashTable<string, Variant>(str_hash, str_equal);
     }
 
-    public override bool has_key(string key)
-    {
+    public override bool has_key(string key) {
         return key in values;
     }
 
@@ -47,8 +43,7 @@ public class KeyValueMap: KeyValueStorage
         return has_key(key);
     }
 
-    public override Variant? get_value(string key)
-    {
+    public override Variant? get_value(string key) {
         Variant? value = null;
         if (values.lookup_extended(key, null, out value))
         return value;
@@ -60,8 +55,7 @@ public class KeyValueMap: KeyValueStorage
         return get_value(key);
     }
 
-    public override void unset(string key)
-    {
+    public override void unset(string key) {
         var old_value = get_value(key);
         if (values.remove(key))
         changed(key, old_value);
@@ -72,8 +66,7 @@ public class KeyValueMap: KeyValueStorage
         yield EventLoop.resume_later();
     }
 
-    protected override void set_value_unboxed(string key, Variant? value)
-    {
+    protected override void set_value_unboxed(string key, Variant? value) {
         var old_value = get_value(key);
         values[key] = value;
         if (old_value != value && (old_value == null || value == null || !old_value.equal(value)))
@@ -85,8 +78,7 @@ public class KeyValueMap: KeyValueStorage
         yield EventLoop.resume_later();
     }
 
-    protected override void set_default_value_unboxed(string key, Variant? value)
-    {
+    protected override void set_default_value_unboxed(string key, Variant? value) {
         default_values[key] = value;
     }
 

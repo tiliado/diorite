@@ -27,7 +27,7 @@ namespace Drt {
 /**
  * Bi-directional channel of a RPC connection.
  */
-public class RpcChannel: RpcConnection{
+public class RpcChannel: RpcConnection {
     static construct {
         log_comunication = Environment.get_variable("DIORITE_LOG_MESSAGE_CHANNEL") == "yes";
     }
@@ -35,7 +35,7 @@ public class RpcChannel: RpcConnection{
     public Drt.DuplexChannel channel {get; construct;}
     public bool pending {get; protected set; default = false;}
     public bool closed {get; protected set; default = false;}
-    public string name {get{return channel.name;}}
+    public string name {get {return channel.name;}}
     private static bool log_comunication;
 
     /**
@@ -142,7 +142,7 @@ public class RpcChannel: RpcConnection{
         var payload = new ByteArray.take((owned) buffer);
         try {
             channel.send_response(id, payload);
-        } catch (GLib.Error e) 	{
+        } catch (GLib.Error e) {
             warning("Failed to send response: %s", e.message);
         }
     }

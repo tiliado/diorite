@@ -19,13 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class JsonValueTest: Drt.TestCase
-{
-    public void test_null()
-    {
+public class JsonValueTest: Drt.TestCase {
+    public void test_null() {
         var val = new JsonValue.@null();
         string? str_val = null;
         bool bool_val = true;
@@ -53,8 +50,7 @@ public class JsonValueTest: Drt.TestCase
         expect_str_equals("null", val.to_string(), "to string");
     }
 
-    public void test_bool()
-    {
+    public void test_bool() {
         var val = new JsonValue.@bool(true);
         string? str_val = null;
         bool bool_val = false;
@@ -82,8 +78,7 @@ public class JsonValueTest: Drt.TestCase
         expect_str_equals("false", new JsonValue.@bool(false).to_string(), "to string");
     }
 
-    public void test_int()
-    {
+    public void test_int() {
         var val = new JsonValue.@int(-1234);
         string? str_val = null;
         bool bool_val = true;
@@ -111,8 +106,7 @@ public class JsonValueTest: Drt.TestCase
         expect_str_equals("4567", new JsonValue.@int(4567).to_string(), "to string");
     }
 
-    public void test_double()
-    {
+    public void test_double() {
         var val = new JsonValue.@double(-12.34);
         string? str_val = null;
         bool bool_val = true;
@@ -140,8 +134,7 @@ public class JsonValueTest: Drt.TestCase
         expect_str_equals("45.68", new JsonValue.@double(45.68).to_string(), "to string");
     }
 
-    public void test_string()
-    {
+    public void test_string() {
         var str = "Test ";
         var val = new JsonValue.@string(str);
         string? str_val = null;
@@ -170,8 +163,7 @@ public class JsonValueTest: Drt.TestCase
         expect_str_equals("\"string\"", new JsonValue.@string("string").to_string(), "to string");
     }
 
-    public void test_escape_string()
-    {
+    public void test_escape_string() {
         expect_str_equals("\\n\\r\\t\\b\\f \\\"", JsonValue.escape_string("\n\r\t\b\f \""), "");
         var buf = new uint8[32]; // the control characters U+0000 to U+001F
         for (uint8 c = 0; c < 31; c++)

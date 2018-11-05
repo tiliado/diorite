@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * SQLite Database Connection wrapper
  */
-public class Connection: GLib.Object, Queryable
-{
+public class Connection: GLib.Object, Queryable {
     public OrmManager orm {get; private set;}
     private Sqlite.Database db;
 
@@ -39,8 +37,7 @@ public class Connection: GLib.Object, Queryable
      * @param db     SQLite database connection
      * @param orm    ORM Manager for object queries. An empty one is created if it is not provided.
      */
-    public Connection(owned Sqlite.Database db, OrmManager? orm)
-    {
+    public Connection(owned Sqlite.Database db, OrmManager? orm) {
         this.orm = orm ?? new OrmManager();
         this.db = (owned) db;
     }
@@ -53,8 +50,7 @@ public class Connection: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         throw_on_error(db.exec(sql, null, null), sql);
     }
@@ -70,8 +66,7 @@ public class Connection: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         Sqlite.Statement statement;
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         throw_on_error(db.prepare_v2(sql, sql.length, out statement), sql);
@@ -91,8 +86,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public Query query_with_values(Cancellable? cancellable, string sql, ...)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return query_with_values_va(cancellable, sql, va_list());
     }
 
@@ -109,8 +103,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public Query query_with_values_va(Cancellable? cancellable, string sql, va_list args)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         var bind_expr = new BindExpression();
         bind_expr.parse_va(sql, args);
         unowned string sql_query = bind_expr.get_sql();
@@ -125,8 +118,7 @@ public class Connection: GLib.Object, Queryable
      *
      * @return the last error message
      */
-    public unowned string? get_last_error_message()
-    {
+    public unowned string? get_last_error_message() {
         return db != null ? db.errmsg() : null;
     }
 
@@ -139,8 +131,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return query_objects<T>(cancellable, null);
     }
 
@@ -155,8 +146,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public ObjectQuery<T> query_objects<T>(Cancellable? cancellable, string? filter, ...)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return query_objects_va<T>(cancellable, filter, va_list());
     }
 
@@ -171,8 +161,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public ObjectQuery<T> query_objects_va<T>(Cancellable? cancellable, string? filter, va_list args)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         var type = typeof(T);
         if (!type.is_object())
@@ -184,8 +173,7 @@ public class Connection: GLib.Object, Queryable
         unowned (unowned ParamSpec)[] param_specs = object_spec.properties;
         var sql = new StringBuilder("SELECT");
         var table_name_escaped = escape_sql_id(object_spec.table_name);
-        for (var i = 0; i <  param_specs.length; i++)
-        {
+        for (var i = 0; i <  param_specs.length; i++) {
             var param = param_specs[i];
             if (param.value_type == typeof(void*) || !is_type_supported(param.value_type))
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", param.value_type.name());
@@ -203,8 +191,7 @@ public class Connection: GLib.Object, Queryable
         sql.append_printf(" FROM \"%s\" ", table_name_escaped);
 
         BindExpression? bind_expr = (filter != null && filter != "") ? new BindExpression() : null;
-        if (bind_expr != null)
-        {
+        if (bind_expr != null) {
             bind_expr.parse_va(filter, args);
             sql.append(bind_expr.get_sql());
         }
@@ -224,8 +211,7 @@ public class Connection: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public T get_object<T>(GLib.Value pk, Cancellable? cancellable=null)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         var type = typeof(T);
         if (!type.is_object())
@@ -247,8 +233,7 @@ public class Connection: GLib.Object, Queryable
     /**
      * Throw error on SQLite failure.
      */
-    protected int throw_on_error(int result, string? sql=null) throws DatabaseError
-    {
+    protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
         if (Drtdb.is_sql_error(result))
         throw convert_sqlite_error(result, get_last_error_message(), sql);
         return result;

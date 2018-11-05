@@ -22,16 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * ORM object specification
  */
-public class ObjectSpec
-{
+public class ObjectSpec {
     public Type object_type {get; private set;}
-    public string table_name {get{ return object_type.name(); }}
+    public string table_name {get { return object_type.name(); }}
     public unowned ParamSpec primary_key {get; private set;}
     public (unowned ParamSpec)[] properties {get; private set;}
 
@@ -43,8 +41,7 @@ public class ObjectSpec
      * @param properties     properties to serialize into database
      * @throws DatabaseError if data type is invalid or primary key is not found
      */
-    public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError
-    {
+    public ObjectSpec(Type type, string primary_key, string[]? properties=null) throws DatabaseError {
         if (!type.is_object())
         throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         var class_spec = (ObjectClass) type.class_ref();
@@ -62,8 +59,7 @@ public class ObjectSpec
      * @param properties     properties to serialize into database
      * @throws DatabaseError if data type is invalid or primary key is not found
      */
-    public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError
-    {
+    public ObjectSpec.with_pspecs(Type type, ParamSpec primary_key, (unowned ParamSpec)[] properties) throws DatabaseError {
         if (!type.is_object())
         throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         this.object_type = type;

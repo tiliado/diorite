@@ -24,20 +24,17 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
-public class EntryMultiCompletion : Gtk.EntryCompletion
-{
-    public Gtk.Entry? entry {get{return base.get_entry() as Gtk.Entry;}}
+public class EntryMultiCompletion : Gtk.EntryCompletion {
+    public Gtk.Entry? entry {get {return base.get_entry() as Gtk.Entry;}}
     public string? key {get; private set; default = null;}
     public bool key_valid {get; private set; default = false;}
     public int key_start {get; private set; default = -1;}
     public int key_end {get; private set; default = -1;}
     public int cursor {get; private set; default = -1;}
 
-    public EntryMultiCompletion(Gtk.Entry entry, Gtk.TreeModel? model = null, int text_column = -1)
-    {
+    public EntryMultiCompletion(Gtk.Entry entry, Gtk.TreeModel? model = null, int text_column = -1) {
         GLib.Object(model: model, minimum_key_length: 1);
         if (text_column >= 0)
         this.text_column = text_column;
@@ -50,10 +47,8 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         insert_prefix.connect(on_insert_prefix);
     }
 
-    public void complete_inline()
-    {
-        if (key_valid && cursor == key_end)
-        {
+    public void complete_inline() {
+        if (key_valid && cursor == key_end) {
             complete(); // Update filter first
             var prefix = compute_prefix(key);
             if (prefix != null)
@@ -61,18 +56,15 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         }
     }
 
-    protected virtual void parse_key()
-    {
+    protected virtual void parse_key() {
         var text = entry.text;
         cursor = entry.cursor_position;
         key = null;
         key_start = key_end = -1;
         key_valid = false;
-        if (cursor > 0 && !String.is_empty(text))
-        {
+        if (cursor > 0 && !String.is_empty(text)) {
             key_start = String.last_index_of_char(text, ' ', 0, cursor) + 1;
-            if (cursor > key_start)
-            {
+            if (cursor > key_start) {
                 key_end = String.index_of_char(text, ' ', cursor);
                 if (key_end < 0)
                 key_end = text.length;
@@ -84,8 +76,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         }
     }
 
-    private bool search_match_func(Gtk.EntryCompletion completion, string text, Gtk.TreeIter iter)
-    {
+    private bool search_match_func(Gtk.EntryCompletion completion, string text, Gtk.TreeIter iter) {
         if (!key_valid)
         return false;
         string candidate;
@@ -96,8 +87,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         return candidate.down().has_prefix(prefix);
     }
 
-    private void insert_match(string match, bool select)
-    {
+    private void insert_match(string match, bool select) {
         return_if_fail(key_valid);
         freeze_notify();
         var text = entry.text;
@@ -111,8 +101,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         thaw_notify();
     }
 
-    private void on_cursor_position_changed(GLib.Object emitter, ParamSpec property)
-    {
+    private void on_cursor_position_changed(GLib.Object emitter, ParamSpec property) {
         parse_key();
         /* Necessary for pop-up window to be shown */
         entry.changed();
@@ -122,21 +111,18 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
     }
 
     private bool on_match_selected(
-        Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter)
-    {
+        Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter) {
         set_text_from_match(model, iter, false);
         return true;
     }
 
     private bool on_cursor_on_match(
-        Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter)
-    {
+        Gtk.EntryCompletion completion, Gtk.TreeModel model, Gtk.TreeIter iter) {
         set_text_from_match(model, iter, true);
         return true;
     }
 
-    private void set_text_from_match(Gtk.TreeModel model, Gtk.TreeIter iter, bool select)
-    {
+    private void set_text_from_match(Gtk.TreeModel model, Gtk.TreeIter iter, bool select) {
         return_if_fail(key_valid);
         freeze_notify();
         string match;
@@ -144,8 +130,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion
         insert_match(match, select);
     }
 
-    private bool on_insert_prefix(Gtk.EntryCompletion completion, string prefix)
-    {
+    private bool on_insert_prefix(Gtk.EntryCompletion completion, string prefix) {
         /* We use complete_inline() method.*/
         return true;
     }

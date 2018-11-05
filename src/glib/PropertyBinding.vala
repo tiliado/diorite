@@ -22,12 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 [Flags]
-public enum PropertyBindingFlags
-{
+public enum PropertyBindingFlags {
     /**
      * When either the value of a property or a key changes, the other is updated.
      */
@@ -42,8 +40,7 @@ public enum PropertyBindingFlags
     PROPERTY_TO_KEY;
 }
 
-public class PropertyBinding
-{
+public class PropertyBinding {
     public unowned KeyValueStorage storage {get; private set;}
     public string key {get; private set;}
     public unowned GLib.Object? object {get; private set;}
@@ -51,8 +48,7 @@ public class PropertyBinding
     public PropertyBindingFlags flags {get; private set;}
     private bool has_gone = false;
 
-    public PropertyBinding(KeyValueStorage storage, string key, GLib.Object object, ParamSpec property, PropertyBindingFlags flags)
-    {
+    public PropertyBinding(KeyValueStorage storage, string key, GLib.Object object, ParamSpec property, PropertyBindingFlags flags) {
         if ((flags & PropertyBindingFlags.PROPERTY_TO_KEY) != 0
         && (flags & PropertyBindingFlags.KEY_TO_PROPERTY) != 0)
         flags |= PropertyBindingFlags.BIDIRECTIONAL;
@@ -71,10 +67,8 @@ public class PropertyBinding
         storage.weak_ref(gone);
     }
 
-    ~PropertyBinding()
-    {
-        if (!has_gone)
-        {
+    ~PropertyBinding() {
+        if (!has_gone) {
             object.weak_unref(gone);
             storage.weak_unref(gone);
             has_gone = true;
@@ -87,8 +81,7 @@ public class PropertyBinding
         storage.changed.disconnect(on_key_changed);
     }
 
-    public string to_string()
-    {
+    public string to_string() {
         string relation;
         if ((flags & PropertyBindingFlags.BIDIRECTIONAL) != 0)
         relation = "<==>";
@@ -102,59 +95,45 @@ public class PropertyBinding
             object.get_type().name(), property.name, property.value_type.name());
     }
 
-    public void update_key()
-    {
+    public void update_key() {
         toggle_changed_notify_handler(false);
 
-        if (property.value_type == typeof(string))
-        {
+        if (property.value_type == typeof(string)) {
             string? str_value = null;
             object.get(property.name, &str_value, null);
             storage.set_string(key, str_value);
-        }
-        else if (property.value_type == typeof(bool))
-        {
+        } else if (property.value_type == typeof(bool)) {
             bool value = false;
             object.get(property.name, &value, null);
             storage.set_bool(key, value);
-        }
-        else
-        {
+        } else {
             critical("Unsupported type for property binding. %s.", to_string());
         }
 
         toggle_changed_notify_handler(true);
     }
 
-    public bool update_property()
-    {
+    public bool update_property() {
         toggle_property_notify_handler(false);
 
         bool result = false;
-        if (property.value_type == typeof(string))
-        {
+        if (property.value_type == typeof(string)) {
             string? str_value = null;
             object.get(property.name, &str_value, null);
             var new_str_value = storage.get_string(key);
-            if (str_value != new_str_value)
-            {
+            if (str_value != new_str_value) {
                 object.set(property.name, new_str_value, null);
                 result = true;
             }
-        }
-        else if (property.value_type == typeof(bool))
-        {
+        } else if (property.value_type == typeof(bool)) {
             bool value = false;
             object.get(property.name, &value, null);
             var new_value = storage.get_bool(key);
-            if (value != new_value)
-            {
+            if (value != new_value) {
                 object.set(property.name, new_value, null);
                 result = true;
             }
-        }
-        else
-        {
+        } else {
             critical("Unsupported type for property binding. %s.", to_string());
         }
 
@@ -175,14 +154,12 @@ public class PropertyBinding
      * @param default_value    default value to set
      * @return self
      */
-    public PropertyBinding set_default(Variant? default_value)
-    {
+    public PropertyBinding set_default(Variant? default_value) {
         storage.set_default_value(key, default_value);
         return this;
     }
 
-    private void toggle_property_notify_handler(bool enabled)
-    {
+    private void toggle_property_notify_handler(bool enabled) {
         uint signal_id;
         Quark detail;
         return_if_fail(Signal.parse_name(
@@ -197,8 +174,7 @@ public class PropertyBinding
             signal_id, detail, null, null, this);
     }
 
-    private void toggle_changed_notify_handler(bool enabled)
-    {
+    private void toggle_changed_notify_handler(bool enabled) {
         uint signal_id;
         return_if_fail(Signal.parse_name(
             "changed", typeof(KeyValueStorage), out signal_id, null, false));
@@ -212,19 +188,16 @@ public class PropertyBinding
             signal_id, 0, null, null, this);
     }
 
-    private void on_property_changed(GLib.Object o, ParamSpec p)
-    {
+    private void on_property_changed(GLib.Object o, ParamSpec p) {
         update_key();
     }
 
-    private void on_key_changed(string key, Variant? old_value)
-    {
+    private void on_key_changed(string key, Variant? old_value) {
         if (key == this.key)
         update_property();
     }
 
-    private void gone(GLib.Object o)
-    {
+    private void gone(GLib.Object o) {
         has_gone = true;
         if (o != object)
         object.weak_unref(gone);

@@ -22,23 +22,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * JSON Array object.
  */
-public class JsonArray: JsonNode
-{
+public class JsonArray: JsonNode {
     [Description(nick = "The length of the array", blurb = "The length of the array.")]
-    public uint length {get{return nodes.length;}}
+    public uint length {get {return nodes.length;}}
     private GLib.Array<JsonNode?> nodes;
 
     /**
      * Creates a new empty JSON Array object.
      */
-    public JsonArray()
-    {
+    public JsonArray() {
         nodes = new GLib.Array<JsonNode?>(false, false);
     }
 
@@ -48,16 +45,12 @@ public class JsonArray: JsonNode
      * @param index    The index of a node to set
      * @param node     {@link JsonNode} to set
      */
-    public void set(uint index, JsonNode node)
-    {
+    public void set(uint index, JsonNode node) {
         return_if_fail(index <= nodes.length);
         return_if_fail(node.parent == null);
-        if (index == nodes.length)
-        {
+        if (index == nodes.length) {
             nodes.append_val(node);
-        }
-        else
-        {
+        } else {
             var current = get(index);
             if (current != null)
             current.parent = null;
@@ -71,8 +64,7 @@ public class JsonArray: JsonNode
      *
      * @param node    the node to append
      */
-    public void append(JsonNode node)
-    {
+    public void append(JsonNode node) {
         return_if_fail(node.parent == null);
         nodes.append_val(node);
         node.parent = this;
@@ -83,8 +75,7 @@ public class JsonArray: JsonNode
      *
      * @param node    the node to prepend
      */
-    public void prepend(JsonNode node)
-    {
+    public void prepend(JsonNode node) {
         return_if_fail(node.parent == null);
         nodes.prepend_val(node);
         node.parent = this;
@@ -96,8 +87,7 @@ public class JsonArray: JsonNode
      * @param index    the index to place the node at
      * @param node     the node to insert into the array
      */
-    public void insert(uint index, JsonNode node)
-    {
+    public void insert(uint index, JsonNode node) {
         return_if_fail(node.parent == null);
         return_if_fail(index <= nodes.length);
         if (index == nodes.length)
@@ -112,8 +102,7 @@ public class JsonArray: JsonNode
      *
      * @param index    index to remove node at
      */
-    public void remove_at(uint index)
-    {
+    public void remove_at(uint index) {
         var node = get(index);
         return_if_fail(node != null);
         nodes.remove_index(index);
@@ -126,11 +115,9 @@ public class JsonArray: JsonNode
      * @param node   The node to remove
      * @return `true` if the node has been found and removed
      */
-    public bool remove(JsonNode node)
-    {
+    public bool remove(JsonNode node) {
         uint pos;
-        if (index(node, out pos))
-        {
+        if (index(node, out pos)) {
             remove_at(pos);
             return true;
         }
@@ -144,13 +131,10 @@ public class JsonArray: JsonNode
      * @param index    The index of the node if it has been found
      * @return `true` if the node if it has been found and so the `index` is valid
      */
-    public bool index(JsonNode node, out uint index)
-    {
+    public bool index(JsonNode node, out uint index) {
         var len = length;
-        for (var i = 0U; i < len; i++)
-        {
-            if (get(i) == node)
-            {
+        for (var i = 0U; i < len; i++) {
+            if (get(i) == node) {
                 index = i;
                 return true;
             }
@@ -164,8 +148,7 @@ public class JsonArray: JsonNode
      *
      * @param compare_func    A comparison function
      */
-    public void sort(CompareFunc<JsonNode> compare_func)
-    {
+    public void sort(CompareFunc<JsonNode> compare_func) {
         nodes.sort(compare_func);
     }
 
@@ -174,8 +157,7 @@ public class JsonArray: JsonNode
      *
      * @param compare_func    A comparison function with user data
      */
-    public void sort_with_data(CompareDataFunc<JsonNode> compare_func)
-    {
+    public void sort_with_data(CompareDataFunc<JsonNode> compare_func) {
         nodes.sort_with_data(compare_func);
     }
 
@@ -185,8 +167,7 @@ public class JsonArray: JsonNode
      * @param index    The index of a node to get
      * @return {@link JsonNode} at given `index` or `null`
      */
-    public unowned JsonNode? get(uint index)
-    {
+    public unowned JsonNode? get(uint index) {
         return index < nodes.length ? nodes.data[index] : null;
     }
 
@@ -199,15 +180,13 @@ public class JsonArray: JsonNode
      * @param path    the dot-path of the node to get
      * @return the requested node if found else `null`
      */
-    public unowned JsonNode? dotget(string path)
-    {
+    public unowned JsonNode? dotget(string path) {
         return_val_if_fail(path[0] != '\0', null);
         var dot = path.index_of_char('.');
         return_val_if_fail(dot != 0, null);
         var index_str = dot < 0 ? path : path.substring(0, dot);
         var len = index_str.length;
-        for (var i = 0; i < len; i++)
-        {
+        for (var i = 0; i < len; i++) {
             var c = index_str.data[i];
             if (c < '0' || c > '9')
             return null;
@@ -233,11 +212,9 @@ public class JsonArray: JsonNode
      * @param result   the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN} and so the `result` is valid
      */
-    public bool get_bool(uint index, out bool result)
-    {
+    public bool get_bool(uint index, out bool result) {
         var node = get(index) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = false;
             return false;
         }
@@ -254,11 +231,9 @@ public class JsonArray: JsonNode
      * @param result   the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN} and so the `result` is valid
      */
-    public bool dotget_bool(string path, out bool result)
-    {
+    public bool dotget_bool(string path, out bool result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = false;
             return false;
         }
@@ -273,11 +248,9 @@ public class JsonArray: JsonNode
      * @return `true` if the node is found and  is of type {@link JsonValueType.INTEGER}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_int(uint index, out int result)
-    {
+    public bool get_int(uint index, out int result) {
         var node = get(index) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0;
             return false;
         }
@@ -294,11 +267,9 @@ public class JsonArray: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.INTEGER} and so the `result` is valid
      */
-    public bool dotget_int(string path, out int result)
-    {
+    public bool dotget_int(string path, out int result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0;
             return false;
         }
@@ -313,11 +284,9 @@ public class JsonArray: JsonNode
      * @return `true` if the node is found and  is of type {@link JsonValueType.DOUBLE}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_double(uint index, out double result)
-    {
+    public bool get_double(uint index, out double result) {
         var node = get(index) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0.0;
             return false;
         }
@@ -334,11 +303,9 @@ public class JsonArray: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.DOUBLE} and so the `result` is valid
      */
-    public bool dotget_double(string path, out double result)
-    {
+    public bool dotget_double(string path, out double result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0.0;
             return false;
         }
@@ -353,11 +320,9 @@ public class JsonArray: JsonNode
      * @return `true` if the node is found and  is of type {@link JsonValueType.STRING}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_string(uint index, out string? result)
-    {
+    public bool get_string(uint index, out string? result) {
         var node = get(index) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = null;
             return false;
         }
@@ -374,11 +339,9 @@ public class JsonArray: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.STRING} and so the `result` is valid
      */
-    public bool dotget_string(string path, out string result)
-    {
+    public bool dotget_string(string path, out string result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = null;
             return false;
         }
@@ -391,8 +354,7 @@ public class JsonArray: JsonNode
      * @param index    the index of the node to get
      * @return `true` if the node is found and is of type {@link JsonValueType.NULL}, `false` otherwise
      */
-    public bool get_null(uint index)
-    {
+    public bool get_null(uint index) {
         var node = get(index) as JsonValue;
         return node == null ? false : node.is_null();
     }
@@ -403,8 +365,7 @@ public class JsonArray: JsonNode
      * @param index    the index of the node to get
      * @return a {@link JsonArray} if the node is found and is an array, `null` otherwise
      */
-    public JsonArray? get_array(uint index)
-    {
+    public JsonArray? get_array(uint index) {
         return get(index) as JsonArray;
     }
 
@@ -414,8 +375,7 @@ public class JsonArray: JsonNode
      * @param index    the index of the node to get
      * @return a {@link JsonObject} if the node is found and is an object, `null` otherwise
      */
-    public JsonObject? get_object(uint index)
-    {
+    public JsonObject? get_object(uint index) {
         return get(index) as JsonObject;
     }
 
@@ -426,13 +386,11 @@ public class JsonArray: JsonNode
      * @return `true` if all array members are of type {@link JsonValueType.BOOLEAN} and thus `result` is valid,
      *     `false` otherwise
      */
-    public bool as_bool_array(out bool[] result)
-    {
+    public bool as_bool_array(out bool[] result) {
         result = null;
         var size = this.length;
         var array = new bool[size];
-        for (uint i = 0; i < size; i++)
-        {
+        for (uint i = 0; i < size; i++) {
             bool val;
             if (get_bool(i, out val))
             array[i] = val;
@@ -450,13 +408,11 @@ public class JsonArray: JsonNode
      * @return `true` if all array members are of type {@link JsonValueType.INTEGER} and thus `result` is valid,
      *     `false` otherwise
      */
-    public bool as_int_array(out int[] result)
-    {
+    public bool as_int_array(out int[] result) {
         result = null;
         var size = this.length;
         var array = new int[size];
-        for (uint i = 0; i < size; i++)
-        {
+        for (uint i = 0; i < size; i++) {
             int val;
             if (get_int(i, out val))
             array[i] = val;
@@ -474,13 +430,11 @@ public class JsonArray: JsonNode
      * @return `true` if all array members are of type {@link JsonValueType.DOUBLE} and thus `result` is valid,
      *     `false` otherwise
      */
-    public bool as_double_array(out double[] result)
-    {
+    public bool as_double_array(out double[] result) {
         result = null;
         var size = this.length;
         var array = new double[size];
-        for (uint i = 0; i < size; i++)
-        {
+        for (uint i = 0; i < size; i++) {
             double val;
             if (get_double(i, out val))
             array[i] = val;
@@ -498,13 +452,11 @@ public class JsonArray: JsonNode
      * @return `true` if all array members are of type {@link JsonValueType.STRING} and thus `result` is valid,
      *     `false` otherwise
      */
-    public bool as_string_array(out string[] result)
-    {
+    public bool as_string_array(out string[] result) {
         result = null;
         var size = this.length;
         var array = new string[size];
-        for (uint i = 0; i < size; i++)
-        {
+        for (uint i = 0; i < size; i++) {
             string? val;
             if (get_string(i, out val))
             array[i] = val;
@@ -522,8 +474,7 @@ public class JsonArray: JsonNode
      *
      * @return a string representation of the node
      */
-    public override string to_string()
-    {
+    public override string to_string() {
         return dump(null, false, 0);
     }
 
@@ -534,8 +485,7 @@ public class JsonArray: JsonNode
      *
      * @return a string representation of the node
      */
-    public string to_pretty_string()
-    {
+    public string to_pretty_string() {
         return dump("    ", false, 0);
     }
 
@@ -546,8 +496,7 @@ public class JsonArray: JsonNode
      *
      * @return a string representation of the node
      */
-    public string to_compact_string()
-    {
+    public string to_compact_string() {
         return dump(null, true, 0);
     }
 
@@ -559,8 +508,7 @@ public class JsonArray: JsonNode
      * @param level      An initial indentation level.
      * @return a string representation of the node
      */
-    public string dump(string? indent, bool compact, uint level = 0)
-    {
+    public string dump(string? indent, bool compact, uint level = 0) {
         var buffer = new StringBuilder();
         dump_to_buffer(buffer, indent, compact, level);
         return buffer.str;
@@ -574,16 +522,14 @@ public class JsonArray: JsonNode
      * @param compact    If `true`, no space after a comma or a colon is added.
      * @param level      An initial indentation level.
      */
-    public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0)
-    {
+    public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0) {
         var nl = !String.is_empty(indent);
         var item_sep = (nl || compact) ? "," : ", ";
         buffer.append_c('[');
         if (nl)
         buffer.append_c('\n');
         var size = this.length;
-        for (uint i = 0; i < size; i++)
-        {
+        for (uint i = 0; i < size; i++) {
             if (nl)
             for (var j = 0; j <= level; j++)
             buffer.append(indent);

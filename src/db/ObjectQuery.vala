@@ -22,16 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * ObjectQuery class
  *
  * Used for ORM queries.
  */
-public class ObjectQuery<T> : GLib.Object
-{
+public class ObjectQuery<T> : GLib.Object {
     // Query to retrieve objects.
     private Query query;
     private OrmManager orm;
@@ -42,8 +40,7 @@ public class ObjectQuery<T> : GLib.Object
      * @param orm      ORM manager
      * @param query    the corresponding {@link Query} to retrieve object data
      */
-    public ObjectQuery(OrmManager orm, Query query)
-    {
+    public ObjectQuery(OrmManager orm, Query query) {
         this.orm = orm;
         this.query = query;
     }
@@ -56,8 +53,7 @@ public class ObjectQuery<T> : GLib.Object
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails, e.g. no object or more then one object are found
      */
-    public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public T get_one(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         var result = query.get_result();
         if (!result.next(cancellable))
         throw new DatabaseError.DOES_NOT_EXIST("No data has been returned for object query.");
@@ -78,8 +74,7 @@ public class ObjectQuery<T> : GLib.Object
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public ObjectCursor<T> get_cursor(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         return new ObjectCursor<T>(orm, query.get_result(), cancellable);
     }
 }

@@ -22,13 +22,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 /**
  * Button which shows popover on click.
  */
-public class PopoverButton : Gtk.Button
-{
+public class PopoverButton : Gtk.Button {
     public Gtk.Popover popover {get; private set;}
 
     /**
@@ -36,21 +34,18 @@ public class PopoverButton : Gtk.Button
      *
      * @param label    The label of the button.
      */
-    public PopoverButton(string? label=null)
-    {
+    public PopoverButton(string? label=null) {
         GLib.Object();
         if (label != null)
         this.label = label;
     }
 
-    construct
-    {
+    construct {
         popover = new Gtk.Popover(this);
         popover.position = Gtk.PositionType.BOTTOM;
     }
 
-    public override void clicked()
-    {
+    public override void clicked() {
         popover.show();
     }
 }

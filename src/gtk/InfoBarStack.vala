@@ -24,16 +24,13 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
-public class InfoBarStack: Gtk.Stack
-{
+public class InfoBarStack: Gtk.Stack {
     private Gtk.Button left_button;
     private Gtk.Button right_button;
 
-    public InfoBarStack()
-    {
+    public InfoBarStack() {
         GLib.Object(hexpand: true, transition_type: Gtk.StackTransitionType.SLIDE_LEFT_RIGHT);
         notify["visible-child"].connect_after(on_visible_child_changed);
 
@@ -60,24 +57,21 @@ public class InfoBarStack: Gtk.Stack
         img.show();
     }
 
-    public override void add(Gtk.Widget child)
-    {
+    public override void add(Gtk.Widget child) {
         return_if_fail(child is Gtk.InfoBar);
         base.add(child);
         child.show();
         visible_child = child;
     }
 
-    public override void remove(Gtk.Widget child)
-    {
+    public override void remove(Gtk.Widget child) {
         if (child == visible_child && !go_next())
         go_previous();
         base.remove(child);
         update_arrows();
     }
 
-    private void update_arrows()
-    {
+    private void update_arrows() {
         var visible_child = this.visible_child;
         var first = get_children();
         unowned List<weak Gtk.Widget> last = first.last();
@@ -85,17 +79,14 @@ public class InfoBarStack: Gtk.Stack
         right_button.visible = last != null && last.data != visible_child;
     }
 
-    public bool go_previous()
-    {
+    public bool go_previous() {
         var children = get_children();
         var visible_child = this.visible_child;
         unowned List<weak Gtk.Widget> cursor = children;
         unowned List<weak Gtk.Widget> next;
-        for (var i = 0; cursor != null; i++)
-        {
+        for (var i = 0; cursor != null; i++) {
             next = cursor.next;
-            if (next != null && next.data == visible_child)
-            {
+            if (next != null && next.data == visible_child) {
                 this.visible_child = cursor.data;
                 return true;
             }
@@ -104,17 +95,14 @@ public class InfoBarStack: Gtk.Stack
         return false;
     }
 
-    public bool go_next()
-    {
+    public bool go_next() {
         var children = get_children();
         var visible_child = this.visible_child;
         unowned List<weak Gtk.Widget> cursor = children;
         unowned List<weak Gtk.Widget> next;
-        for (var i = 0; cursor != null; i++)
-        {
+        for (var i = 0; cursor != null; i++) {
             next = cursor.next;
-            if (cursor.data == visible_child)
-            {
+            if (cursor.data == visible_child) {
                 if (next == null)
                 return false;
                 this.visible_child = next.data;
@@ -134,8 +122,7 @@ public class InfoBarStack: Gtk.Stack
      * @param message_type    type of the info bar
      * @return a newly created Gtk.InfoBar
      */
-    public Gtk.InfoBar create_info_bar(string text, Gtk.MessageType message_type=Gtk.MessageType.INFO)
-    {
+    public Gtk.InfoBar create_info_bar(string text, Gtk.MessageType message_type=Gtk.MessageType.INFO) {
         var bar = new Gtk.InfoBar();
         bar.message_type = message_type;
         bar.show_close_button = true;
@@ -148,22 +135,19 @@ public class InfoBarStack: Gtk.Stack
         return bar;
     }
 
-    private void on_create_info_bar_response(Gtk.InfoBar bar, int response)
-    {
+    private void on_create_info_bar_response(Gtk.InfoBar bar, int response) {
         bar.response.disconnect(on_create_info_bar_response);
         remove(bar);
     }
 
-    private void on_visible_child_changed(GLib.Object o, ParamSpec p)
-    {
+    private void on_visible_child_changed(GLib.Object o, ParamSpec p) {
         Gtk.Container? parent;
         if ((parent = left_button.get_parent() as Gtk.Container) != null)
         parent.remove(left_button);
         if ((parent = right_button.get_parent() as Gtk.Container) != null)
         parent.remove(right_button);
         update_arrows();
-        if (visible_child != null)
-        {
+        if (visible_child != null) {
             var info_bar = visible_child as Gtk.InfoBar;
             return_if_fail(info_bar != null);
             var box = info_bar.get_action_area().get_parent() as Gtk.Box;

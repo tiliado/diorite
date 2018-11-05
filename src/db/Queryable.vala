@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * SQLite queryable object
  */
-public interface Queryable: GLib.Object
-{
+public interface Queryable: GLib.Object {
     /**
      * Execute a sql query on database conection
      *

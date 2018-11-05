@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * Result of database query
  */
-public class Result : GLib.Object
-{
+public class Result : GLib.Object {
     public Connection connection {get; private set;}
     public int n_columns {get; private set; default = -1;}
     public int counter {get; private set; default = 0;}
@@ -43,8 +41,7 @@ public class Result : GLib.Object
      * @param connection    database conection
      * @param statement     prepared SQLite statement to execute
      */
-    public Result(Connection connection, owned Sqlite.Statement statement)
-    {
+    public Result(Connection connection, owned Sqlite.Statement statement) {
         this.connection = connection;
         this.statement = (owned) statement;
         column_indexes = new HashTable<unowned string, int>(str_hash, str_equal);
@@ -59,17 +56,13 @@ public class Result : GLib.Object
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public bool next(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public bool next(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         var done = throw_on_error(statement.step()) == Sqlite.DONE;
-        if (!done)
-        {
+        if (!done) {
             counter++;
             n_columns = statement.data_count();
-        }
-        else
-        {
+        } else {
             n_columns = -1;
         }
         column_indexes.remove_all();
@@ -83,8 +76,7 @@ public class Result : GLib.Object
      * @param name    column name
      * @return the index of the column if it exists, `-1` otherwise
      */
-    public int get_column_index(string name)
-    {
+    public int get_column_index(string name) {
         map_column_names();
         int index;
         if (column_indexes.lookup_extended(name, null, out index))
@@ -98,8 +90,7 @@ public class Result : GLib.Object
      * @param index the index of a column
      * @return the name of the column if index is valid, `null` otherwise
      */
-    public unowned string? get_column_name(int index)
-    {
+    public unowned string? get_column_name(int index) {
         map_column_names();
         if (index < 0 || index >= n_columns)
         return null;
@@ -114,8 +105,7 @@ public class Result : GLib.Object
      * @return the requested value
      * @throws DatabaseError if data type is not supported or index is invalid
      */
-    public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError
-    {
+    public GLib.Value? fetch_value_of_type(int index, Type type) throws DatabaseError {
         if (fetch_is_null(index))
         return null;
 
@@ -152,8 +142,7 @@ public class Result : GLib.Object
      * @return true if value is null
      * @throws DatabaseError if index is invalid
      */
-    public bool fetch_is_null(int index) throws DatabaseError
-    {
+    public bool fetch_is_null(int index) throws DatabaseError {
         check_index(index);
         return statement.column_type(index) == Sqlite.NULL;
     }
@@ -165,8 +154,7 @@ public class Result : GLib.Object
      * @return the integer value
      * @throws DatabaseError if index is invalid
      */
-    public int fetch_int(int index) throws DatabaseError
-    {
+    public int fetch_int(int index) throws DatabaseError {
         check_index(index);
         return statement.column_int(index);
     }
@@ -178,8 +166,7 @@ public class Result : GLib.Object
      * @return the 64bit integer value
      * @throws DatabaseError if index is invalid
      */
-    public int64 fetch_int64(int index) throws DatabaseError
-    {
+    public int64 fetch_int64(int index) throws DatabaseError {
         check_index(index);
         return statement.column_int64(index);
     }
@@ -191,8 +178,7 @@ public class Result : GLib.Object
      * @return the boolean value
      * @throws DatabaseError if index is invalid
      */
-    public bool fetch_bool(int index) throws DatabaseError
-    {
+    public bool fetch_bool(int index) throws DatabaseError {
         return fetch_int(index) != 0;
     }
 
@@ -203,8 +189,7 @@ public class Result : GLib.Object
      * @return the double value
      * @throws DatabaseError if index is invalid
      */
-    public double fetch_double(int index) throws DatabaseError
-    {
+    public double fetch_double(int index) throws DatabaseError {
         check_index(index);
         return statement.column_double(index);
     }
@@ -216,13 +201,11 @@ public class Result : GLib.Object
      * @return the string value
      * @throws DatabaseError if index is invalid
      */
-    public unowned string? fetch_string(int index) throws DatabaseError
-    {
+    public unowned string? fetch_string(int index) throws DatabaseError {
         check_index(index);
         unowned string? result = statement.column_text(index);
         var n_bytes =  statement.column_bytes(index);
-        if (result != null)
-        {
+        if (result != null) {
             var result_len = result.length;
             if (result_len != n_bytes)
             warning("Fetch string: Result may be truncated. Original blob size was %d, but string size is %d.",
@@ -238,8 +221,7 @@ public class Result : GLib.Object
      * @return the binary blob value
      * @throws DatabaseError if index is invalid
      */
-    public uint8[]? fetch_blob(int index) throws DatabaseError
-    {
+    public uint8[]? fetch_blob(int index) throws DatabaseError {
         check_index(index);
         unowned uint8[]? blob = (uint8[]?) statement.column_blob(index);
         blob.length =  statement.column_bytes(index);
@@ -256,8 +238,7 @@ public class Result : GLib.Object
      * @return the binary blob as GLib.Bytes value
      * @throws DatabaseError if index is invalid
      */
-    public GLib.Bytes? fetch_bytes(int index) throws DatabaseError
-    {
+    public GLib.Bytes? fetch_bytes(int index) throws DatabaseError {
         var blob = fetch_blob(index);
         return blob != null ? new GLib.Bytes.take((owned) blob) : null;
     }
@@ -269,8 +250,7 @@ public class Result : GLib.Object
      * @return the binary blob as GLib.ByteArray value
      * @throws DatabaseError if index is invalid
      */
-    public GLib.ByteArray? fetch_byte_array(int index) throws DatabaseError
-    {
+    public GLib.ByteArray? fetch_byte_array(int index) throws DatabaseError {
         var blob = fetch_blob(index);
         return blob != null ? new GLib.ByteArray.take((owned) blob) : null;
     }
@@ -281,8 +261,7 @@ public class Result : GLib.Object
      * @param index    column index
      * @throws DatabaseError if index is invalid
      */
-    protected void check_index(int index) throws DatabaseError
-    {
+    protected void check_index(int index) throws DatabaseError {
         if (n_columns == 0)
         throw new DatabaseError.RANGE("Result doesn't have any columns. |%s|", statement.sql());
         if (index < 0 || index >= n_columns)
@@ -293,8 +272,7 @@ public class Result : GLib.Object
     /**
      * Throw an error on SQLite failure.
      */
-    protected int throw_on_error(int result, string? sql=null) throws DatabaseError
-    {
+    protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
         if (Drtdb.is_sql_error(result))
         throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
         return result;
@@ -303,8 +281,7 @@ public class Result : GLib.Object
     /**
      * Map column names to indexes and vice versa.
      */
-    private void map_column_names()
-    {
+    private void map_column_names() {
         /*
          * name -> index mapping is created because SQLite doesn't offer API to get column index for name.
          * index -> name mapping is created because SQLite invalidates the previously returned column name
@@ -312,11 +289,9 @@ public class Result : GLib.Object
          *
          * http://sqlite.org/c3ref/column_name.html
          */
-        if (column_names == null || column_indexes.length == 0)
-        {
+        if (column_names == null || column_indexes.length == 0) {
             column_names = new string?[n_columns];
-            for (var index = 0; index < n_columns; index++)
-            {
+            for (var index = 0; index < n_columns; index++) {
                 unowned string name = statement.column_name(index);
                 column_indexes[name] = index;
                 column_names[index] = name;

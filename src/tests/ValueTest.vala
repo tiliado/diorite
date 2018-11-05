@@ -19,13 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class ValueTest: Drt.TestCase
-{
-    public void test_to_string()
-    {
+public class ValueTest: Drt.TestCase {
+    public void test_to_string() {
         expect_str_equals("string", Value.to_string("string"), "string");
         expect_str_equals("1024", Value.to_string((int)1024), "int");
         expect_str_equals("1024", Value.to_string((uint)1024), "uint");
@@ -40,14 +37,13 @@ public class ValueTest: Drt.TestCase
         var dummy = new DummyObject();
         expect_str_equals("%p".printf(dummy), Value.to_string(dummy), "simple object");
 
-        var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
+        var bytes = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
         expect_str_equals("01020304050607", Value.to_string(bytes), "bytes");
-        var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
+        var byte_array = new ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
         expect_str_equals("01020304050607", Value.to_string(byte_array), "byte array");
     }
 
-    public void test_describe()
-    {
+    public void test_describe() {
         expect_str_equals("<gchararray:string>", Value.describe("string"), "string");
         expect_str_equals("<gint:1024>", Value.describe((int)1024), "int");
         expect_str_equals("<guint:1024>", Value.describe((uint)1024), "uint");
@@ -62,14 +58,13 @@ public class ValueTest: Drt.TestCase
         var dummy = new DummyObject();
         expect_str_equals("<DrtValueTestDummyObject:%p>".printf(dummy), Value.describe(dummy), "simple object");
 
-        var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
+        var bytes = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
         expect_str_equals("<GBytes:01020304050607>", Value.describe(bytes), "bytes");
-        var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
+        var byte_array = new ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
         expect_str_equals("<GByteArray:01020304050607>", Value.describe(byte_array), "byte array");
     }
 
-    public void test_equal()
-    {
+    public void test_equal() {
         expect_true(Value.equal(null, null), "both null");
         expect_false(Value.equal("string", null), "(\"string\", null)");
         expect_false(Value.equal(null, "string"), "(null, \"string\")");
@@ -95,23 +90,22 @@ public class ValueTest: Drt.TestCase
         expect_true(Value.equal(this, this), "object == object");
         expect_false(Value.equal(this, new DummyObject()), "object != object");
 
-        var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var bytes2 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var bytes3 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
+        var bytes = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var bytes2 = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var bytes3 = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 8});
         expect_true(Value.equal(bytes, bytes), "bytes == bytes");
         expect_true(Value.equal(bytes, bytes2), "bytes == bytes");
         expect_false(Value.equal(bytes, bytes3), "bytes != bytes");
 
-        var byte_array = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var byte_array2 = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var byte_array3 = new ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
+        var byte_array = new ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var byte_array2 = new ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var byte_array3 = new ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 8});
         expect_true(Value.equal(byte_array, byte_array), "byte_array == byte_array");
         expect_true(Value.equal(byte_array, byte_array2), "byte_array == byte_array");
         expect_false(Value.equal(byte_array, byte_array3), "byte_array != byte_array");
     }
 
-    public void test_equal_verbose()
-    {
+    public void test_equal_verbose() {
         string description;
         expect_true(Value.equal_verbose(null, null, out description), "both null");
         expect_str_equals("equal <null>", description, "both null");
@@ -161,9 +155,9 @@ public class ValueTest: Drt.TestCase
         expect_false(Value.equal_verbose(this, dummy, out description), "object != simple object");
         expect_str_equals("<DrtValueTest:%p> != <DrtValueTestDummyObject:%p>".printf(this, dummy), description, "object != simple object");
 
-        var bytes = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var bytes2 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var bytes3 = new Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 8});
+        var bytes = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var bytes2 = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var bytes3 = new Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 8});
         expect_true(Value.equal_verbose(bytes, bytes, out description), "bytes == bytes");
         expect_str_equals("equal <GBytes:01020304050607>", description, "bytes == bytes");
         expect_true(Value.equal_verbose(bytes, bytes2, out description), "bytes == bytes");
@@ -172,8 +166,7 @@ public class ValueTest: Drt.TestCase
         expect_str_equals("<GBytes:01020304050607> != <GBytes:0102030405060708>", description, "bytes != bytes");
     }
 
-    private class DummyObject
-    {
+    private class DummyObject {
     }
 }
 

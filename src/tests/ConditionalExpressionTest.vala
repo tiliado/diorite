@@ -19,13 +19,10 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class ConditionalExpressionTest: Drt.TestCase
-{
-    public void test_valid_expressions()
-    {
+public class ConditionalExpressionTest: Drt.TestCase {
+    public void test_valid_expressions() {
         string[] entries = {
             "true",
             "false",
@@ -57,8 +54,7 @@ public class ConditionalExpressionTest: Drt.TestCase
             false,
         };
         var expr = new ConditionalExpression();
-        for (var i = 0; i < entries.length; i++)
-        {
+        for (var i = 0; i < entries.length; i++) {
             var data = entries[i];
             bool res = false;
             expect_no_error(() => {res = expr.eval(data);}, "'%s'", data);
@@ -66,8 +62,7 @@ public class ConditionalExpressionTest: Drt.TestCase
         }
     }
 
-    public void test_invalid_expressions()
-    {
+    public void test_invalid_expressions() {
         string[] entries = {
             "false or not",
             "true and",
@@ -86,8 +81,7 @@ public class ConditionalExpressionTest: Drt.TestCase
         };
 
         var expr = new ConditionalExpression();
-        for (var i = 0; i < entries.length; i++)
-        {
+        for (var i = 0; i < entries.length; i++) {
             var data = entries[i];
             expect_error(() => expr.eval(data), errors[i], "'%s'", data);
         }

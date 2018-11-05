@@ -24,8 +24,7 @@
 
 using Drt;
 
-namespace Drtgtk.Css
-{
+namespace Drtgtk.Css {
 
 /**
  * Default badge class for {@link Gtk.Label} or {@link Gtk.Button}.
@@ -113,8 +112,7 @@ button.badge-ok:hover {
  *
  * Not necessary if {@link Drt.Application} is used.
  */
-public Gtk.CssProvider apply_custom_styles(Gdk.Screen screen) throws GLib.Error
-{
+public Gtk.CssProvider apply_custom_styles(Gdk.Screen screen) throws GLib.Error {
     var provider = new Gtk.CssProvider();
     provider.load_from_data(CUSTOM_CSS, -1);
     Gtk.StyleContext.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);

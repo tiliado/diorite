@@ -24,8 +24,7 @@
 
 using Drt;
 
-namespace Drtgtk.Icons
-{
+namespace Drtgtk.Icons {
 
 /**
  * Get icon name for given position.
@@ -43,18 +42,13 @@ public static unowned string get_icon_name_for_position(Gtk.PositionType positio
     }
 }
 
-public static Gdk.Pixbuf? load_theme_icon(string[] names, int size)
-{
-    foreach (var name in names)
-    {
-        try
-        {
+public static Gdk.Pixbuf? load_theme_icon(string[] names, int size) {
+    foreach (var name in names) {
+        try {
             var icon = Gtk.IconTheme.get_default().load_icon(name, size, 0);
             if (icon != null)
             return icon;
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             warning("Failed to load icon '%s': %s", name, e.message);
         }
     }

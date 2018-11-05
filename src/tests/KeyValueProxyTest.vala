@@ -19,34 +19,25 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 #if FIXME
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueProxyTest: KeyValueStorageTest
-{
+public class KeyValueProxyTest: KeyValueStorageTest {
     private KeyValueTree tree;
     private KeyValueStorageClient storage_client;
     private KeyValueStorageServer storage_server;
 
-    public override void set_up()
-    {
+    public override void set_up() {
         tree = new KeyValueTree();
         var listener_server = new Ipc.MessageServer("test-listener");
-        try
-        {
+        try {
             listener_server.start_service();
-        }
-        catch (Drt.IOError e)
-        {
+        } catch (Drt.IOError e) {
             fail("Cannot start server service %s: %s", listener_server.name, e.message);
         }
         var provider_server = new Ipc.MessageServer("test");
-        try
-        {
+        try {
             provider_server.start_service();
-        }
-        catch (Drt.IOError e)
-        {
+        } catch (Drt.IOError e) {
             fail("Cannot start server service %s: %s", provider_server.name, e.message);
         }
         var provider_client = new Ipc.MessageClient("test", 15);
@@ -58,8 +49,7 @@ public class KeyValueProxyTest: KeyValueStorageTest
         storage = proxy;
     }
 
-    public override void tear_down()
-    {
+    public override void tear_down() {
         tree = null;
         storage = null;
         storage_client = null;

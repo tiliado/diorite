@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.EventLoop
-{
+namespace Drt.EventLoop {
 
 /**
  * Pause async method and resume it later.
  */
-public async void resume_later()
-{
+public async void resume_later() {
     add_idle(resume_later.callback);
     yield;
 }

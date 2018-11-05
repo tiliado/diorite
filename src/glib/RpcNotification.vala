@@ -148,7 +148,7 @@ public class RpcNotification : RpcCallable {
                 }
             }
         } else {
-            if (data.get_type_string() != "(a{smv})"){
+            if (data.get_type_string() != "(a{smv})") {
                 Rpc.check_type_string(data, "a{smv}");
             }
             var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
@@ -189,7 +189,7 @@ public class RpcNotification : RpcCallable {
         foreach (unowned RpcConnection channel in subscribers) {
             try {
                 yield channel.call("n:" + path, new Variant("(msmv)", detail, data));
-            } catch (GLib.Error e) 	{
+            } catch (GLib.Error e) {
                 result = false;
                 warning("Failed to emit '%s': %s", path, e.message);
             }

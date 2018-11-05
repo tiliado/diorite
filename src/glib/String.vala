@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.String
-{
+namespace Drt.String {
 /**
  * Check whether string is empty, i.e. `null` or `""`.
  *
@@ -66,8 +65,7 @@ public unowned string not_empty_or(string? may_be_empty, string fallback) {
  * @param text        The second string.
  * @return Joined string.
  */
-public string? concat(string? initial, string? separator, owned string text)
-{
+public string? concat(string? initial, string? separator, owned string text) {
     if (is_empty(initial))
     return (owned) text;
     if (is_empty(separator))
@@ -84,8 +82,7 @@ public string? concat(string? initial, string? separator, owned string text)
  * @param separator    The separator which will be added if the initial string is not empty.
  * @param text         The text to append.
  */
-public void append(ref string? initial, string? separator, owned string text)
-{
+public void append(ref string? initial, string? separator, owned string text) {
     initial = concat(initial, separator, (owned) text);
 }
 
@@ -102,8 +99,7 @@ public void append(ref string? initial, string? separator, owned string text)
  *                      is split completely.
  * @return resulting list of strings
  */
-public SList<string> split_strip(string? data, string delimiter, int max_tokens=0)
-{
+public SList<string> split_strip(string? data, string delimiter, int max_tokens=0) {
     if (is_empty(data))
     return new SList<string>();
     return array_to_slist(data.split(delimiter, max_tokens), true);
@@ -117,17 +113,12 @@ public SList<string> split_strip(string? data, string delimiter, int max_tokens=
  * @param strip    strip array elements and ignore empty elements
  * @return resulting list of strings
  */
-public SList<string> array_to_slist(string[] array, bool strip=false)
-{
+public SList<string> array_to_slist(string[] array, bool strip=false) {
     SList<string> result = null;
-    foreach (unowned string item in array)
-    {
-        if (!strip)
-        {
+    foreach (unowned string item in array) {
+        if (!strip) {
             result.prepend(item);
-        }
-        else if (!is_empty(item))
-        {
+        } else if (!is_empty(item)) {
             var stripped_item = item.strip();
             if (!is_empty(stripped_item))
             result.prepend((owned) stripped_item);
@@ -143,14 +134,11 @@ public SList<string> array_to_slist(string[] array, bool strip=false)
  * @param dataset    semicolon-separated set of items
  * @return a set data structurecontaining all unique items from data set
  */
-public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercase)
-{
+public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercase) {
     var result = new GenericSet<string>(str_hash, str_equal);
-    if (!is_empty(dataset))
-    {
+    if (!is_empty(dataset)) {
         var items = dataset.split(";");
-        foreach (var item in items)
-        {
+        foreach (var item in items) {
             item = item.strip();
             if (item[0] != 0)
             result.add(lowercase ? item.down() : item);
@@ -159,27 +147,23 @@ public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercas
     return result;
 }
 
-public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
-{
+public int index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1) {
     char* result = g_utf8_strchr((char*) str + start_index, len, c);
     return result != null ? (int) (result - (char*) str) : -1;
 }
 
-public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1)
-{
+public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_t len = -1) {
     char* result = g_utf8_strrchr((char*) str + start_index, len, c);
     return result != null ? (int) (result - (char*) str) : -1;
 }
 
-public string? unmask(uint8[] data)
-{
+public string? unmask(uint8[] data) {
     var length = data.length;
     if (length < 2)
     return null;
     var shift = data[0];
     var result = new uint8[length];
-    for (var i = 1; i < length; i++)
-    {
+    for (var i = 1; i < length; i++) {
         if (shift > data[i])
         return null;
         result[i - 1] = data[i] - shift;
@@ -196,8 +180,7 @@ public string? unmask(uint8[] data)
  * @param str    a string
  * @return a number of UTF-16 code points
  */
-public int utf16_strlen(string? str)
-{
+public int utf16_strlen(string? str) {
     if (is_empty(str))
     return 0;
     int len = 0;
@@ -215,8 +198,7 @@ public int utf16_strlen(string? str)
  * @param offset    starting offset
  * @return unowned substring starting at given offset
  */
-public unowned string offset(string str, int offset)
-{
+public unowned string offset(string str, int offset) {
     assert(offset >= 0);
     uint8* pointer = ((uint8*) str) + offset;
     unowned string result = (string) pointer;

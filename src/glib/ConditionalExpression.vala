@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public errordomain ConditionalExpressionError
-{
+public errordomain ConditionalExpressionError {
     /**
      * Failed to parse extension
      */
@@ -57,10 +55,9 @@ public errordomain ConditionalExpressionError
  * Example: "webkitgtk[2.15.3] and codec[mp3] and codec[h264] and mse"
  */
 
-public class ConditionalExpression
-{
+public class ConditionalExpression {
     [Description(nick = "Conditional expression", blurb = "A data string containing conditional expression.")]
-    public string? data  {get; private set;}
+    public string? data {get; private set;}
     [Description(nick = "Position", blurb = "Current position inside conditional expression string.")]
     public int pos {get; private set;}
     [Description(nick = "The position of the first error", blurb = "The position of the first error inside conditional expression string.")]
@@ -76,8 +73,7 @@ public class ConditionalExpression
      * Creates new simple conditional expression parser and evaluator.
      * It can be reused for more calls of {@link eval}.
      */
-    public ConditionalExpression()
-    {
+    public ConditionalExpression() {
         peeked_token_len = -1;
         len = 0;
         pos = 0;
@@ -85,12 +81,9 @@ public class ConditionalExpression
         error_text = null;
         error_pos = -1;
         error_object = null;
-        try
-        {
+        try {
             patterns = new Regex("(\\s+)|(\\bnot\\b)|(\\band\\b)|(\\bor\\b)|(\\w+)|(\\[.*?\\])|(\\()|(\\))");
-        }
-        catch (RegexError e)
-        {
+        } catch (RegexError e) {
             error("Failed to compile regex patterns. %s", e.message);
         }
     }
@@ -102,15 +95,13 @@ public class ConditionalExpression
      * @param len      The size of the mark.
      * @return marked string
      */
-    public string mark_pos(int start, int len=1)
-    {
+    public string mark_pos(int start, int len=1) {
         var buf = new StringBuilder(data);
         buf.append_c('\n');
         for (var i = 0; i < pos; i++)
         buf.append_c('_');
         buf.append_c('^');
-        while (len > 1)
-        {
+        while (len > 1) {
             buf.append_c('^');
             len--;
         }
@@ -125,8 +116,7 @@ public class ConditionalExpression
      * @return the result of the expression evaluation.
      * @throws ConditionalExpressionError on failure
      */
-    public bool eval(string expression) throws ConditionalExpressionError
-    {
+    public bool eval(string expression) throws ConditionalExpressionError {
         len = expression.length;
         data = expression;
         pos = 0;
@@ -144,8 +134,7 @@ public class ConditionalExpression
     /**
      * Returns true if there has been an error.
      */
-    public bool is_error_set()
-    {
+    public bool is_error_set() {
         return error_pos >= 0;
     }
 
@@ -157,8 +146,7 @@ public class ConditionalExpression
      * @param parameters    the parameters
      * @return the result of the identifier call
      */
-    protected virtual bool call(int pos, string ident, string? parameters)
-    {
+    protected virtual bool call(int pos, string ident, string? parameters) {
         if (parameters != null)
         set_eval_error(pos, "Parameteres are not supported.");
         return parameters == null && ident != "false";
@@ -167,8 +155,7 @@ public class ConditionalExpression
     /**
      * Reset the inner state before parsing and evaluation of a new expression.
      */
-    protected virtual void reset()
-    {
+    protected virtual void reset() {
     }
 
     /**
@@ -181,10 +168,8 @@ public class ConditionalExpression
      * @param ...     Printf parameters
      * @return `false` as a convenience
      */
-    protected bool set_parse_error(int pos, string text, ...)
-    {
-        if (!is_error_set())
-        {
+    protected bool set_parse_error(int pos, string text, ...) {
+        if (!is_error_set()) {
             var error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.PARSE("%d: %s", pos, error_text), pos, error_text);
         }
@@ -201,10 +186,8 @@ public class ConditionalExpression
      * @param ...     Printf parameters
      * @return `false` as a convenience
      */
-    protected bool set_syntax_error(int pos, string text, ...)
-    {
-        if (!is_error_set())
-        {
+    protected bool set_syntax_error(int pos, string text, ...) {
+        if (!is_error_set()) {
             var error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.SYNTAX("%d: %s", pos, error_text), pos, error_text);
         }
@@ -221,27 +204,22 @@ public class ConditionalExpression
      * @param ...     Printf parameters
      * @return `false` as a convenience
      */
-    protected bool set_eval_error(int pos, string text, ...)
-    {
-        if (!is_error_set())
-        {
+    protected bool set_eval_error(int pos, string text, ...) {
+        if (!is_error_set()) {
             var error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.EVAL("%d: %s", pos, error_text), pos, error_text);
         }
         return false;
     }
 
-    private void set_error(ConditionalExpressionError err, int pos, string text)
-    {
+    private void set_error(ConditionalExpressionError err, int pos, string text) {
         error_object = err;
         error_pos = pos;
         error_text = text;
     }
 
-    private bool wrong_token(int pos, Toks found, string? expected)
-    {
-        switch (found)
-        {
+    private bool wrong_token(int pos, Toks found, string? expected) {
+        switch (found) {
         case Toks.NONE:
             set_parse_error(pos, "Unknown token. %s expected.", expected);
             break;
@@ -255,18 +233,15 @@ public class ConditionalExpression
         return false;
     }
 
-    private bool next(out Toks tok, out string? val, out int position)
-    {
+    private bool next(out Toks tok, out string? val, out int position) {
         if (peek(out tok, out val, out position))
         return skip();
         else
         return false;
     }
 
-    private bool skip()
-    {
-        if (peeked_token_len >= 0)
-        {
+    private bool skip() {
+        if (peeked_token_len >= 0) {
             pos += peeked_token_len;
             peeked_token_len = -1;
             return true;
@@ -274,28 +249,21 @@ public class ConditionalExpression
         return next(null, null, null);
     }
 
-    private bool peek(out Toks tok, out string? val, out int position)
-    {
+    private bool peek(out Toks tok, out string? val, out int position) {
         val = null;
         position = pos;
         peeked_token_len = -1;
-        while (pos < len)
-        {
+        while (pos < len) {
             tok = Toks.NONE;
             MatchInfo mi;
-            try
-            {
-                if (patterns.match_full(data, len, pos, RegexMatchFlags.ANCHORED, out mi))
-                {
-                    for (var i = 1; i < Toks.EOF; i++)
-                    {
+            try {
+                if (patterns.match_full(data, len, pos, RegexMatchFlags.ANCHORED, out mi)) {
+                    for (var i = 1; i < Toks.EOF; i++) {
                         var result = mi.fetch(i);
-                        if (result != null && result[0] != 0)
-                        {
+                        if (result != null && result[0] != 0) {
                             tok = (Toks) i;
                             val = (owned) result;
-                            if (tok != Toks.SPACE)
-                            {
+                            if (tok != Toks.SPACE) {
                                 peeked_token_len = val.length;
                                 return true;
                             }
@@ -305,9 +273,7 @@ public class ConditionalExpression
                         }
                     }
                 }
-            }
-            catch (RegexError e)
-            {
+            } catch (RegexError e) {
                 critical("Regex error: %s", e.message);
             }
             if (tok != Toks.SPACE)
@@ -317,8 +283,7 @@ public class ConditionalExpression
         return false;
     }
 
-    private bool parse_block(Toks end_tok)
-    {
+    private bool parse_block(Toks end_tok) {
         var result = parse_expr(Toks.EOF);
         Toks tok = Toks.NONE;
         string? val;
@@ -330,15 +295,13 @@ public class ConditionalExpression
         return wrong_token(pos, tok, end_tok.to_str() + " token");
     }
 
-    private bool parse_expr(Toks bind)
-    {
+    private bool parse_expr(Toks bind) {
         Toks tok = Toks.NONE;
         string? val;
         var lvalue = false;
         int pos;
         next(out tok, out val, out pos);
-        switch (tok)
-        {
+        switch (tok) {
         default:
             return wrong_token(pos, tok, "One of IDENT, NOT or LPAREN tokens");
         case Toks.NOT:
@@ -352,14 +315,12 @@ public class ConditionalExpression
             break;
         }
 
-        while (true)
-        {
+        while (true) {
             peek(out tok, out val, null);
             if (tok > bind)
             return lvalue;
 
-            switch (tok)
-            {
+            switch (tok) {
             default:
                 return lvalue;
             case Toks.AND:
@@ -374,12 +335,10 @@ public class ConditionalExpression
         }
     }
 
-    private bool parse_ident(int pos, string ident)
-    {
+    private bool parse_ident(int pos, string ident) {
         Toks tok = Toks.NONE;
         string? parameters;
-        if (peek(out tok, out parameters, null) && tok == Toks.CALL)
-        {
+        if (peek(out tok, out parameters, null) && tok == Toks.CALL) {
             skip();
             var len = parameters.length;
             if (len > 2)
@@ -391,32 +350,27 @@ public class ConditionalExpression
         return parse_call(pos, ident, null);
     }
 
-    private bool parse_call(int pos, string ident, string? parameters)
-    {
+    private bool parse_call(int pos, string ident, string? parameters) {
         if (is_error_set())
         return false;
         return call(pos, ident, parameters);
     }
 
-    private bool parse_and(bool lvalue)
-    {
+    private bool parse_and(bool lvalue) {
         var rvalue = parse_expr(Toks.AND);
         return lvalue && rvalue;
     }
 
-    private bool parse_or(bool lvalue)
-    {
+    private bool parse_or(bool lvalue) {
         var rvalue = parse_expr(Toks.OR);
         return lvalue || rvalue;
     }
 
-    private bool parse_not()
-    {
+    private bool parse_not() {
         return !parse_expr(Toks.NOT);
     }
 
-    private enum Toks
-    {
+    private enum Toks {
         NONE,
         SPACE,
         NOT,
@@ -428,8 +382,7 @@ public class ConditionalExpression
         RPAREN,
         EOF;
 
-        public string to_str()
-        {
+        public string to_str() {
             return to_string().substring(Toks.NONE.to_string().length - 4);
         }
     }

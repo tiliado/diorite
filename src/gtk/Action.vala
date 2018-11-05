@@ -24,14 +24,12 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
 public delegate void ActionCallback();
 public delegate void ActionCallbackWithParam(Variant parameter);
 
-public abstract class Action: GLib.Object
-{
+public abstract class Action: GLib.Object {
     public const string SCOPE_NONE = "none";
     public const string SCOPE_APP = "app";
     public const string SCOPE_WIN = "win";
@@ -47,40 +45,34 @@ public abstract class Action: GLib.Object
     public string? keybinding {get; set; default = null;}
     public string name {get {return action.name;}}
     public string full_name {owned get {return scope + "." + action.name;}}
-    public bool enabled
-    {
+    public bool enabled {
         get {return action.enabled;}
         set {action.set_enabled(value);}
     }
-    public Variant? state
-    {
+    public Variant? state {
         owned get {return action.state;}
         set {action.set_state(value);}
     }
 
-    public virtual signal void activated(Variant? parameter)
-    {
+    public virtual signal void activated(Variant? parameter) {
         if (param_callback != null)
         param_callback(parameter);
         else if (callback != null)
         callback();
     }
 
-    public virtual void activate(Variant? parameter)
-    {
+    public virtual void activate(Variant? parameter) {
         if (enabled)
         action.activate(parameter);
         else
         warning("Cannot activate action '%s', because it is disabled.", name);
     }
 
-    public void add_to_map(ActionMap map)
-    {
+    public void add_to_map(ActionMap map) {
         map.add_action(action);
     }
 
-    protected void on_action_activated(Variant? parameter)
-    {
+    protected void on_action_activated(Variant? parameter) {
         if (!enabled)
         warning("Cannot activate action '%s', because it is disabled.", name);
         else if (parameter == null && this is ToggleAction)
@@ -90,10 +82,8 @@ public abstract class Action: GLib.Object
     }
 }
 
-public class SimpleAction : Action
-{
-    public SimpleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback)
-    {
+public class SimpleAction : Action {
+    public SimpleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback) {
         Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
         this.callback = (owned) callback;
         action = new GLib.SimpleAction(name, null);
@@ -102,10 +92,8 @@ public class SimpleAction : Action
     }
 }
 
-public class ToggleAction : Action
-{
-    public ToggleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant state)
-    {
+public class ToggleAction : Action {
+    public ToggleAction(string group, string scope, string name, string? label, string? mnemo_label, string? icon, string? keybinding, owned ActionCallback? callback, Variant state) {
         Object(group: group, scope: scope, label: label, icon: icon, keybinding: keybinding, mnemo_label: mnemo_label);
         this.callback = (owned) callback;
         action = new GLib.SimpleAction.stateful(name, null, state);
@@ -113,8 +101,7 @@ public class ToggleAction : Action
         action.change_state.connect(on_action_activated);
     }
 
-    public override void activate(Variant? parameter)
-    {
+    public override void activate(Variant? parameter) {
         if (parameter == null)
         base.activate(!this.state.get_boolean());
         else if (parameter != null && state != null && parameter.equal(state))
@@ -124,12 +111,10 @@ public class ToggleAction : Action
     }
 }
 
-public class RadioAction: Action
-{
+public class RadioAction: Action {
     private RadioOption[] options;
 
-    public RadioAction(string group, string scope, string name, owned ActionCallbackWithParam? callback, Variant state, RadioOption[] options)
-    {
+    public RadioAction(string group, string scope, string name, owned ActionCallbackWithParam? callback, Variant state, RadioOption[] options) {
         Object(group: group, scope: scope, label: null, icon: null, keybinding: null, mnemo_label: null);
         this.param_callback = (owned) callback;
         this.options = options;
@@ -138,27 +123,23 @@ public class RadioAction: Action
         action.change_state.connect(on_action_activated);
     }
 
-    public unowned RadioOption[] get_options()
-    {
+    public unowned RadioOption[] get_options() {
         return options;
     }
 
-    public RadioOption get_option(int i)
-    {
+    public RadioOption get_option(int i) {
         return options[i];
     }
 }
 
-public class RadioOption
-{
+public class RadioOption {
     public Variant parameter {get; private set;}
     public string? label {get; private set;}
     public string? mnemo_label {get; private set;}
     public string? icon {get; private set;}
     public string? keybinding {get; private set;}
 
-    public RadioOption(Variant parameter, string? label, string? mnemo_label, string? icon, string? keybinding)
-    {
+    public RadioOption(Variant parameter, string? label, string? mnemo_label, string? icon, string? keybinding) {
         this.parameter = parameter;
         this.label = label;
         this.mnemo_label = mnemo_label;

@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
 /**
  * Function that returns real image path for uri.
@@ -58,8 +57,7 @@ public delegate string ImageLocator(string uri);
  * Tag <a> is inserted as anonymous Drt.SimpleDocLink, <img> is inserted as Gtk.Pixbuf.
  * Other tags are inserted as Gtk.TextTags with names TEXT_TAG_*.
  */
-public class RichTextBuffer: Gtk.TextBuffer
-{
+public class RichTextBuffer: Gtk.TextBuffer {
     /**
      * Name of a Gtk.TextTag for tag <h1>.
      */
@@ -113,7 +111,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 
     private Gdk.RGBA? _link_color = null;
 
-    public Gdk.RGBA? get_link_color()  {
+    public Gdk.RGBA? get_link_color() {
         return _link_color;
     }
 
@@ -172,27 +170,21 @@ public class RichTextBuffer: Gtk.TextBuffer
      *
      * @param tag_table    Custom text table.!
      */
-    public RichTextBuffer.with_table(Gtk.TextTagTable tag_table)
-    {
+    public RichTextBuffer.with_table(Gtk.TextTagTable tag_table) {
         Object(tag_table: tag_table);
     }
 
     /**
      * Creates new Simple Document Buffer.
      */
-    public RichTextBuffer()
-    {
+    public RichTextBuffer() {
         Object();
     }
 
-    construct
-    {
-        try
-        {
+    construct {
+        try {
             strip_spaces = new Regex("(\n|\\s)+", 0);
-        }
-        catch (RegexError e)
-        {
+        } catch (RegexError e) {
             error("Failed to compile strip space regex: %s", e.message);
         }
 
@@ -219,14 +211,12 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param width     image width
      * @param height    image height
      */
-    public virtual signal void image_requested(string uri, int width, int height)
-    {
+    public virtual signal void image_requested(string uri, int width, int height) {
         if (_image_locator != null)
         insert_image_at_cursor(_image_locator(uri), width, height);
     }
 
-    public string default_image_locator(string uri)
-    {
+    public string default_image_locator(string uri) {
         return uri;
     }
 
@@ -255,8 +245,7 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param doc_file    document file to load
      * @throws MarkupError on failure
      */
-    public void load_from_file(File doc_file) throws MarkupError
-    {
+    public void load_from_file(File doc_file) throws MarkupError {
         clear();
         append_from_file(doc_file);
     }
@@ -267,15 +256,11 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param doc_file    document file to load
      * @throws MarkupError on failure
      */
-    public void append_from_file(File doc_file) throws MarkupError
-    {
+    public void append_from_file(File doc_file) throws MarkupError {
         string doc_text;
-        try
-        {
+        try {
             doc_text = Drt.System.read_file(doc_file);
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             throw new MarkupError.INVALID_CONTENT("Unable to read file %s.", doc_file.get_path());
         }
         append(doc_text);
@@ -287,8 +272,7 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param doc_text    Content of a document to load.
      * @throws MarkupError on failure
      */
-    public void load(string doc_text) throws MarkupError
-    {
+    public void load(string doc_text) throws MarkupError {
         clear();
         append(doc_text);
     }
@@ -299,20 +283,15 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param doc_text    Content of a document to load.
      * @throws MarkupError on failure
      */
-    public void append(string doc_text) throws MarkupError
-    {
+    public void append(string doc_text) throws MarkupError {
         var context = new MarkupParseContext(parser, 0, this, () => {});
         context.parse(doc_text, -1);
     }
 
-    private string norm_whitespace(string text)
-    {
-        try
-        {
+    private string norm_whitespace(string text) {
+        try {
             return strip_spaces.replace(text, -1, 0, " ");
-        }
-        catch (RegexError e)
-        {
+        } catch (RegexError e) {
             warning("Unable to strip spaces, Regex failed: %s", e.message);
             return text;
         }
@@ -321,8 +300,7 @@ public class RichTextBuffer: Gtk.TextBuffer
     /**
      * Clears buffer and resets parser.
      */
-    public void clear()
-    {
+    public void clear() {
         in_paragraph = strip_left = insert_new_line = false;
         tag_stack.clear();
         Gtk.TextIter start, end;
@@ -331,27 +309,22 @@ public class RichTextBuffer: Gtk.TextBuffer
     }
 
     private void start_tag(
-        MarkupParseContext context, string name, string[] attr_names, string[] attr_values) throws MarkupError
-    {
-        switch (name)
-        {
+        MarkupParseContext context, string name, string[] attr_names, string[] attr_values) throws MarkupError {
+        switch (name) {
         case INPUT_TAG_HEADING1:
         case INPUT_TAG_HEADING2:
         case INPUT_TAG_HEADING3:
         case INPUT_TAG_PARA:
         case INPUT_TAG_DL:
         case INPUT_TAG_UL:
-            if (!in_paragraph)
-            {
-                if (insert_new_line)
-                {
+            if (!in_paragraph) {
+                if (insert_new_line) {
                     insert_new_line = false;
                     insert_at_cursor("\n", -1);
                 }
                 in_paragraph = true;
                 strip_left = true;
-                switch (name)
-                {
+                switch (name) {
                 case INPUT_TAG_HEADING1:
                     append_tag_to_stack(name, tag_h1);
                     break;
@@ -373,9 +346,7 @@ public class RichTextBuffer: Gtk.TextBuffer
                     append_tag_to_stack(name, tag_para);
                     break;
                 }
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
@@ -385,78 +356,58 @@ public class RichTextBuffer: Gtk.TextBuffer
             break;
         case INPUT_TAG_BOLD:
         case INPUT_TAG_STRONG:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 append_tag_to_stack(name, tag_bold);
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
         case INPUT_TAG_ITALIC:
         case INPUT_TAG_EM:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 append_tag_to_stack(name, tag_italic);
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
         case INPUT_TAG_LINK:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 int i;
-                for (i = 0; i < attr_names.length; i++)
-                {
-                    if(attr_names[i] == LINK_TARGET)
+                for (i = 0; i < attr_names.length; i++) {
+                    if (attr_names[i] == LINK_TARGET)
                     break;
                 }
-                if (i >= attr_values.length)
-                {
+                if (i >= attr_values.length) {
                     throw new MarkupError.MISSING_ATTRIBUTE("Missing attribute '%s' for element '%s'.", LINK_TARGET, INPUT_TAG_LINK);
                 }
                 var uri = attr_values[i];
                 append_tag_to_stack(name, create_link_tag(uri));
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
         case INPUT_TAG_DT:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 append_tag_to_stack(name, tag_dt);
                 ignore_text = false;
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
         case INPUT_TAG_DD:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 append_tag_to_stack(name, tag_dd);
                 ignore_text = false;
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
         case INPUT_TAG_LI:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 append_tag_to_stack(name, tag_li);
                 insert_at_cursor("• ", -1);
                 ignore_text = false;
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
@@ -465,10 +416,8 @@ public class RichTextBuffer: Gtk.TextBuffer
             int width = -1;
             int height = -1;
 
-            for (int j = 0; j < attr_names.length; j++)
-            {
-                switch (attr_names[j])
-                {
+            for (int j = 0; j < attr_names.length; j++) {
+                switch (attr_names[j]) {
                 case "src":
                     src = attr_values[j];
                     break;
@@ -485,12 +434,9 @@ public class RichTextBuffer: Gtk.TextBuffer
             image_requested(src, width, height);
             break;
         default:
-            if (in_paragraph)
-            {
+            if (in_paragraph) {
                 unknown_tag_opened(name, attr_names, attr_values);
-            }
-            else
-            {
+            } else {
                 debug("Ignored start tag: %s", name);
             }
             break;
@@ -503,8 +449,7 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param name        tag name
      * @param text_tag    tag format
      */
-    public void append_tag_to_stack(string name, Gtk.TextTag text_tag)
-    {
+    public void append_tag_to_stack(string name, Gtk.TextTag text_tag) {
         Gtk.TextIter iter;
         get_end_iter(out iter);
         var tag = new Tag(name, create_mark(null, iter, true), text_tag);
@@ -512,12 +457,9 @@ public class RichTextBuffer: Gtk.TextBuffer
     }
 
     private void end_tag(MarkupParseContext context, string name)
-    throws MarkupError
-    {
-        if (in_paragraph)
-        {
-            switch (name)
-            {
+    throws MarkupError {
+        if (in_paragraph) {
+            switch (name) {
             case INPUT_TAG_HEADING1:
             case INPUT_TAG_HEADING2:
             case INPUT_TAG_HEADING3:
@@ -560,9 +502,7 @@ public class RichTextBuffer: Gtk.TextBuffer
                 unknown_tag_closed(name);
                 break;
             }
-        }
-        else
-        {
+        } else {
             debug("Ignored end tag: %s", name);
         }
     }
@@ -573,17 +513,14 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param name    tag name
      * @throws MarkupError when name doesn't match nme of the last opened tag.
      */
-    public void close_tag_from_stack(string name) throws MarkupError
-    {
+    public void close_tag_from_stack(string name) throws MarkupError {
         var tag = tag_stack.pop_tail();
-        if (tag == null)
-        {
-            throw new  MarkupError.PARSE("Attempt to close $(name), but not tag is open.");
+        if (tag == null) {
+            throw new MarkupError.PARSE("Attempt to close $(name), but not tag is open.");
         }
-        if (tag.name != name)
-        {
+        if (tag.name != name) {
             tag_stack.push_tail((owned) tag);
-            throw new  MarkupError.PARSE(@"Expected tag $(tag.name), found $(name)");
+            throw new MarkupError.PARSE(@"Expected tag $(tag.name), found $(name)");
         }
         Gtk.TextIter start, end;
         get_iter_at_mark(out start, tag.mark);
@@ -592,8 +529,7 @@ public class RichTextBuffer: Gtk.TextBuffer
         delete_mark(tag.mark);
     }
 
-    private void element_text(MarkupParseContext context, string text, size_t text_len) throws MarkupError
-    {
+    private void element_text(MarkupParseContext context, string text, size_t text_len) throws MarkupError {
         if (text == "")
         return;
 
@@ -601,14 +537,12 @@ public class RichTextBuffer: Gtk.TextBuffer
         if (result == " ")
         return;
 
-        if (ignore_text || !in_paragraph)
-        {
+        if (ignore_text || !in_paragraph) {
             warning("Ignored text: '%s'", text);
             return;
         }
 
-        if (strip_left)
-        {
+        if (strip_left) {
             result = result.chug();
             strip_left = false;
         }
@@ -619,20 +553,17 @@ public class RichTextBuffer: Gtk.TextBuffer
     }
 
 
-    private unowned RichTextLink create_link_tag(string uri)
-    {
+    private unowned RichTextLink create_link_tag(string uri) {
         var tag = new RichTextLink(uri);
         tag_table.add(tag);
-        if (_link_color != null)
-        {
+        if (_link_color != null) {
             tag.foreground_rgba = _link_color;
         }
         weak RichTextLink weak_tag = tag;
         return weak_tag;
     }
 
-    private void find_link_and_set_color(Gtk.TextTag tag)
-    {
+    private void find_link_and_set_color(Gtk.TextTag tag) {
         if (tag is RichTextLink)
         tag.foreground_rgba = _link_color;
     }
@@ -652,33 +583,25 @@ public class RichTextBuffer: Gtk.TextBuffer
      * @param width     image width (-1 to use original width)
      * @param height    image height (-1 to use original height)
      */
-    public void insert_image_at_cursor(string? path, int width=-1, int height=-1)
-    {
+    public void insert_image_at_cursor(string? path, int width=-1, int height=-1) {
         Gdk.Pixbuf pixbuf;
         bool real_size = true;
         int real_width = -1;
         int real_height = -1;
-        if (path == null)
-        {
+        if (path == null) {
             pixbuf = get_missing_image_pixbuf();
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 pixbuf = new Gdk.Pixbuf.from_file_at_size(path, width, height);
                 pixbuf.set_data<string?>(IMAGE_PATH, path);
 
                 if ((height != -1 || width != -1)
-                && Gdk.Pixbuf.get_file_info(path, out real_width, out real_height) != null)
-                {
+                && Gdk.Pixbuf.get_file_info(path, out real_width, out real_height) != null) {
                     real_size = (height == -1 || height == real_height)
                 && (width == -1 || width == real_width);
                 }
                 pixbuf.set_data<bool?>("has_real_size", real_size);
-            }
-            catch (GLib.Error e)
-            {
+            } catch (GLib.Error e) {
                 pixbuf = get_missing_image_pixbuf();
                 warning("Unable to load image %s: %s", path, e.message);
             }
@@ -692,22 +615,19 @@ public class RichTextBuffer: Gtk.TextBuffer
      *
      * @param pixbuf    pixbuf to insert
      */
-    public void insert_pixbuf_at_cursor(Gdk.Pixbuf pixbuf)
-    {
+    public void insert_pixbuf_at_cursor(Gdk.Pixbuf pixbuf) {
         Gtk.TextIter iter;
         get_iter_at_mark(out iter, get_insert());
         insert_pixbuf(iter, pixbuf);
     }
 
     [Compact]
-    private class Tag
-    {
+    private class Tag {
         public string name;
         public Gtk.TextMark mark;
         public unowned Gtk.TextTag tag;
 
-        public Tag(string name, Gtk.TextMark mark, Gtk.TextTag tag)
-        {
+        public Tag(string name, Gtk.TextMark mark, Gtk.TextTag tag) {
             this.name = name;
             this.mark = mark;
             this.tag = tag;
@@ -718,8 +638,7 @@ public class RichTextBuffer: Gtk.TextBuffer
 /**
  * A text tag for links that holds link's URI.
  */
-public class RichTextLink: Gtk.TextTag
-{
+public class RichTextLink: Gtk.TextTag {
     [Description(nick = "Link uri", blurb = "Target URI of the link.")]
     public string uri {get; set;}
 
@@ -728,8 +647,7 @@ public class RichTextLink: Gtk.TextTag
      *
      * @param uri    Target URI of the link
      */
-    public RichTextLink(string uri)
-    {
+    public RichTextLink(string uri) {
         Object(underline: Pango.Underline.SINGLE, uri: uri);
     }
 }

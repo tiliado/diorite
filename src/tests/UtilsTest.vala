@@ -21,17 +21,13 @@
 
 using Drt.Utils;
 
-namespace Drt
-{
+namespace Drt {
 
-public class UtilsTest: Drt.TestCase
-{
-    public void test_slist_to_strv()
-    {
+public class UtilsTest: Drt.TestCase {
+    public void test_slist_to_strv() {
         SList<string> list = null;
         string[] expected = new string[10];
-        for (var i = 0; i < 10; i++)
-        {
+        for (var i = 0; i < 10; i++) {
             expected[i] = "item%d".printf(i);
             list.append(expected[i]);
         }
@@ -39,12 +35,10 @@ public class UtilsTest: Drt.TestCase
         expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
     }
 
-    public void test_list_to_strv()
-    {
+    public void test_list_to_strv() {
         List<string> list = null;
         string[] expected = new string[10];
-        for (var i = 0; i < 10; i++)
-        {
+        for (var i = 0; i < 10; i++) {
             expected[i] = "item%d".printf(i);
             list.append(expected[i]);
         }

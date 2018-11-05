@@ -22,21 +22,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * JSON Object object
  */
-public class JsonObject: JsonNode
-{
+public class JsonObject: JsonNode {
     private HashTable<string, JsonNode?> nodes;
 
     /**
      * Creates a new empty JSON object.
      */
-    public JsonObject()
-    {
+    public JsonObject() {
         nodes = new HashTable<string, JsonNode?>(str_hash, str_equal);
     }
 
@@ -46,8 +43,7 @@ public class JsonObject: JsonNode
      * @param name    the member name
      * @param node    the member
      */
-    public void set(string name, JsonNode node)
-    {
+    public void set(string name, JsonNode node) {
         return_if_fail(node.parent == null);
         var old_node = get(name);
         nodes[name] = node;
@@ -62,8 +58,7 @@ public class JsonObject: JsonNode
      * @param name    the member name
      * @return `true` if the member has been found and thus removed from the object, `false` otherwise
      */
-    public bool remove(string name)
-    {
+    public bool remove(string name) {
         return take(name) != null;
     }
 
@@ -73,8 +68,7 @@ public class JsonObject: JsonNode
      * @param name    the member name
      * @return the member if it has been found and thus removed from the object, `null` otherwise
      */
-    public JsonNode? take(string name)
-    {
+    public JsonNode? take(string name) {
         var node = nodes.take(name, null);
         if (node != null)
         node.parent = null;
@@ -87,8 +81,7 @@ public class JsonObject: JsonNode
      * @param name    the member name
      * @return the member if it has been found, `null` otherwise
      */
-    public unowned JsonNode? get(string name)
-    {
+    public unowned JsonNode? get(string name) {
         return nodes[name];
     }
 
@@ -101,8 +94,7 @@ public class JsonObject: JsonNode
      * @param path    the dot-path of the node to get
      * @return the requested node if found else `null`
      */
-    public unowned JsonNode? dotget(string path)
-    {
+    public unowned JsonNode? dotget(string path) {
         var dot = path.index_of_char('.');
         return_val_if_fail(dot != 0, null);
         if (dot < 0)
@@ -127,11 +119,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_bool(string name, out bool result)
-    {
+    public bool get_bool(string name, out bool result) {
         var node = get(name) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = false;
             return false;
         }
@@ -145,8 +135,7 @@ public class JsonObject: JsonNode
      * @return the actual boolean value if the node is found and is of type {@link JsonValueType.BOOLEAN},
      *     the `default_value` otherwise.
      */
-    public bool get_bool_or(string name, bool default_value=false)
-    {
+    public bool get_bool_or(string name, bool default_value=false) {
         bool result;
         return get_bool(name, out result) ? result : default_value;
     }
@@ -161,11 +150,9 @@ public class JsonObject: JsonNode
      * @param result   the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.BOOLEAN} and so the `result` is valid
      */
-    public bool dotget_bool(string path, out bool result)
-    {
+    public bool dotget_bool(string path, out bool result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = false;
             return false;
         }
@@ -180,11 +167,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is found and is of type {@link JsonValueType.INTEGER}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_int(string name, out int result)
-    {
+    public bool get_int(string name, out int result) {
         var node = get(name) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0;
             return false;
         }
@@ -198,8 +183,7 @@ public class JsonObject: JsonNode
      * @return the actual integer number value if the node is found and is of type
      *     {@link JsonValueType.BOOLEAN}, the `default_value` otherwise.
      */
-    public int get_int_or(string name, int default_value=0)
-    {
+    public int get_int_or(string name, int default_value=0) {
         int result;
         return get_int(name, out result) ? result : default_value;
     }
@@ -214,11 +198,9 @@ public class JsonObject: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.INTEGER} and so the `result` is valid
      */
-    public bool dotget_int(string path, out int result)
-    {
+    public bool dotget_int(string path, out int result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0;
             return false;
         }
@@ -233,11 +215,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is found and is of type {@link JsonValueType.DOUBLE}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_double(string name, out double result)
-    {
+    public bool get_double(string name, out double result) {
         var node = get(name) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0.0;
             return false;
         }
@@ -251,8 +231,7 @@ public class JsonObject: JsonNode
      * @return the actual floating point number value if the node is found and is of type
      *     {@link JsonValueType.DOUBLE}, the `default_value` otherwise.
      */
-    public double get_double_or(string name, double default_value=0.0)
-    {
+    public double get_double_or(string name, double default_value=0.0) {
         double result;
         return get_double(name, out result) ? result : default_value;
     }
@@ -267,11 +246,9 @@ public class JsonObject: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.DOUBLE} and so the `result` is valid
      */
-    public bool dotget_double(string path, out double result)
-    {
+    public bool dotget_double(string path, out double result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = 0.0;
             return false;
         }
@@ -286,11 +263,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is found and is of type {@link JsonValueType.STRING}
      *     and so the `result` is valid, `false` otherwise
      */
-    public bool get_string(string name, out string? result)
-    {
+    public bool get_string(string name, out string? result) {
         var node = get(name) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = null;
             return false;
         }
@@ -304,8 +279,7 @@ public class JsonObject: JsonNode
      * @return the actual string value if the node is found and is of type
      *     {@link JsonValueType.STRING}, the `default_value` otherwise.
      */
-    public string? get_string_or(string name, string? default_value=null)
-    {
+    public string? get_string_or(string name, string? default_value=null) {
         string? result;
         return get_string(name, out result) ? result : default_value;
     }
@@ -320,11 +294,9 @@ public class JsonObject: JsonNode
      * @param result    the obtained value
      * @return `true` if the node is found and is of type {@link JsonValueType.STRING} and so the `result` is valid
      */
-    public bool dotget_string(string path, out string result)
-    {
+    public bool dotget_string(string path, out string result) {
         var node = dotget(path) as JsonValue;
-        if (node == null)
-        {
+        if (node == null) {
             result = null;
             return false;
         }
@@ -337,8 +309,7 @@ public class JsonObject: JsonNode
      * @param name     the member name of the node to get
      * @return `true` if the node is found and is of type {@link JsonValueType.NULL}, `false` otherwise
      */
-    public bool get_null(string name)
-    {
+    public bool get_null(string name) {
         var node = get(name) as JsonValue;
         return node == null ? false : node.is_null();
     }
@@ -349,8 +320,7 @@ public class JsonObject: JsonNode
      * @param name    the member name of the node to get
      * @return a {@link JsonArray} if the node is found and is an array, `null` otherwise
      */
-    public JsonArray? get_array(string name)
-    {
+    public JsonArray? get_array(string name) {
         return get(name) as JsonArray;
     }
 
@@ -362,11 +332,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is {@link JsonArray} and all array members are of type
      *     {@link JsonValueType.BOOLEAN} and thus `result` is valid, `false` otherwise
      */
-    public bool get_bool_array(string name, out bool[] bool_array)
-    {
+    public bool get_bool_array(string name, out bool[] bool_array) {
         var array = get(name) as JsonArray;
-        if (array == null)
-        {
+        if (array == null) {
             bool_array = null;
             return false;
         }
@@ -381,11 +349,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is {@link JsonArray} and all array members are of type
      *     {@link JsonValueType.INTEGER} and thus `result` is valid, `false` otherwise
      */
-    public bool get_int_array(string name, out int[] int_array)
-    {
+    public bool get_int_array(string name, out int[] int_array) {
         var array = get(name) as JsonArray;
-        if (array == null)
-        {
+        if (array == null) {
             int_array = null;
             return false;
         }
@@ -400,11 +366,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is {@link JsonArray} and all array members are of type
      *     {@link JsonValueType.DOUBLE} and thus `result` is valid, `false` otherwise
      */
-    public bool get_double_array(string name, out double[] double_array)
-    {
+    public bool get_double_array(string name, out double[] double_array) {
         var array = get(name) as JsonArray;
-        if (array == null)
-        {
+        if (array == null) {
             double_array = null;
             return false;
         }
@@ -419,11 +383,9 @@ public class JsonObject: JsonNode
      * @return `true` if the node is {@link JsonArray} and all array members are of type
      *     {@link JsonValueType.STRING} and thus `result` is valid, `false` otherwise
      */
-    public bool get_string_array(string name, out string[] string_array)
-    {
+    public bool get_string_array(string name, out string[] string_array) {
         var array = get(name) as JsonArray;
-        if (array == null)
-        {
+        if (array == null) {
             string_array = null;
             return false;
         }
@@ -436,8 +398,7 @@ public class JsonObject: JsonNode
      * @param name    the member name of the node to get
      * @return a {@link JsonObject} if the node is found and is an object, `null` otherwise
      */
-    public JsonObject? get_object(string name)
-    {
+    public JsonObject? get_object(string name) {
         return get(name) as JsonObject;
     }
 
@@ -448,8 +409,7 @@ public class JsonObject: JsonNode
      *
      * @return a string representation of the node
      */
-    public override string to_string()
-    {
+    public override string to_string() {
         return dump(null, false, 0);
     }
 
@@ -460,8 +420,7 @@ public class JsonObject: JsonNode
      *
      * @return a string representation of the node
      */
-    public string to_pretty_string()
-    {
+    public string to_pretty_string() {
         return dump("    ", false, 0);
     }
 
@@ -472,8 +431,7 @@ public class JsonObject: JsonNode
      *
      * @return a string representation of the node
      */
-    public string to_compact_string()
-    {
+    public string to_compact_string() {
         return dump(null, true, 0);
     }
 
@@ -485,8 +443,7 @@ public class JsonObject: JsonNode
      * @param level      An initial indentation level.
      * @return a string representation of the node
      */
-    public string dump(string? indent, bool compact, uint level=0)
-    {
+    public string dump(string? indent, bool compact, uint level=0) {
         var buffer = new StringBuilder();
         dump_to_buffer(buffer, indent, compact, level);
         return buffer.str;
@@ -500,8 +457,7 @@ public class JsonObject: JsonNode
      * @param compact    If `true`, no space after a comma or a colon is added.
      * @param level      An initial indentation level.
      */
-    public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0)
-    {
+    public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0) {
         var nl = !String.is_empty(indent);
         var item_sep = (nl || compact) ? "," : ", ";
         var key_sep = compact ? ":" : ": ";
@@ -512,8 +468,7 @@ public class JsonObject: JsonNode
         unowned string? key = null;
         unowned JsonNode? node = null;
         var next = (iter.next(out key, out node) && key != null && node != null);
-        while (next)
-        {
+        while (next) {
             if (nl)
             for (var i = 0; i <= level; i++)
             buffer.append(indent);

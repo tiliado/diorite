@@ -271,7 +271,6 @@ public abstract class Application : Gtk.Application {
 } // namespace Drtgtk
 
 [DBus(name = "org.xfce.Session.Manager")]
-private interface XfceSessionManager : Object
-{
+private interface XfceSessionManager : Object {
     public signal void state_changed(uint32 old_value, uint32 new_value);
 }

@@ -22,16 +22,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Types
-{
+namespace Drt.Types {
 
-public uint type_hash(Type type)
-{
+public uint type_hash(Type type) {
     return (uint) type;
 }
 
-public bool type_equal(Type type1, Type type2)
-{
+public bool type_equal(Type type1, Type type2) {
     return ((uint) type1) == ((uint) type2);
 }
 

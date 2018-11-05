@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 public const uint SERIALIZE_ALIGN = 8;
 
 /**
@@ -34,8 +33,7 @@ public const uint SERIALIZE_ALIGN = 8;
  * @param offset     starting offset to store value at, must be aligned to 8 bytes
  * @return true on success, false if requirements haven't been met
  */
-public bool serialize_variant(Variant variant, uint8[] buffer, uint offset=0)
-{
+public bool serialize_variant(Variant variant, uint8[] buffer, uint offset=0) {
     return_val_if_fail(buffer.length - offset >= variant.get_size(), false);
     return_val_if_fail(offset % SERIALIZE_ALIGN == 0, false);
     uint8* p = (uint8*) buffer + offset;
@@ -51,8 +49,7 @@ public bool serialize_variant(Variant variant, uint8[] buffer, uint offset=0)
  * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
  * @return byte array with serialized message
  */
-public uint8[] serialize_message(string name, Variant? parameters, uint offset=0)
-{
+public uint8[] serialize_message(string name, Variant? parameters, uint offset=0) {
     string type_str = parameters != null ? parameters.get_type_string() : "";
     uint variant_offset = (uint) (offset + name.length + 1 + type_str.length + 1);
     if (variant_offset % SERIALIZE_ALIGN != 0)
@@ -84,8 +81,7 @@ public uint8[] serialize_message(string name, Variant? parameters, uint offset=0
  * @param trusted     whether data comes from trusted source
  * @return Variant on success, null if requirements haven't been met
  */
-public Variant? deserialize_variant(string type_sig, owned uint8[] buffer, uint offset=0, bool trusted=false)
-{
+public Variant? deserialize_variant(string type_sig, owned uint8[] buffer, uint offset=0, bool trusted=false) {
     return_val_if_fail(VariantType.string_is_valid(type_sig), null);
     return_val_if_fail(offset % SERIALIZE_ALIGN == 0, null);
     unowned uint8[] real_data = (uint8[])((uint8*)buffer + offset);
@@ -104,8 +100,7 @@ public Variant? deserialize_variant(string type_sig, owned uint8[] buffer, uint 
  * @param offset    starting offset to store data at, use for your own data (e.g. format signature)
  * @return true on success, false on failure (i. e. invalid data)
  */
-public bool deserialize_message(owned uint8[] buffer, out string name, out Variant? parameters, uint offset=0)
-{
+public bool deserialize_message(owned uint8[] buffer, out string name, out Variant? parameters, uint offset=0) {
     name = null;
     parameters = null;
     uint32 limit = buffer.length - offset;
@@ -131,8 +126,7 @@ public bool deserialize_message(owned uint8[] buffer, out string name, out Varia
     if (offset % SERIALIZE_ALIGN != 0)
     offset += SERIALIZE_ALIGN - offset % SERIALIZE_ALIGN;
 
-    if (type_str != "")
-    {
+    if (type_str != "") {
         parameters = deserialize_variant(type_str, (owned) buffer, offset);
         return_val_if_fail(parameters != null, false);
     }
@@ -141,13 +135,11 @@ public bool deserialize_message(owned uint8[] buffer, out string name, out Varia
     return true;
 }
 
-public Variant serialize_error(GLib.Error e)
-{
+public Variant serialize_error(GLib.Error e) {
     return new Variant("(sis)", e.domain.to_string(), e.code, e.message);
 }
 
-public GLib.Error deserialize_error(Variant e)
-{
+public GLib.Error deserialize_error(Variant e) {
     string domain = null;
     int code = 0;
     string message = null;

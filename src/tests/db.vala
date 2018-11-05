@@ -19,8 +19,7 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 private const string TABLE_USERS_SQL = """
 CREATE TABLE DrtdbUser(
@@ -35,8 +34,7 @@ CREATE TABLE DrtdbUser(
 
 private const string TABLE_USERS_NAME = "DrtdbUser";
 
-private class User : GLib.Object
-{
+private class User : GLib.Object {
     public int64 id {get; construct;}
     public string name {get; construct set;}
     public int age {get; construct set;}
@@ -46,8 +44,7 @@ private class User : GLib.Object
     public ByteArray? extra {get; construct set;}
     public int not_in_db {get; set; default = 1024;}
 
-    public User(int64 id, string name, int age, double height, bool alive)
-    {
+    public User(int64 id, string name, int age, double height, bool alive) {
         GLib.Object(id: id);
         this.name = name;
         this.age = age;
@@ -55,14 +52,12 @@ private class User : GLib.Object
         this.alive = alive;
     }
 
-    public static string[] all_props()
-    {
+    public static string[] all_props() {
         return {"id", "name", "age", "height", "alive", "blob", "extra"};
     }
 }
 
-private class SimpleUser
-{
+private class SimpleUser {
     public int64 id {get; private set;}
     public string name {get; set;}
     public int age {get; set;}
@@ -72,8 +67,7 @@ private class SimpleUser
     public ByteArray? extra {get; set;}
     public int not_in_db {get; set; default = 1024;}
 
-    public SimpleUser(int64 id, string name, int age, double height, bool alive)
-    {
+    public SimpleUser(int64 id, string name, int age, double height, bool alive) {
         this.id = id;
         this.name = name;
         this.age = age;

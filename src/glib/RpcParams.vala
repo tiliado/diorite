@@ -24,8 +24,7 @@
 
 namespace Drt {
 
-public abstract class RpcParam
-{
+public abstract class RpcParam {
     public string name {get; protected set; default = null;}
     public bool nullable {get; protected set; default = false;}
     public bool required {get; protected set; default = true;}
@@ -34,8 +33,7 @@ public abstract class RpcParam
     public string? description {get; protected set; default = null;}
 
     public RpcParam(string name, bool required, bool nullable, Variant? default_value, string type_string,
-        string? description)
-    {
+        string? description) {
         this.name = name;
         this.nullable = nullable;
         this.required = required;
@@ -44,10 +42,8 @@ public abstract class RpcParam
         this.description = description;
     }
 
-    public virtual Variant? get_value(string path, Variant? value) throws ApiError
-    {
-        if (value == null)
-        {
+    public virtual Variant? get_value(string path, Variant? value) throws ApiError {
+        if (value == null) {
             if (nullable)
             return null;
             if (default_value == null)
@@ -64,8 +60,7 @@ public abstract class RpcParam
     }
 }
 
-public class StringParam: RpcParam
-{
+public class StringParam: RpcParam {
     /**
      * Creates new parameter of type string.
      *
@@ -89,15 +84,13 @@ public class StringParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public StringParam(string name, bool required, bool nullable,
-        string? default_value=null, string? description=null)
-    {
+        string? default_value=null, string? description=null) {
         base(name, required, nullable, default_value == null ? null : new Variant.string(default_value),
             "s", description);
     }
 }
 
-public class BoolParam: RpcParam
-{
+public class BoolParam: RpcParam {
     /**
      * Creates new parameter of type boolean.
      *
@@ -114,14 +107,12 @@ public class BoolParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public BoolParam(string name, bool required,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, false, default_value, "b", description);
     }
 }
 
-public class DoubleParam: RpcParam
-{
+public class DoubleParam: RpcParam {
     /**
      * Creates new parameter of type double.
      *
@@ -138,14 +129,12 @@ public class DoubleParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public DoubleParam(string name, bool required,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, false, default_value, "d", description);
     }
 }
 
-public class IntParam: RpcParam
-{
+public class IntParam: RpcParam {
     /**
      * Creates new parameter of type int.
      *
@@ -162,14 +151,12 @@ public class IntParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public IntParam(string name, bool required,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, false, default_value, "i", description);
     }
 }
 
-public class StringArrayParam: RpcParam
-{
+public class StringArrayParam: RpcParam {
     /**
      * Creates new parameter of type string[].
      *
@@ -188,15 +175,12 @@ public class StringArrayParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public StringArrayParam(string name, bool required,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, true, default_value, "as", description);
     }
 
-    public override Variant? get_value(string path, Variant? value) throws ApiError
-    {
-        if (value == null)
-        {
+    public override Variant? get_value(string path, Variant? value) throws ApiError {
+        if (value == null) {
             if (nullable)
             return null;
             if (default_value == null)
@@ -216,8 +200,7 @@ public class StringArrayParam: RpcParam
 
         var builder = new VariantBuilder(VariantType.STRING_ARRAY);
         var size = value.n_children();
-        for (var i = 0; i < size; i++)
-        {
+        for (var i = 0; i < size; i++) {
             var child = unbox_variant(value.get_child_value(i));
             if (child == null)
             child = new Variant.string("");
@@ -231,8 +214,7 @@ public class StringArrayParam: RpcParam
     }
 }
 
-public class DictParam: RpcParam
-{
+public class DictParam: RpcParam {
     /**
      * Creates new parameter of type HashTable<string, Variant>.
      *
@@ -251,15 +233,12 @@ public class DictParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public DictParam(string name, bool required,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, true, default_value, "a{smv}", description);
     }
 
-    public override Variant? get_value(string path, Variant? value) throws ApiError
-    {
-        if (value == null)
-        {
+    public override Variant? get_value(string path, Variant? value) throws ApiError {
+        if (value == null) {
             if (nullable)
             return null;
             if (default_value == null)
@@ -277,8 +256,7 @@ public class DictParam: RpcParam
     }
 }
 
-public class VariantParam: RpcParam
-{
+public class VariantParam: RpcParam {
     /**
      * Creates new parameter of type Variant.
      *
@@ -302,15 +280,12 @@ public class VariantParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public VariantParam(string name, bool required, bool nullable,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, nullable, default_value, "*", description);
     }
 
-    public override Variant? get_value(string path, Variant? value) throws ApiError
-    {
-        if (value == null)
-        {
+    public override Variant? get_value(string path, Variant? value) throws ApiError {
+        if (value == null) {
             if (nullable)
             return null;
             if (default_value == null)
@@ -323,8 +298,7 @@ public class VariantParam: RpcParam
     }
 }
 
-public class VarArrayParam: RpcParam
-{
+public class VarArrayParam: RpcParam {
     /**
      * Creates new parameter of type Variant array.
      *
@@ -348,15 +322,12 @@ public class VarArrayParam: RpcParam
      * @param description      Description of this parameter for API consumers.
      */
     public VarArrayParam(string name, bool required, bool nullable,
-        Variant? default_value=null, string? description=null)
-    {
+        Variant? default_value=null, string? description=null) {
         base(name, required, nullable, default_value, "*", description);
     }
 
-    public override Variant? get_value(string path, Variant? value) throws ApiError
-    {
-        if (value == null)
-        {
+    public override Variant? get_value(string path, Variant? value) throws ApiError {
+        if (value == null) {
             if (nullable)
             return null;
             if (default_value == null)

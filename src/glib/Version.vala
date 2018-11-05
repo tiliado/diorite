@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 private extern const string VERSION;
 private extern const string REVISION;
@@ -32,31 +31,26 @@ private extern const int VERSION_MINOR;
 private extern const int VERSION_BUGFIX;
 private extern const string VERSION_SUFFIX;
 
-public string get_revision()
-{
+public string get_revision() {
     return REVISION;
 }
 
-public string get_version()
-{
+public string get_version() {
     return VERSION;
 }
 
-public string get_version_suffix()
-{
+public string get_version_suffix() {
     return VERSION_SUFFIX;
 }
 
-public int[] get_versions()
-{
+public int[] get_versions() {
     return {VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX};
 }
 
 /**
  * Returns versions encoded as integer, e.g. 30105 for 3.1.5.
  */
-public int get_encoded_version()
-{
+public int get_encoded_version() {
     return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_BUGFIX;
 }
 

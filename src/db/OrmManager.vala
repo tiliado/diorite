@@ -22,21 +22,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * Object Relationship Mapping
  */
-public class OrmManager : GLib.Object
-{
+public class OrmManager : GLib.Object {
     private HashTable<Type, ObjectSpec> object_specs;
 
     /**
      * Create new OrmManager object.
      */
-    public OrmManager()
-    {
+    public OrmManager() {
         object_specs = new HashTable<Type, ObjectSpec>(Drt.Types.type_hash, Drt.Types.type_equal);
     }
 
@@ -45,10 +42,8 @@ public class OrmManager : GLib.Object
      *
      * @param spec    ORM object specification
      */
-    public void add_object_spec(ObjectSpec spec)
-    {
-        lock (object_specs)
-        {
+    public void add_object_spec(ObjectSpec spec) {
+        lock (object_specs) {
             object_specs[spec.object_type] = spec;
         }
     }
@@ -59,10 +54,8 @@ public class OrmManager : GLib.Object
      * @param type    {@link GLib.Object} type
      * @return ORM object spec or `null` if it is not found
      */
-    public ObjectSpec? get_object_spec(Type type)
-    {
-        lock (object_specs)
-        {
+    public ObjectSpec? get_object_spec(Type type) {
+        lock (object_specs) {
             return object_specs[type];
         }
     }
@@ -75,8 +68,7 @@ public class OrmManager : GLib.Object
      * @throws DatabaseError if data type `T` is not supported or {@link ObjectSpec} is not found
      * @see OrmManager.add_object_spec
      */
-    public T? create_object<T>(Result result) throws DatabaseError
-    {
+    public T? create_object<T>(Result result) throws DatabaseError {
         var type = typeof(T);
         if (!type.is_object())
         throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
@@ -87,8 +79,7 @@ public class OrmManager : GLib.Object
 
         Value[] parameters = {};
         string[] names = {};
-        foreach (var property in object_spec.properties)
-        {
+        foreach (var property in object_spec.properties) {
             var index = result.get_column_index(property.name);
             if (index < 0)
             throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
@@ -109,15 +100,13 @@ public class OrmManager : GLib.Object
      * @param result    The corresponding database record.
      * @throws DatabaseError if corresponding {@link ObjectSpec} is not found
      */
-    public void fill_object(GLib.Object object, Result result) throws DatabaseError
-    {
+    public void fill_object(GLib.Object object, Result result) throws DatabaseError {
         var type = object.get_type();
         var object_spec = get_object_spec(type);
         if (object_spec == null)
         throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
 
-        foreach (var property in object_spec.properties)
-        {
+        foreach (var property in object_spec.properties) {
             var index = result.get_column_index(property.name);
             if (index < 0)
             throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
@@ -127,12 +116,9 @@ public class OrmManager : GLib.Object
             value = GLib.Value(property.value_type);
 
             if ((property.flags & ParamFlags.WRITABLE) != 0
-            && (property.flags & ParamFlags.CONSTRUCT_ONLY) == 0)
-            {
+            && (property.flags & ParamFlags.CONSTRUCT_ONLY) == 0) {
                 object.set_property(property.name, value);
-            }
-            else if ((property.flags & ParamFlags.READABLE) != 0)
-            {
+            } else if ((property.flags & ParamFlags.READABLE) != 0) {
                 var current_value = GLib.Value(property.value_type);
                 object.get_property(property.name, ref current_value);
                 if (!Drt.Value.equal(current_value, value))

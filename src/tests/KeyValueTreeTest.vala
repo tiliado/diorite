@@ -19,27 +19,22 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueTreeTest: KeyValueStorageTest
-{
+public class KeyValueTreeTest: KeyValueStorageTest {
     private KeyValueTree tree;
 
-    public override void set_up()
-    {
+    public override void set_up() {
         tree = new KeyValueTree();
         storage = tree;
     }
 
-    public override void tear_down()
-    {
+    public override void tear_down() {
         tree = null;
         storage = null;
     }
 
-    public void test_print()
-    {
+    public void test_print() {
         var tree = new Drt.KeyValueTree();
         tree.set_value("a", "a");
         tree.set_value("b", "b");

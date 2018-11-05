@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtgtk.X11
-{
+namespace Drtgtk.X11 {
 
 /**
  * Retrieve window property of type window.
@@ -34,8 +33,7 @@ namespace Drtgtk.X11
  *                    null on failure such as invalid ``window``, non-existent ``property``
  *                    or different property type than {@link X.XA_WINDOW}.
  */
-public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string property)
-{
+public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string property) {
     Gdk.X11.Window? win, result = null;
     if (window != null)
     win = window as Gdk.X11.Window;
@@ -52,11 +50,10 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
     display.error_trap_push();
     display.get_xdisplay().get_window_property(
         win.get_xid(), Gdk.X11.get_xatom_by_name_for_display(display, property),
-        0, long.MAX, false, X.XA_WINDOW, out  type, out format, out n_items, out bytes_after, out data);
+        0, long.MAX, false, X.XA_WINDOW, out type, out format, out n_items, out bytes_after, out data);
     display.error_trap_pop_ignored();
 
-    if (type == X.XA_WINDOW)
-    {
+    if (type == X.XA_WINDOW) {
         X.Window xwin = *(X.Window *) data;
         result = new Gdk.X11.Window.foreign_for_display(display, xwin);
     }
@@ -75,8 +72,7 @@ public Gdk.X11.Window? get_window_property_as_win(Gdk.Window? window, string pro
  * @return            the value of property as string on success,
  *                    null on failure such as invalid ``window`` or non-existent ``property``.
  */
-public string? get_window_property_as_utf8(Gdk.Window? window, string property)
-{
+public string? get_window_property_as_utf8(Gdk.Window? window, string property) {
     Gdk.X11.Window win;
     if (window != null)
     win = window as Gdk.X11.Window;
@@ -98,8 +94,7 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property)
         out type, out format, out n_items, out bytes_after, out data);
     display.error_trap_pop_ignored();
 
-    if (data != null)
-    {
+    if (data != null) {
         name = (string) data;
         X.free(data);
     }
@@ -114,8 +109,7 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property)
  *
  * @return    WM_CHECK Window of a compliant window manager of null if there is not any
  */
-public Gdk.X11.Window? get_net_wm_check_window()
-{
+public Gdk.X11.Window? get_net_wm_check_window() {
     var window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
     if (window == null)
     return null;

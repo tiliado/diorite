@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * Cursor to browse set of ORM objects
  */
-public class ObjectCursor<T>
-{
+public class ObjectCursor<T> {
     public uint counter {get; private set; default=0;}
     private OrmManager orm;
     private Cancellable? cancellable;
@@ -42,8 +40,7 @@ public class ObjectCursor<T>
      * @param result         the result of ORM query
      * @param cancellable    Cancelable object
      */
-    public ObjectCursor(OrmManager orm, Result result, Cancellable? cancellable=null)
-    {
+    public ObjectCursor(OrmManager orm, Result result, Cancellable? cancellable=null) {
         this.orm = orm;
         this.result = result;
         this.cancellable = cancellable;
@@ -54,8 +51,7 @@ public class ObjectCursor<T>
      *
      * @return `this` object
      */
-    public ObjectCursor<T> iterator()
-    {
+    public ObjectCursor<T> iterator() {
         return this;
     }
 
@@ -64,10 +60,8 @@ public class ObjectCursor<T>
      *
      * @return `true` if there is still data
      */
-    public bool next() throws Error, DatabaseError
-    {
-        if (result.next())
-        {
+    public bool next() throws Error, DatabaseError {
+        if (result.next()) {
             counter++;
             return true;
         }
@@ -79,8 +73,7 @@ public class ObjectCursor<T>
      *
      * @return current object
      */
-    public T get() throws Error, DatabaseError
-    {
+    public T get() throws Error, DatabaseError {
         return orm.create_object<T>(result);
     }
 }

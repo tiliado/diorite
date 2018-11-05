@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 [CCode(cname="sqlite3_errstr")]
 private extern unowned string sqlite3_errstr(int errcode);
@@ -31,26 +30,20 @@ private extern unowned string sqlite3_errstr(int errcode);
 /**
  * SQLite database object
  */
-public class Database: GLib.Object, Queryable
-{
+public class Database: GLib.Object, Queryable {
 
     public File db_file {get; construct;}
     public OrmManager orm {get; construct;}
 
     private bool _opened = false;
-    public bool opened
-    {
-        get
-        {
-            lock (_opened)
-            {
+    public bool opened {
+        get {
+            lock (_opened) {
                 return _opened;
             }
         }
-        private set
-        {
-            lock (_opened)
-            {
+        private set {
+            lock (_opened) {
                 _opened = value;
             }
         }
@@ -64,8 +57,7 @@ public class Database: GLib.Object, Queryable
      * @param db_file    corresponding database file
      * @param orm        Object Relationship Mapping manager
      */
-    public Database (File db_file, OrmManager? orm=null)
-    {
+    public Database (File db_file, OrmManager? orm=null) {
         GLib.Object(db_file: db_file, orm: orm ?? new OrmManager());
     }
 
@@ -80,8 +72,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.Error when operation is cancelled.
      * @throws DatabaseError when database cannot be opened.
      */
-    public virtual void open(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public virtual void open(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         return_if_fail(!opened);
 
@@ -104,8 +95,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public virtual void close(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public virtual void close(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         return_if_fail(opened);
         master_connection = null;
@@ -120,8 +110,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public void exec(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         get_master_connection().exec(sql, cancellable);
     }
 
@@ -136,8 +125,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public Query query(string sql, Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         return get_master_connection().query(sql, cancellable);
     }
 
@@ -154,8 +142,7 @@ public class Database: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public Query query_with_values(Cancellable? cancellable, string sql, ...)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return get_master_connection().query_with_values_va(cancellable, sql, va_list());
     }
 
@@ -172,8 +159,7 @@ public class Database: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public Query query_with_values_va(Cancellable? cancellable, string sql, va_list args)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return get_master_connection().query_with_values_va(cancellable, sql, args);
     }
 
@@ -185,8 +171,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public ObjectQuery<T> get_objects<T>(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         return get_master_connection().get_objects<T>(cancellable);
     }
 
@@ -201,8 +186,7 @@ public class Database: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public ObjectQuery<T> query_objects<T>(Cancellable? cancellable, string? sql_filter, ...)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return get_master_connection().query_objects_va<T>(cancellable, sql_filter, va_list());
     }
 
@@ -216,8 +200,7 @@ public class Database: GLib.Object, Queryable
      * @throws DatabaseError when operation fails
      */
     public T get_object<T>(GLib.Value pk, Cancellable? cancellable=null)
-    throws GLib.Error, DatabaseError
-    {
+    throws GLib.Error, DatabaseError {
         return get_master_connection().get_object<T>(pk, cancellable);
     }
 
@@ -226,14 +209,10 @@ public class Database: GLib.Object, Queryable
      *
      * @return the last error message
      */
-    public unowned string? get_last_error_message()
-    {
-        try
-        {
+    public unowned string? get_last_error_message() {
+        try {
             return get_master_connection().get_last_error_message();
-        }
-        catch (DatabaseError e)
-        {
+        } catch (DatabaseError e) {
             return null;
         }
     }
@@ -244,8 +223,7 @@ public class Database: GLib.Object, Queryable
      * @throws DatabaseError when database is closed
      * @return master database connection
      */
-    private Connection get_master_connection() throws DatabaseError
-    {
+    private Connection get_master_connection() throws DatabaseError {
         throw_if_not_opened();
         return master_connection;
     }
@@ -257,8 +235,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public Connection open_connection(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public Connection open_connection(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         return open_connection_internal(cancellable, false);
     }
 
@@ -270,8 +247,7 @@ public class Database: GLib.Object, Queryable
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    protected Connection open_connection_internal(Cancellable? cancellable, bool master) throws GLib.Error, DatabaseError
-    {
+    protected Connection open_connection_internal(Cancellable? cancellable, bool master) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         if (!master)
         throw_if_not_opened();
@@ -289,8 +265,7 @@ public class Database: GLib.Object, Queryable
      *
      * @throws DatabaseError if database is closed
      */
-    private inline void throw_if_not_opened() throws DatabaseError
-    {
+    private inline void throw_if_not_opened() throws DatabaseError {
         if (!opened)
         throw new DatabaseError.DATABASE_NOT_OPENED("Database '%s' is not opened.", db_file.get_path());
     }

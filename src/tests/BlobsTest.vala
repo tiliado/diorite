@@ -40,12 +40,12 @@ public class BlobsTest: Drt.TestCase {
     }
 
     public void test_bytes_equal() {
-        var blob_0_items_1 = new GLib.Bytes.take(new uint8[]{});
-        var blob_0_items_2 = new GLib.Bytes.take(new uint8[]{});
-        var blob_7_items_1 = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var blob_7_items_2 = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var blob_7_items_3 = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 6});
-        var blob_8_items = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 6});
+        var blob_0_items_1 = new GLib.Bytes.take(new uint8[] {});
+        var blob_0_items_2 = new GLib.Bytes.take(new uint8[] {});
+        var blob_7_items_1 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var blob_7_items_2 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var blob_7_items_3 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
+        var blob_8_items = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
         expect_true(Blobs.bytes_equal(null, null), "null == null");
         expect_true(Blobs.bytes_equal(blob_0_items_1, blob_0_items_2), "0 items == 0 items");
@@ -57,12 +57,12 @@ public class BlobsTest: Drt.TestCase {
     }
 
     public void test_byte_array_equal() {
-        var blob_0_items_1 = new GLib.ByteArray.take(new uint8[]{});
-        var blob_0_items_2 = new GLib.ByteArray.take(new uint8[]{});
-        var blob_7_items_1 = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var blob_7_items_2 = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var blob_7_items_3 = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 6});
-        var blob_8_items = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 6});
+        var blob_0_items_1 = new GLib.ByteArray.take(new uint8[] {});
+        var blob_0_items_2 = new GLib.ByteArray.take(new uint8[] {});
+        var blob_7_items_1 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var blob_7_items_2 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var blob_7_items_3 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
+        var blob_8_items = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
         expect_true(Blobs.byte_array_equal(null, null), "null == null");
         expect_true(Blobs.byte_array_equal(blob_0_items_1, blob_0_items_2), "0 items == 0 items");
@@ -87,10 +87,10 @@ public class BlobsTest: Drt.TestCase {
     }
 
     public void test_bytes_to_string() {
-        var bytes_0_items = new GLib.Bytes.take(new uint8[]{});
-        var bytes_7_items_1 = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var bytes_7_items_2 = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 6});
-        var bytes_8_items = new GLib.Bytes.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 6});
+        var bytes_0_items = new GLib.Bytes.take(new uint8[] {});
+        var bytes_7_items_1 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var bytes_7_items_2 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
+        var bytes_8_items = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
         expect_str_equals(null, Blobs.bytes_to_string(null), "null");
         expect_str_equals(null, Blobs.bytes_to_string(bytes_0_items), "0 items");
@@ -100,10 +100,10 @@ public class BlobsTest: Drt.TestCase {
     }
 
     public void test_byte_array_to_string() {
-        var byte_array_0_items = new GLib.ByteArray.take(new uint8[]{});
-        var byte_array_7_items_1 = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7});
-        var byte_array_7_items_2 = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 6});
-        var byte_array_8_items = new GLib.ByteArray.take(new uint8[]{1, 2, 3, 4, 5, 6, 7, 6});
+        var byte_array_0_items = new GLib.ByteArray.take(new uint8[] {});
+        var byte_array_7_items_1 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7});
+        var byte_array_7_items_2 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
+        var byte_array_8_items = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
         expect_str_equals(null, Blobs.byte_array_to_string(null), "null");
         expect_str_equals(null, Blobs.byte_array_to_string(byte_array_0_items), "0 items");

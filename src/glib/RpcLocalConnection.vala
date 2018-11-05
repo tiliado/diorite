@@ -27,7 +27,7 @@ namespace Drt {
 /**
  * Local Rpc Connection is used to call {@link RpcRouter} methods from the same process.
  */
-public class RpcLocalConnection: RpcConnection{
+public class RpcLocalConnection: RpcConnection {
     private static bool log_comunication;
     private uint last_payload_id = 0;
     private HashTable<void*, Response?> pending_requests;

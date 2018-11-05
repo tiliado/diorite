@@ -19,26 +19,21 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drtdb
-{
+namespace Drtdb {
 
-public class BindExpressionTest: Drt.TestCase
-{
+public class BindExpressionTest: Drt.TestCase {
 
 
-    public override void set_up()
-    {
+    public override void set_up() {
         base.set_up();
     }
 
-    public override void tear_down()
-    {
+    public override void tear_down() {
         base.tear_down();
 
     }
 
-    public void test_parse_ok()
-    {
+    public void test_parse_ok() {
         var binder = new BindExpression();
         var bytes = new Bytes.take({1, 2, 3, 4});
         var byte_array = new ByteArray.take({1, 2, 3, 4});
@@ -91,8 +86,7 @@ public class BindExpressionTest: Drt.TestCase
         expect_int_equals(1234, val.get_int(), "gvalue");
     }
 
-    public void test_reset_ok()
-    {
+    public void test_reset_ok() {
         var binder = new BindExpression();
         expect_no_error(() => binder.parse("WHERE name = ?s", "John"), "binder.parse");
         var sql = binder.get_sql();

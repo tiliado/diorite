@@ -40,7 +40,7 @@ public abstract class RpcConnection: GLib.Object {
      * @return Remote response.
      * @throws GLib.Error on failure.
      */
-    public async Variant? call(string method, Variant? parameters) throws GLib.Error	{
+    public async Variant? call(string method, Variant? parameters) throws GLib.Error {
         return yield call_full(method, parameters, true, "rw");
     }
 
@@ -89,7 +89,7 @@ public abstract class RpcConnection: GLib.Object {
      * @param detail          Reserved for future use, pass `null`.
      * @throws GLib.Error on failure
      */
-    public async void subscribe(string notification, string? detail=null) throws GLib.Error	{
+    public async void subscribe(string notification, string? detail=null) throws GLib.Error {
         yield call_full(notification, new Variant("(bms)", true, detail), true, "ws");
     }
 

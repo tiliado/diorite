@@ -22,16 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Time
-{
+namespace Drt.Time {
 
 /**
  * Get unix time UTC.
  *
  * @return unix time as number of seconds since 1970-01-01 00:00:00 UTC.
  */
-public int64 get_unix_time_now_utc()
-{
+public int64 get_unix_time_now_utc() {
     return new GLib.DateTime.now_utc().to_unix();
 }
 

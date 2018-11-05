@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Flags
-{
+namespace Drt.Flags {
 
 /**
  * Test whether a flag is set
@@ -32,8 +31,7 @@ namespace Drt.Flags
  * @param flag     a flag whose presence to test
  * @return true if the value contains the flag, false otherwise
  */
-public static inline bool is_set(int value, int flag)
-{
+public static inline bool is_set(int value, int flag) {
     return (value & flag) != 0;
 }
 

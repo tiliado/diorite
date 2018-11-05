@@ -24,18 +24,16 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
-public abstract class DesktopShell: GLib.Object
-{
+public abstract class DesktopShell: GLib.Object {
     private static DesktopShell? default_shell = null;
     private static GenericSet<string> shells = null;
     private static string? initial_gtk_theme = null;
     public bool shows_app_menu {get; protected set; default = false;}
     public bool shows_menu_bar {get; protected set; default = false;}
     public bool client_side_decorations {get; set; default = false;}
-    public GLib.MenuModel? app_menu {get{return _app_menu;}}
+    public GLib.MenuModel? app_menu {get {return _app_menu;}}
     #if !FLATPAK
     public string? wm_name {get; protected set; default = null;}
     public string? wm_name_exact {get; protected set; default = null;}
@@ -45,24 +43,19 @@ public abstract class DesktopShell: GLib.Object
     #endif
     private GLib.Menu _app_menu = null;
 
-    public static DesktopShell get_default()
-    {
+    public static DesktopShell get_default() {
         if (DesktopShell.default_shell == null)
         DesktopShell.default_shell = new DefaultDesktopShell();
         return DesktopShell.default_shell;
     }
 
-    private static void gather_shell_info()
-    {
-        if (shells == null)
-        {
+    private static void gather_shell_info() {
+        if (shells == null) {
             shells = new GenericSet<string>(str_hash, str_equal);
-            foreach  (var variable in new string[]{"XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"})
-            {
+            foreach  (var variable in new string[] {"XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"}) {
                 var shell = Environment.get_variable(variable);
                 debug("Shell: %s = %s", variable, shell);
-                if (shell != null)
-                {
+                if (shell != null) {
                     var parts = String.split_strip(shell.down(), ":");
                     foreach (var part in parts)
                     shells.add(part);
@@ -71,14 +64,12 @@ public abstract class DesktopShell: GLib.Object
         }
     }
 
-    public static bool have_shell(string name)
-    {
+    public static bool have_shell(string name) {
         gather_shell_info();
         return name.down() in shells;
     }
 
-    internal static void set_default(DesktopShell? default_shell)
-    {
+    internal static void set_default(DesktopShell? default_shell) {
         DesktopShell.default_shell = default_shell;
     }
 
@@ -180,8 +171,7 @@ public abstract class DesktopShell: GLib.Object
         return theme_dirs;
     }
 
-    public void set_app_menu_from_model(GLib.MenuModel model)
-    {
+    public void set_app_menu_from_model(GLib.MenuModel model) {
         if (_app_menu == null)
         _app_menu = new Menu();
         Actions.replace_from_menu_model(_app_menu, model);
@@ -191,17 +181,14 @@ public abstract class DesktopShell: GLib.Object
     public signal void app_menu_changed();
 
     #if !FLATPAK
-    protected Gdk.X11.Window? inspect_window_manager()
-    {
+    protected Gdk.X11.Window? inspect_window_manager() {
         var net_wm_check_window = X11.get_net_wm_check_window();
-        if (net_wm_check_window != null)
-        {
+        if (net_wm_check_window != null) {
             wm_name_exact = X11.get_window_property_as_utf8(net_wm_check_window, "_NET_WM_NAME");
             if (wm_name_exact != null)
             wm_name = wm_name_exact.down();
 
-            switch (wm_name)
-            {
+            switch (wm_name) {
             case "gnome shell":
             case "mutter":
             case "mutter(gala)":
@@ -214,10 +201,8 @@ public abstract class DesktopShell: GLib.Object
     #endif
 }
 
-private class DefaultDesktopShell: DesktopShell
-{
-    public DefaultDesktopShell()
-    {
+private class DefaultDesktopShell: DesktopShell {
+    public DefaultDesktopShell() {
         var gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu;
         shows_menu_bar = gs.gtk_shell_shows_menubar;
@@ -233,8 +218,7 @@ private class DefaultDesktopShell: DesktopShell
             (int) shows_app_menu, (int) shows_menu_bar, (int) dialogs_use_header);
         #else
         inspect_window_manager();
-        switch (wm_name)
-        {
+        switch (wm_name) {
         case "gnome shell":
         case "mutter":
         case "mutter(gala)":
@@ -256,10 +240,8 @@ private class DefaultDesktopShell: DesktopShell
 }
 
 
-private class GnomeDesktopShell: DesktopShell
-{
-    public GnomeDesktopShell()
-    {
+private class GnomeDesktopShell: DesktopShell {
+    public GnomeDesktopShell() {
 
         var gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = true;
@@ -276,10 +258,8 @@ private class GnomeDesktopShell: DesktopShell
 }
 
 
-private class UnityDesktopShell: DesktopShell
-{
-    public UnityDesktopShell()
-    {
+private class UnityDesktopShell: DesktopShell {
+    public UnityDesktopShell() {
         var gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = true;
         shows_menu_bar = gs.gtk_shell_shows_menubar = true;
@@ -295,10 +275,8 @@ private class UnityDesktopShell: DesktopShell
 }
 
 
-private class XfceDesktopShell: DesktopShell
-{
-    public XfceDesktopShell()
-    {
+private class XfceDesktopShell: DesktopShell {
+    public XfceDesktopShell() {
         var gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = false;
         shows_menu_bar = gs.gtk_shell_shows_menubar = false;

@@ -22,18 +22,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class SocketChannel : Drt.DuplexChannel
-{
+public class SocketChannel : Drt.DuplexChannel {
     public SocketConnection connection {get; private set;}
     public bool can_read {get; private set; default = false;}
     public bool can_write {get; private set; default = false;}
     private SocketSource socket_source;
 
-    public static SocketConnection create_socket_from_name(string name) throws GLib.Error
-    {
+    public static SocketConnection create_socket_from_name(string name) throws GLib.Error {
         var path = Rpc.create_path(name);
         var address = new UnixSocketAddress(path);
         var socket = new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
@@ -42,8 +39,7 @@ public class SocketChannel : Drt.DuplexChannel
         return connection;
     }
 
-    public SocketChannel(uint id, string name, SocketConnection connection, uint timeout)
-    {
+    public SocketChannel(uint id, string name, SocketConnection connection, uint timeout) {
         base(id, name, connection.input_stream, connection.output_stream, timeout);
         this.connection = connection;
         socket_source = connection.socket.create_source(IOCondition.IN|IOCondition.OUT);
@@ -67,26 +63,22 @@ public class SocketChannel : Drt.DuplexChannel
         this(id, name, connection, timeout);
     }
 
-    ~SocketChannel()
-    {
+    ~SocketChannel() {
         connection.notify["closed"].disconnect(on_connection_closed);
     }
 
-    public override void close() throws GLib.IOError
-    {
+    public override void close() throws GLib.IOError {
         closed = true;
         connection.close();
     }
 
-    private void check_io_condition()
-    {
+    private void check_io_condition() {
         var condition = connection.socket.condition_check(IOCondition.IN|IOCondition.OUT);
         set_condition(condition);
         socket_source.attach(MainContext.@default());
     }
 
-    private void set_condition(IOCondition condition)
-    {
+    private void set_condition(IOCondition condition) {
         var read = Flags.is_set(condition, IOCondition.IN);
         var write = Flags.is_set(condition, IOCondition.OUT);
         if (can_read != read)
@@ -95,14 +87,12 @@ public class SocketChannel : Drt.DuplexChannel
         can_write = write;
     }
 
-    private bool on_socket_source(Socket socket, IOCondition condition)
-    {
+    private bool on_socket_source(Socket socket, IOCondition condition) {
         set_condition(condition);
         return false;
     }
 
-    private void on_connection_closed(GLib.Object o, ParamSpec p)
-    {
+    private void on_connection_closed(GLib.Object o, ParamSpec p) {
         if (closed != connection.closed)
         closed = connection.closed;
     }

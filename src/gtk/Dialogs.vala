@@ -24,13 +24,11 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 /**
  * Simple Error dialog with OK button.
  */
-public class ErrorDialog : Gtk.MessageDialog
-{
+public class ErrorDialog : Gtk.MessageDialog {
 
     /**
      * Constructs new error dialog.
@@ -39,8 +37,7 @@ public class ErrorDialog : Gtk.MessageDialog
      * @param message Text of the error message
      * @param use_markup true if message uses Pango markup
      */
-    public ErrorDialog(string title, string message, bool use_markup=false)
-    {
+    public ErrorDialog(string title, string message, bool use_markup=false) {
         Object(
             title: "",
             modal: true,
@@ -52,8 +49,7 @@ public class ErrorDialog : Gtk.MessageDialog
         this.secondary_text = message;
     }
 
-    public override void response(int id)
-    {
+    public override void response(int id) {
         this.destroy();
     }
 }
@@ -61,8 +57,7 @@ public class ErrorDialog : Gtk.MessageDialog
 /**
  * Simple confirmation dialog with YES and NO buttons.
  */
-public class ConfirmDialog : Gtk.MessageDialog
-{
+public class ConfirmDialog : Gtk.MessageDialog {
 
     /**
      * Constructs new error dialog.
@@ -71,8 +66,7 @@ public class ConfirmDialog : Gtk.MessageDialog
      * @param message Text of the error message
      * @param use_markup true if message uses Pango markup
      */
-    public ConfirmDialog(string title, string message, bool use_markup=false)
-    {
+    public ConfirmDialog(string title, string message, bool use_markup=false) {
         Object(
             title: "",
             modal: true,
@@ -84,8 +78,7 @@ public class ConfirmDialog : Gtk.MessageDialog
         this.secondary_text = message;
     }
 
-    public override void response(int id)
-    {
+    public override void response(int id) {
         this.destroy();
     }
 }
@@ -93,8 +86,7 @@ public class ConfirmDialog : Gtk.MessageDialog
 /**
  * Simple Information dialog with OK button.
  */
-public class InfoDialog : Gtk.MessageDialog
-{
+public class InfoDialog : Gtk.MessageDialog {
 
     /**
      * Constructs new error dialog.
@@ -103,8 +95,7 @@ public class InfoDialog : Gtk.MessageDialog
      * @param message Text of the error message
      * @param use_markup true if message uses Pango markup
      */
-    public InfoDialog(string title, string message, bool use_markup=false)
-    {
+    public InfoDialog(string title, string message, bool use_markup=false) {
         Object(
             title: "",
             modal: true,
@@ -116,8 +107,7 @@ public class InfoDialog : Gtk.MessageDialog
         this.secondary_text = message;
     }
 
-    public override void response(int id)
-    {
+    public override void response(int id) {
         this.destroy();
     }
 }

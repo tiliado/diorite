@@ -22,21 +22,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public static SocketService create_socket_service(string path) throws IOError
-{
+public static SocketService create_socket_service(string path) throws IOError {
     Posix.unlink(path);
     var address = new UnixSocketAddress(path);
     var service = new SocketService();
     SocketAddress effective_address;
-    try
-    {
+    try {
         service.add_address(address, SocketType.STREAM, SocketProtocol.DEFAULT, null, out effective_address);
-    }
-    catch (GLib.Error e)
-    {
+    } catch (GLib.Error e) {
         throw new IOError.CONN_FAILED("Failed to add socket '%s'. %s", path, e.message);
     }
     return service;

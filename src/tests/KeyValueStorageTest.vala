@@ -19,15 +19,12 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public abstract class KeyValueStorageTest: Drt.TestCase
-{
+public abstract class KeyValueStorageTest: Drt.TestCase {
     protected KeyValueStorage storage = null;
 
-    public void test_get_null_for_empty_keys() throws Drt.TestError
-    {
+    public void test_get_null_for_empty_keys() throws Drt.TestError {
         assert(storage != null, "");
         expect(storage.get_value("key1") == null, "");
         expect(storage.get_value("key2") == null, "");
@@ -37,8 +34,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
         expect(storage.get_value("key4.subkey3") == null, "");
     }
 
-    public void test_set_get_default_value() throws Drt.TestError
-    {
+    public void test_set_get_default_value() throws Drt.TestError {
         assert(storage != null, "");
         Variant v;
         string key;
@@ -74,8 +70,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
         expect(storage.get_value(key).equal(v), "");
     }
 
-    public void test_set_get_value_no_default() throws Drt.TestError
-    {
+    public void test_set_get_value_no_default() throws Drt.TestError {
         assert(storage != null, "");
         Variant v;
         string key;
@@ -111,8 +106,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
         expect(storage.get_value(key).equal(v), "");
     }
 
-    public void test_set_get_value_with_default() throws Drt.TestError
-    {
+    public void test_set_get_value_with_default() throws Drt.TestError {
         assert(storage != null, "");
         Variant d1 = new Variant.string("default1");
         Variant d2 = new Variant.string("default2");
@@ -170,8 +164,7 @@ public abstract class KeyValueStorageTest: Drt.TestCase
         expect(storage.get_value(key).equal(v), "");
     }
 
-    public void test_unset_with_default() throws Drt.TestError
-    {
+    public void test_unset_with_default() throws Drt.TestError {
         assert(storage != null, "");
         Variant d1 = new Variant.string("default1");
         Variant v;

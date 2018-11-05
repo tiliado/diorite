@@ -21,13 +21,10 @@
 
 using Drt.Utils;
 
-namespace Drt
-{
+namespace Drt {
 
-public class StringTest: Drt.TestCase
-{
-    public void test_semicolon_separated_set()
-    {
+public class StringTest: Drt.TestCase {
+    public void test_semicolon_separated_set() {
         var result = Drt.String.semicolon_separated_set(null, true);
         expect_uint_equals(0, result.length, "null string");
         result = Drt.String.semicolon_separated_set("", true);
@@ -37,18 +34,17 @@ public class StringTest: Drt.TestCase
         var dataset = " hello ; Bye;;1234;byE;;;";
         result = Drt.String.semicolon_separated_set(dataset, false);
         expect_uint_equals(4, result.length, "original set");
-        foreach (var s in new string[]{"hello", "Bye", "1234", "byE"})
+        foreach (var s in new string[] {"hello", "Bye", "1234", "byE"})
         expect_true(result.contains(s), "item: %s", s);
         expect_false(result.contains("bye"), "item: %s", "bye");
         result = Drt.String.semicolon_separated_set(dataset, true);
         expect_uint_equals(3, result.length, "lowercase set");
-        foreach (var s in new string[]{"hello", "bye", "1234"})
+        foreach (var s in new string[] {"hello", "bye", "1234"})
         expect_true(result.contains(s), "item: %s", s);
         expect_false(result.contains("Bye"), "item: %s", "Bye");
     }
 
-    public void test_concat()
-    {
+    public void test_concat() {
         expect_str_equals("bar", Drt.String.concat(null, "foo", "bar"), "");
         expect_str_equals("bar", Drt.String.concat("", "foo", "bar"), "");
         expect_str_equals("xfoobar", Drt.String.concat("x", "foo", "bar"), "");
@@ -62,8 +58,7 @@ public class StringTest: Drt.TestCase
         expect_str_equals("xbar", Drt.String.concat("x", "", "bar"), "");
     }
 
-    public void test_append()
-    {
+    public void test_append() {
         string? buffer = null;
 
         buffer = null;

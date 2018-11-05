@@ -66,7 +66,7 @@ namespace Rpc {
     public const string RESPONSE_ERROR = "ERROR";
 
     public void check_type_string(Variant? data, string? type_string) throws GLib.Error {
-        if (type_string != null && type_string == TYPE_STRING_ANY){
+        if (type_string != null && type_string == TYPE_STRING_ANY) {
             return;
         }
         if (data == null && type_string != null) {
@@ -93,7 +93,7 @@ namespace Rpc {
         if (type.is_tuple()) {
             return "tuple";
         }
-        if (type.is_array()){
+        if (type.is_array()) {
 
             return type.is_subtype_of(VariantType.DICTIONARY) ? "dict" : "tuple";
         }

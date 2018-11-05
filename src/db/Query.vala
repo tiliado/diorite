@@ -24,14 +24,12 @@
 
 private extern const int SQLITE_TRANSIENT;
 
-namespace Drtdb
-{
+namespace Drtdb {
 
 /**
  * Database query object
  */
-public class Query : GLib.Object
-{
+public class Query : GLib.Object {
     public Connection connection {get; private set;}
     private Sqlite.Statement? statement = null;
     protected int n_parameters = 0;
@@ -42,8 +40,7 @@ public class Query : GLib.Object
      * @param connection      corresponding database connection
      * @param statement       corresponding sql query
      */
-    public Query(Connection connection, owned Sqlite.Statement statement)
-    {
+    public Query(Connection connection, owned Sqlite.Statement statement) {
         GLib.Object();
         this.connection = connection;
         this.statement = (owned) statement;
@@ -58,8 +55,7 @@ public class Query : GLib.Object
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public Result exec(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public Result exec(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         var result = get_result();
         result.next(cancellable);
         return result;
@@ -83,8 +79,7 @@ public class Query : GLib.Object
      * @throws GLib.IOError when the operation is cancelled
      * @throws DatabaseError when operation fails
      */
-    public Result select(Cancellable? cancellable=null) throws GLib.Error, DatabaseError
-    {
+    public Result select(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         return get_result();
     }
 
@@ -97,8 +92,7 @@ public class Query : GLib.Object
      * @return result wrapper
      * @throws DatabaseError if the query has already been executed
      */
-    public Result get_result() throws DatabaseError
-    {
+    public Result get_result() throws DatabaseError {
         check_not_executed();
         var result = new Result(connection, (owned) statement);
         statement = null;
@@ -113,11 +107,9 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when provided data type is not supported or operation fails
      */
-    public Query bind_values(int index, SList<Value?> values) throws DatabaseError
-    {
+    public Query bind_values(int index, SList<Value?> values) throws DatabaseError {
         var len = values.length();
-        for (var i = 0; i < len; i++)
-        {
+        for (var i = 0; i < len; i++) {
             bind(index + i, values.data);
             values = values.next;
         }
@@ -132,8 +124,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when provided data type is not supported or operation fails
      */
-    public Query bind(int index, GLib.Value? value) throws DatabaseError
-    {
+    public Query bind(int index, GLib.Value? value) throws DatabaseError {
         if (value == null)
         return bind_null(index);
         var type = value.type();
@@ -153,8 +144,7 @@ public class Query : GLib.Object
         return bind_bytes(index, (GLib.Bytes) value.get_boxed());
         if (type == typeof(GLib.ByteArray))
         return bind_byte_array(index, (GLib.ByteArray) value.get_boxed());
-        if (type == typeof(void*))
-        {
+        if (type == typeof(void*)) {
             if (value.get_pointer() == null)
             return bind_null(index);
             throw new DatabaseError.DATA_TYPE("Data type %s is supported only with a null pointer.", type.name());
@@ -170,8 +160,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_null(int index) throws DatabaseError
-    {
+    public Query bind_null(int index) throws DatabaseError {
         check_index(index);
         check_not_executed();
         throw_on_error(statement.bind_null(index));
@@ -186,8 +175,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_bool(int index, bool value) throws DatabaseError
-    {
+    public Query bind_bool(int index, bool value) throws DatabaseError {
         return bind_int(index, value ? 1 : 0);
     }
 
@@ -199,8 +187,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_int(int index, int value) throws DatabaseError
-    {
+    public Query bind_int(int index, int value) throws DatabaseError {
         check_index(index);
         check_not_executed();
         throw_on_error(statement.bind_int(index, value));
@@ -215,8 +202,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_int64(int index, int64 value) throws DatabaseError
-    {
+    public Query bind_int64(int index, int64 value) throws DatabaseError {
         check_index(index);
         check_not_executed();
         throw_on_error(statement.bind_int64(index, value));
@@ -231,8 +217,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_string(int index, string? value) throws DatabaseError
-    {
+    public Query bind_string(int index, string? value) throws DatabaseError {
         if (value == null)
         return bind_null(index);
         check_index(index);
@@ -249,8 +234,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_double(int index, double value) throws DatabaseError
-    {
+    public Query bind_double(int index, double value) throws DatabaseError {
         check_index(index);
         check_not_executed();
         throw_on_error(statement.bind_double(index, value));
@@ -265,8 +249,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_blob(int index, uint8[] value) throws DatabaseError
-    {
+    public Query bind_blob(int index, uint8[] value) throws DatabaseError {
         check_index(index);
         check_not_executed();
         /* SQLITE_TRANSIENT is necessary to support query.bind(new uint8[]{1, 2, 3, 4}); */
@@ -282,8 +265,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_bytes(int index, GLib.Bytes? value) throws DatabaseError
-    {
+    public Query bind_bytes(int index, GLib.Bytes? value) throws DatabaseError {
         if (value == null)
         return bind_null(index);
 
@@ -301,8 +283,7 @@ public class Query : GLib.Object
      * @return `this` query object for easier chaining
      * @throws DatabaseError when operation fails
      */
-    public Query bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError
-    {
+    public Query bind_byte_array(int index, GLib.ByteArray? value) throws DatabaseError {
         if (value == null)
         return bind_null(index);
 
@@ -315,8 +296,7 @@ public class Query : GLib.Object
     /**
      * Throw error if the query has already been executed.
      */
-    protected void check_not_executed() throws DatabaseError
-    {
+    protected void check_not_executed() throws DatabaseError {
         if (statement == null)
         throw new DatabaseError.MISUSE("Query has been already executed. |%s|", statement.sql());
     }
@@ -324,8 +304,7 @@ public class Query : GLib.Object
     /**
      * Throw error if the index is out of bounds.
      */
-    protected int check_index(int index) throws DatabaseError
-    {
+    protected int check_index(int index) throws DatabaseError {
         if (n_parameters == 0)
         throw new DatabaseError.RANGE("Query doesn't have parameters. |%s|", statement.sql());
         if (index <= 0 || index > n_parameters)
@@ -337,8 +316,7 @@ public class Query : GLib.Object
     /**
      * Throw error if statement fails.
      */
-    protected int throw_on_error(int result, string? sql=null) throws DatabaseError
-    {
+    protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
         if (Drtdb.is_sql_error(result))
         throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
         return result;

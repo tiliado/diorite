@@ -78,8 +78,7 @@ public async void overwrite_file_async(
 throws GLib.Error {
     try {
         yield make_directory_with_parents_async(file.get_parent(), io_priority, cancellable);
-    }
-    catch (GLib.Error e) {
+    } catch (GLib.Error e) {
         // FIXME: ignore only "directory exists" error
     }
     yield file.replace_contents_async(contents.data, null, false, FileCreateFlags.NONE, cancellable, null);

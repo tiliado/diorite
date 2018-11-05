@@ -68,7 +68,7 @@ public enum RequirementState {
 
 public class RequirementParser {
     [Description(nick = "Conditional expression", blurb = "A data string containing Requirement expression.")]
-    public string? data  {get; private set;}
+    public string? data {get; private set;}
     [Description(nick = "Position", blurb = "Current position inside Requirement expression string.")]
     public int pos {get; private set;}
     [Description(nick = "The position of the first error", blurb = "The position of the first error inside Requirement expression string.")]

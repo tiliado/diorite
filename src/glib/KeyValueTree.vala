@@ -22,22 +22,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class KeyValueTree: KeyValueStorage
-{
+public class KeyValueTree: KeyValueStorage {
     protected Node<Item?> root;
     protected HashTable<string, unowned Node<Item?>> nodes;
 
-    public KeyValueTree()
-    {
+    public KeyValueTree() {
         root = new Node<Item?>(null);
         nodes = new HashTable<string, unowned Node<Item?>>(str_hash, str_equal);
     }
 
-    public override bool has_key(string key)
-    {
+    public override bool has_key(string key) {
         unowned Node<Item?> node = nodes[key];
         if (node == null || node.data == null)
         return false;
@@ -50,8 +46,7 @@ public class KeyValueTree: KeyValueStorage
         return has_key(key);
     }
 
-    public override Variant? get_value(string key)
-    {
+    public override Variant? get_value(string key) {
         unowned Node<Item?> node = nodes[key];
         if (node == null || node.data == null)
         return null;
@@ -64,11 +59,9 @@ public class KeyValueTree: KeyValueStorage
         return get_value(key);
     }
 
-    public override void unset(string key)
-    {
+    public override void unset(string key) {
         unowned Node<Item?> node = nodes[key];
-        if (node != null && node.data != null && node.data.value_set)
-        {
+        if (node != null && node.data != null && node.data.value_set) {
             var old_value = node.data.value;
             node.data.unset();
             changed(key, old_value);
@@ -80,20 +73,17 @@ public class KeyValueTree: KeyValueStorage
         yield EventLoop.resume_later();
     }
 
-    public string to_string()
-    {
+    public string to_string() {
         return print();
     }
 
-    public string print(string? bullet=null)
-    {
+    public string print(string? bullet=null) {
         var printer = new Printer(new StringBuilder("root\n"), bullet);
         printer.print(root);
         return printer.buffer.str;
     }
 
-    protected unowned Node<Item?> get_or_create_node(string key)
-    {
+    protected unowned Node<Item?> get_or_create_node(string key) {
         unowned Node<Item?> node = nodes[key];
         if (node != null)
         return node;
@@ -103,8 +93,7 @@ public class KeyValueTree: KeyValueStorage
         return create_child_node(parent, key, key.substring(index + 1));
     }
 
-    protected unowned Node<Item?> create_child_node(Node<Item?> parent, string full_key, string name)
-    {
+    protected unowned Node<Item?> create_child_node(Node<Item?> parent, string full_key, string name) {
         var node = new Node<Item?>(new Item(name, null, false, null));
         unowned Node<Item?> unowned_node = node;
         parent.append((owned) node);
@@ -112,8 +101,7 @@ public class KeyValueTree: KeyValueStorage
         return unowned_node;
     }
 
-    protected override void set_value_unboxed(string key, Variant? value)
-    {
+    protected override void set_value_unboxed(string key, Variant? value) {
         unowned Node<Item?> node = get_or_create_node(key);
         return_if_fail(node.data != null);
         var old_value = node.data.get();
@@ -128,8 +116,7 @@ public class KeyValueTree: KeyValueStorage
         yield EventLoop.resume_later();
     }
 
-    protected override void set_default_value_unboxed(string key, Variant? value)
-    {
+    protected override void set_default_value_unboxed(string key, Variant? value) {
         unowned Node<Item?> node = get_or_create_node(key);
         return_if_fail(node.data != null);
         var old_value = node.data.get();
@@ -147,66 +134,56 @@ public class KeyValueTree: KeyValueStorage
     }
 
     [Compact]
-    protected class Item
-    {
+    protected class Item {
         public string name = null;
         public Variant? value = null;
         public bool value_set = false;
         public Variant? default_value = null;
 
-        public Item(string name, Variant? value, bool value_set, Variant? default_value=null)
-        {
+        public Item(string name, Variant? value, bool value_set, Variant? default_value=null) {
             this.name = name;
             this.value = value;
             this.value_set = value_set;
             this.default_value = default_value;
         }
 
-        public unowned Variant? get()
-        {
+        public unowned Variant? get() {
             return value_set ? value : default_value;
         }
 
-        public void set(Variant? value)
-        {
+        public void set(Variant? value) {
             this.value = value;
             value_set = true;
         }
 
-        public void unset()
-        {
+        public void unset() {
             value = null;
             value_set = false;
         }
     }
 
     [Compact]
-    protected class Printer
-    {
+    protected class Printer {
         public StringBuilder buffer;
         public string bullet;
         public int space_len;
 
-        public Printer(owned StringBuilder buffer, string? bullet)
-        {
+        public Printer(owned StringBuilder buffer, string? bullet) {
             this.buffer = (owned) buffer;
             this.bullet = bullet != null ? bullet : "  * ";
             this.space_len = this.bullet.length;
         }
 
-        public void print(Node<Item?> root, int depth = -1)
-        {
+        public void print(Node<Item?> root, int depth = -1) {
             root.traverse(TraverseType.PRE_ORDER, TraverseFlags.ALL, depth, print_node);
         }
 
-        private bool print_node(Node<Item?> node)
-        {
+        private bool print_node(Node<Item?> node) {
             if (node.is_root())
             return false;
 
             unowned Item? item = node.data;
-            if (item != null)
-            {
+            if (item != null) {
                 var indent = node.depth() - 2;
                 if (indent > 0)
                 buffer.append(string.nfill(space_len * indent, ' '));

@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public errordomain Error
-{
+public errordomain Error {
     INVALID_ARGUMENT,
     UNEXPECTED_RESULT,
     NOT_SUPPORTED,
@@ -38,8 +36,7 @@ public errordomain Error
     public extern static GLib.Quark quark();
 }
 
-public errordomain IOError
-{
+public errordomain IOError {
     CONN_FAILED,
     TIMEOUT,
     RW_FAILED,

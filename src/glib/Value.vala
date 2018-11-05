@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Value
-{
+namespace Drt.Value {
 
 /**
  * Supported types: GLib.Object, GLib.Bytes, GLib.ByteArray, int, uint, int64, uint64, float, double and bool.
  */
-public string? to_string(GLib.Value? value)
-{
+public string? to_string(GLib.Value? value) {
     if (value == null)
     return null;
 
@@ -67,8 +65,7 @@ public string? to_string(GLib.Value? value)
 /**
  * Supported types: GLib.Object, GLib.Bytes, GLib.ByteArray, int, uint, int64, uint64, float, double and bool.
  */
-public bool equal(GLib.Value? value1, GLib.Value? value2)
-{
+public bool equal(GLib.Value? value1, GLib.Value? value2) {
     if (value1 == null && value2 == null)
     return true;
     if (!(value1 != null && value2 != null))
@@ -109,8 +106,7 @@ public bool equal(GLib.Value? value1, GLib.Value? value2)
 /**
  * Supported types: GLib.Object, GLib.Bytes, GLib.ByteArray, int, uint, int64, uint64, float, double and bool.
  */
-public string describe(GLib.Value? value)
-{
+public string describe(GLib.Value? value) {
     if (value == null)
     return "<null>";
     var type = value.type();
@@ -123,8 +119,7 @@ public string describe(GLib.Value? value)
 /**
  * Supported types: GLib.Object, GLib.Bytes, GLib.ByteArray, int, uint, int64, uint64, float, double and bool.
  */
-public bool equal_verbose(GLib.Value? value1, GLib.Value? value2, out string description)
-{
+public bool equal_verbose(GLib.Value? value1, GLib.Value? value2, out string description) {
     var result = equal(value1, value2);
     if (result)
     description = "equal %s".printf(describe(value1));

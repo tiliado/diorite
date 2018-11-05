@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public errordomain JsonError
-{
+public errordomain JsonError {
     EMPTY_DATA,
     INVALID_DATA,
     EXTRA_DATA,
@@ -36,8 +34,7 @@ public errordomain JsonError
 /**
  * Parser of JSON data format.
  */
-public class JsonParser
-{
+public class JsonParser {
     private char* data = null;
     private char* data_end = null;
     private uint line = 0;
@@ -51,8 +48,7 @@ public class JsonParser
      * @throws JsonError if data is empty or invalid
      * @return a new JSON document
      */
-    public static JsonObject load_object(string? data) throws JsonError
-    {
+    public static JsonObject load_object(string? data) throws JsonError {
         var parser = new JsonParser(data);
         if (parser.root == null || !(parser.root is JsonObject))
         throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object.");
@@ -66,8 +62,7 @@ public class JsonParser
      * @throws JsonError if data is empty or invalid
      * @return a new JSON array
      */
-    public static JsonArray load_array(string? data) throws JsonError
-    {
+    public static JsonArray load_array(string? data) throws JsonError {
         var parser = new JsonParser(data);
         if (parser.root == null || !(parser.root is JsonArray))
         throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript array.");
@@ -81,8 +76,7 @@ public class JsonParser
      * @throws JsonError if data is empty or invalid
      * @return a new JSON array
      */
-    public static JsonNode load(string? data) throws JsonError
-    {
+    public static JsonNode load(string? data) throws JsonError {
         var parser = new JsonParser(data);
         if (parser.root == null || !(parser.root is JsonArray || parser.root is JsonObject))
         throw new JsonError.INVALID_DATA("The data doesn't represent a JavaScript object or array.");
@@ -100,8 +94,7 @@ public class JsonParser
      * @param data    data to parse
      * @throws JsonError if data is empty or invalid
      */
-    public JsonParser(string? data) throws JsonError
-    {
+    public JsonParser(string? data) throws JsonError {
         if (data == null || data[0] == 0)
         throw new JsonError.EMPTY_DATA("Data is empty.");
         this.data = data;
@@ -121,40 +114,31 @@ public class JsonParser
         this.root = root;
     }
 
-    private char get_char()
-    {
+    private char get_char() {
         var c = data < data_end ? *(data++) : 0;
-        if (c == '\n')
-        {
+        if (c == '\n') {
             line++;
             column = 0;
-        }
-        else if (c > 0)
-        {
+        } else if (c > 0) {
             column++;
         }
         return c;
     }
 
-    private char peek_char(uint offset=0)
-    {
+    private char peek_char(uint offset=0) {
         var pos = data + offset;
         return pos >= data && pos < data_end ? *pos : 0;
     }
 
-    private void skip(uint offset)
-    {
+    private void skip(uint offset) {
         while (offset-- > 0)
         get_char();
     }
 
-    private void skip_whitespace()
-    {
+    private void skip_whitespace() {
         char c;
-        while ((c = peek_char()) != 0)
-        {
-            switch (c)
-            {
+        while ((c = peek_char()) != 0) {
+            switch (c) {
             case ' ':
             case '\t':
             case '\n':
@@ -167,13 +151,11 @@ public class JsonParser
         }
     }
 
-    private void parse_one(out JsonNode node) throws JsonError
-    {
+    private void parse_one(out JsonNode node) throws JsonError {
         node = null;
         skip_whitespace();
         var c = peek_char();
-        switch (c)
-        {
+        switch (c) {
         case '{':
             get_char();
             parse_object(out node);
@@ -221,13 +203,11 @@ public class JsonParser
         }
     }
 
-    private void parse_keyword(string keyword, out JsonValue node) throws JsonError
-    {
+    private void parse_keyword(string keyword, out JsonValue node) throws JsonError {
         node = null;
         var len = keyword.data.length;
         unowned uint8[] buf = keyword.data;
-        for (var i = 0; i < len; i++)
-        {
+        for (var i = 0; i < len; i++) {
             var c = get_char();
             if (c == '\0')
             throw new JsonError.PARSE_ERROR(
@@ -238,8 +218,7 @@ public class JsonParser
                 "%u:%u Unexpected character '%c'. The '%c' character of '%s' expected.",
                 line, column, c, buf[i], keyword);
         }
-        switch (keyword)
-        {
+        switch (keyword) {
         case "true":
             node = new JsonValue.@bool(true);
             break;
@@ -254,8 +233,7 @@ public class JsonParser
         }
     }
 
-    private void parse_number(out JsonValue node) throws JsonError
-    {
+    private void parse_number(out JsonValue node) throws JsonError {
         node = null;
         var sign_set = false;
         var integer = true;
@@ -267,10 +245,8 @@ public class JsonParser
         bool leading_zero = false;
         int i;
         char c = 0;
-        for (i = 0; valid_chars && (c = peek_char(i)) != 0; i++)
-        {
-            switch (c)
-            {
+        for (i = 0; valid_chars && (c = peek_char(i)) != 0; i++) {
+            switch (c) {
             case '-':
             case '+':
                 if (sign_set)
@@ -289,8 +265,7 @@ public class JsonParser
             case '7':
             case '8':
             case '9':
-                if (!decimal_point)
-                {
+                if (!decimal_point) {
                     if (c == '0' && !valid_number)
                     leading_zero = true;
                     if (c != '0' && leading_zero)
@@ -329,8 +304,7 @@ public class JsonParser
             }
         }
         skip(i);
-        if (!valid_number)
-        {
+        if (!valid_number) {
             if (c == 0)
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Unexpected end of data. A number character expected.", line, column);
@@ -344,14 +318,12 @@ public class JsonParser
         node = new JsonValue.@double(double.parse(buf.str));
     }
 
-    private void parse_object(out JsonObject object) throws JsonError
-    {
+    private void parse_object(out JsonObject object) throws JsonError {
         object = new JsonObject();
         /* Look for the end of the object */
         skip_whitespace();
         var c = peek_char();
-        switch (c)
-        {
+        switch (c) {
         case '\0':
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Unexpected end of data. A string or '}' expected.", line, column);
@@ -359,14 +331,12 @@ public class JsonParser
             get_char();
             return;
         }
-        while (true)
-        {
+        while (true) {
             /* Look for a key */
             string? key = null;
             skip_whitespace();
             c = get_char();
-            switch (c)
-            {
+            switch (c) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. A string expected.", line, column);
@@ -381,8 +351,7 @@ public class JsonParser
             /* Skip to ':' */
             skip_whitespace();
             c = get_char();
-            switch (c)
-            {
+            switch (c) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. A ':' character expected.", line, column);
@@ -401,8 +370,7 @@ public class JsonParser
             /* Look for a comma or the end of the object */
             skip_whitespace();
             c = get_char();
-            switch (c)
-            {
+            switch (c) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. Characters ',' or '}' expected.", line, column);
@@ -417,8 +385,7 @@ public class JsonParser
         }
     }
 
-    private void parse_array(out JsonArray array) throws JsonError
-    {
+    private void parse_array(out JsonArray array) throws JsonError {
         if (++array_recursion >= 20)
         throw new JsonError.PARSE_ERROR(
             "%u:%u Maximal array recursion depth reached.", line, column);
@@ -426,8 +393,7 @@ public class JsonParser
         array = new JsonArray();
         /* Look for the end of the array */
         skip_whitespace();
-        switch (peek_char())
-        {
+        switch (peek_char()) {
         case '\0':
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Unexpected end of data. An array element or ']' expected.", line, column);
@@ -436,12 +402,10 @@ public class JsonParser
             array_recursion--;
             return;
         }
-        while (true)
-        {
+        while (true) {
             /* Look for an item */
             skip_whitespace();
-            switch (peek_char())
-            {
+            switch (peek_char()) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. An array element expected.", line, column);
@@ -456,8 +420,7 @@ public class JsonParser
             /* Look for a comma or the end of the array */
             skip_whitespace();
             var c = get_char();
-            switch (c)
-            {
+            switch (c) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. Characters ',' or ']' expected.", line, column);
@@ -473,18 +436,15 @@ public class JsonParser
         }
     }
 
-    private void parse_string(out string? value) throws JsonError
-    {
+    private void parse_string(out string? value) throws JsonError {
         value = null;
         var buf = new StringBuilder();
         char c;
-        while ((c = get_char()) != 0)
-        {
+        while ((c = get_char()) != 0) {
             if (c < 32u) // the control characters U+0000 to U+001F
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Invalid control character (%02X) in a string.", line, column, c);
-            switch (c)
-            {
+            switch (c) {
             case '\\':
                 parse_escape_sequence(buf);
                 break;
@@ -499,11 +459,9 @@ public class JsonParser
         throw new JsonError.PARSE_ERROR("%u:%u Unexpected end of data. Incomplete string.", line, column);
     }
 
-    private void parse_escape_sequence(StringBuilder buf) throws JsonError
-    {
+    private void parse_escape_sequence(StringBuilder buf) throws JsonError {
         var c = get_char();
-        switch (c)
-        {
+        switch (c) {
         case '\0':
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Unexpected end of data. Incomplete escape sequence.", line, column);
@@ -533,8 +491,7 @@ public class JsonParser
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Invalid unicode escape sequence.", line, column);
 
-            if (utf16.type() == UnicodeType.SURROGATE)
-            {
+            if (utf16.type() == UnicodeType.SURROGATE) {
                 if (get_char() != '\\' || get_char() != 'u')
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Incomplete unicode escape sequence pair.", line, column);
@@ -565,11 +522,9 @@ public class JsonParser
         }
     }
 
-    private unichar parse_unichar()
-    {
+    private unichar parse_unichar() {
         unichar u = 0;
-        for (var i = 0; i < 4; i++)
-        {
+        for (var i = 0; i < 4; i++) {
             var c = get_char();
             if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
             u += ((unichar) (c <= '9' ? c - '0' : (c & 7) + 9) << ((3 - i) * 4));

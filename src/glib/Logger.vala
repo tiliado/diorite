@@ -23,14 +23,12 @@
  */
 
 private const string G_LOG_DOMAIN="DioriteGlib";
-namespace Drt
-{
+namespace Drt {
 
 /**
  * Logger for GLib
  */
-public class Logger
-{
+public class Logger {
     private static GLib.LogLevelFlags display_level;
     private static unowned FileStream output;
     private static bool colorful;
@@ -50,8 +48,7 @@ public class Logger
     public const int COLOR_WHITE = 7;
 
 
-    public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
-    {
+    public static void init_stderr(GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null) {
         init(stderr, display_level, time, hint);
     }
 
@@ -61,22 +58,16 @@ public class Logger
      * @param output           output to write logger messages to (e. g. sys.stderr)
      * @param display_level    lowest log level to log
      */
-    public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null)
-    {
+    public static void init(FileStream output, GLib.LogLevelFlags display_level=GLib.LogLevelFlags.LEVEL_DEBUG, bool time=false, string? hint=null) {
         Logger.output = output;
         Logger.display_level = display_level;
         Logger.hint = hint != null ? hint + ": " : null;
         var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
-        if (use_colors == "yes")
-        {
+        if (use_colors == "yes") {
             colorful = true;
-        }
-        else if (use_colors == "no")
-        {
+        } else if (use_colors == "no") {
             colorful = false;
-        }
-        else
-        {
+        } else {
             colorful = colors_supported();
             // For subprocesses (they might have redirected output)
             Environment.set_variable("DIORITE_LOGGER_USE_COLORS", colorful ? "yes" : "no", false);
@@ -91,8 +82,7 @@ public class Logger
         GLib.Log.set_default_handler(Logger.log_handler);
     }
 
-    public static bool colors_supported()
-    {
+    public static bool colors_supported() {
         return Posix.isatty(output.fileno());
     }
 
@@ -102,10 +92,8 @@ public class Logger
      * @param format    message format
      */
     [PrintfFormat]
-    public static void printf(string format, ...)
-    {
-        lock (output)
-        {
+    public static void printf(string format, ...) {
+        lock (output) {
             output.vprintf(format, va_list());
             output.flush();
         }
@@ -116,10 +104,8 @@ public class Logger
      *
      * @param line    line to log
      */
-    public static void puts(string line)
-    {
-        lock (output)
-        {
+    public static void puts(string line) {
+        lock (output) {
             output.puts(line);
             output.flush();
         }
@@ -131,12 +117,9 @@ public class Logger
      * @param format    message format
      */
     [PrintfFormat]
-    public static void logf(string format, ...)
-    {
-        lock (output)
-        {
-            if (hint != null)
-            {
+    public static void logf(string format, ...) {
+        lock (output) {
+            if (hint != null) {
                 output.puts(hint);
                 output.putc(' ');
             }
@@ -151,12 +134,9 @@ public class Logger
      *
      * @param line    line to log
      */
-    public static void log(string line)
-    {
-        lock (output)
-        {
-            if (hint != null)
-            {
+    public static void log(string line) {
+        lock (output) {
+            if (hint != null) {
                 output.puts(hint);
                 output.putc(' ');
             }
@@ -166,16 +146,14 @@ public class Logger
         }
     }
 
-    private static void log_handler(string? domain, LogLevelFlags level, string message)
-    {
+    private static void log_handler(string? domain, LogLevelFlags level, string message) {
         var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
         if (!is_fatal_string && level > Logger.display_level)
         return;
 
         print(domain ?? "<unknown>", level, message);
 
-        switch ((int)level)
-        {
+        switch ((int)level) {
         case LogLevelFlags.LEVEL_ERROR:
         case 6:
             print(domain ?? "<unknown>", level, "Application will be terminated.");
@@ -185,19 +163,16 @@ public class Logger
             break;
         }
 
-        if (is_fatal_string)
-        {
+        if (is_fatal_string) {
             print(domain ?? "<unknown>", LogLevelFlags.LEVEL_ERROR, "Will abort because of fatal string match.");
             Process.abort();
         }
     }
 
-    private static void print(string domain, LogLevelFlags level, string message)
-    {
+    private static void print(string domain, LogLevelFlags level, string message) {
         string name = "";
         var color = -1;
-        switch ((int)level)
-        {
+        switch ((int)level) {
         case LogLevelFlags.LEVEL_CRITICAL:
             name = "CRITICAL";
             color = COLOR_RED;
@@ -236,33 +211,27 @@ public class Logger
 
         var hint = Logger.hint ?? "";
 
-        lock (output)
-        {
-            if (time_ref != null)
-            {
+        lock (output) {
+            if (time_ref != null) {
                 var now = new DateTime.now_local();
                 TimeSpan diff;
-                lock (time_ref)
-                {
+                lock (time_ref) {
                     diff = now.difference(time_ref);
                     time_ref = now;
                 }
                 name += " Δ";
                 var hours = diff / TimeSpan.HOUR;
-                if (hours > 0)
-                {
+                if (hours > 0) {
                     diff -= hours * TimeSpan.HOUR;
                     name += "%dh".printf((int) hours);
                 }
                 var minutes = diff / TimeSpan.MINUTE;
-                if (minutes  > 0)
-                {
+                if (minutes  > 0) {
                     diff -= minutes * TimeSpan.MINUTE;
                     name += "%02dm".printf((int) minutes);
                 }
                 var seconds = diff / TimeSpan.SECOND;
-                if (seconds  > 0)
-                {
+                if (seconds  > 0) {
                     diff -= seconds * TimeSpan.SECOND;
                     name += "%02ds".printf((int) seconds);
                 }

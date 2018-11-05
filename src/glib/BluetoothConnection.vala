@@ -22,19 +22,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class BluetoothConnection: GLib.Object, GLib.FileDescriptorBased
-{
+public class BluetoothConnection: GLib.Object, GLib.FileDescriptorBased {
     public string device {get; private set;}
     public int fd {get; private set;}
     public OutputStream output {get; private set;}
     public InputStream input {get; private set;}
     private GLib.Socket socket;
 
-    public BluetoothConnection(GLib.Socket socket, string device)
-    {
+    public BluetoothConnection(GLib.Socket socket, string device) {
         base();
         this.device = device;
         this.socket = socket;
@@ -43,36 +40,26 @@ public class BluetoothConnection: GLib.Object, GLib.FileDescriptorBased
         input = new UnixInputStream(fd, true);
     }
 
-    public BluetoothConnection.from_fd(int fd, string device) throws GLib.Error
-    {
+    public BluetoothConnection.from_fd(int fd, string device) throws GLib.Error {
         this(new Socket.from_fd(fd), device);
     }
 
-    ~BluetoothConnection()
-    {
-        try
-        {
+    ~BluetoothConnection() {
+        try {
             close();
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
         }
     }
 
-    public int get_fd()
-    {
+    public int get_fd() {
         return fd;
     }
 
-    public void close() throws GLib.IOError
-    {
-        try
-        {
+    public void close() throws GLib.IOError {
+        try {
             if (!socket.is_closed())
             socket.close();
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             throw ((GLib.IOError) e);
         }
     }

@@ -22,14 +22,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
 /**
  * JSON Node object is a base object for JSON objects, arrays, strings, numbers, boolean and null values.
  */
-public abstract class JsonNode
-{
+public abstract class JsonNode {
     /**
      * The parent node.
      */
@@ -38,8 +36,7 @@ public abstract class JsonNode
     /**
      * Creates new JSON Node object.
      */
-    protected JsonNode()
-    {
+    protected JsonNode() {
     }
 
     /**
@@ -54,8 +51,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON value type
      */
-    public bool is_value()
-    {
+    public bool is_value() {
         return this is JsonValue;
     }
 
@@ -70,8 +66,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents the JSON null value
      */
-    public bool is_null()
-    {
+    public bool is_null() {
         return this is JsonValue && ((JsonValue) this).value_type == JsonValueType.NULL;
     }
 
@@ -86,8 +81,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON boolean value
      */
-    public bool is_bool()
-    {
+    public bool is_bool() {
         return this is JsonValue && ((JsonValue) this).value_type == JsonValueType.BOOLEAN;
     }
 
@@ -102,8 +96,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON number value of an integer type.
      */
-    public bool is_int()
-    {
+    public bool is_int() {
         return this is JsonValue && ((JsonValue) this).value_type == JsonValueType.INTEGER;
     }
 
@@ -118,8 +111,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON number value of a double type.
      */
-    public bool is_double()
-    {
+    public bool is_double() {
         return this is JsonValue && ((JsonValue) this).value_type == JsonValueType.DOUBLE;
     }
 
@@ -134,8 +126,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON string value.
      */
-    public bool is_string()
-    {
+    public bool is_string() {
         return this is JsonValue && ((JsonValue) this).value_type == JsonValueType.STRING;
     }
 
@@ -144,8 +135,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON object.
      */
-    public bool is_object()
-    {
+    public bool is_object() {
         return this is JsonObject;
     }
 
@@ -154,8 +144,7 @@ public abstract class JsonNode
      *
      * @return `true` if this node represents a JSON array.
      */
-    public bool is_array()
-    {
+    public bool is_array() {
         return this is JsonArray;
     }
 

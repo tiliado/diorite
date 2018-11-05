@@ -24,52 +24,42 @@
 
 using Drt;
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
-public abstract class FormEntry : GLib.Object
-{
+public abstract class FormEntry : GLib.Object {
     public Gtk.Label? label {get; protected set; default = null;}
     public abstract Gtk.Widget widget {get;}
 
     public abstract bool sensitive {get; set; default = true;}
 }
 
-public interface ValueEntry: GLib.Object
-{
+public interface ValueEntry: GLib.Object {
     public abstract Variant value {owned get;}
 }
 
-public interface ToggleEntry: GLib.Object
-{
+public interface ToggleEntry: GLib.Object {
     public signal void toggled();
     public abstract bool state {get; set;}
     public abstract unowned string[] get_enables();
     public abstract unowned string[] get_disables();
 }
 
-public class StringEntry : FormEntry, ValueEntry
-{
+public class StringEntry : FormEntry, ValueEntry {
     private Gtk.Entry entry;
-    public override Gtk.Widget widget {get{return entry;}}
-    public override bool sensitive
-    {
+    public override Gtk.Widget widget {get {return entry;}}
+    public override bool sensitive {
         get {return entry.sensitive;}
         set {entry.sensitive = value;}
     }
 
-    public Variant value
-    {
-        owned get
-        {
+    public Variant value {
+        owned get {
             return new Variant.string(entry.text);
         }
     }
 
-    public StringEntry(string? label, string? value)
-    {
-        if (label != null)
-        {
+    public StringEntry(string? label, string? value) {
+        if (label != null) {
             this.label = new Gtk.Label(label);
             this.label.show();
         }
@@ -81,35 +71,30 @@ public class StringEntry : FormEntry, ValueEntry
         entry.show();
     }
 
-    private void on_icon_press(Gtk.EntryIconPosition position, Gdk.Event event)
-    {
+    private void on_icon_press(Gtk.EntryIconPosition position, Gdk.Event event) {
         if (position == Gtk.EntryIconPosition.SECONDARY)
         entry.set_text("");
     }
 }
 
-public class BoolEntry : FormEntry, ToggleEntry
-{
+public class BoolEntry : FormEntry, ToggleEntry {
     private string[] enables;
     private string[] disables;
 
     private Gtk.CheckButton entry;
-    public override Gtk.Widget widget {get{return entry;}}
+    public override Gtk.Widget widget {get {return entry;}}
 
-    public override bool sensitive
-    {
+    public override bool sensitive {
         get {return entry.sensitive;}
         set {entry.sensitive = value;}
     }
 
-    public bool state
-    {
+    public bool state {
         get {return entry.active;}
         set {entry.active = value;}
     }
 
-    public BoolEntry(string label, string[] enables, string[] disables)
-    {
+    public BoolEntry(string label, string[] enables, string[] disables) {
         this.enables = enables;
         this.disables = disables;
         entry = new Gtk.CheckButton.with_label(label);
@@ -117,56 +102,46 @@ public class BoolEntry : FormEntry, ToggleEntry
         entry.toggled.connect(on_toggled);
     }
 
-    public unowned string[] get_enables()
-    {
+    public unowned string[] get_enables() {
         return enables;
     }
 
-    public unowned string[] get_disables()
-    {
+    public unowned string[] get_disables() {
         return disables;
     }
 
-    private void on_toggled()
-    {
+    private void on_toggled() {
         toggled();
     }
 }
 
-public class OptionEntry : FormEntry, ToggleEntry
-{
+public class OptionEntry : FormEntry, ToggleEntry {
     private string[] enables;
     private string[] disables;
 
     private Gtk.RadioButton entry;
-    public override Gtk.Widget widget {get{return entry;}}
+    public override Gtk.Widget widget {get {return entry;}}
 
-    public override bool sensitive
-    {
+    public override bool sensitive {
         get {return entry.sensitive;}
         set {entry.sensitive = value;}
     }
 
-    public bool state
-    {
+    public bool state {
         get {return entry.active;}
         set {entry.active = value;}
     }
 
-    public Gtk.RadioButton group
-    {
-        get
-        {
+    public Gtk.RadioButton group {
+        get {
             return entry;
         }
-        set
-        {
+        set {
             entry.join_group(value);
         }
     }
 
-    public OptionEntry(string label, string[] enables, string[] disables)
-    {
+    public OptionEntry(string label, string[] enables, string[] disables) {
         this.enables = enables;
         this.disables = disables;
         entry = new Gtk.RadioButton.with_label_from_widget(null, label);
@@ -174,66 +149,55 @@ public class OptionEntry : FormEntry, ToggleEntry
         entry.toggled.connect(on_toggled);
     }
 
-    public unowned string[] get_enables()
-    {
+    public unowned string[] get_enables() {
         return enables;
     }
 
-    public unowned string[] get_disables()
-    {
+    public unowned string[] get_disables() {
         return disables;
     }
 
-    private void on_toggled()
-    {
+    private void on_toggled() {
         toggled();
     }
 }
 
-public errordomain FormError
-{
+public errordomain FormError {
     INVALID_ENTRY, INVALID_DATA;
 }
 
-public class Form : Gtk.Grid
-{
+public class Form : Gtk.Grid {
     private HashTable<string, Variant> values;
     private HashTable<string, FormEntry> entries;
     private HashTable<string, Gtk.RadioButton> radios;
 
-    public Form(HashTable<string, Variant> values)
-    {
+    public Form(HashTable<string, Variant> values) {
         this.values = values;
         entries = new HashTable<string, FormEntry>(str_hash, str_equal);
         radios = new HashTable<string, Gtk.RadioButton>(str_hash, str_equal);
     }
 
     public static Form create_from_spec(HashTable<string, Variant> values, Variant entries_spec)
-    throws FormError
-    {
+    throws FormError {
         var form = new Form(values);
         form.add_entries(entries_spec);
         return form;
     }
 
-    public void add_entries(Variant entries_spec) throws FormError
-    {
+    public void add_entries(Variant entries_spec) throws FormError {
         var array = variant_to_array(entries_spec);
         foreach (unowned Variant entry_spec in array)
         add_entry(variant_to_array(entry_spec));
     }
 
-    public void add_values(HashTable<string, Variant> values)
-    {
+    public void add_values(HashTable<string, Variant> values) {
         foreach (var key in values.get_keys())
         this.values.replace(key, values.get(key));
     }
 
-    public static string print_entry_spec(Variant[] entry_spec)
-    {
+    public static string print_entry_spec(Variant[] entry_spec) {
         var buffer = new StringBuilder("[");
-        for (var i = 0; i < entry_spec.length; i++)
-        {
+        for (var i = 0; i < entry_spec.length; i++) {
             if (i > 0)
             buffer.append(", ");
             buffer.append(entry_spec[i].print(true));
@@ -242,15 +206,13 @@ public class Form : Gtk.Grid
         return buffer.str;
     }
 
-    public static void check_entry_spec_length(Variant[] entry_spec, int min_length) throws FormError
-    {
+    public static void check_entry_spec_length(Variant[] entry_spec, int min_length) throws FormError {
         if (entry_spec.length < min_length)
         throw new FormError.INVALID_ENTRY("Entry spec has missing fields. %s",
             print_entry_spec(entry_spec));
     }
 
-    public void add_entry(Variant[] entry_spec) throws FormError
-    {
+    public void add_entry(Variant[] entry_spec) throws FormError {
         Gtk.Label label = null;
         Gtk.Widget widget = null;
         check_entry_spec_length(entry_spec, 2);
@@ -260,8 +222,7 @@ public class Form : Gtk.Grid
         throw new FormError.INVALID_DATA("Invalid data type for field 0. %s",
             print_entry_spec(entry_spec));
 
-        switch (type)
-        {
+        switch (type) {
         case "string":
             // [type, id, label?]
             string id;
@@ -394,17 +355,14 @@ public class Form : Gtk.Grid
             return;
         }
 
-        if (label != null)
-        {
+        if (label != null) {
             attach_next_to(label, null, Gtk.PositionType.BOTTOM, 1, 1);
             label.margin_start = 8;
             label.margin_top = 5;
             label.halign = Gtk.Align.START;
             label.show();
             attach_next_to(widget, label, Gtk.PositionType.RIGHT, 1, 1);
-        }
-        else
-        {
+        } else {
             attach_next_to(widget, null, Gtk.PositionType.BOTTOM, 2, 1);
         }
         widget.margin_start = 8;
@@ -413,42 +371,31 @@ public class Form : Gtk.Grid
         widget.show();
     }
 
-    public void check_toggles()
-    {
+    public void check_toggles() {
         var entries = this.entries.get_values();
-        foreach (var entry in entries)
-        {
+        foreach (var entry in entries) {
             var toggle = entry as ToggleEntry;
             if (toggle != null)
             entry_toggled(toggle);
         }
     }
 
-    public HashTable<string, Variant> get_original_values()
-    {
+    public HashTable<string, Variant> get_original_values() {
         return values;
     }
 
-    public HashTable<string, Variant> get_values()
-    {
+    public HashTable<string, Variant> get_values() {
         var result = new HashTable<string, Variant>(str_hash, str_equal);
-        foreach (var key in entries.get_keys())
-        {
+        foreach (var key in entries.get_keys()) {
             var entry = entries.get(key);
             var value_entry = entry as ValueEntry;
             var toggle_entry = entry as ToggleEntry;
-            if (value_entry != null)
-            {
+            if (value_entry != null) {
                 result.insert(key, value_entry.value);
-            }
-            else if (toggle_entry != null)
-            {
-                if (toggle_entry is BoolEntry)
-                {
+            } else if (toggle_entry != null) {
+                if (toggle_entry is BoolEntry) {
                     result.insert(key, new Variant.boolean(toggle_entry.state));
-                }
-                else if (toggle_entry is OptionEntry && toggle_entry.state)
-                {
+                } else if (toggle_entry is OptionEntry && toggle_entry.state) {
                     var i = key.index_of(":");
                     if (i > 0)
                     result.insert(key.substring(0, i), new Variant.string(key.substring(i + 1)));
@@ -459,25 +406,21 @@ public class Form : Gtk.Grid
         return result;
     }
 
-    private void entry_toggled(ToggleEntry entry)
-    {
+    private void entry_toggled(ToggleEntry entry) {
         var state = entry.state;
-        foreach (var key in entry.get_enables())
-        {
+        foreach (var key in entry.get_enables()) {
             var target = entries.get(key);
             if (target != null)
             target.sensitive = state;
         }
-        foreach (var key in entry.get_disables())
-        {
+        foreach (var key in entry.get_disables()) {
             var target = entries.get(key);
             if (target != null)
             target.sensitive = !state;
         }
     }
 
-    private void on_entry_toggled(ToggleEntry entry)
-    {
+    private void on_entry_toggled(ToggleEntry entry) {
         entry_toggled(entry);
     }
 }

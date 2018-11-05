@@ -19,23 +19,18 @@
  * Tests are under public domain because they might contain useful sample code.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class JsonParserTest: Drt.TestCase
-{
-    private static inline string load_data(string name, int i) throws GLib.Error
-    {
+public class JsonParserTest: Drt.TestCase {
+    private static inline string load_data(string name, int i) throws GLib.Error {
         return Drt.System.read_file(File.new_for_path("src/tests/data/json/%s%d.json".printf(name, i)));
     }
 
-    public void test_pass()
-    {
+    public void test_pass() {
         int i;
         for (i = 1; i <= 3; i++)
         expect_no_error(() => JsonParser.load(load_data("pass", i)), "pass%d.json", i);
-        for (i = 1; i <= 2; i++)
-        {
+        for (i = 1; i <= 2; i++) {
             expect_no_error(() => JsonParser.load_array(load_data("pass", i)), "pass%d.json", i);
             expect_error(() => JsonParser.load_object(load_data("pass", i)),
                 "The data doesn't represent a JavaScript object.", "pass%d.json", i);
@@ -47,8 +42,7 @@ public class JsonParserTest: Drt.TestCase
             "The data doesn't represent a JavaScript array.", "pass%d.json", i);
     }
 
-    public void test_fail()
-    {
+    public void test_fail() {
         int i = 0;
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "The outermost value must be an object or array.", "fail%d.json", i);

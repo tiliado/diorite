@@ -22,32 +22,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt
-{
+namespace Drt {
 
-public class BluetoothChannel : Drt.DuplexChannel
-{
+public class BluetoothChannel : Drt.DuplexChannel {
     public BluetoothConnection connection {get; private set;}
 
-    public BluetoothChannel(uint id, string name, BluetoothConnection connection, uint timeout)
-    {
+    public BluetoothChannel(uint id, string name, BluetoothConnection connection, uint timeout) {
         base(id, name, connection.input, connection.output, timeout);
         this.connection = connection;
     }
 
-    ~BluetoothChannel()
-    {
-        try
-        {
+    ~BluetoothChannel() {
+        try {
             close();
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
         }
     }
 
-    public override void close() throws GLib.IOError
-    {
+    public override void close() throws GLib.IOError {
         connection.close();
     }
 }

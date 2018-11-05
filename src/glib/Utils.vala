@@ -22,11 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt.Utils
-{
+namespace Drt.Utils {
 
-public bool const_time_byte_equal(uint8[] a, uint8[] b)
-{
+public bool const_time_byte_equal(uint8[] a, uint8[] b) {
     if (a.length != b.length)
     return false;
     uint8 diff = 0;
@@ -35,32 +33,28 @@ public bool const_time_byte_equal(uint8[] a, uint8[] b)
     return diff == 0;
 }
 
-public Array<int?> wrap_intv(int[] array)
-{
+public Array<int?> wrap_intv(int[] array) {
     var result = new Array<int?>();
     foreach (var value in array)
     result.append_val(value);
     return result;
 }
 
-public Array<double?> wrap_doublev(double[] array)
-{
+public Array<double?> wrap_doublev(double[] array) {
     var result = new Array<double?>();
     foreach (var value in array)
     result.append_val(value);
     return result;
 }
 
-public Array<bool?> wrap_boolv(bool[] array)
-{
+public Array<bool?> wrap_boolv(bool[] array) {
     var result = new Array<bool?>();
     foreach (var value in array)
     result.append_val(value);
     return result;
 }
 
-public Array<string?> wrap_strv(string?[] array)
-{
+public Array<string?> wrap_strv(string?[] array) {
     var result = new Array<string?>();
     foreach (var value in array)
     result.append_val(value);
@@ -73,8 +67,7 @@ public Array<string?> wrap_strv(string?[] array)
  * @param list    List of strings
  * @return    array of strings
  */
-public string[] slist_to_strv(SList<string> list)
-{
+public string[] slist_to_strv(SList<string> list) {
     var array = new string[list.length()];
     var i = 0;
     foreach (unowned string item in list)
@@ -88,8 +81,7 @@ public string[] slist_to_strv(SList<string> list)
  * @param list    List of strings
  * @return    array of strings
  */
-public string[] list_to_strv(List<string> list)
-{
+public string[] list_to_strv(List<string> list) {
     var array = new string[list.length()];
     var i = 0;
     foreach (unowned string item in list)

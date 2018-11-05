@@ -22,8 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drtgtk
-{
+namespace Drtgtk {
 
 public delegate void UriOpener(string uri);
 
@@ -33,8 +32,7 @@ public delegate void UriOpener(string uri);
  * It understands all formating tags of SimpleDocBuffer, sets proper link color and
  * manages link actions (changes cursor and emits link_clicked signal).
  */
-public class RichTextView: Gtk.TextView
-{
+public class RichTextView: Gtk.TextView {
     private UriOpener? _link_opener = null;
     public void set_link_opener(owned UriOpener? opener) {
         _link_opener = (owned) opener;
@@ -48,14 +46,10 @@ public class RichTextView: Gtk.TextView
     private Gdk.Cursor? cursor = null;
 
 
-    public static void default_opener(string uri)
-    {
-        try
-        {
+    public static void default_opener(string uri) {
+        try {
             Gtk.show_uri(null, uri, Gdk.CURRENT_TIME);
-        }
-        catch (GLib.Error e)
-        {
+        } catch (GLib.Error e) {
             critical("Failed to open URI '%s'. %s", uri, e.message);
         }
     }
@@ -63,8 +57,7 @@ public class RichTextView: Gtk.TextView
     /**
      * Creates new SimpleDocView.
      */
-    public RichTextView(RichTextBuffer? buffer=null)
-    {
+    public RichTextView(RichTextBuffer? buffer=null) {
         Object(editable: false, wrap_mode: Gtk.WrapMode.WORD);
         _link_opener = default_opener;
         _image_opener = default_opener;
@@ -77,8 +70,7 @@ public class RichTextView: Gtk.TextView
      *
      * @param uri    target URI of the link
      */
-    public virtual signal void link_clicked(string uri)
-    {
+    public virtual signal void link_clicked(string uri) {
         debug("Open link: %s", uri);
         if (_link_opener != null)
         _link_opener(uri);
@@ -90,39 +82,34 @@ public class RichTextView: Gtk.TextView
      *
      * @param path    path of the image
      */
-    public virtual signal void image_clicked(string path)
-    {
+    public virtual signal void image_clicked(string path) {
         debug("Open image: %s", path);
         if (_image_opener != null)
         _image_opener(path);
     }
 
-    public override void realize()
-    {
+    public override void realize() {
         base.realize();
         set_link_color();
     }
 
-    public override void style_updated(){
+    public override void style_updated() {
         base.style_updated();
         if (get_realized())
         set_link_color();
     }
 
-    private void set_link_color()
-    {
+    private void set_link_color() {
         Gdk.RGBA? link_color = null;
         var doc_buffer = buffer as RichTextBuffer;
         if (doc_buffer == null)
         return;
 
         if (!get_style_context().lookup_color("link-color", out link_color)
-        && !get_style_context().lookup_color("link_color", out link_color))
-        {
+        && !get_style_context().lookup_color("link_color", out link_color)) {
             link_color = null;  // Clear link color
             var prop = find_style_property("link-color");
-            if (prop != null)
-            {
+            if (prop != null) {
                 unowned Gdk.Color? color = null;
                 style_get("link-color", out color);
                 if (!prop.value_type.is_a(typeof(Gdk.Color)) && color != null) // See tiliado/nuvolaplayer#197
@@ -134,23 +121,17 @@ public class RichTextView: Gtk.TextView
         doc_buffer.set_link_color(link_color);
     }
 
-    public override bool button_release_event(Gdk.EventButton event)
-    {
+    public override bool button_release_event(Gdk.EventButton event) {
         var cont = base.button_release_event(event);
-        if (event.button == 1)
-        {
+        if (event.button == 1) {
             int x, y;
             window_to_buffer_coords(Gtk.TextWindowType.TEXT, (int) event.x, (int) event.y, out x, out y);
             unowned RichTextLink link;
-            if (get_link_at_pos(x, y, out link))
-            {
+            if (get_link_at_pos(x, y, out link)) {
                 link_clicked(link.uri);
-            }
-            else
-            {
+            } else {
                 var pixbuf = get_pixbuf_at_pos(x, y);
-                if (pixbuf != null)
-                {
+                if (pixbuf != null) {
                     var path = pixbuf.get_data<string?>(RichTextBuffer.IMAGE_PATH);
                     if (path != null)
                     image_clicked(path);
@@ -168,16 +149,13 @@ public class RichTextView: Gtk.TextView
      * @param link    link when found
      * @return true if a link has been found
      */
-    public bool get_link_at_pos(int x, int y, out unowned RichTextLink link)
-    {
+    public bool get_link_at_pos(int x, int y, out unowned RichTextLink link) {
         link = null;
         Gtk.TextIter iter;
         get_iter_at_location(out iter, x, y);
-        foreach (weak Gtk.TextTag tag in iter.get_tags())
-        {
+        foreach (weak Gtk.TextTag tag in iter.get_tags()) {
             weak RichTextLink? maybe_link = tag as RichTextLink;
-            if (maybe_link != null)
-            {
+            if (maybe_link != null) {
                 link = maybe_link;
                 return true;
             }
@@ -193,8 +171,7 @@ public class RichTextView: Gtk.TextView
      * @param y       y coordinate
      * @return true if (x, y) is inside area of iter
      */
-    public bool is_in_iter_area(Gtk.TextIter iter, int x, int y)
-    {
+    public bool is_in_iter_area(Gtk.TextIter iter, int x, int y) {
         Gdk.Rectangle area;
         get_iter_location(iter, out area);
         return x >= area.x && x <= area.x + area.width
@@ -208,8 +185,7 @@ public class RichTextView: Gtk.TextView
      * @param y    coordinate y
      * @return pixbuf if found, null otherwise
      */
-    public Gdk.Pixbuf? get_pixbuf_at_pos(int x, int y)
-    {
+    public Gdk.Pixbuf? get_pixbuf_at_pos(int x, int y) {
         Gtk.TextIter iter;
         get_iter_at_location(out iter, x, y);
         var pixbuf = iter.get_pixbuf();
@@ -228,8 +204,7 @@ public class RichTextView: Gtk.TextView
         return null;
     }
 
-    public override bool motion_notify_event(Gdk.EventMotion event)
-    {
+    public override bool motion_notify_event(Gdk.EventMotion event) {
         var cont = base.motion_notify_event(event);
         int x, y;
         window_to_buffer_coords(Gtk.TextWindowType.TEXT, (int) event.x, (int) event.y, out x, out y);
@@ -237,14 +212,12 @@ public class RichTextView: Gtk.TextView
         return cont;
     }
 
-    private void update_cursor(int x, int y)
-    {
+    private void update_cursor(int x, int y) {
         var display = get_display();
         Gdk.Cursor cursor = get_link_at_pos(x, y, null) || get_pixbuf_at_pos(x, y) != null
         ? new Gdk.Cursor.for_display(display, Gdk.CursorType.HAND2) : null;
 
-        if (this.cursor != cursor)
-        {
+        if (this.cursor != cursor) {
             get_window(Gtk.TextWindowType.TEXT).set_cursor(cursor);
             display.flush();
             this.cursor = cursor;
