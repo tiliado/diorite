@@ -94,7 +94,7 @@ public class OrmManager : GLib.Object {
             names += property.name;
             parameters += value;
         }
-        return (T) GLib.Object.new_with_properties (type, names, parameters);
+        return (T) GLib.Object.new_with_properties(type, names, parameters);
     }
 
     /**

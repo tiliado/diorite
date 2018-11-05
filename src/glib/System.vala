@@ -166,7 +166,7 @@ public bool move_dir_if_target_not_found(File source_dir, File target_dir) throw
 public void purge_directory_content(File dir, bool recursive=false) throws GLib.Error {
     var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
     FileInfo file_info;
-    while ((file_info = enumerator.next_file ()) != null) {
+    while ((file_info = enumerator.next_file()) != null) {
         var f = dir.get_child(file_info.get_name());
         if (f.query_file_type(0) == FileType.DIRECTORY) {
             if (recursive) {
@@ -212,7 +212,7 @@ public void copy_tree(File source_dir, File dest_dir, Cancellable? cancellable=n
     }
     var enumerator = source_dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
     FileInfo file_info;
-    while ((file_info = enumerator.next_file ()) != null) {
+    while ((file_info = enumerator.next_file()) != null) {
         var name = file_info.get_name();
         var source_item = source_dir.get_child(name);
         var dest_item = dest_dir.get_child(name);

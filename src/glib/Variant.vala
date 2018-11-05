@@ -106,7 +106,7 @@ public Variant variant_from_hashtable(HashTable<string, Variant> hashtable) {
     foreach (var key in hashtable.get_keys()) {
         builder.add("{sv}", key, hashtable.get(key));
     }
-    return builder.end ();
+    return builder.end();
 }
 
 /**

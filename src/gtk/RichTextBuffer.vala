@@ -305,7 +305,7 @@ public class RichTextBuffer: Gtk.TextBuffer {
         in_paragraph = strip_left = insert_new_line = false;
         tag_stack.clear();
         Gtk.TextIter start, end;
-        get_bounds (out start, out end);
+        get_bounds(out start, out end);
         @delete(ref start, ref end);
     }
 
