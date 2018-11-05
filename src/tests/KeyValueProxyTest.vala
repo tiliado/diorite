@@ -57,5 +57,5 @@ public class KeyValueProxyTest: KeyValueStorageTest {
     }
 }
 
-} // namespace Nuvola
+} // namespace Drt
 #endif

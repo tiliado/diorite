@@ -119,4 +119,4 @@ public Gtk.CssProvider apply_custom_styles(Gdk.Screen screen) throws GLib.Error 
     return provider;
 }
 
-} // namespace Drt.Css
+} // namespace Drtgtk.Css

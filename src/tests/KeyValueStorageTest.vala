@@ -212,4 +212,4 @@ public abstract class KeyValueStorageTest: Drt.TestCase {
     }
 }
 
-} // namespace Nuvola
+} // namespace Drt

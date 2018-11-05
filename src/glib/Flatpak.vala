@@ -31,4 +31,4 @@ public async void check_desktop_portal_available(Cancellable? cancellable = null
     portal.assert_method("org.freedesktop.portal.ProxyResolver", "Lookup");
 }
 
-} //namespace Drt.Flatpak
+} // namespace Drt.Flatpak
