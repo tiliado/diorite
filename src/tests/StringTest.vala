@@ -25,7 +25,7 @@ namespace Drt {
 
 public class StringTest: Drt.TestCase {
     public void test_semicolon_separated_set() {
-        var result = Drt.String.semicolon_separated_set(null, true);
+        GenericSet<string> result = Drt.String.semicolon_separated_set(null, true);
         expect_uint_equals(0, result.length, "null string");
         result = Drt.String.semicolon_separated_set("", true);
         expect_uint_equals(0, result.length, "empty string");
@@ -34,13 +34,13 @@ public class StringTest: Drt.TestCase {
         var dataset = " hello ; Bye;;1234;byE;;;";
         result = Drt.String.semicolon_separated_set(dataset, false);
         expect_uint_equals(4, result.length, "original set");
-        foreach (var s in new string[] {"hello", "Bye", "1234", "byE"}) {
+        foreach (unowned string s in new string[] {"hello", "Bye", "1234", "byE"}) {
             expect_true(result.contains(s), "item: %s", s);
         }
         expect_false(result.contains("bye"), "item: %s", "bye");
         result = Drt.String.semicolon_separated_set(dataset, true);
         expect_uint_equals(3, result.length, "lowercase set");
-        foreach (var s in new string[] {"hello", "bye", "1234"}) {
+        foreach (unowned string s in new string[] {"hello", "bye", "1234"}) {
             expect_true(result.contains(s), "item: %s", s);
         }
         expect_false(result.contains("Bye"), "item: %s", "Bye");

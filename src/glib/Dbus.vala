@@ -46,7 +46,7 @@ public async XdgDbus get_xdg_dbus(DBusConnection bus, Cancellable? cancellable =
  */
 public async void ensure_service(DBusConnection bus, string name, Cancellable? cancellable = null)
 throws GLib.Error {
-    var dbus = yield get_xdg_dbus(bus, cancellable);
+    XdgDbus dbus = yield get_xdg_dbus(bus, cancellable);
     if (yield dbus.name_has_owner(name)) {
         yield dbus.start_service_by_name(name, 0);
     }
@@ -67,7 +67,7 @@ public async string introspect_xml(DBusConnection bus, string name, string path,
     var allowed_timeouts = 10;
     while (true) {
         try {
-            var introspectable = yield bus.get_proxy<XdgDbusIntrospectable>(name, path, 0, cancellable);
+            XdgDbusIntrospectable introspectable = yield bus.get_proxy(name, path, 0, cancellable);
             return yield introspectable.introspect();
         } catch (GLib.Error e) {
             // Catch also GLib.DBusError.TIMED_OUT. See tiliado/nuvolaruntime#419
@@ -92,7 +92,7 @@ public async string introspect_xml(DBusConnection bus, string name, string path,
  */
 public async Introspection introspect(DBusConnection bus, string name, string path,
     Cancellable? cancellable = null) throws GLib.Error {
-    var xml = yield introspect_xml(bus, name, path, cancellable);
+    string xml = yield introspect_xml(bus, name, path, cancellable);
     return new Introspection(name, path, new DBusNodeInfo.for_xml(xml));
 }
 
@@ -150,7 +150,7 @@ public class Introspection {
      * @return Method info if the interface and method exist, null otherwise.
      */
     public unowned DBusMethodInfo get_method(string ifce_name, string method) {
-        var ifce = get_interface(ifce_name);
+        unowned DBusInterfaceInfo? ifce = get_interface(ifce_name);
         return ifce != null ? ifce.lookup_method(method): null;
     }
 

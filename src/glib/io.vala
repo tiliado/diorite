@@ -42,7 +42,7 @@ throws IOError {
     try {
         var address = new UnixSocketAddress(path);
         var socket =  new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
-        var connection = SocketConnection.factory_create_connection(socket);
+        SocketConnection connection = SocketConnection.factory_create_connection(socket);
         connection.connect(address, cancellable);
         return connection;
     } catch (GLib.Error e) {

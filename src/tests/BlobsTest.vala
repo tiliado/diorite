@@ -165,7 +165,7 @@ public class BlobsTest: Drt.TestCase {
         char[] separators = {'\0', ':', ' ', '.'};
         foreach (char sep in separators) {
             for (var i = 0; i < 10; i++) {
-                var size = rand.int_range(1, 50);
+                int size = rand.int_range(1, 50);
                 uint8[] orig = new uint8[size];
                 for (var j = 0; j < size; j++) {
                     orig[j] = (uint8) rand.int_range(uint8.MIN, uint8.MAX);

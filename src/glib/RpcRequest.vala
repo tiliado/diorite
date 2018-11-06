@@ -83,7 +83,7 @@ public class RpcRequest {
      * @return string value or null.
      */
     public string? pop_string() {
-        var variant = next(typeof(StringParam));
+        Variant? variant = next(typeof(StringParam));
         return variant == null ? null : variant.get_string();;
     }
 
@@ -139,7 +139,7 @@ public class RpcRequest {
      * @return VariantIter iterator of the variant array.
      */
     public VariantIter? pop_variant_array() {
-        var value = next(typeof(VarArrayParam));
+        Variant? value = next(typeof(VarArrayParam));
         return value == null ? null : value.iterator();
     }
 
@@ -151,7 +151,7 @@ public class RpcRequest {
      * @return string[] value. May be empty, but not null.
      */
     public string[] pop_strv() {
-        var variant = next(typeof(StringArrayParam));
+        Variant? variant = next(typeof(StringArrayParam));
         return variant == null ? new string[] {} : variant.dup_strv();
     }
 
@@ -164,8 +164,8 @@ public class RpcRequest {
      */
     public SList<string>pop_str_list() {
         SList<string> list = null;
-        var array = next(typeof(StringArrayParam));
-        var iter = array.iterator();
+        Variant? array = next(typeof(StringArrayParam));
+        VariantIter iter = array.iterator();
         unowned string str = null;
         while (iter.next("s", &str)) {
             list.prepend(str);
@@ -186,13 +186,13 @@ public class RpcRequest {
     }
 
     private Variant? next(Type param_type) {
-        var index = counter++;
+        int index = counter++;
         if (index >= data.length) {
             error(
                 "Method '%s' receives only %d arguments. Access to index %d denied.",
                 method.path, data.length, index);
         }
-        var param =  method.params[index];
+        RpcParam param = method.params[index];
         if (Type.from_instance(param) != param_type) {
             error(
                 "The parameter %d of method '%s' is of type '%s' but %s value requested.",

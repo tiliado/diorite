@@ -60,20 +60,20 @@ public class RpcNotification : RpcCallable {
             throw new ApiError.INVALID_PARAMS(
                 "Method '%s' requires 2 parameters but no parameters have been provided.", path);
         }
-        var params_type = Rpc.get_params_type(data);
+        string params_type = Rpc.get_params_type(data);
         if (params_type == "tuple") {
             if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
                 throw new ApiError.INVALID_PARAMS(
                     "Method '%s' call expected a tuple of parameters, but type of '%s' received.",
                     path, data.get_type_string());
             }
-            var n_children = data.n_children();
+            size_t n_children = data.n_children();
             if (n_children < 1 || n_children > 2) {
                 throw new ApiError.INVALID_PARAMS(
                     "Method '%s' requires %d parameters but %d parameters have been provided.",
                     path, 2, (int) data.n_children());
             }
-            var entry = unbox_variant(data.get_child_value(0));
+            Variant entry = unbox_variant(data.get_child_value(0));
             if (!variant_bool(entry, ref subscribe)) {
                 throw new ApiError.INVALID_PARAMS(
                     "Method '%s' call expected the first parameter to be a boolean, but type of '%s' received.",
@@ -92,8 +92,8 @@ public class RpcNotification : RpcCallable {
                 Rpc.check_type_string(data, "a{smv}");
             }
 
-            var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-            var entry = unbox_variant(dict.lookup_value("subscribe", null));
+            Variant dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
+            Variant entry = unbox_variant(dict.lookup_value("subscribe", null));
             if (entry == null) {
                 throw new ApiError.INVALID_PARAMS(
                     "Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
@@ -127,21 +127,21 @@ public class RpcNotification : RpcCallable {
     throws GLib.Error {
         detail = null;
         parameters = null;
-        var params_type = Rpc.get_params_type(data);
+        string params_type = Rpc.get_params_type(data);
         if (params_type == "tuple") {
             if (!data.get_type().is_subtype_of(VariantType.TUPLE)) {
                 throw new ApiError.INVALID_PARAMS(
                     "Notification call expected a tuple of parameters, but type of '%s' received.",
                     data.get_type_string());
             }
-            var n_children = data.n_children();
+            size_t n_children = data.n_children();
             if (n_children > 2) {
                 throw new ApiError.INVALID_PARAMS(
                     "Notification requires %d parameters but %d parameters have been provided.",
                     2, (int) data.n_children());
             }
             if (n_children > 0) {
-                var entry = unbox_variant(data.get_child_value(0));
+                Variant? entry = unbox_variant(data.get_child_value(0));
                 if (entry != null && !variant_string(entry, out detail)) {
                     throw new ApiError.INVALID_PARAMS(
                         "Notification call expected the first parameter to be a string, but type of '%s' received.",
@@ -155,8 +155,8 @@ public class RpcNotification : RpcCallable {
             if (data.get_type_string() != "(a{smv})") {
                 Rpc.check_type_string(data, "a{smv}");
             }
-            var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-            var entry = unbox_variant(dict.lookup_value("detail", null));
+            Variant dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
+            Variant entry = unbox_variant(dict.lookup_value("detail", null));
             if (entry != null && !variant_string(entry, out detail)) {
                 throw new ApiError.INVALID_PARAMS(
                     "Notification call expected the detail parameter to be a string, but type of '%s' received.",

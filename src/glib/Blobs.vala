@@ -158,7 +158,7 @@ public bool int64_from_blob(uint8[] array, out int64 result) {
  * @param separator    The separator of hexadecimal pairs ('\0' for none).
  */
 public void hexadecimal_from_blob(uint8[] array, out string result, char separator='\0') {
-    var size = separator == '\0' ? 2 * array.length : 3 * array.length - 1;
+    int size = separator == '\0' ? 2 * array.length : 3 * array.length - 1;
     var buffer = new StringBuilder.sized(size);
     hexadecimal_append_from_blob(array, buffer, separator);
     result = (owned) buffer.str;
@@ -291,7 +291,7 @@ public void int64_to_hexadecimal(int64 val, out string result, char separator='\
  * @param offset    The offset of the buffer the result will be stored at.
  */
 public void uint32_to_blob(ref uint8[] buffer, uint32 data, uint offset=0) {
-    var size = sizeof(uint32);
+    size_t size = sizeof(uint32);
     assert(buffer.length >= offset + size);
     for (var i = 0; i < size; i ++) {
         buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
@@ -307,7 +307,7 @@ public void uint32_to_blob(ref uint8[] buffer, uint32 data, uint offset=0) {
  * @param offset    The offset of the buffer the result will be stored at.
  */
 public void int32_to_blob(ref uint8[] buffer, int32 data, uint offset=0) {
-    var size = sizeof(int32);
+    size_t size = sizeof(int32);
     assert(buffer.length >= offset + size);
     for (var i = 0; i < size; i ++) {
         buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
@@ -323,7 +323,7 @@ public void int32_to_blob(ref uint8[] buffer, int32 data, uint offset=0) {
  * @param offset    The offset of the buffer where the uint32 value is stored at.
  */
 public void uint32_from_blob(uint8[] buffer, out uint32 data, uint offset=0) {
-    var size = sizeof(uint32);
+    size_t size = sizeof(uint32);
     assert(buffer.length >= offset + size);
     data = 0;
     for (var i = 0; i < size; i ++) {
@@ -340,7 +340,7 @@ public void uint32_from_blob(uint8[] buffer, out uint32 data, uint offset=0) {
  * @param offset    The offset of the buffer where the int32 value is stored at.
  */
 public void int32_from_blob(uint8[] buffer, out int32 data, uint offset=0) {
-    var size = sizeof(int32);
+    size_t size = sizeof(int32);
     assert(buffer.length >= offset + size);
     data = 0;
     for (var i = 0; i < size; i ++) {

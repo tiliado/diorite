@@ -45,7 +45,7 @@ public class JsonObject: JsonNode {
      */
     public void set(string name, JsonNode node) {
         return_if_fail(node.parent == null);
-        var old_node = get(name);
+        unowned JsonNode? old_node = get(name);
         nodes[name] = node;
         node.parent = this;
         if (old_node != null) {
@@ -70,7 +70,7 @@ public class JsonObject: JsonNode {
      * @return the member if it has been found and thus removed from the object, `null` otherwise
      */
     public JsonNode? take(string name) {
-        var node = nodes.take(name, null);
+        JsonNode? node = nodes.take(name, null);
         if (node != null) {
             node.parent = null;
         }
@@ -97,7 +97,7 @@ public class JsonObject: JsonNode {
      * @return the requested node if found else `null`
      */
     public unowned JsonNode? dotget(string path) {
-        var dot = path.index_of_char('.');
+        int dot = path.index_of_char('.');
         return_val_if_fail(dot != 0, null);
         if (dot < 0) {
             return path[0] != 0 ? get(path) : null;
@@ -463,17 +463,17 @@ public class JsonObject: JsonNode {
      * @param level      An initial indentation level.
      */
     public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0) {
-        var nl = !String.is_empty(indent);
-        var item_sep = (nl || compact) ? "," : ", ";
-        var key_sep = compact ? ":" : ": ";
+        bool nl = !String.is_empty(indent);
+        unowned string item_sep = (nl || compact) ? "," : ", ";
+        unowned string key_sep = compact ? ":" : ": ";
         buffer.append_c('{');
         if (nl) {
             buffer.append_c('\n');
         }
-        var iter =  HashTableIter<string, JsonNode?>(nodes);
+        HashTableIter<string, JsonNode?> iter = HashTableIter<string, JsonNode?>(nodes);
         unowned string? key = null;
         unowned JsonNode? node = null;
-        var next = (iter.next(out key, out node) && key != null && node != null);
+        bool next = (iter.next(out key, out node) && key != null && node != null);
         while (next) {
             if (nl) {
                 for (var i = 0; i <= level; i++) {

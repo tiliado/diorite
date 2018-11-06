@@ -36,7 +36,7 @@ public class Entry: Gtk.Entry {
     public bool copy_to_clipboard() {
         var window = get_toplevel() as Gtk.Window;
         if (window != null) {
-            var clipboard = Gtk.Clipboard.get_for_display(window.get_display(), Gdk.SELECTION_CLIPBOARD);
+            Gtk.Clipboard clipboard = Gtk.Clipboard.get_for_display(window.get_display(), Gdk.SELECTION_CLIPBOARD);
             clipboard.set_text(this.text, -1);
             return true;
         }

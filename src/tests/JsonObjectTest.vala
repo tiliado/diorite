@@ -25,21 +25,21 @@ public class JsonObjectTest: Drt.TestCase {
 
     private JsonObject load_object() throws GLib.Error {
         return JsonParser.load_object("""
-			{
-				"a": null,
-				"b": true,
-				"c": false,
-				"d": -1234,
-				"e": -12.34,
-				"f": "",
-				"g": "string",
-				"h": [1, 2, 3],
-				"i": {
-					"a": null, "b": true, "c": false, "d": -1234, "e": -12.34, "f": "", "g": "string",
-					"h": [1, 2, 3], "i": {"a": "A", "b": "B"}
-				}
-			}
-			""");
+            {
+                "a": null,
+                "b": true,
+                "c": false,
+                "d": -1234,
+                "e": -12.34,
+                "f": "",
+                "g": "string",
+                "h": [1, 2, 3],
+                "i": {
+                    "a": null, "b": true, "c": false, "d": -1234, "e": -12.34, "f": "", "g": "string",
+                    "h": [1, 2, 3], "i": {"a": "A", "b": "B"}
+                }
+            }
+            """);
     }
 
     public void test_set_remove_take() throws GLib.Error {
@@ -67,7 +67,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         unowned JsonNode? node;
         string[] results = {
             "null", // null
@@ -132,7 +132,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_dotget() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         unowned JsonNode? node;
         uint i;
         string key;
@@ -263,7 +263,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_bool() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         bool val = true;
         GLib.Value[,] results = {
             {false, false}, // null
@@ -286,7 +286,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_dotget_bool() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string key;
         unowned string ukey;
         bool val = true;
@@ -334,7 +334,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_bool_or() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         bool[] results = {
             false, // null
             true, // true
@@ -355,7 +355,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_int() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         int val = -1;
         GLib.Value[,] results = {
             {false, 0}, // null
@@ -373,13 +373,13 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.get_int(key, out val), "get_int('%s')", key);
-            var exp_val = results[i, 1].get_int();
+            int exp_val = results[i, 1].get_int();
             expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
         }
     }
 
     public void test_dotget_int() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string key;
         unowned string ukey;
         int val = -1;
@@ -400,13 +400,13 @@ public class JsonObjectTest: Drt.TestCase {
             key = " ";
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
-            var exp_val = results[i, 1].get_int();
+            int exp_val = results[i, 1].get_int();
             expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
-            var exp_val = results[i, 1].get_int();
+            int exp_val = results[i, 1].get_int();
             expect_int_equals(exp_val, val, "[%s] == %d", key, exp_val);
         }
 
@@ -424,13 +424,13 @@ public class JsonObjectTest: Drt.TestCase {
             if (msg[0] != '\0') {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
-            var exp_val = results2[i, 3].get_int();
+            int exp_val = results2[i, 3].get_int();
             expect_int_equals(exp_val, val, "['%s'] == %d", ukey, exp_val);
         }
     }
 
     public void test_get_int_or() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         int[] results = {
             -7, // null
             -7, // true
@@ -451,7 +451,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_double() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         double val = -1.0;
         GLib.Value[,] results = {
             {false, 0.0}, // null
@@ -469,13 +469,13 @@ public class JsonObjectTest: Drt.TestCase {
             var key = " ";
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.get_double(key, out val), "get_double('%s')", key);
-            var exp_val = results[i, 1].get_double();
+            double exp_val = results[i, 1].get_double();
             expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
         }
     }
 
     public void test_dotget_double() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string key;
         unowned string ukey;
         double val = -1;
@@ -496,13 +496,13 @@ public class JsonObjectTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
-            var exp_val = results[i, 1].get_double();
+            double exp_val = results[i, 1].get_double();
             expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
-            var exp_val = results[i, 1].get_double();
+            double exp_val = results[i, 1].get_double();
             expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
         }
 
@@ -520,13 +520,13 @@ public class JsonObjectTest: Drt.TestCase {
             if (msg[0] != '\0') {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
-            var exp_val = results2[i, 3].get_double();
+            double exp_val = results2[i, 3].get_double();
             expect_double_equals(exp_val, val, "['%s'] == %f", ukey, exp_val);
         }
     }
 
     public void test_get_double_or() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         double[] results = {
             -5.6, // null
             -5.6, // true
@@ -547,7 +547,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_string() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string? val = null;
         GLib.Value?[,] results = {
             {false, null}, // null
@@ -571,7 +571,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_dotget_string() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string key;
         unowned string ukey;
         string? val = null;
@@ -592,13 +592,13 @@ public class JsonObjectTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
-            var exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
+            string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
             expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
-            var exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
+            string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
             expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
         }
 
@@ -621,7 +621,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_string_or() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         string[] results = {
             "abc", // "abc"
             "abc", // true
@@ -642,7 +642,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_null() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         bool[] results = {
             true, // null
             false, // true
@@ -663,7 +663,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_array() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         var key = " ";
         for (uint i = 0; i < 10; i++) {
             key.data[0] = (uint8)('a' + i);
@@ -676,7 +676,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_get_object() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         var key = " ";
         for (uint i = 0; i < 10; i++) {
             key.data[0] = (uint8)('a' + i);
@@ -689,7 +689,7 @@ public class JsonObjectTest: Drt.TestCase {
     }
 
     public void test_to_string() throws GLib.Error {
-        var object = load_object();
+        JsonObject object = load_object();
         const string one_line_json = (
             "{\"a\": null, \"b\": true, \"c\": false, \"d\": -1234, \"e\": -12.34, \"f\": \"\", "
             + "\"g\": \"string\", \"h\": [1, 2, 3], \"i\": {\"a\": null, \"b\": true, \"c\": false, "

@@ -144,18 +144,18 @@ public class RpcRouter: GLib.Object {
      * @return true if there is at least one method.
      */
     public bool list_methods(string parent_path, string? strip, bool list_private, out Variant list) {
-        var strip_len = strip != null ? strip.length : 0;
+        int strip_len = strip != null ? strip.length : 0;
         var root = new VariantBuilder(new VariantType("a{sv}"));
         var builder = new VariantBuilder(new VariantType("aa{smv}"));
-        var paths = methods.get_keys();
+        List<unowned string> paths = methods.get_keys();
         paths.sort(string.collate);
-        var prefix = parent_path.has_suffix("/") ? parent_path : parent_path + "/";
+        string prefix = parent_path.has_suffix("/") ? parent_path : parent_path + "/";
         foreach (string path in paths) {
             if (!path.has_prefix(prefix)) {
                 continue;
             }
 
-            var callable = methods[path];
+            RpcCallable callable = methods[path];
             var flags = "";
             if ((callable.flags & RpcFlags.PRIVATE) != 0) {
                 if (!list_private) {
@@ -216,9 +216,9 @@ public class RpcRouter: GLib.Object {
             builder.add("{smv}", "params", params.end());
             builder.close();
         }
-        var array = builder.end();
+        Variant array = builder.end();
         root.add("{sv}", "methods", array);
-        var count = array.n_children();
+        size_t count = array.n_children();
         root.add("{sv}", "count", new Variant.int32((int32) count));
         list = root.end();
         return count > 0;
@@ -234,7 +234,7 @@ public class RpcRouter: GLib.Object {
      * @throws GLib.Error on failure.
      */
     public void handle_request(RpcConnection conn, uint id, string name, Variant? parameters) throws GLib.Error {
-        var always_secure = conn is RpcLocalConnection;
+        bool always_secure = conn is RpcLocalConnection;
         if (log_comunication) {
             debug("Handle message %s: %s", name, parameters == null ? "null" : parameters.print(false));
         }
@@ -242,7 +242,7 @@ public class RpcRouter: GLib.Object {
             conn.respond(id, parameters);
             return;
         }
-        var pos = name.last_index_of("::");
+        int pos = name.last_index_of("::");
         if (pos < 0) {
             throw new ApiError.INVALID_REQUEST("Method name is incomplete: '%s'", name);
         }
@@ -254,13 +254,13 @@ public class RpcRouter: GLib.Object {
             offset = 2;
         }
 
-        var path = name.substring(offset, pos - offset);
-        var spec = name.substring(pos + 2).split(",");
+        string path = name.substring(offset, pos - offset);
+        string[] spec = name.substring(pos + 2).split(",");
         if (spec.length < 3) {
             throw new ApiError.INVALID_REQUEST("Message format specification is incomplete: '%s'", name);
         }
-        var flags = spec[0];
-        var hex_token = String.null_if_empty(spec[2]);
+        unowned string flags = spec[0];
+        string? hex_token = String.null_if_empty(spec[2]);
         uint8[] token;
         if (hex_token != null) {
             Blobs.hexadecimal_to_blob(hex_token, out token);
@@ -275,7 +275,7 @@ public class RpcRouter: GLib.Object {
             conn.respond(id, null);
             return;
         }
-        var method = methods[path];
+        RpcCallable method = methods[path];
         if (method == null) {
             Variant? listing = null;
             list_methods(path, "/nuvola/", false, out listing);

@@ -125,7 +125,7 @@ public class ConditionalExpression {
         error_pos = -1;
         error_object = null;
         reset();
-        var result = parse_block(Toks.EOF);
+        bool result = parse_block(Toks.EOF);
         if (is_error_set()) {
             throw error_object;
         } else {
@@ -173,7 +173,7 @@ public class ConditionalExpression {
      */
     protected bool set_parse_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.PARSE("%d: %s", pos, error_text), pos, error_text);
         }
         return false;
@@ -191,7 +191,7 @@ public class ConditionalExpression {
      */
     protected bool set_syntax_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.SYNTAX("%d: %s", pos, error_text), pos, error_text);
         }
         return false;
@@ -209,7 +209,7 @@ public class ConditionalExpression {
      */
     protected bool set_eval_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new ConditionalExpressionError.EVAL("%d: %s", pos, error_text), pos, error_text);
         }
         return false;
@@ -263,7 +263,7 @@ public class ConditionalExpression {
             try {
                 if (patterns.match_full(data, len, pos, RegexMatchFlags.ANCHORED, out mi)) {
                     for (var i = 1; i < Toks.EOF; i++) {
-                        var result = mi.fetch(i);
+                        string? result = mi.fetch(i);
                         if (result != null && result[0] != 0) {
                             tok = (Toks) i;
                             val = (owned) result;
@@ -289,7 +289,7 @@ public class ConditionalExpression {
     }
 
     private bool parse_block(Toks end_tok) {
-        var result = parse_expr(Toks.EOF);
+        bool result = parse_expr(Toks.EOF);
         Toks tok = Toks.NONE;
         string? val;
         int pos;
@@ -347,7 +347,7 @@ public class ConditionalExpression {
         string? parameters;
         if (peek(out tok, out parameters, null) && tok == Toks.CALL) {
             skip();
-            var len = parameters.length;
+            int len = parameters.length;
             if (len > 2) {
                 parameters = parameters.substring(1, len - 2);
             } else {
@@ -366,12 +366,12 @@ public class ConditionalExpression {
     }
 
     private bool parse_and(bool lvalue) {
-        var rvalue = parse_expr(Toks.AND);
+        bool rvalue = parse_expr(Toks.AND);
         return lvalue && rvalue;
     }
 
     private bool parse_or(bool lvalue) {
-        var rvalue = parse_expr(Toks.OR);
+        bool rvalue = parse_expr(Toks.OR);
         return lvalue || rvalue;
     }
 

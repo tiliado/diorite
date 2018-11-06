@@ -99,7 +99,7 @@ throws DatabaseError {
  */
 private DatabaseError convert_sqlite_error(int errno, string? message, string? sql=null,
     Sqlite.Statement? stm = null) {
-    var msg = "SQLite Error %d: %s. |%s|".printf(
+    string msg = "SQLite Error %d: %s. |%s|".printf(
         errno,
         message ?? "(unknown message)",
         sql ?? (stm != null ? stm.sql() : null));

@@ -53,12 +53,12 @@ public abstract class DesktopShell: GLib.Object {
     private static void gather_shell_info() {
         if (shells == null) {
             shells = new GenericSet<string>(str_hash, str_equal);
-            foreach  (var variable in new string[] {"XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"}) {
-                var shell = Environment.get_variable(variable);
+            foreach (unowned string variable in new string[] {"XDG_CURRENT_DESKTOP", "XDG_SESSION_DESKTOP", "DESKTOP_SESSION"}) {
+                unowned string? shell = Environment.get_variable(variable);
                 debug("Shell: %s = %s", variable, shell);
                 if (shell != null) {
-                    var parts = String.split_strip(shell.down(), ":");
-                    foreach (var part in parts) {
+                    SList<string> parts = String.split_strip(shell.down(), ":");
+                    foreach (unowned string part in parts) {
                         shells.add(part);
                     }
                 }
@@ -81,7 +81,7 @@ public abstract class DesktopShell: GLib.Object {
      * @return The name of the current GTK+ theme.
      */
     public static string get_gtk_theme() {
-        var theme = Gtk.Settings.get_default().gtk_theme_name;
+        string? theme = Gtk.Settings.get_default().gtk_theme_name;
         return theme != "" ? theme : "Adwaita";
     }
 
@@ -121,7 +121,7 @@ public abstract class DesktopShell: GLib.Object {
      * @return Theme directory, or null if not found.
      */
     public static File? lookup_gtk_theme_dir(string theme) {
-        var gtk_css = new Drt.XdgStorage().get_data_file("themes/%s/gtk-3.0/gtk.css".printf(theme));
+        File? gtk_css = new Drt.XdgStorage().get_data_file("themes/%s/gtk-3.0/gtk.css".printf(theme));
         return gtk_css != null ? gtk_css.get_parent() : null;
     }
 
@@ -144,16 +144,16 @@ public abstract class DesktopShell: GLib.Object {
         var storage = new Drt.XdgStorage();
         var theme_dirs = new HashTable<string, File>(str_hash, str_equal);
         foreach (unowned File data_dir in storage.data_dirs()) {
-            var themes_dir = data_dir.get_child("themes");
+            File themes_dir = data_dir.get_child("themes");
             try {
-                var enumerator = yield themes_dir.enumerate_children_async(
+                FileEnumerator enumerator = yield themes_dir.enumerate_children_async(
                     "standard::*", FileQueryInfoFlags.NOFOLLOW_SYMLINKS, Priority.DEFAULT, null);
                 FileInfo info;
                 while ((info = enumerator.next_file(null)) != null) {
-                    var name = info.get_name();
+                    unowned string name = info.get_name();
                     if (!(name in theme_dirs)) {
-                        var theme_dir = themes_dir.get_child(name).get_child("gtk-3.0");
-                        var gtk_css = theme_dir.get_child("gtk.css");
+                        File theme_dir = themes_dir.get_child(name).get_child("gtk-3.0");
+                        File gtk_css = theme_dir.get_child("gtk.css");
                         try {
                             yield gtk_css.query_info_async(FileAttribute.STANDARD_TYPE, 0, Priority.DEFAULT, null);
                             theme_dirs[name] = theme_dir;
@@ -185,7 +185,7 @@ public abstract class DesktopShell: GLib.Object {
 
     #if !FLATPAK
     protected Gdk.X11.Window? inspect_window_manager() {
-        var net_wm_check_window = X11.get_net_wm_check_window();
+        Gdk.X11.Window? net_wm_check_window = X11.get_net_wm_check_window();
         if (net_wm_check_window != null) {
             wm_name_exact = X11.get_window_property_as_utf8(net_wm_check_window, "_NET_WM_NAME");
             if (wm_name_exact != null) {
@@ -207,7 +207,7 @@ public abstract class DesktopShell: GLib.Object {
 
 private class DefaultDesktopShell: DesktopShell {
     public DefaultDesktopShell() {
-        var gs = Gtk.Settings.get_default();
+        unowned Gtk.Settings gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu;
         shows_menu_bar = gs.gtk_shell_shows_menubar;
         #if FLATPAK
@@ -246,8 +246,7 @@ private class DefaultDesktopShell: DesktopShell {
 
 private class GnomeDesktopShell: DesktopShell {
     public GnomeDesktopShell() {
-
-        var gs = Gtk.Settings.get_default();
+        unowned Gtk.Settings gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = true;
         shows_menu_bar = gs.gtk_shell_shows_menubar = false;
         client_side_decorations = true;
@@ -264,7 +263,7 @@ private class GnomeDesktopShell: DesktopShell {
 
 private class UnityDesktopShell: DesktopShell {
     public UnityDesktopShell() {
-        var gs = Gtk.Settings.get_default();
+        unowned Gtk.Settings gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = true;
         shows_menu_bar = gs.gtk_shell_shows_menubar = true;
         client_side_decorations = false;
@@ -281,7 +280,7 @@ private class UnityDesktopShell: DesktopShell {
 
 private class XfceDesktopShell: DesktopShell {
     public XfceDesktopShell() {
-        var gs = Gtk.Settings.get_default();
+        unowned Gtk.Settings gs = Gtk.Settings.get_default();
         shows_app_menu = gs.gtk_shell_shows_app_menu = false;
         shows_menu_bar = gs.gtk_shell_shows_menubar = false;
         client_side_decorations = false;

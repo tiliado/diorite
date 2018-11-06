@@ -67,7 +67,7 @@ public class KeyValueTreeTest: KeyValueStorageTest {
   - c: 3.1400000000000001
   - d: 9223372036854775807
 """;
-        var result = tree.print("- ");
+        string result = tree.print("- ");
         expect(expected == result, "");
     }
 }

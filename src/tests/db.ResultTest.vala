@@ -80,7 +80,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_get_column_name() {
         try {
-            var result = select_data();
+            Result result = select_data();
             foreach (var index in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 expect_str_equals(null, result.get_column_name(index), "index %d", index);
             }
@@ -94,7 +94,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_get_column_index() {
         try {
-            var result = select_data();
+            Result result = select_data();
             foreach (var name in new string[] {"hello", "", "baby"}) {
                 expect_int_equals(-1, result.get_column_index(name), "column '%s'", name);
             }
@@ -108,7 +108,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_is_null() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_false(result.fetch_is_null(0), "id");
@@ -135,7 +135,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_int() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_int_equals(1, result.fetch_int(0), "id");
@@ -162,7 +162,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_int64() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_int64_equals((int64) 1, result.fetch_int64(0), "id");
@@ -189,7 +189,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_bool() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_true(result.fetch_bool(0), "id");
@@ -217,7 +217,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_double() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_double_equals(1.0, result.fetch_double(0), "id");
@@ -245,7 +245,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_string() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_str_equals("1", result.fetch_string(0), "id");
@@ -275,7 +275,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_blob() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_blob_equal("1".data, result.fetch_blob(0), "id");
@@ -304,7 +304,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_bytes() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_bytes_equal(new GLib.Bytes.take("1".data), result.fetch_bytes(0), "id");
@@ -333,7 +333,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_byte_array() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test data type conversions */
             expect_byte_array_equal(new GLib.ByteArray.take("1".data), result.fetch_byte_array(0), "id");
@@ -362,7 +362,7 @@ public class ResultTest: Drt.TestCase {
 
     public void test_fetch_value_of_type() {
         try {
-            var result = select_data();
+            Result result = select_data();
 
             /* Test index check */
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {

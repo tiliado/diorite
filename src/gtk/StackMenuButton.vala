@@ -120,7 +120,7 @@ public class StackMenuButton : Gtk.MenuButton {
     private void update_label() {
         if (stack != null && stack.visible_child != null) {
             string text;
-            var child = stack.visible_child;
+            Gtk.Widget? child = stack.visible_child;
             stack.child_get(child, "title", out text);
             label.label = text;
             show();

@@ -89,7 +89,7 @@ namespace Rpc {
         if (params == null ) {
             return "tuple";
         }
-        var type = params.get_type();
+        VariantType type = params.get_type();
         if (type.is_tuple()) {
             return "tuple";
         }
@@ -101,7 +101,7 @@ namespace Rpc {
     }
 
     private string create_path(string name) {
-        var dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
+        string dir_path = Path.build_filename(Environment.get_user_cache_dir(), "lds");
         try {
             File.new_for_path(dir_path).make_directory_with_parents();
         } catch (GLib.Error e) {

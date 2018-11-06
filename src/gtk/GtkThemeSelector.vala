@@ -99,11 +99,11 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
 
     private async void update(bool select_current, string? select_theme) {
         remove_all();
-        var themes = yield DesktopShell.list_gtk_themes();
-        var names = themes.get_keys();
+        HashTable<string, File> themes = yield DesktopShell.list_gtk_themes();
+        List<unowned string> names = themes.get_keys();
         names.sort(strcmp);
         append("", create_theme_label(null));
-        foreach (var name in names) {
+        foreach (unowned string name in names) {
             append(name, create_theme_label(name));
         }
         if (select_theme != null) {
@@ -118,7 +118,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
     }
 
     private void on_changed() {
-        var theme_name = active_id;
+        unowned string theme_name = active_id;
         if (theme_name == "") {
             DesktopShell.reset_gtk_theme();
         } else if (theme_name != null) {

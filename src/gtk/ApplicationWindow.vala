@@ -94,11 +94,11 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     }
 
     private void update_menu_button() {
-        var actions = app.actions;
-        var menu = menu_button_items != null ? actions.build_menu(menu_button_items, false, false) : new Menu();
+        Actions actions = app.actions;
+        Menu menu = menu_button_items != null ? actions.build_menu(menu_button_items, false, false) : new Menu();
         if (header_bar_revealer != null) {
-            var toggle_toolbar_action = "toggle-toolbar";
-            var toggle_toolbar_item = actions.create_menu_item(toggle_toolbar_action, true, false);
+            unowned string toggle_toolbar_action = "toggle-toolbar";
+            MenuItem? toggle_toolbar_item = actions.create_menu_item(toggle_toolbar_action, true, false);
             if (toggle_toolbar_item == null) {
                 actions.add_action(new ToggleAction("view", "win",
                     toggle_toolbar_action, "Show toolbar", null, null, null,
@@ -112,7 +112,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
             }
         }
 
-        var app_menu = app.shell.app_menu;
+        MenuModel? app_menu = app.shell.app_menu;
         if (app_menu != null) {
             menu.append_section(null, Actions.copy_menu_model(app_menu));
         }
@@ -125,8 +125,8 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     }
 
     public void create_toolbar(string[] items) {
-        var children = header_bar.get_children();
-        foreach (var child in children) {
+        List<unowned Gtk.Widget> children = header_bar.get_children();
+        foreach (unowned Gtk.Widget child in children) {
             header_bar.remove(child);
         }
 
@@ -136,7 +136,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
             for (var i = 0; i < items.length; i++) {
                 if (items[i] == " ") {
                     header_bar.pack_end(menu_button);
-                    for (var j = items.length - 1; j > i; j--) {
+                    for (int j = items.length - 1; j > i; j--) {
                         toolbar_pack_end(items[j]);
                     }
                     break;
@@ -151,11 +151,11 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     }
 
     public Gtk.Button? get_toolbar_button(string action_name) {
-        var action = app.actions.get_action(action_name);
+        Action? action = app.actions.get_action(action_name);
         return_val_if_fail(action != null, false);
-        var full_name = action.full_name;
-        var children = header_bar.get_children();
-        foreach (var child in children) {
+        string full_name = action.full_name;
+        List<unowned Gtk.Widget> children = header_bar.get_children();
+        foreach (unowned Gtk.Widget child in children) {
             var button = child as Gtk.Button;
             if (button != null && button.action_name == full_name) {
                 return button;
@@ -166,7 +166,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
 
     private bool toolbar_pack_start(string action) {
         return_val_if_fail(header_bar != null, false);
-        var button = app.actions.create_action_button(action, true, true);
+        Gtk.Button? button = app.actions.create_action_button(action, true, true);
         if (button != null) {
             header_bar.pack_start(button);
             return true;
@@ -176,7 +176,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
 
     private bool toolbar_pack_end(string action) {
         return_val_if_fail(header_bar != null, false);
-        var button = app.actions.create_action_button(action, true, true);
+        Gtk.Button? button = app.actions.create_action_button(action, true, true);
         if (button != null) {
             header_bar.pack_end(button);
             return true;
@@ -185,7 +185,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     }
 
     private void on_header_bar_revealer_expanded_changed(GLib.Object o, ParamSpec p) {
-        var revelaed = header_bar_revealer.revealer.reveal_child;
+        bool revelaed = header_bar_revealer.revealer.reveal_child;
         header_bar_revealer.button.visible = !revelaed;
     }
 

@@ -43,9 +43,9 @@ public class KeyValueStorageClient: GLib.Object {
     }
 
     private void handle_changed(Drt.RpcRequest request) throws RpcError {
-        var provider_name = request.pop_string();
-        var key = request.pop_string();
-        var old_value = request.pop_variant();
+        string? provider_name = request.pop_string();
+        string? key = request.pop_string();
+        Variant? old_value = request.pop_variant();
         changed(provider_name, key, old_value);
         request.respond(new Variant.boolean(true));
     }

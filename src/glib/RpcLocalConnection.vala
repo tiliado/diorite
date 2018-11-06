@@ -60,10 +60,10 @@ public class RpcLocalConnection: RpcConnection {
      */
     public override async Variant? call_full(string method, Variant? parameters, bool allow_private, string flags)
     throws GLib.Error {
-        var method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
-        var ctx = MainContext.ref_thread_default();
+        string method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
+        MainContext ctx = MainContext.ref_thread_default();
         assert(ctx.is_owner());
-        var id = dispatch_request(method_full, parameters, (ResumeCallback) call_full.callback, ctx);
+        uint id = dispatch_request(method_full, parameters, (ResumeCallback) call_full.callback, ctx);
         yield;
         assert(ctx.is_owner());
         return get_response(id);
@@ -81,10 +81,10 @@ public class RpcLocalConnection: RpcConnection {
      */
     public override Variant? call_full_sync(string method, Variant? parameters, bool allow_private, string flags)
     throws GLib.Error {
-        var method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
-        var ctx = MainContext.ref_thread_default();
+        string method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
+        MainContext ctx = MainContext.ref_thread_default();
         var loop = new MainLoop(ctx);
-        var id = dispatch_request(method_full, parameters, loop.quit, ctx);
+        uint id = dispatch_request(method_full, parameters, loop.quit, ctx);
         loop.run();
         return get_response(id);
     }
@@ -137,7 +137,7 @@ public class RpcLocalConnection: RpcConnection {
      * @param response    The response.
      */
     public override void respond(uint id, Variant? response) {
-        var resp = find_response(id);
+        Response? resp = find_response(id);
         assert(resp != null);
         resp.response = response;
         resp.schedule_callback();
@@ -150,7 +150,7 @@ public class RpcLocalConnection: RpcConnection {
      * @param e     The error.
      */
     public override void fail(uint id, GLib.Error e) {
-        var resp = find_response(id);
+        Response? resp = find_response(id);
         assert(resp != null);
         resp.error = e;
         resp.schedule_callback();

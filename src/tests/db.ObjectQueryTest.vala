@@ -84,7 +84,7 @@ public class ObjectQueryTest: Drt.TestCase {
 
         try {
             User[] users = {};
-            var cursor = conn.get_objects<User>().get_cursor();
+            ObjectCursor<User> cursor = conn.get_objects<User>().get_cursor();
             uint counter = 0;
             foreach (var user in cursor) {
                 users += user;
@@ -120,7 +120,7 @@ public class ObjectQueryTest: Drt.TestCase {
 
         try {
             User[] users = {};
-            var cursor = conn.query_objects<User>(null, "WHERE id=?i", 2).get_cursor();
+            ObjectCursor<User> cursor = conn.query_objects<User>(null, "WHERE id=?i", 2).get_cursor();
             uint counter = 0;
             foreach (var user in cursor) {
                 users += user;
@@ -153,7 +153,7 @@ public class ObjectQueryTest: Drt.TestCase {
 
         try {
             User[] users = {};
-            var q = conn.get_objects<User>(null);
+            ObjectQuery<User> q = conn.get_objects(null);
             foreach (var user in q.get_cursor()) {
                 users += user;
             }
@@ -210,7 +210,7 @@ public class ObjectQueryTest: Drt.TestCase {
 
         try {
 
-            var user = conn.query_objects<User>(null, "WHERE id=?i", 2).get_one();
+            User user = conn.query_objects<User>(null, "WHERE id=?i", 2).get_one();
             expect_int64_equals(2, user.id, "id");
             expect_str_equals("Jean", user.name, "name");
             expect_int_equals(50, user.age, "age");

@@ -62,7 +62,7 @@ public class Logger {
         Logger.output = output;
         Logger.display_level = display_level;
         Logger.hint = hint != null ? hint + ": " : null;
-        var use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
+        unowned string? use_colors = Environment.get_variable("DIORITE_LOGGER_USE_COLORS");
         if (use_colors == "yes") {
             colorful = true;
         } else if (use_colors == "no") {
@@ -75,7 +75,7 @@ public class Logger {
 
         time_ref = time ? new DateTime.now_local() : null;
 
-        var fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
+        unowned string? fatal_string = Environment.get_variable("DIORITE_LOGGER_FATAL_STRING");
         if (fatal_string != null && fatal_string[0] != '\0') {
             Logger.fatal_string = new PatternSpec(fatal_string);
         }
@@ -148,7 +148,7 @@ public class Logger {
     }
 
     private static void log_handler(string? domain, LogLevelFlags level, string message) {
-        var is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
+        bool is_fatal_string = Logger.fatal_string != null && Logger.fatal_string.match_string(message);
         if (!is_fatal_string && level > Logger.display_level) {
             return;
         }
@@ -211,7 +211,7 @@ public class Logger {
             break;
         }
 
-        var hint = Logger.hint ?? "";
+        unowned string hint = Logger.hint ?? "";
 
         lock (output) {
             if (time_ref != null) {
@@ -222,17 +222,17 @@ public class Logger {
                     time_ref = now;
                 }
                 name += " Δ";
-                var hours = diff / TimeSpan.HOUR;
+                TimeSpan hours = diff / TimeSpan.HOUR;
                 if (hours > 0) {
                     diff -= hours * TimeSpan.HOUR;
                     name += "%dh".printf((int) hours);
                 }
-                var minutes = diff / TimeSpan.MINUTE;
+                TimeSpan minutes = diff / TimeSpan.MINUTE;
                 if (minutes  > 0) {
                     diff -= minutes * TimeSpan.MINUTE;
                     name += "%02dm".printf((int) minutes);
                 }
-                var seconds = diff / TimeSpan.SECOND;
+                TimeSpan seconds = diff / TimeSpan.SECOND;
                 if (seconds  > 0) {
                     diff -= seconds * TimeSpan.SECOND;
                     name += "%02ds".printf((int) seconds);

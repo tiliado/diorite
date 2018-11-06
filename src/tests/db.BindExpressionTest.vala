@@ -37,14 +37,14 @@ public class BindExpressionTest: Drt.TestCase {
         var binder = new BindExpression();
         var bytes = new Bytes.take({1, 2, 3, 4});
         var byte_array = new ByteArray.take({1, 2, 3, 4});
-        var gvalue = Value(typeof(int));
+        Value gvalue = Value(typeof(int));
         gvalue.set_int(1234);
         expect_no_error(() => binder.parse(
             "WHERE name = ?s AND age = ?i AND weight = ?f AND money = ?l AND married = ?b"
             + " AND image = ?B AND key = ?A AND val = ?v",
             "John", 18, (double) 65.5, (int64) 123456, true, bytes, byte_array, gvalue),
         "binder.parse");
-        var sql = binder.get_sql();
+        string sql = binder.get_sql();
         expect_str_equals(
             "WHERE name = ? AND age = ? AND weight = ? AND money = ? AND married = ?"
             + " AND image = ? AND key = ? AND val = ?",
@@ -89,7 +89,7 @@ public class BindExpressionTest: Drt.TestCase {
     public void test_reset_ok() {
         var binder = new BindExpression();
         expect_no_error(() => binder.parse("WHERE name = ?s", "John"), "binder.parse");
-        var sql = binder.get_sql();
+        string sql = binder.get_sql();
         expect_str_equals("WHERE name = ?", sql, "sql");
         unowned SList<Value?> values = binder.get_values();
         expect_uint_equals(1, values.length(), "n values");

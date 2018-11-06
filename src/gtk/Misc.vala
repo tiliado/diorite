@@ -29,7 +29,7 @@ public uint get_gtk_version() {
 }
 
 public bool check_gtk_version(uint min, uint max) {
-    var version = get_gtk_version();
+    uint version = get_gtk_version();
     return version >= min && version < max;
 }
 

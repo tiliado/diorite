@@ -118,7 +118,7 @@ public abstract class DuplexChannel : GLib.Object {
         check_not_closed_or_error();
         MainContext ctx = MainContext.ref_thread_default();
         var loop = new MainLoop(ctx);
-        var id = queue_request(data, loop.quit, ctx);
+        uint id = queue_request(data, loop.quit, ctx);
         loop.run();
         return get_response(id);
     }
@@ -132,7 +132,7 @@ public abstract class DuplexChannel : GLib.Object {
      */
     public async ByteArray? send_request_async(ByteArray? data=null) throws GLib.Error {
         check_not_closed_or_error();
-        var ctx = MainContext.ref_thread_default();
+        MainContext ctx = MainContext.ref_thread_default();
         assert(ctx.is_owner() && 1 > 0);
         uint id = queue_request(data, (RequestCallback) send_request_async.callback, ctx);
         yield;
@@ -446,7 +446,7 @@ public abstract class DuplexChannel : GLib.Object {
         data = new ByteArray();
         uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
         unowned uint8[] buffer;
-        var bytes_to_read = (int) 2 * sizeof(uint32);
+        var bytes_to_read = (int) (2 * sizeof(uint32));
         size_t bytes_read_total = 0;
         size_t bytes_read;
         while (bytes_read_total < bytes_to_read) {
@@ -515,7 +515,7 @@ public abstract class DuplexChannel : GLib.Object {
         }
         if (found) {
             payload.timeout_id = 0;
-            var msg = "Channel (%u) Request (%u) timed out.".printf(this.id, id);
+            string msg = "Channel (%u) Request (%u) timed out.".printf(this.id, id);
             if (timeout_fatal) {
                 error(msg);
             }

@@ -190,7 +190,7 @@ public class RequirementParser {
      */
     protected void set_parse_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new RequirementError.PARSE("%d: %s", pos, error_text), pos, error_text);
         }
     }
@@ -206,7 +206,7 @@ public class RequirementParser {
      */
     protected void set_syntax_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new RequirementError.SYNTAX("%d: %s", pos, error_text), pos, error_text);
         }
     }
@@ -222,7 +222,7 @@ public class RequirementParser {
      */
     protected void set_eval_error(int pos, string text, ...) {
         if (!is_error_set()) {
-            var error_text = text.vprintf(va_list());
+            string error_text = text.vprintf(va_list());
             set_error(new RequirementError.EVAL("%d: %s", pos, error_text), pos, error_text);
         }
     }
@@ -292,7 +292,7 @@ public class RequirementParser {
             try {
                 if (patterns.match_full(data, len, pos, RegexMatchFlags.ANCHORED, out mi)) {
                     for (var i = 1; i < Toks.EOF; i++) {
-                        var result = mi.fetch(i);
+                        string? result = mi.fetch(i);
                         if (result != null && result[0] != 0) {
                             tok = (Toks) i;
                             val = (owned) result;
@@ -358,7 +358,7 @@ public class RequirementParser {
         string? parameters;
         if (peek(out tok, out parameters, null) && tok == Toks.PARAMS) {
             skip();
-            var len = parameters.length;
+            int len = parameters.length;
             if (len > 2) {
                 parameters = parameters.substring(1, len - 2);
             } else {
@@ -370,7 +370,7 @@ public class RequirementParser {
     }
 
     private RequirementState parse_call(int pos, string ident, string? parameters) {
-        var result = call(pos, ident, parameters);
+        RequirementState result = call(pos, ident, parameters);
         if (result == RequirementState.UNSUPPORTED) {
             add_failed("%s[%s]".printf(ident, parameters ?? ""));
         } else if (result == RequirementState.UNKNOWN) {

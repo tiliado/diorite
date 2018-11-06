@@ -66,8 +66,8 @@ public class RpcMethod : RpcCallable {
                     path, params.length);
             }
 
-            var params_type = Rpc.get_params_type(data);
-            var data_type = data.get_type();
+            string params_type = Rpc.get_params_type(data);
+            VariantType data_type = data.get_type();
             if (params_type == "tuple") {
                 if (!data_type.is_container() || data_type.is_subtype_of(VariantType.DICTIONARY)) {
                     throw new ApiError.INVALID_PARAMS(
@@ -82,18 +82,18 @@ public class RpcMethod : RpcCallable {
 
                 handler_params = new Variant?[params.length];
                 for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    var child = unbox_variant(data.get_child_value(i));
+                    RpcParam param = params[i];
+                    Variant? child = unbox_variant(data.get_child_value(i));
                     handler_params[i] = param.get_value(path, child);
                 }
             } else {
                 if (data.get_type_string() != "(a{smv})") {
                     Rpc.check_type_string(data, "a{smv}");
                 }
-                var dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
+                Variant dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
                 handler_params = new Variant?[params.length];
                 for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
+                    RpcParam param = params[i];
                     Variant? entry = dict.lookup_value(param.name, null);
                     if (entry == null && param.required) {
                         throw new ApiError.INVALID_PARAMS(

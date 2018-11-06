@@ -115,7 +115,7 @@ public class Storage: GLib.Object {
      * @return cache subdirectory
      */
     public File create_cache_subdir(string path) {
-        var dir = user_cache_dir.get_child(path);
+        File dir = user_cache_dir.get_child(path);
         try {
             System.make_dirs(dir);
         } catch (GLib.Error e) {
@@ -141,7 +141,7 @@ public class Storage: GLib.Object {
      * @return data subdirectory
      */
     public File create_data_subdir(string path) {
-        var dir = user_data_dir.get_child(path);
+        File dir = user_data_dir.get_child(path);
         try {
             System.make_dirs(dir);
         } catch (GLib.Error e) {
@@ -186,12 +186,12 @@ public class Storage: GLib.Object {
      * @return file instance, never null
      */
     public File require_data_file(string name) {
-        var data_file = get_data_file(name);
+        File data_file = get_data_file(name);
         if (data_file != null) {
             return data_file;
         }
 
-        var paths = user_data_dir.get_path();
+        string paths = user_data_dir.get_path();
         foreach (File dir in data_dirs()) {
             paths += ":" + dir.get_path();
         }

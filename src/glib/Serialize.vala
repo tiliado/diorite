@@ -89,7 +89,7 @@ public Variant? deserialize_variant(string type_sig, owned uint8[] buffer, uint 
     unowned uint8[] real_data = (uint8[])((uint8*)buffer + offset);
     real_data.length =  (int) (buffer.length - offset); // SIGSEGV without this!
     var type = new VariantType(type_sig);
-    var variant = Variant.new_from_data(type, real_data, trusted, (owned) buffer);
+    Variant? variant = Variant.new_from_data(type, real_data, trusted, (owned) buffer);
     return variant;
 }
 

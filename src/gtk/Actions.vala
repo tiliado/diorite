@@ -51,7 +51,7 @@ public class Actions : GLib.Object {
     }
 
     public static int append_from_menu_model(GLib.Menu menu, GLib.MenuModel model) {
-        var size = model.get_n_items();
+        int size = model.get_n_items();
         for (var i = 0; i < size; i++) {
             menu.append_item(new MenuItem.from_model(model, i));
         }
@@ -69,11 +69,11 @@ public class Actions : GLib.Object {
     }
 
     public void add_action(Action action, bool prepend=false) {
-        var group_name = action.group;
+        unowned string group_name = action.group;
         GenericArray<Action?>? group = groups[group_name];
         if (group == null) {
             group = new GenericArray<Action?>(1);
-            groups.insert((owned) group_name, group);
+            groups.insert(group_name, group);
         }
         if (prepend) {
             group.insert(0, action);
@@ -82,7 +82,7 @@ public class Actions : GLib.Object {
         }
         actions.set(action.name, action);
         action.activated.connect(on_action_activated);
-        var keybinding = action.keybinding;
+        unowned string? keybinding = action.keybinding;
         if (keybinding != null) {
             app.set_accels_for_action(
                 GLib.Action.print_detailed_name(action.scope + "." + action.name, null), {keybinding});
@@ -96,7 +96,7 @@ public class Actions : GLib.Object {
     }
 
     public void remove_action(Action action) {
-        var group_name = action.group;
+        unowned string group_name = action.group;
         GenericArray<Action?>? group = groups[group_name];
         if (group != null) {
             group.remove(action);
@@ -110,7 +110,7 @@ public class Actions : GLib.Object {
     }
 
     public bool activate_action(string name, Variant? param=null) {
-        var action = get_action(name);
+        Action? action = get_action(name);
         if (action == null) {
             return false;
         }
@@ -183,7 +183,7 @@ public class Actions : GLib.Object {
                 continue;
             }
 
-            var item = create_menu_item(full_name, use_mnemonic, use_icons);
+            MenuItem? item = create_menu_item(full_name, use_mnemonic, use_icons);
             if (item != null) {
                 menu.append_item(item);
             } else {
@@ -231,7 +231,7 @@ public class Actions : GLib.Object {
                 return null;
             }
             if (action is SimpleAction) {
-                var button = use_image && action.icon != null
+                Gtk.Button button = use_image && action.icon != null
                 ? new Gtk.Button.from_icon_name(
                     symbolic_images ? action.icon + "-symbolic" : action.icon,
                     Gtk.IconSize.SMALL_TOOLBAR)
@@ -257,7 +257,7 @@ public class Actions : GLib.Object {
     }
 
     public Gtk.Toolbar build_toolbar(string[] actions, Gtk.Toolbar? toolbar=null) {
-        var t = toolbar ?? new Gtk.Toolbar();
+        Gtk.Toolbar t = toolbar ?? new Gtk.Toolbar();
         foreach (var full_name in actions) {
             if (full_name == "|") {
                 var item = new Gtk.SeparatorToolItem();
@@ -308,8 +308,8 @@ public class Actions : GLib.Object {
     }
 
     public void add_to_map_by_name(string[] names, ActionMap map) {
-        foreach (var name in names) {
-            var action = actions.get(name);
+        foreach (unowned string name in names) {
+            Action action = actions.get(name);
             if (action != null) {
                 action.add_to_map(map);
             }
@@ -330,10 +330,10 @@ public class Actions : GLib.Object {
         }
 
         if (p.name == "keybinding") {
-            var full_name = action.scope + "." + action.name;
-            var accel_name = "<GAction>/" + full_name;
-            var keybinding = action.keybinding;
-            var found = Gtk.AccelMap.lookup_entry(accel_name, null);
+            string full_name = action.scope + "." + action.name;
+            string accel_name = "<GAction>/" + full_name;
+            unowned string? keybinding = action.keybinding;
+            bool found = Gtk.AccelMap.lookup_entry(accel_name, null);
             if (!found && keybinding != null) {
                 app.set_accels_for_action(GLib.Action.print_detailed_name(full_name, null), {keybinding});
             } else if (found) {
@@ -355,7 +355,7 @@ public class Actions : GLib.Object {
     }
 
     public static string parse_full_name(string full_name, out int option) {
-        var i = full_name.index_of("::");
+        int i = full_name.index_of("::");
         if (i == -1) {
             option = -1;
             return full_name;

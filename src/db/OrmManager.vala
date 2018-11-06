@@ -69,12 +69,12 @@ public class OrmManager : GLib.Object {
      * @see OrmManager.add_object_spec
      */
     public T? create_object<T>(Result result) throws DatabaseError {
-        var type = typeof(T);
+        Type type = typeof(T);
         if (!type.is_object()) {
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         }
 
-        var object_spec = get_object_spec(type);
+        ObjectSpec? object_spec = get_object_spec(type);
         if (object_spec == null) {
             throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
         }
@@ -82,12 +82,12 @@ public class OrmManager : GLib.Object {
         Value[] parameters = {};
         string[] names = {};
         foreach (var property in object_spec.properties) {
-            var index = result.get_column_index(property.name);
+            int index = result.get_column_index(property.name);
             if (index < 0) {
                 throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
             }
 
-            var value = result.fetch_value_of_type(index, property.value_type);
+            GLib.Value? value = result.fetch_value_of_type(index, property.value_type);
             if (value == null) {
                 value = GLib.Value(property.value_type);
             }
@@ -105,19 +105,19 @@ public class OrmManager : GLib.Object {
      * @throws DatabaseError if corresponding {@link ObjectSpec} is not found
      */
     public void fill_object(GLib.Object object, Result result) throws DatabaseError {
-        var type = object.get_type();
-        var object_spec = get_object_spec(type);
+        Type type = object.get_type();
+        ObjectSpec? object_spec = get_object_spec(type);
         if (object_spec == null) {
             throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
         }
 
         foreach (var property in object_spec.properties) {
-            var index = result.get_column_index(property.name);
+            int index = result.get_column_index(property.name);
             if (index < 0) {
                 throw new DatabaseError.NAME("There is no column named '%s'.", property.name);
             }
 
-            var value = result.fetch_value_of_type(index, property.value_type);
+            GLib.Value? value = result.fetch_value_of_type(index, property.value_type);
             if (value == null) {
                 value = GLib.Value(property.value_type);
             }
@@ -126,7 +126,7 @@ public class OrmManager : GLib.Object {
             && (property.flags & ParamFlags.CONSTRUCT_ONLY) == 0) {
                 object.set_property(property.name, value);
             } else if ((property.flags & ParamFlags.READABLE) != 0) {
-                var current_value = GLib.Value(property.value_type);
+                GLib.Value current_value = GLib.Value(property.value_type);
                 object.get_property(property.name, ref current_value);
                 if (!Drt.Value.equal(current_value, value)) {
                     throw new DatabaseError.MISMATCH("Read-only value of property '%s' doesn't match database data.", property.name);

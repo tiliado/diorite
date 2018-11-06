@@ -163,20 +163,20 @@ public class Connection: GLib.Object, Queryable {
     public ObjectQuery<T> query_objects_va<T>(Cancellable? cancellable, string? filter, va_list args)
     throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-        var type = typeof(T);
+        Type type = typeof(T);
         if (!type.is_object()) {
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         }
 
-        var object_spec = orm.get_object_spec(type);
+        ObjectSpec? object_spec = orm.get_object_spec(type);
         if (object_spec == null) {
             throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
         }
         unowned (unowned ParamSpec)[] param_specs = object_spec.properties;
         var sql = new StringBuilder("SELECT");
-        var table_name_escaped = escape_sql_id(object_spec.table_name);
+        string table_name_escaped = escape_sql_id(object_spec.table_name);
         for (var i = 0; i <  param_specs.length; i++) {
-            var param = param_specs[i];
+            unowned ParamSpec param = param_specs[i];
             if (param.value_type == typeof(void*) || !is_type_supported(param.value_type)) {
                 throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", param.value_type.name());
             }
@@ -199,7 +199,7 @@ public class Connection: GLib.Object, Queryable {
             bind_expr.parse_va(filter, args);
             sql.append(bind_expr.get_sql());
         }
-        var query = this.query(sql.str, cancellable);
+        Query query = this.query(sql.str, cancellable);
         if (bind_expr != null) {
             query.bind_values(1, bind_expr.get_values());
         }
@@ -218,21 +218,21 @@ public class Connection: GLib.Object, Queryable {
     public T get_object<T>(GLib.Value pk, Cancellable? cancellable=null)
     throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-        var type = typeof(T);
+        Type type = typeof(T);
         if (!type.is_object()) {
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         }
 
-        var object_spec = orm.get_object_spec(type);
+        ObjectSpec? object_spec = orm.get_object_spec(type);
         if (object_spec == null) {
             throw new DatabaseError.DATA_TYPE("ObjectSpec for %s has not been found.", type.name());
         }
 
         /* Full qualified column name with table name are used because SQLite treat non-existent
          * column names in quotes as string literals otherwise. */
-        var table_escaped = escape_sql_id(object_spec.table_name);
-        var column_escaped = escape_sql_id(object_spec.primary_key.name);
-        var query = query_objects<T>(
+        string table_escaped = escape_sql_id(object_spec.table_name);
+        string column_escaped = escape_sql_id(object_spec.primary_key.name);
+        ObjectQuery<T> query = query_objects<T>(
             cancellable, "WHERE \"%s\".\"%s\" == ?v".printf(table_escaped, column_escaped), pk);
         return query.get_one(cancellable);
     }

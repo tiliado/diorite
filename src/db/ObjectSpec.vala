@@ -46,7 +46,7 @@ public class ObjectSpec {
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         }
         var class_spec = (ObjectClass) type.class_ref();
-        var primary_pspec = class_spec.find_property(primary_key);
+        unowned ParamSpec? primary_pspec = class_spec.find_property(primary_key);
         if (primary_pspec == null) {
             throw new DatabaseError.NAME("There is no property named '%s'.", primary_key);
         }

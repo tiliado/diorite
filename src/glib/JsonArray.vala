@@ -51,7 +51,7 @@ public class JsonArray: JsonNode {
         if (index == nodes.length) {
             nodes.append_val(node);
         } else {
-            var current = get(index);
+            unowned JsonNode? current = get(index);
             if (current != null) {
                 current.parent = null;
             }
@@ -105,7 +105,7 @@ public class JsonArray: JsonNode {
      * @param index    index to remove node at
      */
     public void remove_at(uint index) {
-        var node = get(index);
+        unowned JsonNode? node = get(index);
         return_if_fail(node != null);
         nodes.remove_index(index);
         node.parent = null;
@@ -134,7 +134,7 @@ public class JsonArray: JsonNode {
      * @return `true` if the node if it has been found and so the `index` is valid
      */
     public bool index(JsonNode node, out uint index) {
-        var len = length;
+        uint len = length;
         for (var i = 0U; i < len; i++) {
             if (get(i) == node) {
                 index = i;
@@ -184,12 +184,12 @@ public class JsonArray: JsonNode {
      */
     public unowned JsonNode? dotget(string path) {
         return_val_if_fail(path[0] != '\0', null);
-        var dot = path.index_of_char('.');
+        int dot = path.index_of_char('.');
         return_val_if_fail(dot != 0, null);
-        var index_str = dot < 0 ? path : path.substring(0, dot);
-        var len = index_str.length;
+        string index_str = dot < 0 ? path : path.substring(0, dot);
+        int len = index_str.length;
         for (var i = 0; i < len; i++) {
-            var c = index_str.data[i];
+            uint8 c = index_str.data[i];
             if (c < '0' || c > '9') {
                 return null;
             }
@@ -394,7 +394,7 @@ public class JsonArray: JsonNode {
      */
     public bool as_bool_array(out bool[] result) {
         result = null;
-        var size = this.length;
+        uint size = this.length;
         var array = new bool[size];
         for (uint i = 0; i < size; i++) {
             bool val;
@@ -417,7 +417,7 @@ public class JsonArray: JsonNode {
      */
     public bool as_int_array(out int[] result) {
         result = null;
-        var size = this.length;
+        uint size = this.length;
         var array = new int[size];
         for (uint i = 0; i < size; i++) {
             int val;
@@ -440,7 +440,7 @@ public class JsonArray: JsonNode {
      */
     public bool as_double_array(out double[] result) {
         result = null;
-        var size = this.length;
+        uint size = this.length;
         var array = new double[size];
         for (uint i = 0; i < size; i++) {
             double val;
@@ -463,7 +463,7 @@ public class JsonArray: JsonNode {
      */
     public bool as_string_array(out string[] result) {
         result = null;
-        var size = this.length;
+        uint size = this.length;
         var array = new string[size];
         for (uint i = 0; i < size; i++) {
             string? val;
@@ -533,13 +533,13 @@ public class JsonArray: JsonNode {
      * @param level      An initial indentation level.
      */
     public void dump_to_buffer(StringBuilder buffer, string? indent, bool compact, uint level=0) {
-        var nl = !String.is_empty(indent);
-        var item_sep = (nl || compact) ? "," : ", ";
+        bool nl = !String.is_empty(indent);
+        unowned string item_sep = (nl || compact) ? "," : ", ";
         buffer.append_c('[');
         if (nl) {
             buffer.append_c('\n');
         }
-        var size = this.length;
+        uint size = this.length;
         for (uint i = 0; i < size; i++) {
             if (nl) {
                 for (var j = 0; j <= level; j++) {

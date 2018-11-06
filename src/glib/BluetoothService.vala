@@ -94,7 +94,7 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
     }
 
     ~BluetoothProfile1() {
-        var devices = sockets.get_keys();
+        List<unowned ObjectPath> devices = sockets.get_keys();
         foreach (unowned ObjectPath device in devices) {
             try {
                 request_disconnection(device);
@@ -108,8 +108,8 @@ private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
     }
 
     public void new_connection(ObjectPath device, GLib.Socket fd, HashTable<string, Variant> fd_properties) throws GLib.Error {
-        var parts = device.split("/");
-        var address = parts.length == 5
+        string[] parts = device.split("/");
+        string address = parts.length == 5
         ? "%s/%s".printf(parts[3], parts[4].substring(4).replace("_", ":")) : device;
         debug("New bluetooth connection from %s (%d).", address, fd.fd);
         GenericArray<GLib.Socket>? device_sockets = sockets[device];

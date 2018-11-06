@@ -126,7 +126,7 @@ public class PropertyBinding {
         if (property.value_type == typeof(string)) {
             string? str_value = null;
             object.get(property.name, &str_value, null);
-            var new_str_value = storage.get_string(key);
+            string? new_str_value = storage.get_string(key);
             if (str_value != new_str_value) {
                 object.set(property.name, new_str_value, null);
                 result = true;
@@ -134,7 +134,7 @@ public class PropertyBinding {
         } else if (property.value_type == typeof(bool)) {
             bool value = false;
             object.get(property.name, &value, null);
-            var new_value = storage.get_bool(key);
+            bool new_value = storage.get_bool(key);
             if (value != new_value) {
                 object.set(property.name, new_value, null);
                 result = true;

@@ -108,7 +108,7 @@ public class JsonParser {
         JsonNode? root = null;
         parse_one(out root);
         skip_whitespace();
-        var c = get_char();
+        char c = get_char();
         if (c != 0) {
             throw new JsonError.EXTRA_DATA(
                 "%u:%u Extra data has been found after a parsed JSON document. The first character is '%c'.",
@@ -121,7 +121,7 @@ public class JsonParser {
     }
 
     private char get_char() {
-        var c = data < data_end ? *(data++) : 0;
+        char c = data < data_end ? *(data++) : 0;
         if (c == '\n') {
             line++;
             column = 0;
@@ -132,7 +132,7 @@ public class JsonParser {
     }
 
     private char peek_char(uint offset=0) {
-        var pos = data + offset;
+        char* pos = data + offset;
         return pos >= data && pos < data_end ? *pos : 0;
     }
 
@@ -161,7 +161,7 @@ public class JsonParser {
     private void parse_one(out JsonNode node) throws JsonError {
         node = null;
         skip_whitespace();
-        var c = peek_char();
+        char c = peek_char();
         switch (c) {
         case '{':
             get_char();
@@ -212,10 +212,10 @@ public class JsonParser {
 
     private void parse_keyword(string keyword, out JsonValue node) throws JsonError {
         node = null;
-        var len = keyword.data.length;
+        int len = keyword.data.length;
         unowned uint8[] buf = keyword.data;
         for (var i = 0; i < len; i++) {
-            var c = get_char();
+            char c = get_char();
             if (c == '\0') {
                 throw new JsonError.PARSE_ERROR(
                     "%u:%u Unexpected end of data. The '%c' character of '%s' expected.",
@@ -338,7 +338,7 @@ public class JsonParser {
         object = new JsonObject();
         /* Look for the end of the object */
         skip_whitespace();
-        var c = peek_char();
+        char c = peek_char();
         switch (c) {
         case '\0':
             throw new JsonError.PARSE_ERROR(
@@ -436,7 +436,7 @@ public class JsonParser {
 
             /* Look for a comma or the end of the array */
             skip_whitespace();
-            var c = get_char();
+            char c = get_char();
             switch (c) {
             case '\0':
                 throw new JsonError.PARSE_ERROR(
@@ -478,7 +478,7 @@ public class JsonParser {
     }
 
     private void parse_escape_sequence(StringBuilder buf) throws JsonError {
-        var c = get_char();
+        char c = get_char();
         switch (c) {
         case '\0':
             throw new JsonError.PARSE_ERROR(
@@ -548,7 +548,7 @@ public class JsonParser {
     private unichar parse_unichar() {
         unichar u = 0;
         for (var i = 0; i < 4; i++) {
-            var c = get_char();
+            char c = get_char();
             if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
                 u += ((unichar) (c <= '9' ? c - '0' : (c & 7) + 9) << ((3 - i) * 4));
             } else {

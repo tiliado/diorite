@@ -112,7 +112,7 @@ public class RichTextView: Gtk.TextView {
         if (!get_style_context().lookup_color("link-color", out link_color)
         && !get_style_context().lookup_color("link_color", out link_color)) {
             link_color = null;  // Clear link color
-            var prop = find_style_property("link-color");
+            unowned ParamSpec prop = find_style_property("link-color");
             if (prop != null) {
                 unowned Gdk.Color? color = null;
                 style_get("link-color", out color);
@@ -128,7 +128,7 @@ public class RichTextView: Gtk.TextView {
     }
 
     public override bool button_release_event(Gdk.EventButton event) {
-        var cont = base.button_release_event(event);
+        bool cont = base.button_release_event(event);
         if (event.button == 1) {
             int x, y;
             window_to_buffer_coords(Gtk.TextWindowType.TEXT, (int) event.x, (int) event.y, out x, out y);
@@ -136,9 +136,9 @@ public class RichTextView: Gtk.TextView {
             if (get_link_at_pos(x, y, out link)) {
                 link_clicked(link.uri);
             } else {
-                var pixbuf = get_pixbuf_at_pos(x, y);
+                Gdk.Pixbuf? pixbuf = get_pixbuf_at_pos(x, y);
                 if (pixbuf != null) {
-                    var path = pixbuf.get_data<string?>(RichTextBuffer.IMAGE_PATH);
+                    unowned string? path = pixbuf.get_data<unowned string?>(RichTextBuffer.IMAGE_PATH);
                     if (path != null) {
                         image_clicked(path);
                     }
@@ -195,7 +195,7 @@ public class RichTextView: Gtk.TextView {
     public Gdk.Pixbuf? get_pixbuf_at_pos(int x, int y) {
         Gtk.TextIter iter;
         get_iter_at_location(out iter, x, y);
-        var pixbuf = iter.get_pixbuf();
+        Gdk.Pixbuf? pixbuf = iter.get_pixbuf();
         if (pixbuf != null && is_in_iter_area(iter, x, y)) {
             return pixbuf;
         }
@@ -214,7 +214,7 @@ public class RichTextView: Gtk.TextView {
     }
 
     public override bool motion_notify_event(Gdk.EventMotion event) {
-        var cont = base.motion_notify_event(event);
+        bool cont = base.motion_notify_event(event);
         int x, y;
         window_to_buffer_coords(Gtk.TextWindowType.TEXT, (int) event.x, (int) event.y, out x, out y);
         update_cursor(x, y);
@@ -222,7 +222,7 @@ public class RichTextView: Gtk.TextView {
     }
 
     private void update_cursor(int x, int y) {
-        var display = get_display();
+        unowned Gdk.Display display = get_display();
         Gdk.Cursor cursor = get_link_at_pos(x, y, null) || get_pixbuf_at_pos(x, y) != null
         ? new Gdk.Cursor.for_display(display, Gdk.CursorType.HAND2) : null;
 

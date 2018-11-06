@@ -86,9 +86,9 @@ public class RpcChannel: RpcConnection {
      */
     public override async Variant? call_full(string method, Variant? parameters, bool allow_private, string flags)
     throws GLib.Error {
-        var method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
-        var request = serialize_request(method_full, parameters);
-        var response = yield channel.send_request_async(request);
+        string method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
+        ByteArray? request = serialize_request(method_full, parameters);
+        ByteArray? response = yield channel.send_request_async(request);
         return deserialize_response((owned) response);
     }
 
@@ -104,9 +104,9 @@ public class RpcChannel: RpcConnection {
      */
     public override Variant? call_full_sync(string method, Variant? parameters, bool allow_private, string flags)
     throws GLib.Error {
-        var method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
-        var request = serialize_request(method_full, parameters);
-        var response = channel.send_request(request);
+        string? method_full = create_full_method_name(method, allow_private, flags, Rpc.get_params_type(parameters));
+        ByteArray? request = serialize_request(method_full, parameters);
+        ByteArray? response = channel.send_request(request);
         return deserialize_response((owned) response);
     }
 
@@ -138,8 +138,8 @@ public class RpcChannel: RpcConnection {
      * @param response    Response data.
      */
     protected void send_response(uint id, string status, Variant? response) {
-        var buffer = serialize_message(status, response, 0);
-        var payload = new ByteArray.take((owned) buffer);
+        uint8[] buffer = serialize_message(status, response, 0);
+        ByteArray payload = new ByteArray.take((owned) buffer);
         try {
             channel.send_response(id, payload);
         } catch (GLib.Error e) {
@@ -159,7 +159,7 @@ public class RpcChannel: RpcConnection {
             debug("Channel(%u) Request: %s => %s",
                 channel.id, name, parameters != null ? parameters.print(false) : "null");
         }
-        var buffer = serialize_message(name, parameters, 0);
+        uint8[] buffer = serialize_message(name, parameters, 0);
         return new ByteArray.take((owned) buffer);
     }
 
@@ -171,8 +171,8 @@ public class RpcChannel: RpcConnection {
      * @throws GLib.Error on failure.
      */
     private Variant? deserialize_response(owned ByteArray? data) throws GLib.Error {
-        var bytes = ByteArray.free_to_bytes((owned) data);
-        var buffer = Bytes.unref_to_data((owned) bytes);
+        Bytes bytes = ByteArray.free_to_bytes((owned) data);
+        uint8[] buffer = Bytes.unref_to_data((owned) bytes);
         string? label = null;
         Variant? parameters = null;
         if (!deserialize_message((owned) buffer, out label, out parameters, 0)) {
@@ -189,7 +189,7 @@ public class RpcChannel: RpcConnection {
             if (parameters == null) {
                 throw new RpcError.INVALID_RESPONSE("Server returned empty error.");
             }
-            var e = deserialize_error(parameters);
+            GLib.Error? e = deserialize_error(parameters);
             if (e == null) {
                 throw new RpcError.UNKNOWN("Server returned unknown error.");
             }
@@ -226,8 +226,8 @@ public class RpcChannel: RpcConnection {
     private void on_incoming_request(uint id, owned ByteArray? data) {
         string? name = null;
         Variant? parameters = null;
-        var bytes = ByteArray.free_to_bytes((owned) data);
-        var buffer = Bytes.unref_to_data((owned) bytes);
+        Bytes bytes = ByteArray.free_to_bytes((owned) data);
+        uint8[] buffer = Bytes.unref_to_data((owned) bytes);
         if (!deserialize_message((owned) buffer, out name, out parameters, 0)) {
             warning("Server sent invalid request. Cannot deserialize message.");
             return;

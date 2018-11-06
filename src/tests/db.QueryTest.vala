@@ -77,7 +77,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_int() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 try {
                     q.bind(index, 1);
@@ -112,7 +112,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_int64() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 int64 val = 2 * ((int64) int32.MAX);
                 try {
@@ -148,7 +148,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_double() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 double val = 3.14;
                 try {
@@ -184,7 +184,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_string() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 string val = "Hello!";
                 try {
@@ -220,7 +220,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_bool() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 try {
                     q.bind(index, true);
@@ -255,7 +255,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_null() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 try {
                     q.bind(index, null);
@@ -287,11 +287,11 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_void() {
         try {
-            var void_null = GLib.Value(typeof(void*)), void_non_null = GLib.Value(typeof(void*));
+            Value void_null = GLib.Value(typeof(void*)), void_non_null = GLib.Value(typeof(void*));
             void_null.set_pointer(null);
             void_non_null.set_pointer(this);
 
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 try {
                     q.bind(index, void_null);
@@ -338,7 +338,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_blob() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 uint8[] val = "Hello!".data;
                 try {
@@ -350,7 +350,7 @@ public class QueryTest : Drt.TestCase {
             }
 
             for (var j = 0; j < 100; j++) {
-                var value = rand_blob();
+                uint8[] value = rand_blob();
                 try {
                     q.bind_blob(1, value);
                 } catch (GLib.Error e) {
@@ -366,7 +366,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_bytes() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 GLib.Bytes val = new GLib.Bytes.take("Hello!".data);
                 try {
@@ -407,7 +407,7 @@ public class QueryTest : Drt.TestCase {
 
     public void test_bind_byte_array() {
         try {
-            var q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
+            Query? q = query("SELECT name FROM %s WHERE id = ? and age < ?".printf(TABLE_USERS_NAME));
             foreach (int index in new int[] {int.MIN, -2, -1, 0, 3, 4, int.MAX}) {
                 GLib.ByteArray val = new GLib.ByteArray.take("Hello!".data);
                 try {

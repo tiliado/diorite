@@ -101,9 +101,9 @@ public abstract class Application : Gtk.Application {
             }
         }
         try {
-            var reference_window = active_window;
+            Gtk.Window? reference_window = active_window;
             if (reference_window != null) {
-                var toplevels = Gtk.Window.list_toplevels();
+                List<unowned Gtk.Window> toplevels = Gtk.Window.list_toplevels();
                 foreach (var toplevel in toplevels) {
                     if (toplevel.visible && active_window == toplevel.get_transient_for()) {
                         /* Do not show XDG Desktop Portal web browser selector under a dialog. */
@@ -148,7 +148,7 @@ public abstract class Application : Gtk.Application {
         base.startup();
 
         /* Use this enviroment variable only for debugging purposes */
-        var gui_mode = Environment.get_variable("DIORITE_GUI_MODE");
+        unowned string? gui_mode = Environment.get_variable("DIORITE_GUI_MODE");
         if (gui_mode != null) {
             switch (gui_mode) {
             case "unity":
@@ -186,7 +186,7 @@ public abstract class Application : Gtk.Application {
             default_menubar.remove_all();
         }
         menubar_app_submenu = null;
-        var unity = shell.shows_app_menu && shell.shows_menu_bar;
+        bool unity = shell.shows_app_menu && shell.shows_menu_bar;
         if (!unity && shell.app_menu != null) {
             menubar_app_submenu = Actions.copy_menu_model(shell.app_menu);
             default_menubar.append_submenu("_App", menubar_app_submenu);
@@ -209,7 +209,7 @@ public abstract class Application : Gtk.Application {
 
     private static void terminate_handler(int sig_num, Posix.siginfo_t info, void* data) {
         var sig_pid = (int) info.si_pid;
-        var cmdline = System.get_cmdline_for_pid(sig_pid);
+        string cmdline = System.get_cmdline_for_pid(sig_pid);
         if (sig_num == Posix.Signal.TERM && sig_pid == Posix.getpid()) {
             warning("Ignoring signal %d from PID %d (%s).", sig_num, sig_pid, cmdline);
         } else {

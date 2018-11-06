@@ -56,7 +56,7 @@ public class Query : GLib.Object {
      * @throws DatabaseError when operation fails
      */
     public Result exec(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
-        var result = get_result();
+        Result result = get_result();
         result.next(cancellable);
         return result;
     }
@@ -108,7 +108,7 @@ public class Query : GLib.Object {
      * @throws DatabaseError when provided data type is not supported or operation fails
      */
     public Query bind_values(int index, SList<Value?> values) throws DatabaseError {
-        var len = values.length();
+        uint len = values.length();
         for (var i = 0; i < len; i++) {
             bind(index + i, values.data);
             values = values.next;
@@ -128,7 +128,7 @@ public class Query : GLib.Object {
         if (value == null) {
             return bind_null(index);
         }
-        var type = value.type();
+        Type type = value.type();
         if (type == typeof(bool)) {
             return bind_bool(index, value.get_boolean());
         }

@@ -122,7 +122,7 @@ public SList<string> array_to_slist(string[] array, bool strip=false) {
         if (!strip) {
             result.prepend(item);
         } else if (!is_empty(item)) {
-            var stripped_item = item.strip();
+            string stripped_item = item.strip();
             if (!is_empty(stripped_item)) {
                 result.prepend((owned) stripped_item);
             }
@@ -141,7 +141,7 @@ public SList<string> array_to_slist(string[] array, bool strip=false) {
 public GenericSet<string> semicolon_separated_set(string? dataset, bool lowercase) {
     var result = new GenericSet<string>(str_hash, str_equal);
     if (!is_empty(dataset)) {
-        var items = dataset.split(";");
+        string[] items = dataset.split(";");
         foreach (var item in items) {
             item = item.strip();
             if (item[0] != 0) {
@@ -163,11 +163,11 @@ public int last_index_of_char(string str, unichar c, int start_index = 0, ssize_
 }
 
 public string? unmask(uint8[] data) {
-    var length = data.length;
+    int length = data.length;
     if (length < 2) {
         return null;
     }
-    var shift = data[0];
+    uint8 shift = data[0];
     var result = new uint8[length];
     for (var i = 1; i < length; i++) {
         if (shift > data[i]) {

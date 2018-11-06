@@ -37,10 +37,10 @@ public bool variant_equal(Variant? a, Variant? b) {
 public string[] variant_to_strv(Variant variant) {
     string[] result;
     if (variant.is_container() && variant.n_children() > 0) {
-        var size = variant.n_children();
+        size_t size = variant.n_children();
         result = new string[size];
         for (size_t i = 0; i < size; i++) {
-            var child = variant.get_child_value(i);
+            Variant child = variant.get_child_value(i);
             string? str;
             if (!variant_string(child, out str) || str == null) {
                 warning("Wrong child type %s: %s", child.get_type_string(), child.print(true));
@@ -61,11 +61,10 @@ public string[] variant_to_strv(Variant variant) {
 public Variant[] variant_to_array(Variant variant) {
     Variant[] result;
     if (variant.is_container() && variant.n_children() > 0) {
-
-        var size = variant.n_children();
+        size_t size = variant.n_children();
         result = new Variant[size];
         for (size_t i = 0; i < size; i++) {
-            var val = variant.get_child_value(i);
+            Variant val = variant.get_child_value(i);
             if (val.is_of_type(VariantType.VARIANT)) {
                 val = val.get_variant();
             }
@@ -80,7 +79,7 @@ public Variant[] variant_to_array(Variant variant) {
 public HashTable<string, Variant> variant_to_hashtable(Variant? variant) {
     var result = new HashTable<string, Variant>(str_hash, str_equal);
     if (variant != null && variant.is_of_type(VariantType.DICTIONARY)) {
-        var iter = variant.iterator();
+        VariantIter iter = variant.iterator();
         Variant? val = null;
         string? key = null;
         while (iter.next("{s*}", &key, &val)) {
@@ -160,7 +159,7 @@ public bool variant_bool(Variant? variant, ref bool result) {
 }
 
 public static string? variant_dict_str(Variant dict, string key) {
-    var val = dict.lookup_value(key, null);
+    Variant val = dict.lookup_value(key, null);
     if (val == null) {
         return null;
     }
@@ -182,7 +181,7 @@ public static string? variant_dict_str(Variant dict, string key) {
 }
 
 public static double variant_dict_double(Variant dict, string key, double default_value) {
-    var val = dict.lookup_value(key, null);
+    Variant? val = dict.lookup_value(key, null);
     if (val == null) {
         return default_value;
     }
@@ -237,7 +236,7 @@ public Variant? unbox_variant(Variant? value) {
  * @return actual boolean value if the value is of type boolean, false otherwise
  */
 public bool variant_to_bool(Variant? value) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN)) {
         return unboxed.get_boolean();
     }
@@ -251,7 +250,7 @@ public bool variant_to_bool(Variant? value) {
  * @return actual int64 value if the value is of type int64, zero otherwise
  */
 public int64 variant_to_int64(Variant? value) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null && unboxed.is_of_type(VariantType.INT64)) {
         return unboxed.get_int64();
     }
@@ -265,7 +264,7 @@ public int64 variant_to_int64(Variant? value) {
  * @return actual int value if the value is of type int, zero otherwise
  */
 public int variant_to_int(Variant? value) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null && unboxed.is_of_type(VariantType.INT32)) {
         return (int) unboxed.get_int32();
     }
@@ -282,7 +281,7 @@ public int variant_to_int(Variant? value) {
  * @return actual uint value if the value is of type uint, zero otherwise
  */
 public uint variant_to_uint(Variant? value) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null && unboxed.is_of_type(VariantType.UINT32)) {
         return (uint) unboxed.get_uint32();
     }
@@ -299,7 +298,7 @@ public uint variant_to_uint(Variant? value) {
  * @return actual double value if the value is of type double or int64, 0.0 otherwise
  */
 public double variant_to_double(Variant? value) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null) {
         if (unboxed.is_of_type(VariantType.DOUBLE)) {
             return unboxed.get_double();
@@ -320,7 +319,7 @@ public double variant_to_double(Variant? value) {
  * @return actual string value if the value is of type string, default value otherwise
  */
 public string? variant_to_string(Variant? value, string? default_val=null) {
-    var unboxed = unbox_variant(value);
+    Variant? unboxed = unbox_variant(value);
     if (unboxed != null && unboxed.is_of_type(VariantType.STRING)) {
         return unboxed.get_string();
     }
@@ -368,9 +367,9 @@ public Variant? strv_to_variant_dict(string[]? args, int offset=0) {
     }
 
     var builder = new VariantBuilder(new VariantType("a{smv}"));
-    for (var i = offset; i < args.length; i++) {
-        var arg = args[i];
-        var arg_parts = arg.split("=", 2);
+    for (int i = offset; i < args.length; i++) {
+        unowned string arg = args[i];
+        string[] arg_parts = arg.split("=", 2);
         unowned string? key = arg_parts[0];
         unowned string? value = arg_parts.length == 2 ? arg_parts[1] : null;
         variant_dict_add_param(builder, key, value);
@@ -399,7 +398,7 @@ public Variant? str_table_to_variant_dict(HashTable<string, string>? args) {
     }
 
     var builder = new VariantBuilder(new VariantType("a{smv}"));
-    var iter = HashTableIter<string, string>(args);
+    HashTableIter<string, string> iter = HashTableIter<string, string>(args);
     unowned string key;
     unowned string value;
     while (iter.next(out key, out value)) {
@@ -412,7 +411,7 @@ private void variant_dict_add_param(VariantBuilder dict_builder, string key, str
     string param_type;
     string param_key;
     Variant? param_value = null;
-    var parts = key.split(":", 2);
+    string[] parts = key.split(":", 2);
     if (parts.length < 2) {
         param_type = "s";
         param_key = key;

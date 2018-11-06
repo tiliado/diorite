@@ -64,7 +64,7 @@ public class KeyValueTree: KeyValueStorage {
     public override void unset(string key) {
         unowned Node<Item?> node = nodes[key];
         if (node != null && node.data != null && node.data.value_set) {
-            var old_value = node.data.value;
+            Variant? old_value = node.data.value;
             node.data.unset();
             changed(key, old_value);
         }
@@ -91,7 +91,7 @@ public class KeyValueTree: KeyValueStorage {
             return node;
         }
 
-        var index = key.last_index_of_char('.');
+        int index = key.last_index_of_char('.');
         unowned Node<Item?> parent = index > 0 ? get_or_create_node(key.substring(0, index)) : root;
         return create_child_node(parent, key, key.substring(index + 1));
     }
@@ -107,7 +107,7 @@ public class KeyValueTree: KeyValueStorage {
     protected override void set_value_unboxed(string key, Variant? value) {
         unowned Node<Item?> node = get_or_create_node(key);
         return_if_fail(node.data != null);
-        var old_value = node.data.get();
+        Variant? old_value = node.data.get();
         node.data.set(value);
 
         if (old_value != value && (old_value == null || value == null || !old_value.equal(value))) {
@@ -123,9 +123,9 @@ public class KeyValueTree: KeyValueStorage {
     protected override void set_default_value_unboxed(string key, Variant? value) {
         unowned Node<Item?> node = get_or_create_node(key);
         return_if_fail(node.data != null);
-        var old_value = node.data.get();
+        Variant? old_value = node.data.get();
         node.data.default_value = value;
-        var new_value = node.data.get();
+        Variant? new_value = node.data.get();
 
         if (old_value != new_value
         && (old_value == null || new_value == null || !old_value.equal(new_value))) {
@@ -190,12 +190,12 @@ public class KeyValueTree: KeyValueStorage {
 
             unowned Item? item = node.data;
             if (item != null) {
-                var indent = node.depth() - 2;
+                uint indent = node.depth() - 2;
                 if (indent > 0) {
                     buffer.append(string.nfill(space_len * indent, ' '));
                 }
                 buffer.append(bullet);
-                var value = item.get();
+                Variant? value = item.get();
                 buffer.append_printf("%s: %s\n", item.name, value != null ? value.print(false) : "(null)");
             }
             return false;

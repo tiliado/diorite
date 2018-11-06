@@ -115,46 +115,46 @@ public class KeyValueStorageServer: GLib.Object {
     }
 
     private void handle_add_listener(Drt.RpcRequest request) throws RpcError {
-        var provider_name = request.pop_string();
+        string? provider_name = request.pop_string();
         request.respond(new Variant.boolean(add_listener(provider_name, request.connection)));
     }
 
     private void handle_remove_listener(Drt.RpcRequest request) throws RpcError {
-        var provider_name = request.pop_string();
+        string? provider_name = request.pop_string();
         request.respond(new Variant.boolean(remove_listener(provider_name, request.connection)));
     }
 
     private void handle_has_key(Drt.RpcRequest request) throws RpcError {
-        var name = request.pop_string();
-        var key = request.pop_string();
+        string? name = request.pop_string();
+        string? key = request.pop_string();
         request.respond(new Variant.boolean(get_provider(name).storage.has_key(key)));
     }
 
     private void handle_get_value(Drt.RpcRequest request) throws RpcError {
-        var name = request.pop_string();
-        var key = request.pop_string();
+        string? name = request.pop_string();
+        string? key = request.pop_string();
         request.respond(get_provider(name).storage.get_value(key));
     }
 
     private void handle_set_value(Drt.RpcRequest request) throws RpcError {
-        var name = request.pop_string();
-        var key = request.pop_string();
-        var value = request.pop_variant();
+        string? name = request.pop_string();
+        string? key = request.pop_string();
+        Variant? value = request.pop_variant();
         get_provider(name).storage.set_value(key, value);
         request.respond(null);
     }
 
     private void handle_unset(Drt.RpcRequest request) throws RpcError {
-        var name = request.pop_string();
-        var key = request.pop_string();
+        string? name = request.pop_string();
+        string? key = request.pop_string();
         get_provider(name).storage.unset(key);
         request.respond(null);
     }
 
     private void handle_set_default_value(Drt.RpcRequest request) throws RpcError {
-        var name = request.pop_string();
-        var key = request.pop_string();
-        var value = request.pop_variant();
+        string? name = request.pop_string();
+        string? key = request.pop_string();
+        Variant? value = request.pop_variant();
         get_provider(name).storage.set_default_value(key, value);
         request.respond(null);
     }
@@ -173,9 +173,9 @@ public class KeyValueStorageServer: GLib.Object {
         }
 
         private void on_changed(string key, Variant? old_value) {
-            foreach (var listener in listeners) {
+            foreach (Drt.RpcConnection listener in listeners) {
                 try {
-                    var response = listener.call_sync(METHOD_CHANGED,
+                    Variant? response = listener.call_sync(METHOD_CHANGED,
                         new Variant("(ssmv)", name, key, old_value));
                     if (response == null
                     || !response.is_of_type(VariantType.BOOLEAN)

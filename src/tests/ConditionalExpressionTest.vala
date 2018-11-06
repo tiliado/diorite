@@ -55,7 +55,7 @@ public class ConditionalExpressionTest: Drt.TestCase {
         };
         var expr = new ConditionalExpression();
         for (var i = 0; i < entries.length; i++) {
-            var data = entries[i];
+            unowned string data = entries[i];
             bool res = false;
             expect_no_error(() => {res = expr.eval(data);}, "'%s'", data);
             expect_true(results[i] == res, "'%s'", data);
@@ -82,7 +82,7 @@ public class ConditionalExpressionTest: Drt.TestCase {
 
         var expr = new ConditionalExpression();
         for (var i = 0; i < entries.length; i++) {
-            var data = entries[i];
+            unowned string data = entries[i];
             expect_error(() => expr.eval(data), errors[i], "'%s'", data);
         }
     }

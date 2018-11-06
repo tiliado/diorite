@@ -82,7 +82,7 @@ public class RpcBus: GLib.Object {
      * @throws IOError on failure.
      */
     public RpcChannel connect_channel(string name, uint timeout) throws IOError {
-        var id = get_next_client_id();
+        uint id = get_next_client_id();
         var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
             id: id, channel: new SocketChannel.from_name(id, name, timeout), router: router);
         clients[id.to_pointer()] = channel;
@@ -98,7 +98,7 @@ public class RpcBus: GLib.Object {
      * @throws IOError on failure.
      */
     public RpcChannel connect_channel_socket(Socket socket, uint timeout) throws IOError {
-        var id = get_next_client_id();
+        uint id = get_next_client_id();
         var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
             id: id, channel: new SocketChannel.from_socket(id, socket, timeout), router: router);
         clients[id.to_pointer()] = channel;
@@ -157,7 +157,7 @@ public class RpcBus: GLib.Object {
      * @param source_object    The source of the connection.
      */
     private bool on_incoming(SocketConnection connection, GLib.Object? source_object) {
-        var id = get_next_client_id();
+        uint id = get_next_client_id();
         var channel = (RpcChannel) GLib.Object.@new(typeof(RpcChannel),
             id: id, channel: new SocketChannel(id, path, connection, timeout), router: router);
         clients[id.to_pointer()] = channel;

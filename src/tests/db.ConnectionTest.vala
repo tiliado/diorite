@@ -183,7 +183,7 @@ public class ConnectionTest: Drt.TestCase {
 
         try {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-            var user = conn.get_object<User>(2);
+            User user = conn.get_object(2);
             expect_int64_equals(2, user.id, "id");
             expect_str_equals("Jean", user.name, "name");
             expect_int_equals(50, user.age, "age");

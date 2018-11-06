@@ -31,10 +31,10 @@ public class SocketChannel : Drt.DuplexChannel {
     private SocketSource socket_source;
 
     public static SocketConnection create_socket_from_name(string name) throws GLib.Error {
-        var path = Rpc.create_path(name);
+        string path = Rpc.create_path(name);
         var address = new UnixSocketAddress(path);
         var socket = new Socket(SocketFamily.UNIX, SocketType.STREAM, SocketProtocol.DEFAULT);
-        var connection = SocketConnection.factory_create_connection(socket);
+        SocketConnection connection = SocketConnection.factory_create_connection(socket);
         connection.connect(address, null);
         return connection;
     }
@@ -50,7 +50,7 @@ public class SocketChannel : Drt.DuplexChannel {
 
     public SocketChannel.from_name(uint id, string name, uint timeout) throws IOError {
         try {
-            var connection = create_socket_from_name(name);
+            SocketConnection connection = create_socket_from_name(name);
             this(id, name, connection, timeout);
         } catch (GLib.Error e) {
             throw new IOError.CONN_FAILED("Failed to create socket channel from name '%s'. %s", name, e.message);
@@ -58,8 +58,8 @@ public class SocketChannel : Drt.DuplexChannel {
     }
 
     public SocketChannel.from_socket(uint id, Socket socket, uint timeout) throws IOError {
-        var name = "fd:%d".printf(socket.get_fd());
-        var connection = SocketConnection.factory_create_connection(socket);
+        string name = "fd:%d".printf(socket.get_fd());
+        SocketConnection connection = SocketConnection.factory_create_connection(socket);
         this(id, name, connection, timeout);
     }
 
@@ -73,14 +73,14 @@ public class SocketChannel : Drt.DuplexChannel {
     }
 
     private void check_io_condition() {
-        var condition = connection.socket.condition_check(IOCondition.IN|IOCondition.OUT);
+        IOCondition condition = connection.socket.condition_check(IOCondition.IN|IOCondition.OUT);
         set_condition(condition);
         socket_source.attach(MainContext.@default());
     }
 
     private void set_condition(IOCondition condition) {
-        var read = Flags.is_set(condition, IOCondition.IN);
-        var write = Flags.is_set(condition, IOCondition.OUT);
+        bool read = Flags.is_set(condition, IOCondition.IN);
+        bool write = Flags.is_set(condition, IOCondition.OUT);
         if (can_read != read) {
             can_read = read;
         }

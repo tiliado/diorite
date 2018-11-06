@@ -76,7 +76,7 @@ public class Database: GLib.Object, Queryable {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         return_if_fail(!opened);
 
-        var db_dir = db_file.get_parent();
+        File db_dir = db_file.get_parent();
         if (!db_dir.query_exists(cancellable)) {
             db_dir.make_directory_with_parents(cancellable);
         }
@@ -256,7 +256,7 @@ public class Database: GLib.Object, Queryable {
         }
 
         Sqlite.Database db;
-        var result = Sqlite.Database.open_v2(
+        int result = Sqlite.Database.open_v2(
             db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null);
         if (Drtdb.is_sql_error(result)) {
             throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));

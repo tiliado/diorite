@@ -51,7 +51,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
     public void complete_inline() {
         if (key_valid && cursor == key_end) {
             complete(); // Update filter first
-            var prefix = compute_prefix(key);
+            string? prefix = compute_prefix(key);
             if (prefix != null) {
                 insert_match(prefix, true);
             }
@@ -59,7 +59,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
     }
 
     protected virtual void parse_key() {
-        var text = entry.text;
+        string text = entry.text;
         cursor = entry.cursor_position;
         key = null;
         key_start = key_end = -1;
@@ -72,7 +72,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
                     key_end = text.length;
                 }
                 key = text.slice(key_start, cursor);
-//~ 				debug("Text '%s', key '%s', %d→%d→%d", text, key, key_start, cursor, key_end);
+//~                 debug("Text '%s', key '%s', %d→%d→%d", text, key, key_start, cursor, key_end);
                 if (!String.is_empty(key.strip())) {
                     key_valid = true;
                 }
@@ -86,7 +86,7 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
         }
         string candidate;
         model.get(iter, text_column, out candidate);
-        var prefix = key.strip().down();
+        string prefix = key.strip().down();
         if (String.is_empty(prefix)) {
             return false;
         }
@@ -96,9 +96,9 @@ public class EntryMultiCompletion : Gtk.EntryCompletion {
     private void insert_match(string match, bool select) {
         return_if_fail(key_valid);
         freeze_notify();
-        var text = entry.text;
-        var original_cursor = cursor;
-        var match_end_cursor = key_start + match.length;
+        string text = entry.text;
+        int original_cursor = cursor;
+        int match_end_cursor = key_start + match.length;
         entry.text = text.slice(0, cursor) + match.substring(cursor - key_start) + text.substring(key_end);
         if (select) {
             entry.select_region(match_end_cursor, original_cursor);

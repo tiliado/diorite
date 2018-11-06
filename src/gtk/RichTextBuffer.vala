@@ -382,7 +382,7 @@ public class RichTextBuffer: Gtk.TextBuffer {
                 if (i >= attr_values.length) {
                     throw new MarkupError.MISSING_ATTRIBUTE("Missing attribute '%s' for element '%s'.", LINK_TARGET, INPUT_TAG_LINK);
                 }
-                var uri = attr_values[i];
+                unowned string uri = attr_values[i];
                 append_tag_to_stack(name, create_link_tag(uri));
             } else {
                 debug("Ignored start tag: %s", name);
@@ -517,7 +517,7 @@ public class RichTextBuffer: Gtk.TextBuffer {
      * @throws MarkupError when name doesn't match nme of the last opened tag.
      */
     public void close_tag_from_stack(string name) throws MarkupError {
-        var tag = tag_stack.pop_tail();
+        Tag? tag = tag_stack.pop_tail();
         if (tag == null) {
             throw new MarkupError.PARSE("Attempt to close $(name), but not tag is open.");
         }
@@ -537,7 +537,7 @@ public class RichTextBuffer: Gtk.TextBuffer {
             return;
         }
 
-        var result = norm_whitespace(text);
+        string result = norm_whitespace(text);
         if (result == " ") {
             return;
         }

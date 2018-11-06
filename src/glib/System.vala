@@ -164,10 +164,10 @@ public bool move_dir_if_target_not_found(File source_dir, File target_dir) throw
  * @throws             GLib.Error on failure
  */
 public void purge_directory_content(File dir, bool recursive=false) throws GLib.Error {
-    var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
+    FileEnumerator enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
     FileInfo file_info;
     while ((file_info = enumerator.next_file()) != null) {
-        var f = dir.get_child(file_info.get_name());
+        File f = dir.get_child(file_info.get_name());
         if (f.query_file_type(0) == FileType.DIRECTORY) {
             if (recursive) {
                 purge_directory_content(f, true);
@@ -210,12 +210,12 @@ public void copy_tree(File source_dir, File dest_dir, Cancellable? cancellable=n
     if (!dest_dir.query_exists()) {
         dest_dir.make_directory_with_parents();
     }
-    var enumerator = source_dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
+    FileEnumerator enumerator = source_dir.enumerate_children(FileAttribute.STANDARD_NAME, 0);
     FileInfo file_info;
     while ((file_info = enumerator.next_file()) != null) {
-        var name = file_info.get_name();
-        var source_item = source_dir.get_child(name);
-        var dest_item = dest_dir.get_child(name);
+        string name = file_info.get_name();
+        File source_item = source_dir.get_child(name);
+        File dest_item = dest_dir.get_child(name);
         if (source_item.query_file_type(0) == FileType.DIRECTORY) {
             copy_tree(source_item, dest_item, cancellable);
         } else if (source_item.query_file_type(0) == FileType.REGULAR) {
@@ -237,10 +237,10 @@ public void copy_tree(File source_dir, File dest_dir, Cancellable? cancellable=n
 public async File resolve_symlink(File file, Cancellable? cancellable) {
     File result = file;
     try {
-        var info = yield file.query_info_async(
+        FileInfo info = yield file.query_info_async(
             "standard::*", FileQueryInfoFlags.NOFOLLOW_SYMLINKS, Priority.DEFAULT, cancellable);
         if (info.get_file_type() == FileType.SYMBOLIC_LINK) {
-            var target = info.get_symlink_target();
+            string target = info.get_symlink_target();
             result = target[0] == '/' ? File.new_for_path(target) : file.get_parent().get_child(target);
             return yield resolve_symlink(result, cancellable);
         }
@@ -261,14 +261,14 @@ public async File resolve_symlink(File file, Cancellable? cancellable) {
 public int[] find_pid_by_basename(string basename) {
     int[] result = {};
     try {
-        var procfs = Dir.open("/proc", 0);
+        Dir procfs = Dir.open("/proc", 0);
         string? name = null;
         while ((name = procfs.read_name()) != null) {
-            var pid = int.parse(name);
-            var path = Path.build_filename("/proc", name, "exe");
+            int pid = int.parse(name);
+            string path = Path.build_filename("/proc", name, "exe");
             if (pid > 0 && FileUtils.test(path, FileTest.IS_SYMLINK)) {
                 try {
-                    var target = FileUtils.read_link(path);
+                    string target = FileUtils.read_link(path);
                     if (Path.get_basename(target) == basename) {
                         result += pid;
                     }
@@ -310,7 +310,7 @@ public string? get_cmdline_for_pid(int pid) {
  */
 public int sigall(int[] pids, int signum) {
     foreach (int pid in pids) {
-        var result = Posix.kill((Posix.pid_t) pid, signum);
+        int result = Posix.kill((Posix.pid_t) pid, signum);
         if (result != 0) {
             return result;
         }

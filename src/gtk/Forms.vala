@@ -186,7 +186,7 @@ public class Form : Gtk.Grid {
     }
 
     public void add_entries(Variant entries_spec) throws FormError {
-        var array = variant_to_array(entries_spec);
+        Variant[] array = variant_to_array(entries_spec);
         foreach (unowned Variant entry_spec in array) {
             add_entry(variant_to_array(entry_spec));
         }
@@ -244,7 +244,7 @@ public class Form : Gtk.Grid {
             }
 
             string? e_value = null;
-            var value = values.get(id);
+            Variant? value = values.get(id);
             if (value != null && value.is_of_type(VariantType.STRING)) {
                 e_value = value.get_string();
             }
@@ -270,7 +270,7 @@ public class Form : Gtk.Grid {
             }
 
             bool e_value = false;
-            var value = values.get(id);
+            Variant? value = values.get(id);
             if (value != null && value.is_of_type(VariantType.BOOLEAN)) {
                 e_value = value.get_boolean();
             }
@@ -315,9 +315,8 @@ public class Form : Gtk.Grid {
                     print_entry_spec(entry_spec));
             }
 
-
-            var full_id = "%s:%s".printf(id, e_target);
-            var value = values.get(id);
+            string full_id = "%s:%s".printf(id, e_target);
+            Variant? value = values.get(id);
             bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
             string[] e_enables;
             if (entry_spec.length > 4) {
@@ -336,7 +335,7 @@ public class Form : Gtk.Grid {
             label = entry.label;
             widget = entry.widget;
             entries.set(full_id, entry);
-            var group = radios.get(id);
+            Gtk.RadioButton? group = radios.get(id);
             if (group == null) {
                 radios.set(id, entry.group);
             } else {
@@ -394,8 +393,8 @@ public class Form : Gtk.Grid {
     }
 
     public void check_toggles() {
-        var entries = this.entries.get_values();
-        foreach (var entry in entries) {
+        List<unowned FormEntry> entries = this.entries.get_values();
+        foreach (unowned FormEntry entry in entries) {
             var toggle = entry as ToggleEntry;
             if (toggle != null) {
                 entry_toggled(toggle);
@@ -410,7 +409,7 @@ public class Form : Gtk.Grid {
     public HashTable<string, Variant> get_values() {
         var result = new HashTable<string, Variant>(str_hash, str_equal);
         foreach (var key in entries.get_keys()) {
-            var entry = entries.get(key);
+            FormEntry entry = entries.get(key);
             var value_entry = entry as ValueEntry;
             var toggle_entry = entry as ToggleEntry;
             if (value_entry != null) {
@@ -419,7 +418,7 @@ public class Form : Gtk.Grid {
                 if (toggle_entry is BoolEntry) {
                     result.insert(key, new Variant.boolean(toggle_entry.state));
                 } else if (toggle_entry is OptionEntry && toggle_entry.state) {
-                    var i = key.index_of(":");
+                    int i = key.index_of(":");
                     if (i > 0) {
                         result.insert(key.substring(0, i), new Variant.string(key.substring(i + 1)));
                     }
@@ -431,15 +430,15 @@ public class Form : Gtk.Grid {
     }
 
     private void entry_toggled(ToggleEntry entry) {
-        var state = entry.state;
-        foreach (var key in entry.get_enables()) {
-            var target = entries.get(key);
+        bool state = entry.state;
+        foreach (unowned string key in entry.get_enables()) {
+            FormEntry? target = entries.get(key);
             if (target != null) {
                 target.sensitive = state;
             }
         }
-        foreach (var key in entry.get_disables()) {
-            var target = entries.get(key);
+        foreach (unowned string key in entry.get_disables()) {
+            FormEntry? target = entries.get(key);
             if (target != null) {
                 target.sensitive = !state;
             }

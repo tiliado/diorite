@@ -31,7 +31,7 @@ public class UtilsTest: Drt.TestCase {
             expected[i] = "item%d".printf(i);
             list.append(expected[i]);
         }
-        var result = Drt.Utils.slist_to_strv(list);
+        string[] result = Drt.Utils.slist_to_strv(list);
         expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
     }
 
@@ -42,7 +42,7 @@ public class UtilsTest: Drt.TestCase {
             expected[i] = "item%d".printf(i);
             list.append(expected[i]);
         }
-        var result = Drt.Utils.list_to_strv(list);
+        string[] result = Drt.Utils.list_to_strv(list);
         expect_array(wrap_strv(expected), wrap_strv(result), str_eq, "array");
     }
 }

@@ -113,7 +113,7 @@ public string? get_window_property_as_utf8(Gdk.Window? window, string property) 
  * @return    WM_CHECK Window of a compliant window manager of null if there is not any
  */
 public Gdk.X11.Window? get_net_wm_check_window() {
-    var window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
+    Gdk.X11.Window? window = get_window_property_as_win(null, "_NET_SUPPORTING_WM_CHECK");
     if (window == null) {
         return null;
     }

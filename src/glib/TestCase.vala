@@ -240,7 +240,7 @@ public abstract class TestCase : GLib.Object {
     [Diagnostics]
     [PrintfFormat]
     protected bool expect_str_equals(string? expected, string? value, string format, ...) {
-        var result = process(expected == value, format, va_list());
+        bool result = process(expected == value, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.printf("\t '%s' == '%s' failed.\n", expected, value);
         }
@@ -258,7 +258,7 @@ public abstract class TestCase : GLib.Object {
     [Diagnostics]
     [PrintfFormat]
     protected bool expect_type_equals(Type expected, Type value, string format, ...) {
-        var result = process(expected == value, format, va_list());
+        bool result = process(expected == value, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.printf("\t %s == %s failed.\n", expected.name(), value.name());
         }
@@ -276,7 +276,7 @@ public abstract class TestCase : GLib.Object {
     [Diagnostics]
     [PrintfFormat]
     protected bool expect_str_not_equal(string? expected, string? value, string format, ...) {
-        var result = process(expected != value, format, va_list());
+        bool result = process(expected != value, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.printf("\t '%s' != '%s' failed.\n", expected, value);
         }
@@ -333,7 +333,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     private bool process_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, va_list args) {
-        var result = process(
+        bool result = process(
             (expected == null && value == null)
         || (expected != null && value != null && expected.compare(value) == 0),
             format, args);
@@ -384,7 +384,7 @@ public abstract class TestCase : GLib.Object {
 
     private bool process_value_equal(GLib.Value? expected, GLib.Value? actual, string format, va_list args) {
         string description;
-        var result = process(Value.equal_verbose(expected, actual, out description), format, args);
+        bool result = process(Value.equal_verbose(expected, actual, out description), format, args);
         if (!result && !Test.quiet()) {
             stdout.printf("\t %s\n", description);
         }
@@ -474,7 +474,7 @@ public abstract class TestCase : GLib.Object {
         } catch (GLib.Error e) {
             err = "\tUnexpected error: %s %d %s\n".printf(e.domain.to_string(), e.code, e.message);
         }
-        var result = process(err == null, format, va_list());
+        bool result = process(err == null, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.puts(err);
         }
@@ -484,7 +484,7 @@ public abstract class TestCase : GLib.Object {
     [Diagnostics]
     [PrintfFormat]
     protected bool expect_error(TestCallback func, string message_pattern, string format, ...) {
-        var result = false;
+        bool result = false;
         string? err = null;
         try {
             func();
@@ -516,9 +516,9 @@ public abstract class TestCase : GLib.Object {
 
     protected bool expect_type_internal(Type expected_type, void* object, string format, va_list args) {
         string? type_found = null;
-        var result = false;
+        bool result = false;
         if (object != null) {
-            var object_type = Type.from_instance(object);
+            Type object_type = Type.from_instance(object);
             type_found = object_type.name();
             result = (object_type == expected_type || object_type.is_a(expected_type));
         }
@@ -532,20 +532,20 @@ public abstract class TestCase : GLib.Object {
     [Diagnostics]
     [PrintfFormat]
     protected bool expect_enum<T>(T expected, T found, string format, ...) {
-        var expected_type = typeof(T);
-        var enum_name = expected_type.name();
-        var result = false;
+        Type expected_type = typeof(T);
+        unowned string enum_name = expected_type.name();
+        bool result = false;
         string? err = null;
         unowned EnumClass enum_class = expected_type.is_enum() ? (EnumClass) expected_type.class_ref() : null;
         if (enum_class == null) {
             err = enum_name + "is not an enumeration.\n";
         } else {
-            var expected_member = enum_class.get_value((int) expected);
+            unowned EnumValue? expected_member = enum_class.get_value((int) expected);
             if (expected_member == null) {
                 err = "The value expected (%d) is not a member of the %s enumeration.\n".printf(
                     (int) expected, enum_name);
             } else {
-                var member_found = enum_class.get_value((int) found);
+                unowned EnumValue? member_found = enum_class.get_value((int) found);
                 if (member_found == null) {
                     err = "The value found (%d) is not a member of the %s enumeration.\n".printf(
                         (int) found, enum_name);
@@ -617,7 +617,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     private bool process_str_match(bool expected, string pattern, string data, string format, va_list args) {
-        var result = process(PatternSpec.match_simple(pattern, data) == expected, format, args);
+        bool result = process(PatternSpec.match_simple(pattern, data) == expected, format, args);
         if (!result && !Test.quiet()) {
             stdout.printf("\tPattern %s should%s match string '%s'.\n", pattern, expected ? "" : " not", data);
         }
@@ -640,8 +640,8 @@ public abstract class TestCase : GLib.Object {
     }
 
     protected bool process_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, va_list args) {
-        var limit = uint.max(expected.length, found.length);
-        var result = true;
+        uint limit = uint.max(expected.length, found.length);
+        bool result = true;
         if (expected.length != found.length) {
             if (result) {
                 print_result(false, format, args);
@@ -718,7 +718,7 @@ public abstract class TestCase : GLib.Object {
     private bool expect_log_message_va(
         string? domain, LogLevelFlags level, string text_pattern, string format, va_list args
     ) {
-        var result = false;
+        bool result = false;
         if (log_messages != null) {
             foreach (unowned LogMessage msg in log_messages) {
                 if ((msg.level & level) == 0 || msg.domain != domain) {

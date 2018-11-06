@@ -25,7 +25,7 @@ public class OrmManagerTest: Drt.TestCase {
     private File db_file;
     private Database db;
     private OrmManager orm;
-//~ 	private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
+//~     private string[] column_names = {"id", "name", "age", "height", "blob", "alive", "extra"};
 
     public override void set_up() {
         base.set_up();
@@ -82,7 +82,7 @@ public class OrmManagerTest: Drt.TestCase {
 
     public void test_create_object() {
         try {
-            var result = select_data();
+            Result result = select_data();
             /* All fields */
             try {
                 orm.create_object<User>(result);
@@ -109,7 +109,7 @@ public class OrmManagerTest: Drt.TestCase {
 
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
-                var user = orm.create_object<User>(result);
+                User user = orm.create_object<User>(result);
                 expect_int64_equals(1, user.id, "id");
                 expect_str_equals("George", user.name, "name");
                 expect_int_equals(30, user.age, "age");
@@ -125,7 +125,7 @@ public class OrmManagerTest: Drt.TestCase {
             }
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
-                var user = orm.create_object<User>(result);
+                User user = orm.create_object<User>(result);
                 expect_int64_equals(1, user.id, "id");
                 expect_str_equals("George", user.name, "name");
                 expect_int_equals(30, user.age, "age");
@@ -154,7 +154,7 @@ public class OrmManagerTest: Drt.TestCase {
 
     public void test_fill_object() {
         try {
-            var result = select_data();
+            Result result = select_data();
             User user;
 
             try {

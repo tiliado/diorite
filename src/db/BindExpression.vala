@@ -102,7 +102,7 @@ public class BindExpression {
      */
     public void parse_va(string sql_str, va_list args) throws DatabaseError {
         var offset = 0;
-        var len = sql_str.length;
+        int len = sql_str.length;
         unowned uint8[] data = sql_str.data;
         int pos;
         for (pos = 0; pos < len; pos++) {

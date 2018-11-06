@@ -58,7 +58,7 @@ public class Result : GLib.Object {
      */
     public bool next(Cancellable? cancellable=null) throws GLib.Error, DatabaseError {
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
-        var done = throw_on_error(statement.step()) == Sqlite.DONE;
+        bool done = throw_on_error(statement.step()) == Sqlite.DONE;
         if (!done) {
             counter++;
             n_columns = statement.data_count();
@@ -116,7 +116,7 @@ public class Result : GLib.Object {
             throw new DatabaseError.DATA_TYPE("Data type %s is not supported.", type.name());
         }
 
-        var value = GLib.Value(type);
+        GLib.Value? value = GLib.Value(type);
         if (type == typeof(bool)) {
             value.set_boolean(fetch_bool(index));
         } else if (type == typeof(int)) {
@@ -209,9 +209,9 @@ public class Result : GLib.Object {
     public unowned string? fetch_string(int index) throws DatabaseError {
         check_index(index);
         unowned string? result = statement.column_text(index);
-        var n_bytes =  statement.column_bytes(index);
+        int n_bytes =  statement.column_bytes(index);
         if (result != null) {
-            var result_len = result.length;
+            int result_len = result.length;
             if (result_len != n_bytes) {
                 warning("Fetch string: Result may be truncated. Original blob size was %d, but string size is %d.",
                     n_bytes, result_len);
@@ -246,7 +246,7 @@ public class Result : GLib.Object {
      * @throws DatabaseError if index is invalid
      */
     public GLib.Bytes? fetch_bytes(int index) throws DatabaseError {
-        var blob = fetch_blob(index);
+        uint8[]? blob = fetch_blob(index);
         return blob != null ? new GLib.Bytes.take((owned) blob) : null;
     }
 
@@ -258,7 +258,7 @@ public class Result : GLib.Object {
      * @throws DatabaseError if index is invalid
      */
     public GLib.ByteArray? fetch_byte_array(int index) throws DatabaseError {
-        var blob = fetch_blob(index);
+        uint8[]? blob = fetch_blob(index);
         return blob != null ? new GLib.ByteArray.take((owned) blob) : null;
     }
 

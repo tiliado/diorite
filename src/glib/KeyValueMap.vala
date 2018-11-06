@@ -57,7 +57,7 @@ public class KeyValueMap: KeyValueStorage {
     }
 
     public override void unset(string key) {
-        var old_value = get_value(key);
+        Variant? old_value = get_value(key);
         if (values.remove(key)) {
             changed(key, old_value);
         }
@@ -69,7 +69,7 @@ public class KeyValueMap: KeyValueStorage {
     }
 
     protected override void set_value_unboxed(string key, Variant? value) {
-        var old_value = get_value(key);
+        Variant? old_value = get_value(key);
         values[key] = value;
         if (old_value != value && (old_value == null || value == null || !old_value.equal(value))) {
             changed(key, old_value);

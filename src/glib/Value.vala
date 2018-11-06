@@ -32,7 +32,7 @@ public string? to_string(GLib.Value? value) {
         return null;
     }
 
-    var type = value.type();
+    Type type = value.type();
     if (type.is_object()) {
         return "%p".printf((void*) value.get_object());
     }
@@ -87,7 +87,7 @@ public bool equal(GLib.Value? value1, GLib.Value? value2) {
         return false;
     }
 
-    var type = value1.type();
+    Type type = value1.type();
     if (type != value2.type()) {
         return false;
     }
@@ -139,8 +139,8 @@ public string describe(GLib.Value? value) {
     if (value == null) {
         return "<null>";
     }
-    var type = value.type();
-    var content = to_string(value);
+    Type type = value.type();
+    string content = to_string(value);
     if (content != null) {
         return "<%s:%s>".printf(type.name(), content);
     }
@@ -151,7 +151,7 @@ public string describe(GLib.Value? value) {
  * Supported types: GLib.Object, GLib.Bytes, GLib.ByteArray, int, uint, int64, uint64, float, double and bool.
  */
 public bool equal_verbose(GLib.Value? value1, GLib.Value? value2, out string description) {
-    var result = equal(value1, value2);
+    bool result = equal(value1, value2);
     if (result) {
         description = "equal %s".printf(describe(value1));
     } else {

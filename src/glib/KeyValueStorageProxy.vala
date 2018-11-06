@@ -45,9 +45,9 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     public override bool has_key(string key) {
-        var method = KeyValueStorageServer.METHOD_HAS_KEY;
+        unowned string method = KeyValueStorageServer.METHOD_HAS_KEY;
         try {
-            var response = client.channel.call_sync(method, new Variant("(ss)", name, key));
+            Variant? response = client.channel.call_sync(method, new Variant("(ss)", name, key));
             if (response.is_of_type(VariantType.BOOLEAN)) {
                 return response.get_boolean();
             }
@@ -60,9 +60,9 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     public override async bool has_key_async(string key) {
-        var method = KeyValueStorageServer.METHOD_HAS_KEY;
+        unowned string method = KeyValueStorageServer.METHOD_HAS_KEY;
         try {
-            var response = yield client.channel.call(method, new Variant("(ss)", name, key));
+            Variant? response = yield client.channel.call(method, new Variant("(ss)", name, key));
             if (response.is_of_type(VariantType.BOOLEAN)) {
                 return response.get_boolean();
             }
@@ -75,7 +75,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override Variant? get_value(string key) {
-        var method = KeyValueStorageServer.METHOD_GET_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_GET_VALUE;
         try {
             return unbox_variant(client.channel.call_sync(method, new Variant("(ss)", name, key)));
         } catch (GLib.Error e) {
@@ -85,7 +85,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override async Variant? get_value_async(string key) {
-        var method = KeyValueStorageServer.METHOD_GET_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_GET_VALUE;
         try {
             return unbox_variant(yield client.channel.call(method, new Variant("(ss)", name, key)));
         } catch (GLib.Error e) {
@@ -95,7 +95,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override void set_value_unboxed(string key, Variant? value) {
-        var method = KeyValueStorageServer.METHOD_SET_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_SET_VALUE;
         try {
             client.channel.call_sync(method, new Variant("(ssmv)", name, key, value));
         } catch (GLib.Error e) {
@@ -104,7 +104,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override async void set_value_unboxed_async(string key, Variant? value) {
-        var method = KeyValueStorageServer.METHOD_SET_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_SET_VALUE;
         try {
             yield client.channel.call(method, new Variant("(ssmv)", name, key, value));
         } catch (GLib.Error e) {
@@ -113,7 +113,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override void set_default_value_unboxed(string key, Variant? value) {
-        var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
         try {
             client.channel.call_sync(method, new Variant("(ssmv)", name, key, value));
         } catch (GLib.Error e) {
@@ -122,7 +122,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     protected override async void set_default_value_unboxed_async(string key, Variant? value) {
-        var method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
+        unowned string method = KeyValueStorageServer.METHOD_SET_DEFAULT_VALUE;
         try {
             yield client.channel.call(method, new Variant("(ssmv)", name, key, value));
         } catch (GLib.Error e) {
@@ -131,7 +131,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     public override void unset(string key) {
-        var method = KeyValueStorageServer.METHOD_UNSET;
+        unowned string method = KeyValueStorageServer.METHOD_UNSET;
         try {
             client.channel.call_sync(method, new Variant("(ss)", name, key));
         } catch (GLib.Error e) {
@@ -140,7 +140,7 @@ public class KeyValueStorageProxy: KeyValueStorage {
     }
 
     public override async void unset_async(string key) {
-        var method = KeyValueStorageServer.METHOD_UNSET;
+        unowned string method = KeyValueStorageServer.METHOD_UNSET;
         try {
             yield client.channel.call(method, new Variant("(ss)", name, key));
         } catch (GLib.Error e) {
@@ -158,10 +158,10 @@ public class KeyValueStorageProxy: KeyValueStorage {
             method = KeyValueStorageServer.METHOD_REMOVE_LISTENER;
             payload = new Variant("(s)", name);
         }
-        var channel = client.channel;
+        RpcChannel channel = client.channel;
         channel.call.begin(method, payload, (o, res ) => {
             try {
-                var response = channel.call.end(res);
+                Variant? response = channel.call.end(res);
                 if (response == null || !response.is_of_type(VariantType.BOOLEAN) || !response.get_boolean()) {
                     warning("Invalid response to %s: %s", method, response == null ? "null" : response.print(false));
                 }

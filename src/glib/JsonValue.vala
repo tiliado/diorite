@@ -59,10 +59,10 @@ public class JsonValue: JsonNode {
             return "";
         }
         return_val_if_fail(str.validate(), "");
-        var result = (str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
+        string result = (str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
             .replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f"));
         uint8 c = 0;
-        var len = result.length;
+        int len = result.length;
         for (var i = 0; i < len && (c = result.data[i]) != 0; i++) {
             if (c < 32) { // the control characters U+0000 to U+001F
                 result.data[i] = 32;

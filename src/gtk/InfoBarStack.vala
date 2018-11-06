@@ -73,16 +73,16 @@ public class InfoBarStack: Gtk.Stack {
     }
 
     private void update_arrows() {
-        var visible_child = this.visible_child;
-        var first = get_children();
+        Gtk.Widget? visible_child = this.visible_child;
+        List<weak Gtk.Widget> first = get_children();
         unowned List<weak Gtk.Widget> last = first.last();
         left_button.visible = first != null && first.data != visible_child;
         right_button.visible = last != null && last.data != visible_child;
     }
 
     public bool go_previous() {
-        var children = get_children();
-        var visible_child = this.visible_child;
+        List<weak Gtk.Widget> children = get_children();
+        Gtk.Widget? visible_child = this.visible_child;
         unowned List<weak Gtk.Widget> cursor = children;
         unowned List<weak Gtk.Widget> next;
         for (var i = 0; cursor != null; i++) {
@@ -97,8 +97,8 @@ public class InfoBarStack: Gtk.Stack {
     }
 
     public bool go_next() {
-        var children = get_children();
-        var visible_child = this.visible_child;
+        List<weak Gtk.Widget> children = get_children();
+        Gtk.Widget? visible_child = this.visible_child;
         unowned List<weak Gtk.Widget> cursor = children;
         unowned List<weak Gtk.Widget> next;
         for (var i = 0; cursor != null; i++) {

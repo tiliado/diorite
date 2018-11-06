@@ -99,7 +99,7 @@ public abstract class KeyValueStorage: GLib.Object {
 
     public PropertyBinding? bind_object_property(string key, GLib.Object object, string property_name,
         PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL) {
-        var property = object.get_class().find_property(property_name);
+        unowned ParamSpec? property = object.get_class().find_property(property_name);
         return_val_if_fail(property != null, null);
         var binding = new PropertyBinding(this, make_full_key(key, property_name), object, property, flags);
         property_bindings.prepend(binding);
@@ -107,7 +107,7 @@ public abstract class KeyValueStorage: GLib.Object {
     }
 
     public void unbind_object_property(string key, GLib.Object object, string property_name) {
-        var binding = get_property_binding(key, object, property_name);
+        PropertyBinding? binding = get_property_binding(key, object, property_name);
         if (binding != null) {
             remove_property_binding(binding);
         }
@@ -115,8 +115,8 @@ public abstract class KeyValueStorage: GLib.Object {
 
     public PropertyBinding? get_property_binding(string key, GLib.Object object,
         string property_name) {
-        var full_key = make_full_key(key, property_name);
-        foreach (var binding in property_bindings) {
+        string full_key = make_full_key(key, property_name);
+        foreach (unowned PropertyBinding binding in property_bindings) {
             if (binding.object == object && binding.key == full_key
             && binding.property.name == property_name) {
                 return binding;
