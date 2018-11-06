@@ -2,6 +2,5 @@ build
 .waf*
 .lock*
 examples/build
-Makefile
 __pycache__
 *~
