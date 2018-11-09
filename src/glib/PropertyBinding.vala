@@ -112,6 +112,10 @@ public class PropertyBinding {
             bool value = false;
             object.get(property.name, &value, null);
             storage.set_bool(key, value);
+        } else if (property.value_type == typeof(int)) {
+            int value = 0;
+            object.get(property.name, &value, null);
+            storage.set_int64(key, (int64) value);
         } else {
             critical("Unsupported type for property binding. %s.", to_string());
         }
@@ -138,6 +142,32 @@ public class PropertyBinding {
             if (value != new_value) {
                 object.set(property.name, new_value, null);
                 result = true;
+            }
+        } else if (property.value_type == typeof(int)) {
+            int value = 0;
+            object.get(property.name, &value, null);
+            Variant? maybe_new_value = storage.get_value(key);
+            if (maybe_new_value == null) {
+                critical("Cannot update property. The new value is null. %s", to_string());
+            } else {
+                int new_value = 0;
+                bool type_ok = true;
+                if (maybe_new_value.is_of_type(VariantType.INT64)) {
+                    new_value = (int) maybe_new_value.get_int64();
+                } else if (maybe_new_value.is_of_type(VariantType.INT32)) {
+                    new_value = (int) maybe_new_value.get_int32();
+                } else if (maybe_new_value.is_of_type(VariantType.DOUBLE)) {
+                    new_value = (int) maybe_new_value.get_double();
+                } else {
+                    type_ok = false;
+                    critical(
+                        "Unsupported Variant type '%s' for property binding. %s.",
+                        maybe_new_value.get_type_string(), to_string());
+                }
+                if (type_ok && value != new_value) {
+                    object.set(property.name, new_value, null);
+                    result = true;
+                }
             }
         } else {
             critical("Unsupported type for property binding. %s.", to_string());
