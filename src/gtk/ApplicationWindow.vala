@@ -34,6 +34,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     protected unowned Application app;
     private Gtk.MenuButton menu_button = null;
     private string[]? menu_button_items = null;
+    private SList<unowned Gtk.Button> toolbar_buttons = null;
 
     public ApplicationWindow(Application app, bool collapsible_header_bar) {
         GLib.Object(application: app);
@@ -125,10 +126,11 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
     }
 
     public void create_toolbar(string[] items) {
-        List<unowned Gtk.Widget> children = header_bar.get_children();
-        foreach (unowned Gtk.Widget child in children) {
-            header_bar.remove(child);
+        foreach (unowned Gtk.Widget button in toolbar_buttons) {
+            header_bar.remove(button);
         }
+        toolbar_buttons = null;
+        List<unowned Gtk.Widget> extra_widgets = header_bar.get_children();
 
         if (items.length == 0) {
             header_bar.pack_end(menu_button);
@@ -146,6 +148,11 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
                     header_bar.pack_end(menu_button);
                 }
             }
+        }
+
+        foreach (Gtk.Widget widget in extra_widgets) {
+            header_bar.remove(widget);
+            header_bar.pack_end(widget);
         }
         header_bar.show_all();
     }
@@ -169,6 +176,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
         Gtk.Button? button = app.actions.create_action_button(action, true, true);
         if (button != null) {
             header_bar.pack_start(button);
+            toolbar_buttons.prepend(button);
             return true;
         }
         return false;
@@ -179,6 +187,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
         Gtk.Button? button = app.actions.create_action_button(action, true, true);
         if (button != null) {
             header_bar.pack_end(button);
+            toolbar_buttons.prepend(button);
             return true;
         }
         return false;
