@@ -7,6 +7,22 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.14.0 - November 11th, 2018
+------------------------------------
+
+* Waf was updated to 2.0.12 (compatible with Python 3.7). Issue: tiliado/diorite#26
+* Diorite testgen is now compatible with Python 3.7. Issue: tiliado/diorite#27
+* Fedora 29 is used for continuous integration.
+* Utility function `uint8v_equal` was removed. Use `Blobs.blob_equal` instead.
+* Utility functions for conversion between binary and other formats were moved under Blobs namespace and renamed.
+* New function: Arrays.from_2d_uint8 to extract one-dimensional uint8 array from two-dimensional array.
+* Removed classes: VectorClock, Lst.
+* Configure script `configure` was removed. Use `waf --configure` instead.
+* PropertyBinding now supports int values.
+* ApplicationWindow.create_toolbars no longer removes HeaderBar widgets not created with this function.
+* The entire codebase was converted to a single code style, which is guarded by valalint (`make valalint`).
+* A lot of refactoring and improvements of documentation comments.
+
 Release 4.13.0 - October 14th, 2018
 -----------------------------------
 
