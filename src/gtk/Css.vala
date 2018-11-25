@@ -53,56 +53,56 @@ label.badge-warning,  button.badge-warning,
 label.badge-error,  button.badge-error,
 label.badge-ok,  button.badge-ok,
 label.badge-info,  button.badge-info {
-	font-weight: bold;
+    font-weight: bold;
 }
 label.badge-default,
 label.badge-ok,
 label.badge-info,
 label.badge-warning,
 label.badge-error {
-	border-radius: 10px;
-	padding: 5px 5px;
-	font-size: 95%;
+    border-radius: 10px;
+    padding: 5px 5px;
+    font-size: 95%;
 }
 
 label.badge-warning,  button.badge-warning {
-	background: #FFD600;
-	color: #000000;
+    background: #FFD600;
+    color: #000000;
 }
 button.badge-warning:hover {
-	background-color: #E7C200;
+    background-color: #E7C200;
 }
 
 label.badge-error,  button.badge-error {
-	background: #FF0000;
-	color: #FFFFFF;
+    background: #FF0000;
+    color: #FFFFFF;
 }
 button.badge-error:hover {
-	background-color: #C70000;
+    background-color: #C70000;
 }
 
 label.badge-info,  button.badge-info {
-	background: #5FB0FF;
-	color: #000000;
+    background: #5FB0FF;
+    color: #000000;
 }
 button.badge-info:hover {
-	background-color: #43A2FF;
+    background-color: #43A2FF;
 }
 
 label.badge-default,  button.badge-default {
-	background: #BFBFBF;
-	color: #000000;
+    background: #BFBFBF;
+    color: #000000;
 }
 button.badge-default:hover {
-	background-color: #ABABAB;
+    background-color: #ABABAB;
 }
 
 label.badge-ok,  button.badge-ok {
-	background: #6FEF6F;
-	color: #000000;
+    background: #6FEF6F;
+    color: #000000;
 }
 button.badge-ok:hover {
-	background-color: #52CA52;
+    background-color: #52CA52;
 }
 
 """;
