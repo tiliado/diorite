@@ -25,7 +25,7 @@
 namespace Drt {
 
 [CCode(has_target=false)]
-public delegate bool EqualData(void* data1, void* data2);
+public delegate bool EqualData(void* data1, void* data2, out string? reason);
 
 
 public errordomain TestError {
@@ -41,22 +41,48 @@ public delegate void TestCallback() throws GLib.Error;
  * Base class for test cases.
  */
 public abstract class TestCase : GLib.Object {
-    public static bool str_eq(void* data1, void* data2) {
+    public static bool str_eq(void* data1, void* data2, out string? reason) {
         unowned string str1 = (string) data1;
         unowned string str2 = (string) data2;
-        return str_equal(str1, str2);
+        if (str_equal(str1, str2)) {
+            reason = null;
+            return true;
+        }
+        reason = "\"%s\" != \"%s\"".printf(str1, str2);
+        return false;
     }
 
-    public static bool int_eq(void* data1, void* data2) {
-        return *((int*)data1) == *((int*)data2);
+    public static bool int_eq(void* data1, void* data2, out string? reason) {
+        int val1 = *((int*)data1);
+        int val2 = *((int*)data2);
+        if (val1 == val2) {
+            reason = null;
+            return true;
+        }
+        reason = "%d != %d".printf(val1, val2);
+        return false;
     }
 
-    public static bool double_eq(void* data1, void* data2) {
-        return *((double*)data1) == *((double*)data2);
+    public static bool double_eq(void* data1, void* data2, out string? reason) {
+        double val1 = *((double*)data1);
+        double val2 = *((double*)data2);
+        if (val1 == val2) {
+            reason = null;
+            return true;
+        }
+        reason = "%f != %f".printf(val1, val2);
+        return  false;
     }
 
-    public static bool bool_eq(void* data1, void* data2) {
-        return *((bool*)data1) == *((bool*)data2);
+    public static bool bool_eq(void* data1, void* data2, out string? reason) {
+        bool val1 = *((bool*)data1);
+        bool val2 = *((bool*)data2);
+        if (val1 == val2) {
+            reason = null;
+            return true;
+        }
+        reason = "%s != %s".printf(val1.to_string(), val2.to_string());
+        return false;
     }
 
     public int passed = 0;
@@ -642,6 +668,7 @@ public abstract class TestCase : GLib.Object {
     protected bool process_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, va_list args) {
         uint limit = uint.max(expected.length, found.length);
         bool result = true;
+        string? reason = null;
         if (expected.length != found.length) {
             if (result) {
                 print_result(false, format, args);
@@ -668,13 +695,13 @@ public abstract class TestCase : GLib.Object {
                 if (!Test.quiet()) {
                     stdout.printf("\tMissing element (%d)\n", i);
                 }
-            } else if (!eq(expected.data[i], found.data[i])) {
+            } else if (!eq(expected.data[i], found.data[i], out reason)) {
                 if (result) {
                     print_result(false, format, args);
                 }
                 result = false;
                 if (!Test.quiet()) {
-                    stdout.printf("\tElement mismatch (%d)\n", i);
+                    stdout.printf("\tElement mismatch (%d): %s\n", i, reason);
                 }
             }
         }
