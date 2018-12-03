@@ -52,6 +52,18 @@ public abstract class TestCase : GLib.Object {
         return false;
     }
 
+    public static bool variant_eq(void* data1, void* data2, out string? reason) {
+        reason = null;
+        unowned Variant? var1 = (Variant?) data1;
+        unowned Variant? var2 = (Variant?) data2;
+        if (VariantUtils.equal(var1, var2)) {
+            reason = null;
+            return true;
+        }
+        reason = "\"%s\" != \"%s\"".printf(VariantUtils.print(var1), VariantUtils.print(var2));
+        return false;
+    }
+
     public static bool int_eq(void* data1, void* data2, out string? reason) {
         int val1 = *((int*)data1);
         int val2 = *((int*)data2);
