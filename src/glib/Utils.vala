@@ -67,6 +67,14 @@ public Array<string?> wrap_strv(string?[] array) {
     return result;
 }
 
+public Array<Variant?> wrap_variantv(Variant?[] array) {
+    var result = new Array<Variant?>();
+    foreach (var value in array) {
+        result.append_val(value);
+    }
+    return result;
+}
+
 /**
  * Create string array from a single-linked list
  *
