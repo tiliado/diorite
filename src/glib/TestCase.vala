@@ -283,6 +283,21 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
+    protected bool expect_variant_equal(Variant? expected, Variant? value, string format, ...) {
+        return process(VariantUtils.equal(expected, value), "%s: %s == %s".printf(
+            format, VariantUtils.print(expected), VariantUtils.print(value)), va_list());
+    }
+
+    /**
+     * Expectation
+     *
+     * Test is not terminated when expectation fails.
+     *
+     * @param expected    expected value
+     * @param value       real value
+     */
+    [Diagnostics]
+    [PrintfFormat]
     protected bool expect_type_equals(Type expected, Type value, string format, ...) {
         bool result = process(expected == value, format, va_list());
         if (!result && !Test.quiet()) {
