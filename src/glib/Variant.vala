@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2018 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,9 +22,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Drt {
+/**
+ * The Drt.VariantUtils namespace contains various utility functions for {@link GLib.Variant} such as:
+ *
+ *  * Null-aware {@link Drt.VariantUtils.equal}, {@link Drt.VariantUtils.to_string} and {@link Drt.VariantUtils.print}
+ *    functions.
+ *  * Functions to extract a value with type checking: {@link Drt.VariantUtils.get_string},
+ *    {@link Drt.VariantUtils.get_bool}, {@link Drt.VariantUtils.get_double}, {@link Drt.VariantUtils.get_int64},
+ *    {@link Drt.VariantUtils.get_int}, {@link Drt.VariantUtils.get_uint}, {@link Drt.VariantUtils.get_number}.
+ *  * Functions to extract a value from a variant dictionary with type checking:
+ *    {@link Drt.VariantUtils.get_string_item}, {@link Drt.VariantUtils.get_double_item}.
+ *  * Conversion of arrays and hash tables: {@link Drt.VariantUtils.to_strv}, {@link Drt.VariantUtils.to_array},
+ *    {@link Drt.VariantUtils.to_hash_table}, {@link Drt.VariantUtils.from_hash_table}.
+ *  * Unboxing of variant-variant and maybe-variant: {@link Drt.VariantUtils.unbox}.
+ *  * Converting simple typed strings to variants: {@link Drt.VariantUtils.parse_typed_value}.
+ *
+ */
+namespace Drt.VariantUtils {
 
-public bool variant_equal(Variant? a, Variant? b) {
+/**
+ * Compare two Variant values for equality.
+ *
+ * They can be null as well.
+ *
+ * @param a    The first value to compare.
+ * @param b    The second value to compare.
+ * @return `true` if the Variant values equal or both are null.
+ */
+public bool equal(Variant? a, Variant? b) {
     if (a == null && b == null) {
         return true;
     }
@@ -34,41 +59,57 @@ public bool variant_equal(Variant? a, Variant? b) {
     return a.equal(b);
 }
 
-public string[] variant_to_strv(Variant variant) {
+
+/**
+ * Convert Variant value to a string vector.
+ *
+ * If the Variant value is not a container, the behavior is undefined.
+ *
+ * All child values are unboxed and converted to a string representation regardless of the actual type.
+ * An empty string is used from empty variants. Resulting string vector doesn't contain any null values.
+ *
+ * @param variant    A Variant container value.
+ * @return The array of string representations of child nodes.
+ */
+public string[] to_strv(Variant variant) {
+    return_val_if_fail(variant.is_container(), null);
     string[] result;
-    if (variant.is_container() && variant.n_children() > 0) {
-        size_t size = variant.n_children();
+    size_t size = variant.n_children();
+    if (size > 0) {
         result = new string[size];
         for (size_t i = 0; i < size; i++) {
             Variant child = variant.get_child_value(i);
             string? str;
-            if (!variant_string(child, out str) || str == null) {
-                warning("Wrong child type %s: %s", child.get_type_string(), child.print(true));
-                str = child.print(false);
+            if (!get_string(child, out str)) {
+                str = to_string(unbox(child));
             }
-            result[i] = str;
+            result[i] = (owned) str;
         }
     } else {
-        if (!variant.is_container()) {
-            warning("Variant is not a container: %s: %s", variant.get_type_string(), variant.print(true));
-        }
-
         result = {};
     }
-    return result;
+    return (owned) result;
 }
 
-public Variant[] variant_to_array(Variant variant) {
+
+/**
+ * Convert Variant value to an array of child Variant values.
+ *
+ * If the Variant value is not a container, the behavior is undefined.
+ *
+ * All child values are unboxed. If the variant value is empty, null is added to the array.
+ *
+ * @param variant    A Variant container value.
+ * @return The array of child variant values.
+ */
+public Variant?[] to_array(Variant variant) {
+    return_val_if_fail(variant.is_container(), null);
     Variant[] result;
-    if (variant.is_container() && variant.n_children() > 0) {
-        size_t size = variant.n_children();
+    size_t size = variant.n_children();
+    if (size > 0) {
         result = new Variant[size];
         for (size_t i = 0; i < size; i++) {
-            Variant val = variant.get_child_value(i);
-            if (val.is_of_type(VariantType.VARIANT)) {
-                val = val.get_variant();
-            }
-            result[i] = val;
+            result[i] = unbox(variant.get_child_value(i));
         }
     } else {
         result = {};
@@ -76,134 +117,290 @@ public Variant[] variant_to_array(Variant variant) {
     return result;
 }
 
-public HashTable<string, Variant> variant_to_hashtable(Variant? variant) {
-    var result = new HashTable<string, Variant>(str_hash, str_equal);
-    if (variant != null && variant.is_of_type(VariantType.DICTIONARY)) {
-        VariantIter iter = variant.iterator();
-        Variant? val = null;
-        string? key = null;
-        while (iter.next("{s*}", &key, &val)) {
-            if (key != null) {
 
-                if (val.is_of_type(VariantType.MAYBE)) {
-                    val = val.get_maybe();
-                }
-                if (val.is_of_type(VariantType.VARIANT)) {
-                    val = val.get_variant();
-                }
-                result.insert(key, val);
-            }
+/**
+ * Convert Variant value to a hash table of child Variant values.
+ *
+ * If the Variant value is not a dictionary, the behavior is undefined.
+ * All child values are unboxed. A null value is used for empty variants.
+ *
+ * @param variant    A Variant dictionary value of type "a{s*}".
+ * @return A hash table of child variant values.
+ */
+public HashTable<string, Variant?> to_hash_table(Variant variant) {
+    return_val_if_fail(variant.is_of_type(new VariantType("a{s*}")), null);
+    var result = new HashTable<string, Variant?>(str_hash, str_equal);
+    VariantIter iter = variant.iterator();
+    Variant? val = null;
+    unowned string? key = null;
+    while (iter.next("{&s*}", out key, out val)) {
+        if (key != null) {
+            result.insert(key, unbox(val));
+        } else {
+            critical("A null key present in a Variant dictionary.");
         }
-    } else if (variant != null) {
-        critical("Wrong type: %s %s", variant.get_type_string(), variant.print(true));
     }
     return result;
 }
 
-public Variant variant_from_hashtable(HashTable<string, Variant> hashtable) {
-    var builder = new VariantBuilder(new VariantType("a{sv}"));
-    foreach (var key in hashtable.get_keys()) {
-        builder.add("{sv}", key, hashtable.get(key));
+
+/**
+ * Construct a Variant dictionary from a hash table.
+ *
+ * The keys in the variant dictionary are sorted.
+ *
+ * @param hash_table    The hash table to construct the dictionary from.
+ * @return Variant dictionary.
+ */
+public Variant from_hash_table(HashTable<string, Variant?> hash_table) {
+    var builder = new VariantBuilder(new VariantType("a{smv}"));
+    List<unowned string?> keys = hash_table.get_keys();
+    keys.sort(strcmp);
+    foreach (unowned string? key in keys) {
+        if (key != null) {
+            builder.add("{smv}", key, hash_table[key]);
+        } else {
+            critical("A null key present in a hash table.");
+        }
     }
     return builder.end();
 }
 
+
 /**
- * Extract string from variant with unboxing and data type checking.
+ * Extract a non-null string from variant with unboxing and data type checking.
+ *
+ * @param variant    The variant value to extract a string from.
+ * @param data       The return location for the result.
+ * @return true on success, false on failure.
  */
-public bool variant_string(Variant variant, out string? data) {
-    if (variant.is_of_type(VariantType.STRING)) {
-        data = variant.get_string();
+public bool get_string(Variant? variant, out string data) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null && unboxed.is_of_type(VariantType.STRING)) {
+        data = unboxed.get_string();
         return true;
     }
-
-    if (variant.get_type().is_subtype_of(VariantType.MAYBE)) {
-        Variant? maybe_variant = null;
-        variant.get("m*", &maybe_variant);
-        if (maybe_variant == null) {
-            data = null;
-            return true;
-        }
-        return variant_string(maybe_variant, out data);
-    }
-
-    if (variant.is_of_type(VariantType.VARIANT)) {
-        return variant_string(variant.get_variant(), out data);
-    }
-
     data = null;
     return false;
 }
 
-public bool variant_bool(Variant? variant, ref bool result) {
-    if (variant == null) {
-        return false;
-    }
 
-    if (variant.is_of_type(VariantType.BOOLEAN)) {
-        result = variant.get_boolean();
+/**
+ * Extract a string or a null value from variant with unboxing and data type checking.
+ *
+ * @param variant    The variant value to extract a string from.
+ * @param data       The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_maybe_string(Variant? variant, out string? data) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed == null) {
+        data = null;
         return true;
     }
-
-    if (variant.get_type().is_subtype_of(VariantType.MAYBE)) {
-        Variant? maybe_variant = null;
-        variant.get("m*", &maybe_variant);
-        return variant_bool(maybe_variant, ref result);
+    if (unboxed.is_of_type(VariantType.STRING)) {
+        data = unboxed.get_string();
+        return true;
     }
-
-    if (variant.is_of_type(VariantType.VARIANT)) {
-        return variant_bool(variant.get_variant(), ref result);
-    }
-
+    data = null;
     return false;
 }
 
-public static string? variant_dict_str(Variant dict, string key) {
-    Variant val = dict.lookup_value(key, null);
-    if (val == null) {
-        return null;
-    }
 
-    if (val.is_of_type(VariantType.MAYBE)) {
-        val = val.get_maybe();
-        if (val == null) {
-            return null;
-        }
+/**
+ * Extract a boolean value from variant with unboxing and data type checking.
+ *
+ * @param variant    The variant value to extract a boolean value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_bool(Variant? variant, out bool result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN)) {
+        result = unboxed.get_boolean();
+        return true;
     }
-
-    if (val.is_of_type(VariantType.VARIANT)) {
-        val = val.get_variant();
-    }
-    if (val.is_of_type(VariantType.STRING)) {
-        return val.get_string();
-    }
-    return null;
+    result = false;
+    return false;
 }
 
-public static double variant_dict_double(Variant dict, string key, double default_value) {
-    Variant? val = dict.lookup_value(key, null);
-    if (val == null) {
-        return default_value;
-    }
 
-    if (val.is_of_type(VariantType.MAYBE)) {
-        val = val.get_maybe();
-        if (val == null) {
-            return default_value;
+/**
+ * Extract a double value from variant with unboxing and data type checking.
+ *
+ * @param variant    The variant value to extract a double value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_double(Variant? variant, out double result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null && unboxed.is_of_type(VariantType.DOUBLE)) {
+        result = unboxed.get_double();
+        return true;
+    }
+    result = 0.0;
+    return false;
+}
+
+
+/**
+ * Extract an int64 value from variant with unboxing and data type checking.
+ *
+ * @param variant    The variant value to extract an int64 value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_int64(Variant? variant, out int64 result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null && unboxed.is_of_type(VariantType.INT64)) {
+        result = unboxed.get_int64();
+        return true;
+    }
+    result = 0;
+    return false;
+}
+
+
+/**
+ * Extract an int value from variant with unboxing and data type checking.
+ *
+ * Both VariantType.INT32 and VariantType.INT64 are accepted.
+ *
+ * @param variant    The variant value to extract an int value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_int(Variant? variant, out int result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null) {
+        if (unboxed.is_of_type(VariantType.INT64)) {
+            result = (int) unboxed.get_int64();
+            return true;
+        }
+        if (unboxed.is_of_type(VariantType.INT32)) {
+            result = (int) unboxed.get_int32();
+            return true;
         }
     }
+    result = 0;
+    return false;
+}
 
-    if (val.is_of_type(VariantType.VARIANT)) {
-        val = val.get_variant();
+
+/**
+ * Extract an uint value from variant with unboxing and data type checking.
+ *
+ * Both VariantType.UINT32 and VariantType.UINT64 are accepted.
+ *
+ * @param variant    The variant value to extract an uint value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_uint(Variant? variant, out uint result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null) {
+        if (unboxed.is_of_type(VariantType.UINT64)) {
+            result = (uint) unboxed.get_uint64();
+            return true;
+        }
+        if (unboxed.is_of_type(VariantType.UINT32)) {
+            result = (uint) unboxed.get_uint32();
+            return true;
+        }
     }
-    if (val.is_of_type(VariantType.DOUBLE)) {
-        return val.get_double();
+    result = 0;
+    return false;
+}
+
+
+/**
+ * Extract a number value from variant with unboxing and data type checking.
+ *
+ * VariantType.DOUBLE, VariantType.INT32 and VariantType.INT64 are accepted.
+ * Integer types are casted to double.
+ *
+ * @param variant    The variant value to extract a double/int value from.
+ * @param result     The return location for the result.
+ * @return true on success, false on failure.
+ */
+public bool get_number(Variant? variant, out double result) {
+    Variant? unboxed = unbox(variant);
+    if (unboxed != null) {
+        if (unboxed.is_of_type(VariantType.DOUBLE)) {
+            result = unboxed.get_double();
+            return true;
+        }
+        if (unboxed.is_of_type(VariantType.INT64)) {
+            result = (double) unboxed.get_int64();
+            return true;
+        }
+        if (unboxed.is_of_type(VariantType.INT32)) {
+            result = (double) unboxed.get_int32();
+            return true;
+        }
     }
-    return default_value;
+    result = 0;
+    return false;
+}
+
+
+/**
+ * Extract a string item from a variant dictionary.
+ *
+ * @param dict      The variant dictionary.
+ * @param key       The key of the dictionary.
+ * @param result    The return location for the extracted string.
+ * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a string value.
+ */
+public bool get_string_item(Variant dict, string key, out string result) {
+    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return get_string(dict.lookup_value(key, null), out result);
 }
 
 /**
- * Unboxes variant value.
+ * Extract a string or null item from a variant dictionary.
+ *
+ * @param dict      The variant dictionary.
+ * @param key       The key of the dictionary.
+ * @param result    The return location for the extracted string.
+ * @return true on success, false if dict is not a dictionary, the key does exist but doesn't contain a string value.
+ */
+public bool get_maybe_string_item(Variant dict, string key, out string? result) {
+    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return get_maybe_string(dict.lookup_value(key, null), out result);
+}
+
+
+/**
+ * Extract a boolean value item from a variant dictionary.
+ *
+ * @param dict      The variant dictionary.
+ * @param key       The key of the dictionary.
+ * @param result    The return location for the extracted boolean value.
+ * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a boolean value.
+ */
+public bool get_bool_item(Variant dict, string key, out bool result) {
+    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return get_bool(dict.lookup_value(key, null), out result);
+}
+
+
+/**
+ * Extract a double value item from a variant dictionary.
+ *
+ * @param dict      The variant dictionary.
+ * @param key       The key of the dictionary.
+ * @param result    The return location for the extracted double value.
+ * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a double value.
+ */
+public bool get_double_item(Variant dict, string key, out double result) {
+    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return get_double(dict.lookup_value(key, null), out result);
+}
+
+
+/**
+ * Unbox variant value.
  *
  *  * Null maybe variant is converted to null.
  *  * Child value is returned for values of type variant.
@@ -211,248 +408,110 @@ public static double variant_dict_double(Variant dict, string key, double defaul
  * @param value    value to unbox
  * @return unboxed value or null
  */
-public Variant? unbox_variant(Variant? value) {
+public Variant? unbox(Variant? value) {
     if (value == null) {
         return null;
     }
-
     if (value.get_type().is_subtype_of(VariantType.MAYBE)) {
         Variant? maybe_variant = null;
         value.get("m*", &maybe_variant);
-        return unbox_variant(maybe_variant);
+        return unbox(maybe_variant);
     }
-
     if (value.is_of_type(VariantType.VARIANT)) {
-        return unbox_variant(value.get_variant());
+        return unbox(value.get_variant());
     }
-
     return value;
 }
 
-/**
- * Converts any Variant value to boolean.
- *
- * @param value    value to convert
- * @return actual boolean value if the value is of type boolean, false otherwise
- */
-public bool variant_to_bool(Variant? value) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null && unboxed.is_of_type(VariantType.BOOLEAN)) {
-        return unboxed.get_boolean();
-    }
-    return false;
-}
 
 /**
- * Converts any Variant value to int64.
+ * Converts a typed value to variant.
  *
- * @param value    value to convert
- * @return actual int64 value if the value is of type int64, zero otherwise
- */
-public int64 variant_to_int64(Variant? value) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null && unboxed.is_of_type(VariantType.INT64)) {
-        return unboxed.get_int64();
-    }
-    return (int64) 0;
-}
-
-/**
- * Converts any Variant value to int.
- *
- * @param value    value to convert
- * @return actual int value if the value is of type int, zero otherwise
- */
-public int variant_to_int(Variant? value) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null && unboxed.is_of_type(VariantType.INT32)) {
-        return (int) unboxed.get_int32();
-    }
-    if (unboxed != null && unboxed.is_of_type(VariantType.INT64)) {
-        return (int) unboxed.get_int64();
-    }
-    return 0;
-}
-
-/**
- * Converts any Variant value to uint.
- *
- * @param value    value to convert
- * @return actual uint value if the value is of type uint, zero otherwise
- */
-public uint variant_to_uint(Variant? value) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null && unboxed.is_of_type(VariantType.UINT32)) {
-        return (uint) unboxed.get_uint32();
-    }
-    if (unboxed != null && unboxed.is_of_type(VariantType.UINT64)) {
-        return (uint) unboxed.get_uint64();
-    }
-    return 0;
-}
-
-/**
- * Converts any Variant value to double.
- *
- * @param value    value to convert
- * @return actual double value if the value is of type double or int64, 0.0 otherwise
- */
-public double variant_to_double(Variant? value) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null) {
-        if (unboxed.is_of_type(VariantType.DOUBLE)) {
-            return unboxed.get_double();
-        }
-        /* double value that happens to be integer may be actually stored as integer */
-        if (unboxed.is_of_type(VariantType.INT64)) {
-            return (double) unboxed.get_int64();
-        }
-    }
-    return 0.0;
-}
-
-/**
- * Converts any Variant value to string.
- *
- * @param value      value to convert
- * @param default_val    default value (usually null or empty string)
- * @return actual string value if the value is of type string, default value otherwise
- */
-public string? variant_to_string(Variant? value, string? default_val=null) {
-    Variant? unboxed = unbox_variant(value);
-    if (unboxed != null && unboxed.is_of_type(VariantType.STRING)) {
-        return unboxed.get_string();
-    }
-    return default_val;
-}
-
-/**
- * Dump variant as a string or return null.
- *
- * @param value    Variant value.
- * @return null if `value` is null, the variant value as a string otherwise
- */
-public inline string? variant_dump(Variant? value) {
-    return value == null ? null : value.print(true);
-}
-
-public Variant? new_variant_string_or_null(string? str) {
-    if (str == null) {
-        return null;
-    }
-    return new Variant.string(str);
-}
-
-/**
- * Converts string array to Variant dictionary
- *
- * The string array entries must follow this format: "[x:]key=value", where
- * `key` is the dictionary key, `x` is the type specifier and `value` is the dictionary value.
+ * The value format is: "[x:]value", where `value` is the actual value to parse and `x` is the type specifier.
  *
  * The type specifiers are:
  *
  *   *  `d` - double
- *   *  `b` - boolean
+ *   *  `i` - int
+ *   *  `b` - boolean (true or false)
  *   *  `s` - string
  *
  * If the specifier is omitted, the default type is string.
  *
- * @param args      array of `[x:]key=value` strings
- * @param offset    the offset of the first param
- * @return `null` if `args` is `null` or `offset` is invalid, Variant dict otherwise
+ * @param value    The string value to parse in "[x:]value" format.
+ * @return The parsed value as Variant on success, null on failure (wrong format specifier, cannot parse value).
  */
-public Variant? strv_to_variant_dict(string[]? args, int offset=0) {
-    if (args == null || offset < 0 || offset >= args.length) {
-        return null;
-    }
-
-    var builder = new VariantBuilder(new VariantType("a{smv}"));
-    for (int i = offset; i < args.length; i++) {
-        unowned string arg = args[i];
-        string[] arg_parts = arg.split("=", 2);
-        unowned string? key = arg_parts[0];
-        unowned string? value = arg_parts.length == 2 ? arg_parts[1] : null;
-        variant_dict_add_param(builder, key, value);
-    }
-    return builder.end();
-}
-
-/**
- * Converts a HashTable with both string keys and values to Variant dictionary
- *
- * The table keys must follow this format: "[x:]key", where `key` is the dictionary key and `x` is the type
- * specifier:
- *
- *   *  `d` - double
- *   *  `b` - boolean
- *   *  `s` - string
- *
- * If the specifier is omitted, the default type is string.
- *
- * @param args      hash table of `[x:]key` = `value` pairs
- * @return `null` if `args` is `null`, Variant dict otherwise
- */
-public Variant? str_table_to_variant_dict(HashTable<string, string>? args) {
-    if (args == null) {
-        return null;
-    }
-
-    var builder = new VariantBuilder(new VariantType("a{smv}"));
-    HashTableIter<string, string> iter = HashTableIter<string, string>(args);
-    unowned string key;
-    unowned string value;
-    while (iter.next(out key, out value)) {
-        variant_dict_add_param(builder, key, value);
-    }
-    return builder.end();
-}
-
-private void variant_dict_add_param(VariantBuilder dict_builder, string key, string value) {
-    string param_type;
-    string param_key;
-    Variant? param_value = null;
-    string[] parts = key.split(":", 2);
-    if (parts.length < 2) {
-        param_type = "s";
-        param_key = key;
-    } else {
-        param_type = parts[0];
-        param_key = parts[1];
-    }
-
-    if (value == null) {
-        param_value = null;
-    } else {
-        switch (param_type) {
-        case "d":
-            double d;
-            if (double.try_parse(value, out d)) {
-                param_value = new Variant.double(d);
-            }
-            break;
-        case "b":
-            bool b;
-            if (bool.try_parse(value, out b)) {
-                param_value = new Variant.boolean(b);
-            }
-            break;
-        case "s":
-        default:
-            param_value = new Variant.string(value);
-            break;
+public Variant? parse_typed_value(string value) {
+    string?[] parts = value.split(":", 2);
+    char type = 's';
+    unowned string value_to_parse = value;
+    if (parts.length == 2) {
+        if (parts[0].length != 1) {
+            return null;
         }
+        type = parts[0][0];
+        value_to_parse = parts[1];
     }
-    dict_builder.add("{smv}", param_key, param_value);
+    switch (type) {
+    case 'b':
+        bool b = false;
+        if (!String.is_empty(value_to_parse) && bool.try_parse(value_to_parse, out b)) {
+            return new Variant.boolean(b);
+        }
+        break;
+    case 'i':
+        int64 i = 0;
+        if (!String.is_empty(value_to_parse) && int64.try_parse(value_to_parse, out i)) {
+            return new Variant.int64(i);
+        }
+        break;
+    case 'd':
+        double d = 0.0;
+        if (!String.is_empty(value_to_parse) && double.try_parse(value_to_parse, out d)) {
+            return new Variant.double(d);
+        }
+        break;
+    case 's':
+        return new Variant.string(value_to_parse);
+    }
+    return null;
 }
 
+
 /**
- * Print variant as string
+ * Print variant as a string.
+ *
+ * If the variant is null, an empty non-null string is returned.
  *
  * @param variant    Variant to print.
  * @return Printed value.
  */
-public string print_variant(Variant? variant) {
-    return variant != null ? variant.print(true) : "null";
+public string to_string(Variant? variant) {
+    return variant != null ? variant.print(false) : "";
 }
 
-} // namespace Drt
+
+/**
+ * Print a non-null variant as a string.
+ *
+ * If the variant is null, null is returned.
+ *
+ * @param variant           Variant to print.
+ * @param type_annotate     true if type information should be included in the output.
+ * @return Printed value.
+ */
+public string? print(Variant? variant, bool type_annotate=true) {
+    return variant != null ? variant.print(type_annotate) : null;
+}
+
+/**
+ * Create a string Variant if the passed string is not null,
+ *
+ * @param str    The string to create a variant from.
+ * @return A string Variant if str is not null, null otherwise.
+ */
+public Variant? from_string_if_not_null(string? str) {
+    return str != null ? new Variant.string(str) : null;
+}
+
+} // namespace Drt.VariantUtils

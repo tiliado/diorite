@@ -83,7 +83,7 @@ public class RpcMethod : RpcCallable {
                 handler_params = new Variant?[params.length];
                 for (var i = 0; i < params.length; i++) {
                     RpcParam param = params[i];
-                    Variant? child = unbox_variant(data.get_child_value(i));
+                    Variant? child = VariantUtils.unbox(data.get_child_value(i));
                     handler_params[i] = param.get_value(path, child);
                 }
             } else {
@@ -104,7 +104,7 @@ public class RpcMethod : RpcCallable {
                     if (entry == null) {
                         entry = param.default_value;
                     }
-                    handler_params[i] = param.get_value(path, entry == null ? null : unbox_variant(entry));
+                    handler_params[i] = param.get_value(path, entry == null ? null : VariantUtils.unbox(entry));
                 }
             }
         }

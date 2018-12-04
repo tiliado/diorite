@@ -79,7 +79,7 @@ public abstract class Action: GLib.Object {
             warning("Cannot activate action '%s', because it is disabled.", name);
         } else if (parameter == null && this is ToggleAction) {
             activate(!this.state.get_boolean());
-        } else if (parameter == null || !variant_equal(parameter, this.state)) {
+        } else if (parameter == null || !VariantUtils.equal(parameter, this.state)) {
             activated(parameter);
         }
     }

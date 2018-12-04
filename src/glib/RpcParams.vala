@@ -208,7 +208,7 @@ public class StringArrayParam: RpcParam {
         var builder = new VariantBuilder(VariantType.STRING_ARRAY);
         size_t size = value.n_children();
         for (var i = 0; i < size; i++) {
-            Variant? child = unbox_variant(value.get_child_value(i));
+            Variant? child = VariantUtils.unbox(value.get_child_value(i));
             if (child == null) {
                 child = new Variant.string("");
             }

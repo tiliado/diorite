@@ -50,35 +50,39 @@ public abstract class KeyValueStorage: GLib.Object {
     protected abstract void set_value_unboxed(string key, Variant? value);
 
     public async void set_value_async(string key, Variant? value) {
-        yield set_value_unboxed_async(key, unbox_variant(value));
+        yield set_value_unboxed_async(key, VariantUtils.unbox(value));
     }
 
     public void set_value(string key, Variant? value) {
-        set_value_unboxed(key, unbox_variant(value));
+        set_value_unboxed(key, VariantUtils.unbox(value));
     }
 
     public async void set_default_value_async(string key, Variant? value) {
-        yield set_default_value_unboxed_async(key, unbox_variant(value));
+        yield set_default_value_unboxed_async(key, VariantUtils.unbox(value));
     }
 
     public void set_default_value(string key, Variant? value) {
-        set_default_value_unboxed(key, unbox_variant(value));
+        set_default_value_unboxed(key, VariantUtils.unbox(value));
     }
 
     public bool get_bool(string key) {
-        return variant_to_bool(get_value(key));
+        bool result;
+        return VariantUtils.get_bool(get_value(key), out result) ? result : false;
     }
 
     public int64 get_int64(string key) {
-        return variant_to_int64(get_value(key));
+        int64 result;
+        return VariantUtils.get_int64(get_value(key), out result) ? result : 0;
     }
 
     public double get_double(string key) {
-        return variant_to_double(get_value(key));
+        double result;
+        return VariantUtils.get_number(get_value(key), out result) ? result : 0.0;
     }
 
     public string? get_string(string key) {
-        return variant_to_string(get_value(key), null);
+        string? result;
+        return VariantUtils.get_string(get_value(key), out result) ? (owned) result : null;
     }
 
     public void set_string(string key, string? value) {

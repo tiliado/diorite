@@ -182,7 +182,7 @@ public class RpcRequest {
      * @return a dictionary. May be empty but not null.
      */
     public HashTable<string, Variant?> pop_dict() {
-        return variant_to_hashtable(next(typeof(DictParam)));
+        return VariantUtils.to_hash_table(next(typeof(DictParam)));
     }
 
     private Variant? next(Type param_type) {
@@ -198,7 +198,7 @@ public class RpcRequest {
                 "The parameter %d of method '%s' is of type '%s' but %s value requested.",
                 index, method.path, Type.from_instance(param).name(), param_type.name());
         }
-        return unbox_variant(data[index]);
+        return VariantUtils.unbox(data[index]);
     }
 
     /**

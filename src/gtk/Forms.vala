@@ -186,9 +186,9 @@ public class Form : Gtk.Grid {
     }
 
     public void add_entries(Variant entries_spec) throws FormError {
-        Variant[] array = variant_to_array(entries_spec);
+        Variant[] array = VariantUtils.to_array(entries_spec);
         foreach (unowned Variant entry_spec in array) {
-            add_entry(variant_to_array(entry_spec));
+            add_entry(VariantUtils.to_array(entry_spec));
         }
     }
 
@@ -222,8 +222,8 @@ public class Form : Gtk.Grid {
         Gtk.Widget widget = null;
         check_entry_spec_length(entry_spec, 2);
 
-        string? type;
-        if (!variant_string(entry_spec[0], out type) || type == null) {
+        string type;
+        if (!VariantUtils.get_string(entry_spec[0], out type)) {
             throw new FormError.INVALID_DATA("Invalid data type for field 0. %s",
                 print_entry_spec(entry_spec));
         }
@@ -232,21 +232,20 @@ public class Form : Gtk.Grid {
         case "string":
             // [type, id, label?]
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null) {
+            if (!VariantUtils.get_string(entry_spec[1], out id)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
                     print_entry_spec(entry_spec));
             }
 
             string? e_label = null;
-            if (entry_spec.length >= 3 && !variant_string(entry_spec[2], out e_label)) {
+            if (entry_spec.length >= 3 && !VariantUtils.get_maybe_string(entry_spec[2], out e_label)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
                     print_entry_spec(entry_spec));
             }
 
             string? e_value = null;
-            Variant? value = values.get(id);
-            if (value != null && value.is_of_type(VariantType.STRING)) {
-                e_value = value.get_string();
+            if (!VariantUtils.get_maybe_string(values.get(id), out e_value)) {
+                warning("Value doesn't have a string type: [%s] = %s", id, VariantUtils.print(values.get(id)));
             }
             var entry = new StringEntry(e_label, e_value);
             label = entry.label;
@@ -258,31 +257,31 @@ public class Form : Gtk.Grid {
             check_entry_spec_length(entry_spec, 3);
 
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null) {
+            if (!VariantUtils.get_string(entry_spec[1], out id)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
                     print_entry_spec(entry_spec));
             }
 
             string e_label;
-            if (!variant_string(entry_spec[2], out e_label) || e_label == null) {
+            if (!VariantUtils.get_string(entry_spec[2], out e_label)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
                     print_entry_spec(entry_spec));
             }
 
             bool e_value = false;
-            Variant? value = values.get(id);
-            if (value != null && value.is_of_type(VariantType.BOOLEAN)) {
-                e_value = value.get_boolean();
+            if (!VariantUtils.get_bool(values.get(id), out e_value)) {
+                warning("Value doesn't have a bool type: [%s] = %s", id, VariantUtils.print(values.get(id)));
             }
+
             string[] e_enables;
             if (entry_spec.length > 3) {
-                e_enables = variant_to_strv(entry_spec[3]);
+                e_enables = VariantUtils.to_strv(entry_spec[3]);
             } else {
                 e_enables = {};
             }
             string[] e_disables;
             if (entry_spec.length > 4) {
-                e_disables = variant_to_strv(entry_spec[4]);
+                e_disables = VariantUtils.to_strv(entry_spec[4]);
             } else {
                 e_disables = {};
             }
@@ -298,19 +297,19 @@ public class Form : Gtk.Grid {
             check_entry_spec_length(entry_spec, 4);
 
             string id;
-            if (!variant_string(entry_spec[1], out id) || id == null) {
+            if (!VariantUtils.get_string(entry_spec[1], out id)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
                     print_entry_spec(entry_spec));
             }
 
             string e_target;
-            if (!variant_string(entry_spec[2], out e_target) || e_target == null) {
+            if (!VariantUtils.get_string(entry_spec[2], out e_target)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 2. %s",
                     print_entry_spec(entry_spec));
             }
 
             string e_label;
-            if (!variant_string(entry_spec[3], out e_label) || e_label == null) {
+            if (!VariantUtils.get_string(entry_spec[3], out e_label)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 3. %s",
                     print_entry_spec(entry_spec));
             }
@@ -320,13 +319,13 @@ public class Form : Gtk.Grid {
             bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
             string[] e_enables;
             if (entry_spec.length > 4) {
-                e_enables = variant_to_strv(entry_spec[4]);
+                e_enables = VariantUtils.to_strv(entry_spec[4]);
             } else {
                 e_enables = {};
             }
             string[] e_disables;
             if (entry_spec.length > 5) {
-                e_disables = variant_to_strv(entry_spec[5]);
+                e_disables = VariantUtils.to_strv(entry_spec[5]);
             } else {
                 e_disables = {};
             }
@@ -347,7 +346,7 @@ public class Form : Gtk.Grid {
         case "label":
             // [type, text]
             string text;
-            if (!variant_string(entry_spec[1], out text) || text == null) {
+            if (!VariantUtils.get_string(entry_spec[1], out text)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
                     print_entry_spec(entry_spec));
             }
@@ -359,7 +358,7 @@ public class Form : Gtk.Grid {
         case "header":
             // [type, text]
             string text;
-            if (!variant_string(entry_spec[1], out text) || text == null) {
+            if (!VariantUtils.get_string(entry_spec[1], out text)) {
                 throw new FormError.INVALID_DATA("Invalid data type for field 1. %s",
                     print_entry_spec(entry_spec));
             }

@@ -73,15 +73,15 @@ public class RpcNotification : RpcCallable {
                     "Method '%s' requires %d parameters but %d parameters have been provided.",
                     path, 2, (int) data.n_children());
             }
-            Variant entry = unbox_variant(data.get_child_value(0));
-            if (!variant_bool(entry, ref subscribe)) {
+            Variant entry = data.get_child_value(0);
+            if (!VariantUtils.get_bool(entry, out subscribe)) {
                 throw new ApiError.INVALID_PARAMS(
                     "Method '%s' call expected the first parameter to be a boolean, but type of '%s' received.",
                     path, entry.get_type_string());
             }
             if (n_children == 2) {
-                entry = unbox_variant(data.get_child_value(1));
-                if (entry != null && !variant_string(entry, out detail)) {
+                entry = data.get_child_value(1);
+                if (!VariantUtils.get_maybe_string(entry, out detail)) {
                     throw new ApiError.INVALID_PARAMS(
                         "Method '%s' call expected the second parameter to be a string, but type of '%s' received.",
                         path, entry.get_type_string());
@@ -93,24 +93,15 @@ public class RpcNotification : RpcCallable {
             }
 
             Variant dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-            Variant entry = unbox_variant(dict.lookup_value("subscribe", null));
-            if (entry == null) {
+            if (!VariantUtils.get_bool_item(dict, "subscribe", out subscribe)) {
                 throw new ApiError.INVALID_PARAMS(
-                    "Method '%s' requires the 'subscribe' parameter of type 'b', but it has been omitted.",
-                    path);
+                    "Method '%s' requires the 'subscribe' parameter of type 'b', but it wasn't provided: %s",
+                    path, VariantUtils.print(dict));
             }
-
-            if (!variant_bool(entry, ref subscribe)) {
+            if (!VariantUtils.get_maybe_string_item(dict, "detail", out detail)) {
                 throw new ApiError.INVALID_PARAMS(
-                    "Method '%s' call expected the subscribe parameter to be a boolean, but type of '%s' received.",
-                    path, entry.get_type_string());
-            }
-
-            entry = unbox_variant(dict.lookup_value("detail", null));
-            if (entry != null && !variant_string(entry, out detail)) {
-                throw new ApiError.INVALID_PARAMS(
-                    "Method '%s' call expected the detail parameter to be a string, but type of '%s' received.",
-                    path, entry.get_type_string());
+                    "Method '%s' call expected the detail parameter to be a string, but the type is different: %s",
+                    path, VariantUtils.print(dict));
             }
         }
     }
@@ -138,17 +129,16 @@ public class RpcNotification : RpcCallable {
             if (n_children > 2) {
                 throw new ApiError.INVALID_PARAMS(
                     "Notification requires %d parameters but %d parameters have been provided.",
-                    2, (int) data.n_children());
+                    2, (int) n_children);
             }
             if (n_children > 0) {
-                Variant? entry = unbox_variant(data.get_child_value(0));
-                if (entry != null && !variant_string(entry, out detail)) {
+                if (!VariantUtils.get_maybe_string(data.get_child_value(0), out detail)) {
                     throw new ApiError.INVALID_PARAMS(
-                        "Notification call expected the first parameter to be a string, but type of '%s' received.",
-                        entry.get_type_string());
+                        "Notification call expected the first parameter to be a maybe string: %s",
+                        VariantUtils.print(data));
                 }
                 if (n_children == 2) {
-                    parameters = unbox_variant(data.get_child_value(1));
+                    parameters = VariantUtils.unbox(data.get_child_value(1));
                 }
             }
         } else {
@@ -156,13 +146,12 @@ public class RpcNotification : RpcCallable {
                 Rpc.check_type_string(data, "a{smv}");
             }
             Variant dict = data.get_type_string() == "(a{smv})" ? data.get_child_value(0) : data;
-            Variant entry = unbox_variant(dict.lookup_value("detail", null));
-            if (entry != null && !variant_string(entry, out detail)) {
+            if (!VariantUtils.get_maybe_string_item(dict, "detail", out detail)) {
                 throw new ApiError.INVALID_PARAMS(
-                    "Notification call expected the detail parameter to be a string, but type of '%s' received.",
-                    entry.get_type_string());
+                    "Notification call expected the detail parameter to be a string: %s",
+                    VariantUtils.print(data));
             }
-            parameters = unbox_variant(dict.lookup_value("params", null));
+            parameters = VariantUtils.unbox(dict.lookup_value("params", null));
         }
     }
 

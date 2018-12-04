@@ -177,13 +177,15 @@ public class RpcRouter: GLib.Object {
             builder.open(new VariantType("a{smv}"));
             var params = new VariantBuilder(new VariantType("aa{smv}"));
             var method = callable as RpcMethod;
+            unowned string? description;
             if (method != null) {
                 builder.add("{smv}", "type", new Variant.string("method"));
                 foreach (var param in method.params) {
+                    description = param.description;
                     params.open(new VariantType("a{smv}"));
                     params.add("{smv}", "name", new Variant.string(param.name));
                     params.add("{smv}", "type", new Variant.string(param.type_string));
-                    params.add("{smv}", "description", new_variant_string_or_null(param.description));
+                    params.add("{smv}", "description", description == null ? null : new Variant.string(description));
                     params.add("{smv}", "required", new Variant.boolean(param.required));
                     params.add("{smv}", "nullable", new Variant.boolean(param.nullable));
                     params.add("{smv}", "default_value", param.default_value);
@@ -210,9 +212,10 @@ public class RpcRouter: GLib.Object {
                 params.add("{smv}", "default_value", null);
                 params.close();
             }
+            description = callable.description;
             builder.add("{smv}", "path", new Variant.string(path));
             builder.add("{smv}", "flags", new Variant.string(flags));
-            builder.add("{smv}", "description", new_variant_string_or_null(callable.description));
+            builder.add("{smv}", "description", description == null ? null : new Variant.string(description));
             builder.add("{smv}", "params", params.end());
             builder.close();
         }
