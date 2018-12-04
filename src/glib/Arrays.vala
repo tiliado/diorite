@@ -35,6 +35,7 @@ namespace Drt.Arrays {
  * @return All entries with the given first index.
  */
 public uint8[] from_2d_uint8(uint8[,] array_2d, int index) {
+    return_val_if_fail(index >= 0 && index < array_2d.length[0], null);
     int size = array_2d.length[1];
     var result = new uint8[size];
     for (var i = 0; i < size; i++) {
