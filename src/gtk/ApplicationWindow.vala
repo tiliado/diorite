@@ -149,6 +149,7 @@ public class ApplicationWindow: Gtk.ApplicationWindow {
                 }
             }
         }
+        toolbar_buttons.prepend(menu_button);
 
         foreach (Gtk.Widget widget in extra_widgets) {
             header_bar.remove(widget);
