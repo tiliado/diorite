@@ -83,7 +83,7 @@ public abstract class TestCase : GLib.Object {
             return true;
         }
         reason = "%f != %f".printf(val1, val2);
-        return  false;
+        return false;
     }
 
     public static bool bool_eq(void* data1, void* data2, out string? reason) {
