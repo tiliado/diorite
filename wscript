@@ -43,7 +43,7 @@ assert sys.version_info >= (3, 4, 0), "Run waf with Python >= 3.4"
 
 from waflib.Errors import ConfigurationError
 from waflib.Configure import conf
-from waflib import Utils
+from waflib import TaskGen, Utils, Errors, Node, Task
 
 TARGET_GLIB = MIN_GLIB.rsplit(".", 1)[0]
 REVISION_SNAPSHOT = "snapshot"
@@ -133,6 +133,68 @@ def gir_compile(ctx, name, lib):
         target=ctx.path.find_or_declare(name + ".typelib"),
         install_path="${LIBDIR}/girepository-1.0")
 
+@TaskGen.feature('valalint')
+@TaskGen.before_method('process_source', 'process_rule')
+def valalint_taskgen(self):
+    source = Utils.to_list(getattr(self, 'source', []))
+    if isinstance(source, Node.Node):
+        source = [source]
+    if not source:
+        raise Errors.WafError('no input file')
+    for i, item in enumerate(source):
+        if isinstance(item, str):
+            source[i] =  self.path.find_resource(item)
+        elif not isinstance(item, Node.Node):
+            raise Errors.WafError('invalid source for %r' % self)
+    self.source = []
+    task = self.create_task('valalint', source, None)
+
+    if getattr(self, 'packages', None):
+        task.packages = Utils.to_list(self.packages)
+    if getattr(self, 'vapi_dirs', None):
+        vapi_dirs = Utils.to_list(self.vapi_dirs)
+        for vapi_dir in vapi_dirs:
+            try:
+                task.vapi_dirs.append(self.path.find_dir(vapi_dir).abspath())
+            except AttributeError:
+                Logs.warn('Unable to locate Vala API directory: %r', vapi_dir)
+    if getattr(self, 'protected', None):
+        task.protected = self.protected
+    if getattr(self, 'private', None):
+        task.private = self.private
+    if getattr(self, 'inherit', None):
+        task.inherit = self.inherit
+    if getattr(self, 'deps', None):
+        task.deps = self.deps
+    if getattr(self, 'vala_defines', None):
+        task.vala_defines = Utils.to_list(self.vala_defines)
+    if getattr(self, 'vala_target_glib', None):
+        task.vala_target_glib = self.vala_target_glib
+    if getattr(self, 'enable_non_null_experimental', None):
+        task.enable_non_null_experimental = self.enable_non_null_experimental
+    if getattr(self, 'force', None):
+        task.force = self.force
+    if getattr(self, 'checks', None):
+        task.valalint_checks = Utils.to_list(self.checks)
+
+
+class valalint(Task.Task):
+    vars  = ['VALALINT', 'VALALINTFLAGS']
+    color = 'BLUE'
+    def __init__(self, *k, **kw):
+        Task.Task.__init__(self, *k, **kw)
+        self.valalint_checks = []
+
+    def run(self):
+        cmd = [Utils.subst_vars('${VALALINT}', self.env)]
+        if getattr(self, 'valalint_checks', None):
+            for check in self.valalint_checks:
+                cmd.append ('-c %s' % check)
+        if self.env.VALALINTFLAGS:
+            cmd.extend(self.env.VALALINTFLAGS)
+        cmd.append (' '.join ([i.abspath() for i in self.inputs]))
+        return self.generator.bld.exec_command(' '.join(cmd))
+
 # Actions #
 #=========#
 
@@ -144,6 +206,11 @@ def options(ctx):
     ctx.add_option('--novaladoc', action='store_false', default=True, dest='buildvaladoc', help="Don't build Vala documentation.")
     ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
     ctx.add_option('--no-strict', action='store_false', default=True, dest='strict', help="Disable strict checks (e.g. fatal warnings).")
+    ctx.add_option(
+        '--no-vala-lint', action='store_false', default=True, dest='lint_vala', help="Don't use Vala linter.")
+    ctx.add_option(
+        '--lint-vala-auto-fix', action='store_true', default=False,
+        dest='lint_vala_auto_fix', help="Use Vala linter and automatically fix errors (dangerous).")
 
 def configure(ctx):
     add_version_info(ctx)
@@ -178,6 +245,10 @@ def configure(ctx):
     if ctx.env.BUILD_VALADOC:
         ctx.load('valadoc', tooldir='.')
 
+    ctx.env.LINT_VALA = ctx.options.lint_vala
+    if ctx.env.LINT_VALA:
+        ctx.find_program('valalint', var='VALALINT')
+
     pkgconfig(ctx, 'glib-2.0', 'GLIB', MIN_GLIB)
     pkgconfig(ctx, 'gthread-2.0', 'GTHREAD', MIN_GLIB)
     pkgconfig(ctx, 'gio-2.0', 'GIO', MIN_GLIB)
@@ -201,6 +272,16 @@ def configure(ctx):
     ctx.define('GDK_VERSION_MIN_REQUIRED', glib_encode_version(MIN_GTK))
 
 def build(ctx):
+    def valalint(source_dir=None, **kwargs):
+        if not ctx.env.LINT_VALA:
+            return
+        if source_dir is not None:
+            kwargs["source"] = ctx.path.ant_glob(source_dir + '/**/*.vala')
+        return ctx(features="valalint", **kwargs)
+
+    if ctx.options.lint_vala_auto_fix:
+        ctx.env.append_unique('VALALINTFLAGS', '--fix')
+
     #~ print ctx.env
     PC_CFLAGS = ""
     DIORITE_GLIB = "{}glib{}".format(APPNAME, ctx.env.SERIES)
@@ -218,6 +299,12 @@ def build(ctx):
     env_vapi_dir = os.environ.get("VAPIDIR")
     if env_vapi_dir:
         vapi_dirs.extend(os.path.relpath(path) for path in env_vapi_dir.split(":"))
+
+    valalint(source_dir = 'src/glib')
+    valalint(source_dir = 'src/gtk')
+    valalint(source_dir = 'src/db')
+    valalint(source_dir = 'src/tests')
+    ctx.add_group()
 
     ctx(features = "c cshlib",
         target = DIORITE_GLIB,
