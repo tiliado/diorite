@@ -175,8 +175,8 @@ public string? unmask(uint8[] data) {
         }
         result[i - 1] = data[i] - shift;
     }
-    result[length] = 0;
     return (string) result;
+    result[length - 1] = 0;
 }
 
 /**
