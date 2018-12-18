@@ -93,6 +93,28 @@ public class StringTest: Drt.TestCase {
         Drt.String.append(ref buffer, "", "bar");
         expect_str_equals("xbar", buffer, "");
     }
+
+    public void test_unmask() {
+        uint8[] data = {46, 143, 144, 145, 146, 147, 148};
+        string? actual = Drt.String.unmask(data);
+        expect_str_equals("abcdef", actual, "valid");
+
+        data = {};
+        actual = Drt.String.unmask(data);
+        expect_null<string>(actual, "zero items  not enough");
+
+        data = {46};
+        actual = Drt.String.unmask(data);
+        expect_null<string>(actual, "1 item not enough");
+
+        data = {46, 143};
+        actual = Drt.String.unmask(data);
+        expect_str_equals("a", actual, "2 items enough");
+
+        data = {146, 143};
+        actual = Drt.String.unmask(data);
+        expect_null<string>(actual, "invalid offset");
+    }
 }
 
 } // namespace Drt
