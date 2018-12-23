@@ -41,6 +41,15 @@
 namespace Drt.VariantUtils {
 
 /**
+ * Get VariantType for a dictionary with string keys and maybe-variant values.
+ *
+ * @return Variant type "a{smv}".
+ */
+public unowned VariantType get_type_dict_maybe_value() {
+    return (VariantType) "a{smv}";
+}
+
+/**
  * Compare two Variant values for equality.
  *
  * They can be null as well.
@@ -154,7 +163,7 @@ public HashTable<string, Variant?> to_hash_table(Variant variant) {
  * @return Variant dictionary.
  */
 public Variant from_hash_table(HashTable<string, Variant?> hash_table) {
-    var builder = new VariantBuilder(new VariantType("a{smv}"));
+    var builder = new VariantBuilder(get_type_dict_maybe_value());
     List<unowned string?> keys = hash_table.get_keys();
     keys.sort(strcmp);
     foreach (unowned string? key in keys) {
