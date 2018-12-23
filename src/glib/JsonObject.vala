@@ -70,9 +70,10 @@ public class JsonObject: JsonNode {
      * @return the member if it has been found and thus removed from the object, `null` otherwise
      */
     public JsonNode? take(string name) {
-        JsonNode? node = nodes.take(name, null);
+        JsonNode? node = nodes[name];
         if (node != null) {
             node.parent = null;
+            nodes.remove(name);
         }
         return node;
     }

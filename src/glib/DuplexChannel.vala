@@ -220,12 +220,12 @@ public abstract class DuplexChannel : GLib.Object {
      * @throw local or remote errors arisen from the request
      */
     private ByteArray? get_response(uint id) throws GLib.Error {
-        bool found;
         Payload? payload;
         lock (outgoing_requests) {
-            payload = outgoing_requests.take(id.to_pointer(), out found);
+            payload = outgoing_requests[id.to_pointer()];
+            outgoing_requests.remove(id.to_pointer());
         }
-        if (!found) {
+        if (payload == null) {
             throw new GLib.IOError.NOT_FOUND("Response with id %u has not been found.", id);
         }
         if (payload.error != null) {
@@ -508,12 +508,12 @@ public abstract class DuplexChannel : GLib.Object {
     }
 
     protected void request_timed_out(uint id) {
-        bool found;
         Payload? payload;
         lock (outgoing_requests) {
-            payload = outgoing_requests.take(id.to_pointer(), out found);
+            payload = outgoing_requests.get(id.to_pointer());
+            outgoing_requests.remove(id.to_pointer());
         }
-        if (found) {
+        if (payload != null) {
             payload.timeout_id = 0;
             string msg = "Channel (%u) Request (%u) timed out.".printf(this.id, id);
             if (timeout_fatal) {

@@ -186,12 +186,12 @@ public class RpcLocalConnection: RpcConnection {
      * @throws GLib.Error if the response has not been found or it ended with an error.
      */
     private Variant? get_response(uint id) throws GLib.Error {
-        bool found;
         Response? resp;
         lock (pending_requests) {
-            resp = pending_requests.take(id.to_pointer(), out found);
+            resp = pending_requests.get(id.to_pointer());
+            pending_requests.remove(id.to_pointer());
         }
-        if (!found) {
+        if (resp == null) {
             throw new GLib.IOError.NOT_FOUND("Response with id %u has not been found.", id);
         } else if (resp.error != null) {
             throw resp.error;
