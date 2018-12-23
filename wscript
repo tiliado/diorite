@@ -33,6 +33,7 @@ VERSION = "4.14.0"
 MIN_VALA = "0.42.0"
 MIN_GLIB = "2.56.1"
 MIN_GTK = "3.22.30"
+MIN_GEE = "0.20.1"
 
 # Extras #
 #========#
@@ -256,6 +257,7 @@ def configure(ctx):
     pkgconfig(ctx, 'gtk+-3.0', 'GTK+', MIN_GTK)
     pkgconfig(ctx, 'gdk-3.0', 'GDK', MIN_GTK)
     pkgconfig(ctx, 'gdk-x11-3.0', 'GDKX11', MIN_GTK)
+    pkgconfig(ctx, 'gee-0.8', 'GEE', MIN_GEE)
     pkgconfig(ctx, 'x11', 'X11', "0")
     pkgconfig(ctx, 'sqlite3', 'SQLITE', "3.7")
 
@@ -289,9 +291,9 @@ def build(ctx):
     DIORITE_DB = "{}db{}".format(APPNAME, ctx.env.SERIES)
     DIORITE_TESTS = "{}tests".format(APPNAME)
     RUN_DIORITE_TESTS = "run-{}".format(DIORITE_TESTS)
-    packages = 'posix glib-2.0 gio-2.0 gio-unix-2.0'
+    packages = 'posix glib-2.0 gio-2.0 gio-unix-2.0 gee-0.8'
     packages_gtk = packages + " gtk+-3.0 x11 gdk-3.0 gdk-x11-3.0"
-    uselib = 'GLIB GIO UNIXGIO'
+    uselib = 'GLIB GIO UNIXGIO GEE'
     uselib_gtk = uselib + " GTK+ GDK X11 GDKX11"
     vala_defines = ctx.env.VALA_DEFINES
 

@@ -23,6 +23,7 @@ Dependencies
   - glib-2.0 >= 2.56.1
   - gio-2.0 >= 2.56.1
   - gtk+-3.0 >= 3.22.30
+  - gee-0.8 >= 0.20.1
   - sqlite >= 3.7
   - x11
   - g-ir-compiler
