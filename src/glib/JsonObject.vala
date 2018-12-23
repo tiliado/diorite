@@ -46,11 +46,11 @@ public class JsonObject: JsonNode {
     public void set(string name, JsonNode node) {
         return_if_fail(node.parent == null);
         unowned JsonNode? old_node = get(name);
-        nodes[name] = node;
-        node.parent = this;
         if (old_node != null) {
             old_node.parent = null;
         }
+        nodes[name] = node;
+        node.parent = this;
     }
 
     /**
