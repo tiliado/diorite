@@ -131,14 +131,15 @@ public HashTable<string, Variant?> to_hash_table(Variant variant) {
     return_val_if_fail(variant.is_of_type(new VariantType("a{s*}")), null);
     var result = new HashTable<string, Variant?>(str_hash, str_equal);
     VariantIter iter = variant.iterator();
-    Variant? val = null;
-    unowned string? key = null;
+    unowned string? key = null; // "&s" (unowned)
+    Variant? val = null; // "*" (new reference)
     while (iter.next("{&s*}", out key, out val)) {
         if (key != null) {
             result.insert(key, unbox(val));
         } else {
             critical("A null key present in a Variant dictionary.");
         }
+        val = null; // https://gitlab.gnome.org/GNOME/vala/issues/722
     }
     return result;
 }
@@ -413,7 +414,7 @@ public Variant? unbox(Variant? value) {
         return null;
     }
     if (value.get_type().is_subtype_of(VariantType.MAYBE)) {
-        Variant? maybe_variant = null;
+        Variant? maybe_variant = null; // "m*" (new reference)
         value.get("m*", &maybe_variant);
         return unbox(maybe_variant);
     }

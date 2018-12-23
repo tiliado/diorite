@@ -166,8 +166,8 @@ public class RpcRequest {
         SList<string> list = null;
         Variant? array = next(typeof(StringArrayParam));
         VariantIter iter = array.iterator();
-        unowned string str = null;
-        while (iter.next("s", &str)) {
+        unowned string str = null;  // "&s" (unowned)
+        while (iter.next("&s", out str)) {
             list.prepend(str);
         }
         list.reverse();
