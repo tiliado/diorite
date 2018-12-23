@@ -50,6 +50,15 @@ public unowned VariantType get_type_dict_maybe_value() {
 }
 
 /**
+ * Get VariantType for a dictionary with string keys and simple values.
+ *
+ * @return Variant type "a{s*}".
+ */
+public unowned VariantType get_type_dict_any_value() {
+    return (VariantType) "a{s*}";
+}
+
+/**
  * Compare two Variant values for equality.
  *
  * They can be null as well.
@@ -137,7 +146,7 @@ public Variant?[] to_array(Variant variant) {
  * @return A hash table of child variant values.
  */
 public HashTable<string, Variant?> to_hash_table(Variant variant) {
-    return_val_if_fail(variant.is_of_type(new VariantType("a{s*}")), null);
+    return_val_if_fail(variant.is_of_type(get_type_dict_any_value()), null);
     var result = new HashTable<string, Variant?>(str_hash, str_equal);
     VariantIter iter = variant.iterator();
     unowned string? key = null; // "&s" (unowned)
@@ -363,7 +372,7 @@ public bool get_number(Variant? variant, out double result) {
  * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a string value.
  */
 public bool get_string_item(Variant dict, string key, out string result) {
-    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return_val_if_fail(dict.is_of_type(get_type_dict_any_value()), false);
     return get_string(dict.lookup_value(key, null), out result);
 }
 
@@ -376,7 +385,7 @@ public bool get_string_item(Variant dict, string key, out string result) {
  * @return true on success, false if dict is not a dictionary, the key does exist but doesn't contain a string value.
  */
 public bool get_maybe_string_item(Variant dict, string key, out string? result) {
-    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return_val_if_fail(dict.is_of_type(get_type_dict_any_value()), false);
     return get_maybe_string(dict.lookup_value(key, null), out result);
 }
 
@@ -390,7 +399,7 @@ public bool get_maybe_string_item(Variant dict, string key, out string? result) 
  * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a boolean value.
  */
 public bool get_bool_item(Variant dict, string key, out bool result) {
-    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return_val_if_fail(dict.is_of_type(get_type_dict_any_value()), false);
     return get_bool(dict.lookup_value(key, null), out result);
 }
 
@@ -404,7 +413,7 @@ public bool get_bool_item(Variant dict, string key, out bool result) {
  * @return true on success, false if dict is not a dictionary, the key doesn't exist or doesn't contain a double value.
  */
 public bool get_double_item(Variant dict, string key, out double result) {
-    return_val_if_fail(dict.is_of_type(new VariantType("a{s*}")), false);
+    return_val_if_fail(dict.is_of_type(get_type_dict_any_value()), false);
     return get_double(dict.lookup_value(key, null), out result);
 }
 
