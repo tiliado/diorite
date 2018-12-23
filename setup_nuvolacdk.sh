@@ -10,6 +10,10 @@ CC="gcc"
 export CC CFLAGS PKG_CONFIG_PATH PATH LD_LIBRARY_PATH
 export GI_TYPELIB_PATH="$PWD/build:$GI_TYPELIB_PATH"
 
+# Memory corruption checks
+export MALLOC_CHECK_=3
+export MALLOC_PERTURB_=$(($RANDOM % 255 + 1))
+
 alias configure="python3 ./waf configure --flatpak"
 alias waf="python3 ./waf -v "
 alias update="python3 ./waf && sudo python3 ./waf install"
