@@ -335,7 +335,8 @@ public class JsonParser {
     }
 
     private void parse_object(out JsonObject object) throws JsonError {
-        object = new JsonObject();
+        object = null;
+        var new_object = new JsonObject();
         /* Look for the end of the object */
         skip_whitespace();
         char c = peek_char();
@@ -345,6 +346,7 @@ public class JsonParser {
                 "%u:%u Unexpected end of data. A string or '}' expected.", line, column);
         case '}':
             get_char();
+            object = (owned) new_object;
             return;
         }
         while (true) {
@@ -381,7 +383,7 @@ public class JsonParser {
             /* Parse the value */
             JsonNode node = null;
             parse_one(out node);
-            object[key] = node;
+            new_object[key] = node;
 
             /* Look for a comma or the end of the object */
             skip_whitespace();
@@ -393,6 +395,7 @@ public class JsonParser {
             case ',':
                 break;
             case '}':
+                object = (owned) new_object;
                 return;
             default:
                 throw new JsonError.PARSE_ERROR(
@@ -402,12 +405,13 @@ public class JsonParser {
     }
 
     private void parse_array(out JsonArray array) throws JsonError {
+        array = null;
         if (++array_recursion >= 20) {
             throw new JsonError.PARSE_ERROR(
                 "%u:%u Maximal array recursion depth reached.", line, column);
         }
 
-        array = new JsonArray();
+        var new_array = new JsonArray();
         /* Look for the end of the array */
         skip_whitespace();
         switch (peek_char()) {
@@ -417,6 +421,7 @@ public class JsonParser {
         case ']':
             get_char();
             array_recursion--;
+            array = (owned) new_array;
             return;
         }
         while (true) {
@@ -430,7 +435,7 @@ public class JsonParser {
                 /* Parse the value */
                 JsonNode node;
                 parse_one(out node);
-                array.append(node);
+                new_array.append(node);
                 break;
             }
 
@@ -445,6 +450,7 @@ public class JsonParser {
                 break;
             case ']':
                 array_recursion--;
+                array = (owned) new_array;
                 return;
             default:
                 throw new JsonError.PARSE_ERROR(
