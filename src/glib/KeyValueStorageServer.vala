@@ -91,7 +91,7 @@ public class KeyValueStorageServer: GLib.Object {
             return false;
         }
 
-        provider.listeners.prepend(listener);
+        provider.listeners.add(listener);
         return true;
     }
 
@@ -163,13 +163,13 @@ public class KeyValueStorageServer: GLib.Object {
     private class Provider {
         public unowned string name;
         public KeyValueStorage storage;
-        public SList<Drt.RpcConnection> listeners;
+        public Gee.List<Drt.RpcConnection> listeners;
 
         public Provider(string name, KeyValueStorage storage) {
             this.name = name;
             this.storage = storage;
             storage.changed.connect(on_changed);
-            listeners = null;
+            listeners = new Gee.LinkedList<Drt.RpcConnection>();
         }
 
         private void on_changed(string key, Variant? old_value) {

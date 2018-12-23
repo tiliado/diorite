@@ -28,7 +28,7 @@ namespace Drt {
  * RPC Notification handles incoming request to subscribe/unsubscribe and emits notifications..
  */
 public class RpcNotification : RpcCallable {
-    private SList<RpcConnection> subscribers = null;
+    private Gee.List<RpcConnection> subscribers = new Gee.LinkedList<RpcConnection>();
 
     /**
      * Creates new Rpcnotification handler
@@ -164,7 +164,7 @@ public class RpcNotification : RpcCallable {
      */
     public void subscribe(RpcConnection conn, bool subscribe, string? detail) throws GLib.Error {
         if (subscribe) {
-            subscribers.append(conn);
+            subscribers.add(conn);
         } else {
             subscribers.remove(conn);
         }
@@ -179,7 +179,7 @@ public class RpcNotification : RpcCallable {
      */
     public async bool emit(string? detail, Variant? data) {
         var result = true;
-        foreach (unowned RpcConnection channel in subscribers) {
+        foreach (RpcConnection channel in subscribers) {
             try {
                 yield channel.call("n:" + path, new Variant("(msmv)", detail, data));
             } catch (GLib.Error e) {

@@ -99,7 +99,7 @@ public abstract class TestCase : GLib.Object {
 
     public int passed = 0;
     public int failed = 0;
-    private SList<LogMessage> log_messages = null;
+    private Gee.List<LogMessage>? log_messages = null;
     private bool first_result = true;
 
     construct {
@@ -114,7 +114,7 @@ public abstract class TestCase : GLib.Object {
     public virtual void set_up() {
         first_result = true;
         Test.log_set_fatal_handler(log_fatal_func);
-        log_messages = null;
+        log_messages = new Gee.LinkedList<LogMessage>();
         GLib.Log.set_default_handler(log_handler);
     }
 
@@ -748,7 +748,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     private void log_handler(string? domain, LogLevelFlags level, string text) {
-        log_messages.append(new LogMessage(domain, level, text));
+        log_messages.add(new LogMessage(domain, level, text));
     }
 
     [Diagnostics]
@@ -774,13 +774,15 @@ public abstract class TestCase : GLib.Object {
     ) {
         bool result = false;
         if (log_messages != null) {
-            foreach (unowned LogMessage msg in log_messages) {
+            Gee.Iterator<LogMessage> iter = log_messages.iterator();
+            while (iter.next()) {
+                LogMessage msg = iter.get();
                 if ((msg.level & level) == 0 || msg.domain != domain) {
                     continue;
                 }
                 if (PatternSpec.match_simple(text_pattern, msg.text)) {
                     result = true;
-                    log_messages.remove(msg);
+                    iter.remove();
                 }
                 break;
             }
@@ -793,7 +795,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     private void check_log_messages() {
-        foreach (unowned LogMessage msg in log_messages) {
+        foreach (LogMessage msg in log_messages) {
             if ((msg.level & LogLevelFlags.LEVEL_ERROR) != 0) {
                 expectation_failed("Uncaught error log message: %s %s", msg.domain, msg.text);
             } else if ((msg.level & LogLevelFlags.LEVEL_WARNING) != 0) {

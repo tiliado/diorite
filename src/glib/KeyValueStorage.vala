@@ -25,7 +25,7 @@
 namespace Drt {
 
 public abstract class KeyValueStorage: GLib.Object {
-    protected SList<PropertyBinding> property_bindings = null;
+    protected Gee.List<PropertyBinding> property_bindings = new Gee.LinkedList<PropertyBinding>();
 
     public signal void changed(string key, Variant? old_value);
 
@@ -106,7 +106,7 @@ public abstract class KeyValueStorage: GLib.Object {
         unowned ParamSpec? property = object.get_class().find_property(property_name);
         return_val_if_fail(property != null, null);
         var binding = new PropertyBinding(this, make_full_key(key, property_name), object, property, flags);
-        property_bindings.prepend(binding);
+        property_bindings.add(binding);
         return binding;
     }
 
@@ -120,7 +120,7 @@ public abstract class KeyValueStorage: GLib.Object {
     public PropertyBinding? get_property_binding(string key, GLib.Object object,
         string property_name) {
         string full_key = make_full_key(key, property_name);
-        foreach (unowned PropertyBinding binding in property_bindings) {
+        foreach (PropertyBinding binding in property_bindings) {
             if (binding.object == object && binding.key == full_key
             && binding.property.name == property_name) {
                 return binding;

@@ -113,19 +113,14 @@ public void make_dirs(GLib.File directory) throws GLib.Error {
 public async void make_directory_with_parents_async(
     File directory, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
 throws GLib.Error {
-    SList<File> dirs = new SList<File>();
-    dirs.prepend(directory);
-    unowned File? dir;
-    while (dirs != null) {
-        dir = dirs.data;
+    while (true) {
         try {
-            yield dir.make_directory_async(io_priority, cancellable);
-            dirs.remove_link(dirs);
+            yield directory.make_directory_async(io_priority, cancellable);
+            break;
         } catch (GLib.Error e) {
             if (e is GLib.IOError.NOT_FOUND) {
-                dirs.prepend(dir.get_parent());
+                yield make_directory_with_parents_async(directory.get_parent(), io_priority, cancellable);
             } else {
-                dirs = null;
                 throw e;
             }
         }
