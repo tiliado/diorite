@@ -1,0 +1,20 @@
+{
+   g_type_register_fundamental() of glib
+   Memcheck:Leak
+   ...
+   fun:g_type_register_fundamental
+}
+
+{
+   sqlite3MemMalloc of sqlite3
+   Memcheck:Leak
+   ...
+   fun:sqlite3MemMalloc
+}
+
+{
+   _g_io_modules_ensure_loaded of glib
+   Memcheck:Leak
+   ...
+   fun:_g_io_modules_ensure_loaded
+}

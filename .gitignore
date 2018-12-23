@@ -4,3 +4,4 @@ build
 examples/build
 __pycache__
 *~
+/valgrind-tests.log
