@@ -50,7 +50,9 @@ public class BindExpressionTest: Drt.TestCase {
             + " AND image = ? AND key = ? AND val = ?",
             sql, "sql");
         unowned Value? val;
-        unowned SList<Value?> values = binder.get_values();
+
+        SList<Value?> bound_values = binder.take_values();
+        unowned SList<Value?> values = bound_values;
         expect_uint_equals(8, values.length(), "n values");
 
         val = values.data; values = values.next;
@@ -91,14 +93,14 @@ public class BindExpressionTest: Drt.TestCase {
         expect_no_error(() => binder.parse("WHERE name = ?s", "John"), "binder.parse");
         string sql = binder.get_sql();
         expect_str_equals("WHERE name = ?", sql, "sql");
-        unowned SList<Value?> values = binder.get_values();
-        expect_uint_equals(1, values.length(), "n values");
+        SList<Value?> bound_values = binder.take_values();
+        expect_uint_equals(1, bound_values.length(), "n values");
 
         binder.reset();
         sql = binder.get_sql();
         expect_str_equals("", sql, "sql");
-        values = binder.get_values();
-        expect_uint_equals(0, values.length(), "n values");
+        bound_values = binder.take_values();
+        expect_uint_equals(0, bound_values.length(), "n values");
     }
 
 }

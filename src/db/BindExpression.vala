@@ -69,8 +69,8 @@ public class BindExpression {
      *
      * @return data as {@link GLib.Value} instances
      */
-    public unowned SList<Value?> get_values() {
-        return values;
+    public SList<Value?> take_values() {
+        return (owned) values;
     }
 
     /**

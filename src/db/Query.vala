@@ -32,6 +32,7 @@ namespace Drtdb {
 public class Query : GLib.Object {
     public Connection connection {get; private set;}
     private Sqlite.Statement? statement = null;
+    private SList<Value?>? bound_values = null;
     protected int n_parameters = 0;
 
     /**
@@ -107,12 +108,15 @@ public class Query : GLib.Object {
      * @return `this` query object for easier chaining
      * @throws DatabaseError when provided data type is not supported or operation fails
      */
-    public Query bind_values(int index, SList<Value?> values) throws DatabaseError {
+    public Query bind_values(int index, owned SList<Value?> values) throws DatabaseError {
         uint len = values.length();
+        unowned SList<Value?>? cursor = values;
         for (var i = 0; i < len; i++) {
-            bind(index + i, values.data);
-            values = values.next;
+            bind(index + i, cursor.data);
+            cursor = cursor.next;
         }
+        // We must not free the values during the lifetime of Sqlite.Statement.
+        this.bound_values = (owned) values;
         return this;
     }
 

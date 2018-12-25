@@ -110,7 +110,7 @@ public class Connection: GLib.Object, Queryable {
         Sqlite.Statement statement;
         throw_if_cancelled(cancellable, GLib.Log.METHOD, GLib.Log.FILE, GLib.Log.LINE);
         throw_on_error(db.prepare_v2(sql_query, sql_query.length, out statement), sql_query);
-        return new Query(this, (owned) statement).bind_values(1, bind_expr.get_values());
+        return new Query(this, (owned) statement).bind_values(1, bind_expr.take_values());
     }
 
     /**
@@ -201,7 +201,7 @@ public class Connection: GLib.Object, Queryable {
         }
         Query query = this.query(sql.str, cancellable);
         if (bind_expr != null) {
-            query.bind_values(1, bind_expr.get_values());
+            query.bind_values(1, bind_expr.take_values());
         }
         return new ObjectQuery<T>(orm, query);
     }
