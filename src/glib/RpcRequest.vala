@@ -162,15 +162,14 @@ public class RpcRequest {
      *
      * @return list of string values. May be empty.
      */
-    public SList<string>pop_str_list() {
-        SList<string> list = null;
+    public Gee.List<string>pop_str_list() {
+        var list = new Gee.LinkedList<string>();
         Variant? array = next(typeof(StringArrayParam));
         VariantIter iter = array.iterator();
         unowned string str = null;  // "&s" (unowned)
         while (iter.next("&s", out str)) {
-            list.prepend(str);
+            list.add(str);
         }
-        list.reverse();
         return list;
     }
 
