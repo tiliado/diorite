@@ -7,6 +7,24 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.15.0 - December 28th, 2018
+------------------------------------
+
+* New dependency: gee-0.8 >= 0.20.1
+* Build errors with Valac 0.43.x were addressed.
+* Drt.TestCase.expect_variant_equal was added to test equality of Variant values.
+* Array-comparison TestCase methods were improved to print the value of unequal array elements.
+* Rarely used API were removed: Utils.(s)list_to_strv.
+* Improved documentation, test cases and refactoring: VariantUtils, Arrays.from_2d_uint8, String.unmask
+* Incorrect handling of the title widget and the menu button in ApplicationWindow header bar was fixed.
+* The code style checker Valalint is run by default unless `--no-vala-lint` is passed.
+* A memory corruption in Drt.String.unmask was fixed. Issue: tiliado/nuvolaruntime#488
+* Unit tests are now run also with Valgrind to detect memory errors. A few memory leaks were fixed as a result.
+* MALLOC_CHECK_=3 and MALLOC_PERTURB_ are used during development to detect some memory errors.
+  Issue: tiliado/nuvolaruntime#490
+* RcpRequest.pop_str_list() returns Gee.List instead of GLib.SList.
+
+
 Release 4.14.0 - November 11th, 2018
 ------------------------------------
 

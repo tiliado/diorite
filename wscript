@@ -28,7 +28,7 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-VERSION = "4.14.0"
+VERSION = "4.15.0"
 
 MIN_VALA = "0.42.0"
 MIN_GLIB = "2.56.1"
