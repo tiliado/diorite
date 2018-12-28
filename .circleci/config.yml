@@ -11,7 +11,7 @@ jobs:
             dnf update -y > /dev/null
             dnf install -y git openssh-clients \
               gcc vala vala-devel valadoc gobject-introspection-devel 'pkgconfig(python3)' \
-              'pkgconfig(gtk+-3.0)' sqlite-devel python3-pyparsing \
+              'pkgconfig(gtk+-3.0)' 'pkgconfig(gee-0.8)' sqlite-devel python3-pyparsing \
               wget tar xz \
               make autoconf automake glib2-devel graphviz-devel flex bison libxslt
             dnf clean all > /dev/null
