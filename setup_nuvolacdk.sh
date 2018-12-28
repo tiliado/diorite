@@ -24,6 +24,10 @@ rebuild()
     && build/run-dioritetests
 }
 
+run-tests() {
+    ./waf && ./build/run-dioritetests "$@"
+}
+
 valgrind-tests() {
     python3 ./waf \
     && G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind \
