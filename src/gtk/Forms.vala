@@ -274,13 +274,13 @@ public class Form : Gtk.Grid {
             }
 
             string[] e_enables;
-            if (entry_spec.length > 3) {
+            if (entry_spec.length > 3 && entry_spec[3] != null) {
                 e_enables = VariantUtils.to_strv(entry_spec[3]);
             } else {
                 e_enables = {};
             }
             string[] e_disables;
-            if (entry_spec.length > 4) {
+            if (entry_spec.length > 4 && entry_spec[4] != null) {
                 e_disables = VariantUtils.to_strv(entry_spec[4]);
             } else {
                 e_disables = {};
@@ -318,13 +318,13 @@ public class Form : Gtk.Grid {
             Variant? value = values.get(id);
             bool e_checked = value != null && value.is_of_type(VariantType.STRING) && value.get_string() == e_target;
             string[] e_enables;
-            if (entry_spec.length > 4) {
+            if (entry_spec.length > 4 && entry_spec[4] != null) {
                 e_enables = VariantUtils.to_strv(entry_spec[4]);
             } else {
                 e_enables = {};
             }
             string[] e_disables;
-            if (entry_spec.length > 5) {
+            if (entry_spec.length > 5 && entry_spec[5] != null) {
                 e_disables = VariantUtils.to_strv(entry_spec[5]);
             } else {
                 e_disables = {};
