@@ -226,6 +226,7 @@ def configure(ctx):
     ctx.env.append_unique("VALAFLAGS", ["-v"])
     if ctx.options.strict:
         ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
+        ctx.env.append_unique("VALADOCFLAGS", ["--fatal-warnings"])
     ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
     ctx.env.FLATPAK = ctx.options.flatpak
     if ctx.env.FLATPAK:
