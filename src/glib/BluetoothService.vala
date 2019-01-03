@@ -83,8 +83,7 @@ public class BluetoothService {
 }
 
 
-[DBus(name = "org.bluez.Profile1")]
-private class BluetoothProfile1 : GLib.Object, BluezProfile1 {
+internal class BluetoothProfile1 : GLib.Object, BluezProfile1 {
     private weak BluetoothService service;
     private HashTable<ObjectPath, GenericArray<GLib.Socket>?> sockets;
 
