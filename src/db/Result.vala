@@ -32,7 +32,7 @@ public class Result : GLib.Object {
     public int n_columns {get; private set; default = -1;}
     public int counter {get; private set; default = 0;}
     private Sqlite.Statement statement;
-    private HashTable<unowned string, int> column_indexes;
+    private HashTable<unowned string, void*> column_indexes;
     private (unowned string)[]? column_names;
 
     /**
@@ -44,7 +44,7 @@ public class Result : GLib.Object {
     public Result(Connection connection, owned Sqlite.Statement statement) {
         this.connection = connection;
         this.statement = (owned) statement;
-        column_indexes = new HashTable<unowned string, int>(str_hash, str_equal);
+        column_indexes = new HashTable<unowned string, void*>(str_hash, str_equal);
         column_names = null;
     }
 
@@ -78,9 +78,9 @@ public class Result : GLib.Object {
      */
     public int get_column_index(string name) {
         map_column_names();
-        int index;
+        void* index;
         if (column_indexes.lookup_extended(name, null, out index)) {
-            return index;
+            return int.from_pointer(index);
         }
         return -1;
     }
@@ -303,7 +303,7 @@ public class Result : GLib.Object {
             column_names = new string?[n_columns];
             for (var index = 0; index < n_columns; index++) {
                 unowned string name = statement.column_name(index);
-                column_indexes[name] = index;
+                column_indexes[name] = index.to_pointer();
                 column_names[index] = name;
             }
         }
