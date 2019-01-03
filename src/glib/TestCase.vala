@@ -593,18 +593,20 @@ public abstract class TestCase : GLib.Object {
         if (enum_class == null) {
             err = enum_name + "is not an enumeration.\n";
         } else {
-            unowned EnumValue? expected_member = enum_class.get_value((int) expected);
+            int expected_index = int.from_pointer(expected);
+            unowned EnumValue? expected_member = enum_class.get_value(expected_index);
             if (expected_member == null) {
                 err = "The value expected (%d) is not a member of the %s enumeration.\n".printf(
-                    (int) expected, enum_name);
+                    expected_index, enum_name);
             } else {
-                unowned EnumValue? member_found = enum_class.get_value((int) found);
+                int found_index = int.from_pointer(found);
+                unowned EnumValue? member_found = enum_class.get_value(found_index);
                 if (member_found == null) {
                     err = "The value found (%d) is not a member of the %s enumeration.\n".printf(
-                        (int) found, enum_name);
-                } else if ((int) found != (int) expected) {
+                        found_index, enum_name);
+                } else if (found_index != expected_index) {
                     err = "Expected the enum value %s (%d) but the value %s (%d) found.\n".printf(
-                        expected_member.value_name, (int) expected, member_found.value_name, (int) found);
+                        expected_member.value_name, expected_index, member_found.value_name, found_index);
                 } else {
                     result = true;
                 }
