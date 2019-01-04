@@ -115,6 +115,34 @@ public class StringTest: Drt.TestCase {
         actual = Drt.String.unmask(data);
         expect_null<string>(actual, "invalid offset");
     }
+
+    public void test_as_array_of_bytes() {
+        string? str = null;
+        uint8[] array = Drt.String.as_array_of_bytes((owned) str);
+        expect_null<void*>(array, "null string leads to null array");
+        expect_log_message(
+            "DioriteGlib", LogLevelFlags.LEVEL_CRITICAL, "drt_string_as_array_of_bytes: assertion 'str != NULL' failed",
+            "null string produces critical warning");
+
+        str = "";
+        unowned string str0 = str;
+        array = Drt.String.as_array_of_bytes((owned) str);
+        expect_null<void*>(str, "string ownership transferred");
+        expect_true((void*) array == (void*) str0, "The address of the data has not changed");
+        expect_not_null<void*>(array, "empty string produces non-null result");
+        expect_int_equals(0, array.length, "empty string produces 0-length array");
+        expect_uint_equals(0, array[0], "empty string produces 0-length array with [0] == '\\0'");
+
+        str = "abc";
+        str0 = str;
+        array = Drt.String.as_array_of_bytes((owned) str);
+        expect_null<void*>(str, "string ownership transferred");
+        expect_true((void*) array == (void*) str0, "The address of the data has not changed");
+        expect_not_null<void*>(array, "empty string produces non-null result");
+        expect_int_equals(3, array.length, "abc string produces 3-length array");
+        expect_uint_equals(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
+        expect_bytes_equal(new Bytes.take({'a', 'b', 'c'}), new Bytes.static(array), "strings equal");
+    }
 }
 
 } // namespace Drt

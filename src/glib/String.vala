@@ -214,4 +214,17 @@ public unowned string offset(string str, int offset) {
     return result;
 }
 
+/**
+ * Cast owned string as a byte array without copying.
+ *
+ * @param str    The string to cast.
+ * @return The string casted as a byte array.
+ */
+public uint8[] as_array_of_bytes(owned string str) {
+    int length = str.length;
+    uint8[] result = (uint8[]) (owned) str;
+    result.length = length;
+    return result;
+}
+
 } // namespace Drt.String
