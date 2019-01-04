@@ -42,9 +42,6 @@ public string read_file(File file) throws GLib.Error {
 
 // TODO: read_file_async
 
-
-
-
 /**
  * Replace the contents of a file with a text in UTF-8 encoding.
  *
@@ -59,11 +56,7 @@ public string read_file(File file) throws GLib.Error {
 public async void overwrite_file_async(
     File file, string contents, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
 throws GLib.Error {
-    try {
-        yield make_directory_with_parents_async(file.get_parent(), io_priority, cancellable);
-    } catch (GLib.Error e) {
-        // FIXME: ignore only "directory exists" error
-    }
+    yield make_dirs_async(file.get_parent(), io_priority, cancellable);
     yield file.replace_contents_async(contents.data, null, false, FileCreateFlags.NONE, cancellable, null);
 }
 
@@ -86,23 +79,29 @@ public void make_dirs(GLib.File directory) throws GLib.Error {
 
 
 /**
- * Make a directory and parents, ignore if they already exist.
+ * Make a directory and its parents, ignore if they already exist.
  *
  * @param directory      The final directory to create.
  * @param io_priority    The priority of the I/O operation.
  * @param cancellable    To cancel the operation.
  * @throws GLib.Error on failure.
  */
-public async void make_directory_with_parents_async(
-    File directory, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
+public async void make_dirs_async(File directory, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
 throws GLib.Error {
     while (true) {
         try {
             yield directory.make_directory_async(io_priority, cancellable);
             break;
         } catch (GLib.Error e) {
-            if (e is GLib.IOError.NOT_FOUND) {
-                yield make_directory_with_parents_async(directory.get_parent(), io_priority, cancellable);
+            if (e is GLib.IOError.EXISTS) {
+                FileInfo info = yield directory.query_info_async(
+                    FileAttribute.STANDARD_TYPE, 0, io_priority, cancellable);
+                if (info.get_file_type() != FileType.DIRECTORY) {
+                    throw e;
+                }
+                break;
+            } else if (e is GLib.IOError.NOT_FOUND) {
+                yield make_dirs_async(directory.get_parent(), io_priority, cancellable);
             } else {
                 throw e;
             }
