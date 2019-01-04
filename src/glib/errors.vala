@@ -63,7 +63,7 @@ public string error_to_string(GLib.Error e) {
     if (!e.message.has_suffix(".")) {
         pretty.append_c('.');
     }
-    return pretty.str;
+    return (owned) pretty.str;
 }
 
 
