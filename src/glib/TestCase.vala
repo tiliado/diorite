@@ -590,6 +590,18 @@ public abstract class TestCase : GLib.Object {
 
     [Diagnostics]
     [PrintfFormat]
+    protected bool expect_error_match(GLib.Error e, string message_pattern, string format, ...) {
+        bool result = PatternSpec.match_simple(message_pattern, e.message);
+        process(result, format, va_list());
+        if (!result && !Test.quiet()) {
+            stdout.printf("An exception was expected: %s\n", message_pattern);
+            stdout.printf("Other exception has been thrown: %s\n", error_to_string(e));
+        }
+        return result;
+    }
+
+    [Diagnostics]
+    [PrintfFormat]
     protected bool expect_type(Type expected_type, void* object, string format, ...) {
         return expect_type_internal(expected_type, object, format, va_list());
     }
