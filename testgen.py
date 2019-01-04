@@ -382,7 +382,9 @@ class TestGenerator:
                         buf.append('\t\tcatch (%s e%d)\n\t\t{\n\t\t\ttest.exception(e%d);\n\t\t}\n' % (error, i, i))
                 else:
                     buf.append('\t\ttest.%s.end(res);\n' % method)
+                buf.append('\t\tloop.quit();\n')
                 buf.append('\t});\n')
+                buf.append('\tloop.run();\n')
             else:
                 if throws:
                     buf.append('\ttry\n\t{\n\t\ttest.%s();\n\t}\n' % method)
