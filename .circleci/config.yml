@@ -12,9 +12,21 @@ jobs:
             dnf install -y git openssh-clients \
               gcc vala vala-devel valadoc gobject-introspection-devel 'pkgconfig(python3)' \
               'pkgconfig(gtk+-3.0)' 'pkgconfig(gee-0.8)' sqlite-devel python3-pyparsing \
-              wget tar xz \
+              wget tar xz git autoconf-archive \
               make autoconf automake glib2-devel graphviz-devel flex bison libxslt
             dnf clean all > /dev/null
+      - run:
+          name: Download Vala
+          command: |
+            git clone https://gitlab.gnome.org/GNOME/vala.git
+      - run:
+          name: Build Vala
+          working_directory: ~/workdir/vala
+          command: |
+            ./autogen.sh --prefix=/usr
+            make all
+            dnf remove -y vala valadoc
+            make install
       - run:
           name: Install Valalint
           command: |
