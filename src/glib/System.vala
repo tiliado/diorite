@@ -53,11 +53,12 @@ public string read_file(File file) throws GLib.Error {
  * @param cancellable    To cancel the operation.
  * @throws GLib.Error on failure
  */
-public async void overwrite_file_async(
-    File file, string contents, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
+public async void write_to_file_async(
+    File file, owned string contents, int io_priority=GLib.Priority.DEFAULT, Cancellable? cancellable=null)
 throws GLib.Error {
+    Bytes bytes = String.as_bytes((owned) contents);
     yield make_dirs_async(file.get_parent(), io_priority, cancellable);
-    yield file.replace_contents_async(contents.data, null, false, FileCreateFlags.NONE, cancellable, null);
+    yield file.replace_contents_bytes_async(bytes, null, false, FileCreateFlags.NONE, cancellable, null);
 }
 
 

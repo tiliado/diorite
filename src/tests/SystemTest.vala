@@ -77,6 +77,40 @@ public class SystemTest: Drt.TestCase {
         }
         expect_true(file.query_file_type(0) == FileType.REGULAR, "file is still file");
     }
+
+    public async void test_write_to_file_async() {
+        unowned File tmp = get_tmp_dir();
+        expect_true(tmp.query_file_type(0) == FileType.DIRECTORY, "tmp dir exists");
+        unowned string contents = "abc";
+
+        try {
+            yield System.write_to_file_async(tmp, contents);
+            expectation_failed("Should not overwrite a directory");
+        } catch (GLib.Error e) {
+            expect_error_match(e, "*Error opening file *: Is a directory*", "Cannot overwrite directory.");
+        }
+
+        foreach (unowned string path in new (unowned string)[] {"file1", "dir1/file2", "dir2/dir3/file3"}) {
+            File file = tmp.get_child(path);
+            try {
+                yield System.write_to_file_async(file, contents);
+                expect_true(file.query_file_type(0) == FileType.REGULAR, "file was created");
+                string actual_contents;
+                FileUtils.get_contents(file.get_path(), out actual_contents);
+                expect_str_equals(contents, actual_contents, "contents equal");
+            } catch (GLib.Error e) {
+                unexpected_error(e, "Failed to create file.");
+            }
+        }
+
+        File file = tmp.get_child("file1/file4");
+        try {
+            yield System.write_to_file_async(file, contents);
+            expectation_failed("Should not overwrite a parent file");
+        } catch (GLib.Error e) {
+            expect_error_match(e, "*Error creating directory *file1: File exists*", "Cannot overwrite directory.");
+        }
+    }
 }
 
 } // namespace Drt
