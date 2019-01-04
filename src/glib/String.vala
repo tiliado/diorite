@@ -227,4 +227,14 @@ public uint8[] as_array_of_bytes(owned string str) {
     return result;
 }
 
+/**
+ * Create a new {@link GLib.Bytes} instance from owned string without copying.
+ *
+ * @param str    The string to create new Bytes instance from.
+ * @return The new {@link GLib.Bytes} instance.
+ */
+public Bytes as_bytes(owned string str) {
+    return new Bytes.take(as_array_of_bytes((owned) str));
+}
+
 } // namespace Drt.String
