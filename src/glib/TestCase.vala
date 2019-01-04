@@ -101,6 +101,7 @@ public abstract class TestCase : GLib.Object {
     public int failed = 0;
     private Gee.List<LogMessage>? log_messages = null;
     private bool first_result = true;
+    private File? tmp_dir = null;
 
     construct {
         if (GLib.Test.verbose()) {
@@ -118,10 +119,42 @@ public abstract class TestCase : GLib.Object {
         GLib.Log.set_default_handler(log_handler);
     }
 
+    public unowned File get_tmp_dir() {
+        if (tmp_dir == null) {
+            File dir = File.new_for_path("../build/tests/tmp").get_child(this.get_type().name());
+            try {
+                System.purge_directory_content(dir, true);
+            } catch (GLib.Error e) {
+                if (!(e is GLib.IOError.NOT_FOUND)) {
+                    critical("Failed to purge dir %s: %s", dir.get_path(), e.message);
+                }
+            }
+            try {
+                dir.make_directory_with_parents();
+            } catch (GLib.Error e) {
+                if (!(e is GLib.IOError.EXISTS)) {
+                    critical("Failed to create dir %s: %s", dir.get_path(), e.message);
+                }
+            }
+            tmp_dir = dir;
+        }
+        return tmp_dir;
+    }
+
     /**
      * Clean up environment after each test of this test case.
      */
     public virtual void tear_down() {
+        if (tmp_dir != null) {
+            try {
+                System.purge_directory_content(tmp_dir, true);
+            } catch (GLib.Error e) {
+                if (!(e is GLib.IOError.NOT_FOUND)) {
+                    critical("Failed to purge dir %s: %s", tmp_dir.get_path(), e.message);
+                }
+            }
+            tmp_dir = null;
+        }
         check_log_messages();
         log_messages = null;
     }
