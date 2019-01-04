@@ -43,23 +43,6 @@ public string read_file(File file) throws GLib.Error {
 // TODO: read_file_async
 
 
-/**
- * Replace the contents of a file with a text in UTF-8 encoding.
- *
- * Parent directories are created as necessary.
- *
- * @param file        The file to overwrite.
- * @param contents    The contents of the file
- * @throws GLib.Error on failure.
- */
-public void overwrite_file(File file, string contents) throws GLib.Error {
-    try {
-        file.get_parent().make_directory_with_parents();
-    } catch (GLib.Error e) {
-        // FIXME: ignore only "directory exists" error
-    }
-    file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
-}
 
 
 /**
