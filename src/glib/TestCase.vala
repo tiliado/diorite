@@ -602,6 +602,15 @@ public abstract class TestCase : GLib.Object {
 
     [Diagnostics]
     [PrintfFormat]
+    protected void unexpected_error(GLib.Error e, string format, ...) {
+        process(false, format, va_list());
+        if (!Test.quiet()) {
+            stdout.printf("Unexpected exception has been thrown: %s\n", error_to_string(e));
+        }
+    }
+
+    [Diagnostics]
+    [PrintfFormat]
     protected bool expect_type(Type expected_type, void* object, string format, ...) {
         return expect_type_internal(expected_type, object, format, va_list());
     }
