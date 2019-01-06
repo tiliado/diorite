@@ -34,7 +34,7 @@ public class ResultTest: Drt.TestCase {
         try {
             query(TABLE_USERS_SQL).exec();
             query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
-            .bind(1, 1).bind(2, "George").bind(3, 30).bind(4, 1.72)
+            .bind(1, 1).bind(2, "Jiří").bind(3, 30).bind(4, 1.72)
             .bind_blob(5, new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
             .bind(6, true).bind_null(7).exec();
         } catch (GLib.Error e) {
@@ -249,7 +249,7 @@ public class ResultTest: Drt.TestCase {
 
             /* Test data type conversions */
             expect_str_equals("1", result.fetch_string(0), "id");
-            expect_str_equals("George", result.fetch_string(1), "name");
+            expect_str_equals("Jiří", result.fetch_string(1), "name");
             expect_str_equals("30", result.fetch_string(2), "age");
             expect_str_equals("1.72", result.fetch_string(3), "height");
             expect_str_equals("\x07\x06\x05\x04\x03\x02\x01", result.fetch_string(4), "blob");
@@ -279,7 +279,7 @@ public class ResultTest: Drt.TestCase {
 
             /* Test data type conversions */
             expect_blob_equal("1".data, result.fetch_blob(0), "id");
-            expect_blob_equal("George".data, result.fetch_blob(1), "name");
+            expect_blob_equal("Jiří".data, result.fetch_blob(1), "name");
             expect_blob_equal("30".data, result.fetch_blob(2), "age");
             expect_blob_equal("1.72".data, result.fetch_blob(3), "height");
             expect_blob_equal(
@@ -308,7 +308,7 @@ public class ResultTest: Drt.TestCase {
 
             /* Test data type conversions */
             expect_bytes_equal(new GLib.Bytes.take("1".data), result.fetch_bytes(0), "id");
-            expect_bytes_equal(new GLib.Bytes.take("George".data), result.fetch_bytes(1), "name");
+            expect_bytes_equal(new GLib.Bytes.take("Jiří".data), result.fetch_bytes(1), "name");
             expect_bytes_equal(new GLib.Bytes.take("30".data), result.fetch_bytes(2), "age");
             expect_bytes_equal(new GLib.Bytes.take("1.72".data), result.fetch_bytes(3), "height");
             expect_bytes_equal(
@@ -337,7 +337,7 @@ public class ResultTest: Drt.TestCase {
 
             /* Test data type conversions */
             expect_byte_array_equal(new GLib.ByteArray.take("1".data), result.fetch_byte_array(0), "id");
-            expect_byte_array_equal(new GLib.ByteArray.take("George".data), result.fetch_byte_array(1), "name");
+            expect_byte_array_equal(new GLib.ByteArray.take("Jiří".data), result.fetch_byte_array(1), "name");
             expect_byte_array_equal(new GLib.ByteArray.take("30".data), result.fetch_byte_array(2), "age");
             expect_byte_array_equal(new GLib.ByteArray.take("1.72".data), result.fetch_byte_array(3), "height");
             expect_byte_array_equal(
