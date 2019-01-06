@@ -227,6 +227,17 @@ def configure(ctx):
     if ctx.options.strict:
         ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
         ctx.env.append_unique("VALADOCFLAGS", ["--fatal-warnings"])
+        ctx.env.append_unique('CFLAGS', [
+            '-Wall', '-Werror',
+            '-Wno-unused-but-set-variable',
+            '-Wno-incompatible-pointer-types',
+            '-Wno-discarded-qualifiers',
+            '-Wno-unused-function',
+            '-Wno-unused-variable',
+            '-Wno-unused-label',
+            '-Wno-deprecated-declarations',
+            '-Wno-address',
+            ])
     ctx.env.append_unique("LINKFLAGS", ["-Wl,--no-undefined", "-Wl,--as-needed"])
     ctx.env.FLATPAK = ctx.options.flatpak
     if ctx.env.FLATPAK:
