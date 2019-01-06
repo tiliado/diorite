@@ -15,11 +15,16 @@ Dependencies
 ------------
 
   - Python 3 and the pyparsing module
-  - [Vala compiler](https://wiki.gnome.org/Projects/Vala) >= 0.42.0 && < 0.43 (built with valadoc or pass --novaladoc).
-    If your system contains a different version of Vala, we cannot guarantee that Diorite builds correctly and it
-    may lead to memory leaks or [invalid memory access](https://github.com/tiliado/nuvolaruntime/issues/464).
-    We recommend [building the correct Vala version from source](https://github.com/tiliado/diorite/commit/d56e4cf528237492cf30608d00fc6cd416e11437)
-    prior to building Nuvola. You can then throw it away as Vala compiler is not needed after Nuvola is built.
+  - [Vala compiler](https://wiki.gnome.org/Projects/Vala)
+    (built with valadoc or pass `--novaladoc` to `./waf configure` to disable Valadoc).
+
+    The best version is 0.44.x. If you need to use 0.42.x, pass `--no-strict` to `./waf configure`, copy
+    `gio-2.0.vapi` from your Vala distribution into the `vapi` subdirectory and apply
+    [this bug fix](https://gitlab.gnome.org/GNOME/vala/commit/d450ac063c63b53eba4a61a58eae2d97875d94d7).
+
+    N. B. Memory check with Valgrind discovered a few memory leaks with Vala 0.42.x. You can build a proper version of
+    Valac just before building Diorite and then not to install it. There is  no runtime dependency on Valac after
+    Diorite is built.
   - glib-2.0 >= 2.56.1
   - gio-2.0 >= 2.56.1
   - gtk+-3.0 >= 3.22.30
@@ -27,7 +32,6 @@ Dependencies
   - sqlite >= 3.7
   - x11
   - g-ir-compiler
-
 
 Waf
 ---
@@ -42,7 +46,7 @@ To find out what build parameters can be set run ./waf --help
 Build
 -----
 
-    $ ./waf configure [--prefix=...] [--libdir=...] [--nodebug] [--novaladoc]
+    $ ./waf configure [--prefix=...] [--libdir=...] [--nodebug] [--novaladoc] [--no-strict]
     $ ./waf build
 
 Test
