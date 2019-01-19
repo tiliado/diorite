@@ -160,18 +160,43 @@ public class BlobsTest: Drt.TestCase {
         expect_false(Blobs.int64_from_blob(data, out result), "9 bytes is too much for int64");
     }
 
-    public void test_hexadecimal_from_blob() throws Drt.TestError {
+    public void test_hexadecimal_from_blob_samples() throws Drt.TestError {
+        uint8[] blob0 = {1};
+        uint8[] blob1 = {170};
+        uint8[] blob2 = {187};
+        uint8[] blob3 = {204};
+        uint8[] blob4 = {170, 187, 204};
+        uint8[] blob5 = {222, 173, 190, 239};
+        uint8*[] blobs = {blob0, blob1, blob2, blob3, blob4, blob5};
+        int[] sizes = {blob0.length, blob1.length, blob2.length, blob3.length, blob4.length, blob5.length};
+
         string[] values = {"01", "aa", "bb", "cc", "aabbcc", "deadbeef"};
-        var rand = new Rand();
+        string[] values_with_colon = {"01", "aa", "bb", "cc", "aa:bb:cc", "de:ad:be:ef"};
+
         uint8[] data;
         string result;
 
-        foreach (unowned string i in values) {
-            assert(Blobs.hexadecimal_to_blob(i, out data), "Blobs.hexadecimal_to_blob");
+        for (var i = 0; i < values.length; i++) {
+            // Expected result
+            unowned uint8[] blob = (uint8[]) blobs[i];
+            blob.length = sizes[i];
+            // Hexadecimal values without a separator
+            unowned string s = values[i];
+            assert(Blobs.hexadecimal_to_blob(s, out data), @"'$s': Blobs.hexadecimal_to_blob");
+            expect_true(Blobs.blob_equal(blob, data), @"'$s': bytes not equal");
             Blobs.hexadecimal_from_blob(data, out result);
-            assert(i == result, @"$i == $result");
+            assert(s == result, @"'$s': round trip result '$result' is wrong");
+            // Hexadecimal values with a separator ':'
+            s = values_with_colon[i];
+            assert(Blobs.hexadecimal_to_blob(s, out data, ':'), @"'$s': Blobs.hexadecimal_to_blob");
+            expect_true(Blobs.blob_equal(blob, data), @"'$s': bytes not equal");
+            Blobs.hexadecimal_from_blob(data, out result, ':');
+            assert(s == result, @"'$s': round trip result '$result' is wrong");
         }
+    }
 
+    public void test_hexadecimal_from_blob_random() throws Drt.TestError {
+        var rand = new Rand();
         char[] separators = {'\0', ':', ' ', '.'};
         foreach (char sep in separators) {
             for (var i = 0; i < 10; i++) {
@@ -183,22 +208,23 @@ public class BlobsTest: Drt.TestCase {
                 string hex;
                 Blobs.hexadecimal_from_blob(orig, out hex, sep);
                 uint8[] output;
-                assert(Blobs.hexadecimal_to_blob(hex, out output, sep), "Blobs.hexadecimal_to_blob");
-                assert(output.length == size, @"$(output.length) == $size");
-                for (var k = 0; k < size; k++) {
-                    assert(orig[k] == output[k], "");
-                }
+                assert(Blobs.hexadecimal_to_blob(hex, out output, sep), @"'$hex': Blobs.hexadecimal_to_blob fails");
+                assert(Blobs.blob_equal(orig, output),
+                    @"'$hex': $(Blobs.blob_to_string(orig)) != $(Blobs.blob_to_string(output))");
             }
         }
+    }
 
+    public void test_hexadecimal_to_blob_invalid() {
+        uint8[] data;
         string[] invalid_hex = {"a", "abc", "efgh"};
         foreach (unowned string invalid in invalid_hex) {
-            assert(!Blobs.hexadecimal_to_blob(invalid, out data), "");
+            expect_false(Blobs.hexadecimal_to_blob(invalid, out data), @"'$invalid' should be invalid");
         }
 
         invalid_hex = {"aa:", "ab:c", "a:bb:a", "ef:gh"};
         foreach (unowned string invalid in invalid_hex) {
-            assert(!Blobs.hexadecimal_to_blob(invalid, out data, ':'), "invalid '%s'", invalid);
+            expect_false(Blobs.hexadecimal_to_blob(invalid, out data, ':'), @"'$invalid' should be invalid");
         }
     }
 
