@@ -79,7 +79,7 @@ public bool byte_array_equal(GLib.ByteArray? value1, GLib.ByteArray? value2) {
  * Convert a binary blob to printable string.
  *
  * @param value    The binary blob to convert. It may be null.
- * @return Printable representation of the value if it is not null, `null` otherwise.
+ * @return Printable representation of the value if it is not null nor empty, `null` otherwise.
  */
 public string? blob_to_string(uint8[]? value) {
     if (value == null) {
@@ -95,7 +95,7 @@ public string? blob_to_string(uint8[]? value) {
  * Convert a {@link GLib.Bytes} instance to printable string.
  *
  * @param value    The binary blob to convert. It may be null.
- * @return Printable representation of the value if it is not null, `null` otherwise.
+ * @return Printable representation of the value if it is not null nor empty, `null` otherwise.
  */
 public string? bytes_to_string(GLib.Bytes? value) {
     return blob_to_string(value != null ? value.get_data() : null);
@@ -106,7 +106,7 @@ public string? bytes_to_string(GLib.Bytes? value) {
  * Convert a {@link GLib.ByteArray} instance to printable string.
  *
  * @param value    The binary blob to convert. It may be null.
- * @return Printable representation of the value if it is not null, `null` otherwise.
+ * @return Printable representation of the value if it is not null nor empty, `null` otherwise.
  */
 public string? byte_array_to_string(GLib.ByteArray? value) {
     return blob_to_string(value != null ? value.data : null);
