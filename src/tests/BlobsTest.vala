@@ -228,22 +228,61 @@ public class BlobsTest: Drt.TestCase {
         }
     }
 
-    public void test_int64_to_hexadecimal() throws Drt.TestError {
-        var rand = new Rand();
+    public void test_int64_to_hexadecimal_samples() throws Drt.TestError {
         int64 val;
         string data;
         int64 result;
-        int64[] values = {int64.MIN, int32.MIN, 0, int32.MAX, int64.MAX};
-        foreach (int64 i in values) {
-            val = i;
+        (unowned string)[] hexadecimal = {
+            "8000000000000000",
+            "ffffffff80000000",
+            "ffffffffffffffff",
+            "0000000000000000",
+            "0000000000000001",
+            "000000007fffffff",
+            "7fffffffffffffff"
+        };
+        (unowned string)[] hexadecimal_separated = {
+            "80:00:00:00:00:00:00:00",
+            "ff:ff:ff:ff:80:00:00:00",
+            "ff:ff:ff:ff:ff:ff:ff:ff",
+            "00:00:00:00:00:00:00:00",
+            "00:00:00:00:00:00:00:01",
+            "00:00:00:00:7f:ff:ff:ff",
+            "7f:ff:ff:ff:ff:ff:ff:ff"
+        };
+        int64[] values = {
+            int64.MIN,
+            int32.MIN,
+            -1,
+            0,
+            1,
+            int32.MAX,
+            int64.MAX
+        };
+        for (int j = 0; j < values.length; j++) {
+            val = values[j];
+            data = null;
             Blobs.int64_to_hexadecimal(val, out data);
-            assert(Blobs.int64_from_hexadecimal(data, out result), "");
+            expect_str_equals(hexadecimal[j], data, @"item $j doesn't equal");
+            assert(Blobs.int64_from_hexadecimal(data, out result), @"item $j not valid hexadecimal");
+            assert(val == result, @"$val == $result");
+
+            data = null;
+            Blobs.int64_to_hexadecimal(val, out data, ':');
+            expect_str_equals(hexadecimal_separated[j], data, @"item $j doesn't equal");
+            assert(Blobs.int64_from_hexadecimal(data, out result, ':'), @"item $j not valid hexadecimal");
             assert(val == result, @"$val == $result");
         }
+    }
+
+    public void test_int64_to_hexadecimal_random() throws Drt.TestError {
+        var rand = new Rand();
+        string data;
+        int64 result;
         for (var i = 0; i < 100; i++) {
-            val = 2 * ((int64) rand.int_range(int32.MIN, int32.MAX));
+            int64 val = 2 * ((int64) rand.int_range(int32.MIN, int32.MAX));
             Blobs.int64_to_hexadecimal(val, out data);
-            assert(Blobs.int64_from_hexadecimal(data, out result), "");
+            assert(Blobs.int64_from_hexadecimal(data, out result), @"the hex value of $val is invalid");
             assert(val == result, @"$val == $result");
         }
     }

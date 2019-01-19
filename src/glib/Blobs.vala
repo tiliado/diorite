@@ -263,9 +263,8 @@ public bool hexadecimal_to_blob(string hex, out uint8[] result, char separator='
  */
 public bool int64_from_hexadecimal(string hex, out int64 result, char separator='\0') {
     uint8[] data;
-    return_val_if_fail(hexadecimal_to_blob(hex, out data, separator), false);
-    return_val_if_fail(int64_from_blob(data, out result), false);
-    return true;
+    result = 0;
+    return hexadecimal_to_blob(hex, out data, separator) && int64_from_blob(data, out result);
 }
 
 
