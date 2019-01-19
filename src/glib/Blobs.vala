@@ -87,7 +87,7 @@ public string? blob_to_string(uint8[]? value) {
     }
     string hex;
     hexadecimal_from_blob(value, out hex, '\0');
-    return hex;
+    return (owned) hex;
 }
 
 
