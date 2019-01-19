@@ -112,8 +112,7 @@ public class BlobsTest: Drt.TestCase {
         expect_str_equals("0102030405060706", Blobs.byte_array_to_string(byte_array_8_items), "8 items");
     }
 
-    public void test_int64_to_blob() throws Drt.TestError {
-        var rand = new Rand();
+    public void test_int64_to_and_from_blob_samples() throws Drt.TestError {
         int64 val;
         uint8[] data;
         uint8[] expected;
@@ -123,7 +122,6 @@ public class BlobsTest: Drt.TestCase {
         // int64 = 64 bits = 8 bytes
         // https://en.wikipedia.org/wiki/Signed_number_representations#Two's_complement
         // Invert all the bits through the number, then add one.
-        // Done by hand :-)
         uint8[,] blobs = {
             {128, 0, 0, 0, 0, 0, 0, 0}, // −9,223,372,036,854,775,808
             {255, 255, 255, 255, 128, 0, 0, 0}, // −2,147,483,648
@@ -137,17 +135,29 @@ public class BlobsTest: Drt.TestCase {
             val = values[i];
             expected = Drt.Arrays.from_2d_uint8(blobs, i);
             Blobs.int64_to_blob(val, out data);
-            expect_blob_equal(expected, data, @"int64 value $i");
-            assert(Blobs.int64_from_blob(data, out result), "");
-            assert(val == result, @"$val == $result");
+            expect_blob_equal(expected, data, @"$i: int64 value");
+            assert(Blobs.int64_from_blob(data, out result), @"$i: int64_from_blob");
+            assert(val == result, @"$i: $val == $result");
         }
+    }
 
+    public void test_int64_to_and_from_blob_random() throws Drt.TestError {
+        var rand = new Rand();
+        int64 val;
+        uint8[] data;
+        int64 result;
         for (int i = 0; i < 100; i++) {
             val = 2 * ((int64) rand.int_range(int32.MIN, int32.MAX));
             Blobs.int64_to_blob(val, out data);
-            assert(Blobs.int64_from_blob(data, out result), "");
-            assert(val == result, @"$val == $result");
+            assert(Blobs.int64_from_blob(data, out result), @"$i ($val): int64_from_blob");
+            assert(val == result, @"$i: $val == $result");
         }
+    }
+
+    public void test_int64_from_blob_too_large() throws Drt.TestError {
+        uint8[] data = {0, 255, 255, 255, 255, 255, 255, 255, 255};
+        int64 result;
+        expect_false(Blobs.int64_from_blob(data, out result), "9 bytes is too much for int64");
     }
 
     public void test_hexadecimal_from_blob() throws Drt.TestError {
