@@ -286,6 +286,80 @@ public class BlobsTest: Drt.TestCase {
             assert(val == result, @"$val == $result");
         }
     }
+
+    public void test_int32_to_blob() throws Drt.TestError {
+        var rand = new Rand();
+        int32 val;
+        uint8[] data;
+        uint8[] expected;
+        int32 result;
+
+        int32[] values = {int32.MIN, -1, 0, 1, int32.MAX};
+        // int32 = 32 bits = 4 bytes
+        // https://en.wikipedia.org/wiki/Signed_number_representations#Two's_complement
+        // Invert all the bits through the number, then add one.
+        // Done by hand :-)
+        uint8[,] blobs = {
+            {128, 0, 0, 0}, // −2,147,483,648
+            {255, 255, 255, 255}, // -1
+            {0, 0, 0, 0}, // 0
+            {0, 0, 0, 1}, // 1
+            {127, 255, 255, 255} // +2,147,483,647
+        };
+        for (int i = 0; i < values.length; i++) {
+            val = values[i];
+            expected = Drt.Arrays.from_2d_uint8(blobs, i);
+            data = new uint8[sizeof(int32)];
+            Blobs.int32_to_blob(val, data);
+            expect_blob_equal(expected, data, @"int32 value $i");
+            Blobs.int32_from_blob(data, out result);
+            assert(val == result, @"$val == $result");
+        }
+
+        for (int i = 0; i < 100; i++) {
+            val = rand.int_range(int32.MIN, int32.MAX);
+            data = new uint8[sizeof(int32)];
+            Blobs.int32_to_blob(val, data);
+            Blobs.int32_from_blob(data, out result);
+            assert(val == result, @"$val == $result");
+        }
+    }
+
+    public void test_uint32_to_blob() throws Drt.TestError {
+        var rand = new Rand();
+        uint32 val;
+        uint8[] data;
+        uint8[] expected;
+        uint32 result;
+
+        uint32[] values = {0, 1, uint32.MAX / 2 - 1, uint32.MAX / 2, uint32.MAX / 2 + 1, uint32.MAX};
+        // uint32 = 32 bits = 4 bytes
+        uint8[,] blobs = {
+            {0, 0, 0, 0}, // 0
+            {0, 0, 0, 1}, // 1
+            {127, 255, 255, 254}, // +2,147,483,646
+            {127, 255, 255, 255}, // +2,147,483,647
+            {128, 0, 0, 0}, // +2,147,483,648
+            {255, 255, 255, 255}
+        };
+        for (int i = 0; i < values.length; i++) {
+            val = values[i];
+            expected = Drt.Arrays.from_2d_uint8(blobs, i);
+            data = new uint8[sizeof(uint32)];
+            Blobs.uint32_to_blob(val, data);
+            expect_blob_equal(expected, data, @"uint32 value $i");
+            Blobs.uint32_from_blob(data, out result);
+            assert(val == result, @"$val == $result");
+        }
+
+        for (int i = 0; i < 100; i++) {
+            val = (uint32) rand.int_range(0, int32.MAX);
+            data = new uint8[sizeof(uint32)];
+            Blobs.uint32_to_blob(val, data);
+            Blobs.uint32_from_blob(data, out result);
+            assert(val == result, @"$val == $result");
+        }
+    }
 }
 
 } // namespace Drt

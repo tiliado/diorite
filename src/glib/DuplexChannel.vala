@@ -382,8 +382,8 @@ public abstract class DuplexChannel : GLib.Object {
      */
     void read_header(uint8[] buffer, uint offset, out bool direction, out uint id, out uint32 size) {
         uint32 header;
-        Blobs.uint32_from_blob(buffer, out header, offset);
-        Blobs.uint32_from_blob(buffer, out size, (uint)(offset + sizeof(uint32)));
+        Blobs.uint32_from_blob(buffer[offset:offset + sizeof(uint32)], out header);
+        Blobs.uint32_from_blob(buffer[offset + sizeof(uint32):offset + 2 * sizeof(uint32)], out size);
         direction = (header & HEADER_MASK) != 0 ? RESPONSE : REQUEST;
         id = (uint)(header & ~HEADER_MASK);
     }
@@ -398,8 +398,8 @@ public abstract class DuplexChannel : GLib.Object {
      */
     void write_header(ref uint8[] buffer, uint offset, bool direction, uint id, uint32 size) {
         uint32 header = ((uint32) id) | (direction == RESPONSE ? HEADER_MASK : 0);
-        Blobs.uint32_to_blob(ref buffer, header, offset);
-        Blobs.uint32_to_blob(ref buffer, size, (uint)(offset + sizeof(uint32)));
+        Blobs.uint32_to_blob(header, buffer[offset:offset + sizeof(uint32)]);
+        Blobs.uint32_to_blob(size, buffer[offset + sizeof(uint32):offset + 2 * sizeof(uint32)]);
     }
 
     protected void write_data_sync(bool direction, uint32 id, ByteArray? data) throws IOError {

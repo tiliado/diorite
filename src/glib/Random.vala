@@ -31,23 +31,11 @@ namespace Drt.Random {
  * @return Random binary data.
  */
 public string hexadecimal(uint n_bits) {
-    uint n_bytes = n_bits / 8;
-    if (n_bytes * 8 < n_bits) {
-        n_bytes++;    // Round up to the nearest byte
-    }
-    uint n_32bits = n_bytes / 4;
-    if (n_32bits * 4 < n_bytes) {
-        n_32bits++;    // Round up to the whole uint32
-    }
-    uint size = n_32bits * 4;
-    uint8[] buffer = new uint8[size];
-    for (uint offset = 0; offset + 4 <= size; offset += 4) {
-        Blobs.uint32_to_blob(ref buffer, GLib.Random.next_int(), offset);
-    }
-
     string result;
+    uint8[] buffer;
+    blob(n_bits, out buffer);
     Blobs.hexadecimal_from_blob(buffer, out result);
-    return size == n_bytes ? (owned) result : result.substring(0, n_bytes * 2);
+    return (owned) result;
 }
 
 /**
@@ -67,8 +55,8 @@ public void blob(uint n_bits, out uint8[] result) {
     }
     uint size = n_32bits * 4;
     result = new uint8[size];
-    for (uint offset = 0; offset + 4 <= size; offset += 4) {
-        Blobs.uint32_to_blob(ref result, GLib.Random.next_int(), offset);
+    for (int offset = 0; offset + 4 <= size; offset += 4) {
+        Blobs.uint32_to_blob(GLib.Random.next_int(), result[offset:offset + sizeof(uint32)]);
     }
 }
 

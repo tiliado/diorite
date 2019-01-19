@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2019 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -287,13 +287,12 @@ public void int64_to_hexadecimal(int64 val, out string result, char separator='\
  *
  * @param buffer    The array of bytes at least `sizeof(uint32)` where the result will be stored.
  * @param data      The uint32 value to convert.
- * @param offset    The offset of the buffer the result will be stored at.
  */
-public void uint32_to_blob(ref uint8[] buffer, uint32 data, uint offset=0) {
+public void uint32_to_blob(uint32 data, uint8[] buffer) {
     size_t size = sizeof(uint32);
-    assert(buffer.length >= offset + size);
+    assert(buffer.length >= size);
     for (var i = 0; i < size; i ++) {
-        buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
+        buffer[i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
     }
 }
 
@@ -303,13 +302,12 @@ public void uint32_to_blob(ref uint8[] buffer, uint32 data, uint offset=0) {
  *
  * @param buffer    The array of bytes size at least `sizeof(int32)` where the result will be stored.
  * @param data      The int32 value to convert.
- * @param offset    The offset of the buffer the result will be stored at.
  */
-public void int32_to_blob(ref uint8[] buffer, int32 data, uint offset=0) {
+public void int32_to_blob(int32 data, uint8[] buffer) {
     size_t size = sizeof(int32);
-    assert(buffer.length >= offset + size);
+    assert(buffer.length >= size);
     for (var i = 0; i < size; i ++) {
-        buffer[offset + i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
+        buffer[i] = (uint8)((data >> ((size - 1 - i) * 8)) & 0xFF);
     }
 }
 
@@ -319,14 +317,13 @@ public void int32_to_blob(ref uint8[] buffer, int32 data, uint offset=0) {
  *
  * @param buffer    The array of bytes that contains the uint32 value.
  * @param data      The resulting uint32 value.
- * @param offset    The offset of the buffer where the uint32 value is stored at.
  */
-public void uint32_from_blob(uint8[] buffer, out uint32 data, uint offset=0) {
+public void uint32_from_blob(uint8[] buffer, out uint32 data) {
     size_t size = sizeof(uint32);
-    assert(buffer.length >= offset + size);
+    assert(buffer.length >= size);
     data = 0;
     for (var i = 0; i < size; i ++) {
-        data += buffer[offset + i] * (1 << ((uint32)size - 1 - i) * 8);
+        data += buffer[i] * (1 << ((uint32)size - 1 - i) * 8);
     }
 }
 
@@ -336,14 +333,13 @@ public void uint32_from_blob(uint8[] buffer, out uint32 data, uint offset=0) {
  *
  * @param buffer    The array of bytes that contains the int32 value.
  * @param data      The resulting int32 value.
- * @param offset    The offset of the buffer where the int32 value is stored at.
  */
-public void int32_from_blob(uint8[] buffer, out int32 data, uint offset=0) {
+public void int32_from_blob(uint8[] buffer, out int32 data) {
     size_t size = sizeof(int32);
-    assert(buffer.length >= offset + size);
+    assert(buffer.length >= size);
     data = 0;
     for (var i = 0; i < size; i ++) {
-        data += buffer[offset + i] * (1 << ((int32)size - 1 - i) * 8);
+        data += buffer[i] * (1 << ((int32)size - 1 - i) * 8);
     }
 }
 
