@@ -43,3 +43,17 @@ gdb-tests() {
     python3 ./waf \
     && gdb --args ./build/run-dioritetests "$@"
 }
+
+versions() {
+    python3 --version
+    valac --version
+    gcc --version | head -n 1
+    gdb --version | head -n 1
+    valgrind --version
+    for pkg in glib-2.0 gtk+-3.0
+    do
+        echo "$pkg $(pkg-config --modversion $pkg)"
+    done
+}
+
+versions
