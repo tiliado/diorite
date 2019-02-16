@@ -38,3 +38,8 @@ valgrind-tests() {
         --log-file=valgrind-tests.log ./build/run-dioritetests "$@" \
     && less valgrind-tests.log
 }
+
+gdb-tests() {
+    python3 ./waf \
+    && gdb --args ./build/run-dioritetests "$@"
+}
