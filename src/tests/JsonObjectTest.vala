@@ -47,13 +47,13 @@ public class JsonObjectTest: Drt.TestCase {
         var null_val = new JsonValue.@null();
         object["aa"] = null_val;
         expect_true(null_val.parent == object, "parent");
-        expect_true(null_val == object["aa"], "member equals");
+        expect_true(null_val == object["aa"], "member equal");
         object["bb"] = null_val;
         expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
 
         var int_val = new JsonValue.@int(5);
         object["aa"] = int_val;
-        expect_true(int_val == object["aa"], "member equals");
+        expect_true(int_val == object["aa"], "member equal");
         expect_null(null_val.parent, "parent");
         expect_true(int_val.parent == object, "parent");
         expect_true(object.take("aa") == int_val, "parent");
@@ -374,7 +374,7 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.get_int(key, out val), "get_int('%s')", key);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
         }
     }
 
@@ -401,13 +401,13 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%s] == %d", key, exp_val);
+            expect_int_equal(exp_val, val, "[%s] == %d", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -425,7 +425,7 @@ public class JsonObjectTest: Drt.TestCase {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
             int exp_val = results2[i, 3].get_int();
-            expect_int_equals(exp_val, val, "['%s'] == %d", ukey, exp_val);
+            expect_int_equal(exp_val, val, "['%s'] == %d", ukey, exp_val);
         }
     }
 
@@ -446,7 +446,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect_int_equals(results[i], object.get_int_or(key, -7), "get_int_or('%s')", key);
+            expect_int_equal(results[i], object.get_int_or(key, -7), "get_int_or('%s')", key);
         }
     }
 
@@ -470,7 +470,7 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.get_double(key, out val), "get_double('%s')", key);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
         }
     }
 
@@ -497,13 +497,13 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -521,7 +521,7 @@ public class JsonObjectTest: Drt.TestCase {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
             double exp_val = results2[i, 3].get_double();
-            expect_double_equals(exp_val, val, "['%s'] == %f", ukey, exp_val);
+            expect_double_equal(exp_val, val, "['%s'] == %f", ukey, exp_val);
         }
     }
 
@@ -542,7 +542,7 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < results.length; i++) {
             var key = " ";
             key.data[0] = (uint8)('a' + i);
-            expect_double_equals(results[i], object.get_double_or(key, -5.6), "get_double_or('%s')", key);
+            expect_double_equal(results[i], object.get_double_or(key, -5.6), "get_double_or('%s')", key);
         }
     }
 
@@ -566,7 +566,7 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0].get_boolean() == object.get_string(key, out val), "get_string('%s')", key);
             unowned string? exp_val = results[i, 1] == null ? null : results[i, 1].get_string();
-            expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
         }
     }
 
@@ -593,13 +593,13 @@ public class JsonObjectTest: Drt.TestCase {
             key.data[0] = (uint8)('a' + i);
             expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
             string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
             expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
             string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equals(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -637,7 +637,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect_str_equals(results[i], object.get_string_or(key, "abc"), "get_string_or('%s')", key);
+            expect_str_equal(results[i], object.get_string_or(key, "abc"), "get_string_or('%s')", key);
         }
     }
 
@@ -733,15 +733,15 @@ public class JsonObjectTest: Drt.TestCase {
     }
 }
 """;
-        expect_str_equals(one_line_json, object.to_string(), "one line json");
-        expect_str_equals(one_line_json, object.dump(null, false, 0), "one line json");
-        expect_str_equals(compact_json, object.dump(null, true, 0), "compact json");
-        expect_str_equals(compact_json, object.to_compact_string(), "compact json");
-        expect_str_equals(pretty_json, object.to_pretty_string(), "pretty json");
-        expect_str_equals(pretty_json, object.dump("    ", false, 0), "pretty json");
+        expect_str_equal(one_line_json, object.to_string(), "one line json");
+        expect_str_equal(one_line_json, object.dump(null, false, 0), "one line json");
+        expect_str_equal(compact_json, object.dump(null, true, 0), "compact json");
+        expect_str_equal(compact_json, object.to_compact_string(), "compact json");
+        expect_str_equal(pretty_json, object.to_pretty_string(), "pretty json");
+        expect_str_equal(pretty_json, object.dump("    ", false, 0), "pretty json");
         var buf = new StringBuilder();
         object.dump_to_buffer(buf, "    ", false, 0);
-        expect_str_equals(pretty_json, buf.str, "pretty json");
+        expect_str_equal(pretty_json, buf.str, "pretty json");
     }
 }
 

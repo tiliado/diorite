@@ -45,40 +45,40 @@ public class JsonArrayTest: Drt.TestCase {
         var array = new JsonArray();
         var null_val = new JsonValue.@null();
         array.append(null_val);
-        assert_uint_equals(1, array.length, "1 item");
-        assert(array[0] == null_val, "[0] equals");
+        assert_uint_equal(1, array.length, "1 item");
+        assert(array[0] == null_val, "[0] equal");
 
         var int_val = new JsonValue.@int(5);
         array.append(int_val);
-        assert_uint_equals(2, array.length, "2 items");
-        assert(array[1] == int_val, "[1] equals");
+        assert_uint_equal(2, array.length, "2 items");
+        assert(array[1] == int_val, "[1] equal");
 
         var double_val = new JsonValue.@double(5.5);
         array.prepend(double_val);
-        assert_uint_equals(3, array.length, "3 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == null_val, "[1] equals");
-        assert(array[2] == int_val, "[2] equals");
+        assert_uint_equal(3, array.length, "3 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == null_val, "[1] equal");
+        assert(array[2] == int_val, "[2] equal");
 
         var str_val = new JsonValue.@string("str");
         array.insert(1, str_val);
-        assert_uint_equals(4, array.length, "4 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == str_val, "[1] equals");
-        assert(array[2] == null_val, "[2] equals");
-        assert(array[3] == int_val, "[3] equals");
+        assert_uint_equal(4, array.length, "4 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == str_val, "[1] equal");
+        assert(array[2] == null_val, "[2] equal");
+        assert(array[3] == int_val, "[3] equal");
 
         var array_val = new JsonArray();
         array.insert(9, array_val);
         expect_critical_message("DioriteGlib", "drt_json_array_insert*assertion '*<=*' failed",
             "invalid index 9");
         array.insert(4, array_val);
-        assert_uint_equals(5, array.length, "5 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == str_val, "[1] equals");
-        assert(array[2] == null_val, "[2] equals");
-        assert(array[3] == int_val, "[3] equals");
-        assert(array[4] == array_val, "[4] equals");
+        assert_uint_equal(5, array.length, "5 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == str_val, "[1] equal");
+        assert(array[2] == null_val, "[2] equal");
+        assert(array[3] == int_val, "[3] equal");
+        assert(array[4] == array_val, "[4] equal");
 
         array.insert(1, str_val);
         expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
@@ -86,58 +86,58 @@ public class JsonArrayTest: Drt.TestCase {
         expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
         array.append(str_val);
         expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
-        assert_uint_equals(5, array.length, "5 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == str_val, "[1] equals");
-        assert(array[2] == null_val, "[2] equals");
-        assert(array[3] == int_val, "[3] equals");
-        assert(array[4] == array_val, "[4] equals");
+        assert_uint_equal(5, array.length, "5 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == str_val, "[1] equal");
+        assert(array[2] == null_val, "[2] equal");
+        assert(array[3] == int_val, "[3] equal");
+        assert(array[4] == array_val, "[4] equal");
 
         uint index;
         expect_true(array.index(double_val, out index), "index found");
-        assert_uint_equals(0, index, "index 0 equals");
+        assert_uint_equal(0, index, "index 0 equal");
         expect_true(array.index(str_val, out index), "index found");
-        assert_uint_equals(1, index, "index 4 equals");
+        assert_uint_equal(1, index, "index 4 equal");
         expect_true(array.index(null_val, out index), "index found");
-        assert_uint_equals(2, index, "index 2 equals");
+        assert_uint_equal(2, index, "index 2 equal");
         expect_true(array.index(int_val, out index), "index found");
-        assert_uint_equals(3, index, "index 3 equals");
+        assert_uint_equal(3, index, "index 3 equal");
         expect_true(array.index(array_val, out index), "index found");
-        assert_uint_equals(4, index, "index 4 equals");
+        assert_uint_equal(4, index, "index 4 equal");
 
 
         array.remove_at(5);
-        assert_uint_equals(5, array.length, "5 items");
+        assert_uint_equal(5, array.length, "5 items");
         expect_critical_message("DioriteGlib", "*assertion '* != NULL' failed", "invalid index");
 
         array.remove_at(4);
-        assert_uint_equals(4, array.length, "4 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == str_val, "[1] equals");
-        assert(array[2] == null_val, "[2] equals");
-        assert(array[3] == int_val, "[3] equals");
+        assert_uint_equal(4, array.length, "4 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == str_val, "[1] equal");
+        assert(array[2] == null_val, "[2] equal");
+        assert(array[3] == int_val, "[3] equal");
         expect_false(array.index(array_val, out index), "index not found");
 
         array.remove_at(1);
-        assert_uint_equals(3, array.length, "53items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == null_val, "[2] equals");
-        assert(array[2] == int_val, "[3] equals");
+        assert_uint_equal(3, array.length, "53items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == null_val, "[2] equal");
+        assert(array[2] == int_val, "[3] equal");
 
         expect_false(array.remove(str_val), "remove non-existent");
-        assert_uint_equals(3, array.length, "3 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == null_val, "[2] equals");
-        assert(array[2] == int_val, "[3] equals");
+        assert_uint_equal(3, array.length, "3 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == null_val, "[2] equal");
+        assert(array[2] == int_val, "[3] equal");
 
         expect_true(array.remove(null_val), "remove existent");
-        assert_uint_equals(2, array.length, "3 items");
-        assert(array[0] == double_val, "[0] equals");
-        assert(array[1] == int_val, "[3] equals");
+        assert_uint_equal(2, array.length, "3 items");
+        assert(array[0] == double_val, "[0] equal");
+        assert(array[1] == int_val, "[3] equal");
 
         array.remove_at(0);
         array.remove_at(0);
-        assert_uint_equals(0, array.length, "0 items");
+        assert_uint_equal(0, array.length, "0 items");
 
         array.remove_at(0);
         expect_critical_message("DioriteGlib", "*assertion '* != NULL' failed", "invalid index");
@@ -150,8 +150,8 @@ public class JsonArrayTest: Drt.TestCase {
         expect_critical_message("DioriteGlib", "*assertion '*<=*' failed",
             "invalid index 1");
         array[0] = null_val;
-        assert_uint_equals(1, array.length, "1 item");
-        expect_true(array[0] == null_val, "item 0 equals");
+        assert_uint_equal(1, array.length, "1 item");
+        expect_true(array[0] == null_val, "item 0 equal");
         array[1] = null_val;
         expect_critical_message("DioriteGlib", "*assertion '* == NULL' failed", "parent not null");
 
@@ -160,13 +160,13 @@ public class JsonArrayTest: Drt.TestCase {
         expect_critical_message("DioriteGlib", "*assertion '*<=*' failed",
             "invalid index 2");
         array[1] = int_val;
-        assert_uint_equals(2, array.length, "2 items");
-        expect_true(array[1] == int_val, "item 1 equals");
+        assert_uint_equal(2, array.length, "2 items");
+        expect_true(array[1] == int_val, "item 1 equal");
 
         var double_val = new JsonValue.@double(5.5);
         array[1] = double_val;
-        assert_uint_equals(2, array.length, "2 items");
-        expect_true(array[1] == double_val, "item 1 equals");
+        assert_uint_equal(2, array.length, "2 items");
+        expect_true(array[1] == double_val, "item 1 equal");
     }
 
     public void test_get() throws GLib.Error {
@@ -447,7 +447,7 @@ public class JsonArrayTest: Drt.TestCase {
         for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.get_int(i, out val), "get_int(%u)", i);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
         }
     }
 
@@ -472,13 +472,13 @@ public class JsonArrayTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.dotget_int(i.to_string(), out val), "dotget_int(%u)", i);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0] == array.dotget_int(key, out val), "dotget_int('%s')", key);
             int exp_val = results[i, 1].get_int();
-            expect_int_equals(exp_val, val, "[%s] == %d", key, exp_val);
+            expect_int_equal(exp_val, val, "[%s] == %d", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -496,7 +496,7 @@ public class JsonArrayTest: Drt.TestCase {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
             int exp_val = results2[i, 3].get_int();
-            expect_int_equals(exp_val, val, "['%s'] == %d", ukey, exp_val);
+            expect_int_equal(exp_val, val, "['%s'] == %d", ukey, exp_val);
         }
     }
 
@@ -518,7 +518,7 @@ public class JsonArrayTest: Drt.TestCase {
         for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.get_double(i, out val), "get_double(%u)", i);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "[%u] == %f", i, exp_val);
+            expect_double_equal(exp_val, val, "[%u] == %f", i, exp_val);
         }
     }
 
@@ -543,13 +543,13 @@ public class JsonArrayTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0] == array.dotget_double(i.to_string(), out val), "dotget_double(%u)", i);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "[%u] == %f", i, exp_val);
+            expect_double_equal(exp_val, val, "[%u] == %f", i, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0] == array.dotget_double(key, out val), "dotget_double('%s')", key);
             double exp_val = results[i, 1].get_double();
-            expect_double_equals(exp_val, val, "[%s] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, "[%s] == %f", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -567,7 +567,7 @@ public class JsonArrayTest: Drt.TestCase {
                 expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
             }
             double exp_val = results2[i, 3].get_double();
-            expect_double_equals(exp_val, val, "['%s'] == %f", ukey, exp_val);
+            expect_double_equal(exp_val, val, "['%s'] == %f", ukey, exp_val);
         }
     }
 
@@ -589,7 +589,7 @@ public class JsonArrayTest: Drt.TestCase {
         for (uint i = 0; i < results.length[0]; i++) {
             expect(results[i, 0].get_boolean() == array.get_string(i, out val), "get_string(%u)", i);
             unowned string? exp_val = results[i, 1] == null ? null : results[i, 1].get_string();
-            expect_str_equals(exp_val, val, "[%u] == '%s'", i, exp_val);
+            expect_str_equal(exp_val, val, "[%u] == '%s'", i, exp_val);
         }
     }
 
@@ -614,13 +614,13 @@ public class JsonArrayTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             expect(results[i, 0].get_boolean() == array.dotget_string(i.to_string(), out val), "dotget_string(%u)", i);
             string exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equals(exp_val, val, "[%u] == '%s'", i, exp_val);
+            expect_str_equal(exp_val, val, "[%u] == '%s'", i, exp_val);
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
             expect(results[i, 0].get_boolean() == array.dotget_string(key, out val), "dotget_string('%s')", key);
             string exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equals(exp_val, val, "[%s] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, "[%s] == '%s'", key, exp_val);
         }
 
         GLib.Value[,] results2 = {
@@ -800,15 +800,15 @@ public class JsonArrayTest: Drt.TestCase {
     }
 ]
 """;
-        expect_str_equals(one_line_json, array.to_string(), "one line json");
-        expect_str_equals(one_line_json, array.dump(null, false, 0), "one line json");
-        expect_str_equals(compact_json, array.dump(null, true, 0), "compact json");
-        expect_str_equals(compact_json, array.to_compact_string(), "compact json");
-        expect_str_equals(pretty_json, array.to_pretty_string(), "pretty json");
-        expect_str_equals(pretty_json, array.dump("    ", false, 0), "pretty json");
+        expect_str_equal(one_line_json, array.to_string(), "one line json");
+        expect_str_equal(one_line_json, array.dump(null, false, 0), "one line json");
+        expect_str_equal(compact_json, array.dump(null, true, 0), "compact json");
+        expect_str_equal(compact_json, array.to_compact_string(), "compact json");
+        expect_str_equal(pretty_json, array.to_pretty_string(), "pretty json");
+        expect_str_equal(pretty_json, array.dump("    ", false, 0), "pretty json");
         var buf = new StringBuilder();
         array.dump_to_buffer(buf, "    ", false, 0);
-        expect_str_equals(pretty_json, buf.str, "pretty json");
+        expect_str_equal(pretty_json, buf.str, "pretty json");
     }
 }
 

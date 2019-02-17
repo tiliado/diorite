@@ -82,10 +82,10 @@ public class ResultTest: Drt.TestCase {
         try {
             Result result = select_data();
             foreach (var index in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
-                expect_str_equals(null, result.get_column_name(index), "index %d", index);
+                expect_str_equal(null, result.get_column_name(index), "index %d", index);
             }
             for (var index = 0; index < column_names.length; index++) {
-                expect_str_equals(column_names[index], result.get_column_name(index), "index %d", index);
+                expect_str_equal(column_names[index], result.get_column_name(index), "index %d", index);
             }
         } catch (GLib.Error e) {
             expectation_failed("%s", e.message);
@@ -96,10 +96,10 @@ public class ResultTest: Drt.TestCase {
         try {
             Result result = select_data();
             foreach (var name in new string[] {"hello", "", "baby"}) {
-                expect_int_equals(-1, result.get_column_index(name), "column '%s'", name);
+                expect_int_equal(-1, result.get_column_index(name), "column '%s'", name);
             }
             for (var index = 0; index < column_names.length; index++) {
-                expect_int_equals(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
+                expect_int_equal(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
             }
         } catch (GLib.Error e) {
             expectation_failed("%s", e.message);
@@ -138,13 +138,13 @@ public class ResultTest: Drt.TestCase {
             Result result = select_data();
 
             /* Test data type conversions */
-            expect_int_equals(1, result.fetch_int(0), "id");
-            expect_int_equals(0, result.fetch_int(1), "name");
-            expect_int_equals(30, result.fetch_int(2), "age");
-            expect_int_equals(1, result.fetch_int(3), "height");
-            expect_int_equals(0, result.fetch_int(4), "blob");
-            expect_int_equals(1, result.fetch_int(5), "alive");
-            expect_int_equals(0, result.fetch_int(6), "extra");
+            expect_int_equal(1, result.fetch_int(0), "id");
+            expect_int_equal(0, result.fetch_int(1), "name");
+            expect_int_equal(30, result.fetch_int(2), "age");
+            expect_int_equal(1, result.fetch_int(3), "height");
+            expect_int_equal(0, result.fetch_int(4), "blob");
+            expect_int_equal(1, result.fetch_int(5), "alive");
+            expect_int_equal(0, result.fetch_int(6), "extra");
 
             /* Test index check */
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
@@ -165,13 +165,13 @@ public class ResultTest: Drt.TestCase {
             Result result = select_data();
 
             /* Test data type conversions */
-            expect_int64_equals((int64) 1, result.fetch_int64(0), "id");
-            expect_int64_equals((int64) 0, result.fetch_int64(1), "name");
-            expect_int64_equals((int64) 30, result.fetch_int64(2), "age");
-            expect_int64_equals((int64) 1, result.fetch_int64(3), "height");
-            expect_int64_equals((int64) 0, result.fetch_int64(4), "blob");
-            expect_int64_equals((int64) 1, result.fetch_int64(5), "alive");
-            expect_int64_equals((int64) 0, result.fetch_int64(6), "extra");
+            expect_int64_equal((int64) 1, result.fetch_int64(0), "id");
+            expect_int64_equal((int64) 0, result.fetch_int64(1), "name");
+            expect_int64_equal((int64) 30, result.fetch_int64(2), "age");
+            expect_int64_equal((int64) 1, result.fetch_int64(3), "height");
+            expect_int64_equal((int64) 0, result.fetch_int64(4), "blob");
+            expect_int64_equal((int64) 1, result.fetch_int64(5), "alive");
+            expect_int64_equal((int64) 0, result.fetch_int64(6), "extra");
 
             /* Test index check */
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
@@ -220,13 +220,13 @@ public class ResultTest: Drt.TestCase {
             Result result = select_data();
 
             /* Test data type conversions */
-            expect_double_equals(1.0, result.fetch_double(0), "id");
-            expect_double_equals(0.0, result.fetch_double(1), "name");
-            expect_double_equals(30.0, result.fetch_double(2), "age");
-            expect_double_equals(1.72, result.fetch_double(3), "height");
-            expect_double_equals(0.0, result.fetch_double(4), "blob");
-            expect_double_equals(1.0, result.fetch_double(5), "alive");
-            expect_double_equals(0.0, result.fetch_double(6), "extra");
+            expect_double_equal(1.0, result.fetch_double(0), "id");
+            expect_double_equal(0.0, result.fetch_double(1), "name");
+            expect_double_equal(30.0, result.fetch_double(2), "age");
+            expect_double_equal(1.72, result.fetch_double(3), "height");
+            expect_double_equal(0.0, result.fetch_double(4), "blob");
+            expect_double_equal(1.0, result.fetch_double(5), "alive");
+            expect_double_equal(0.0, result.fetch_double(6), "extra");
 
             /* Test index check */
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
@@ -248,16 +248,16 @@ public class ResultTest: Drt.TestCase {
             Result result = select_data();
 
             /* Test data type conversions */
-            expect_str_equals("1", result.fetch_string(0), "id");
-            expect_str_equals("Jiří", result.fetch_string(1), "name");
-            expect_str_equals("30", result.fetch_string(2), "age");
-            expect_str_equals("1.72", result.fetch_string(3), "height");
-            expect_str_equals("\x07\x06\x05\x04\x03\x02\x01", result.fetch_string(4), "blob");
+            expect_str_equal("1", result.fetch_string(0), "id");
+            expect_str_equal("Jiří", result.fetch_string(1), "name");
+            expect_str_equal("30", result.fetch_string(2), "age");
+            expect_str_equal("1.72", result.fetch_string(3), "height");
+            expect_str_equal("\x07\x06\x05\x04\x03\x02\x01", result.fetch_string(4), "blob");
             expect_warning_message("DioriteDB",
                 "*Result may be truncated. Original blob size was 15, but string size is 7.*",
                 "blob warning");
-            expect_str_equals("1", result.fetch_string(5), "alive");
-            expect_str_equals(null, result.fetch_string(6), "extra");
+            expect_str_equal("1", result.fetch_string(5), "alive");
+            expect_str_equal(null, result.fetch_string(6), "extra");
 
             /* Test index check */
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {

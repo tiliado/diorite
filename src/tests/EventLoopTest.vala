@@ -62,7 +62,7 @@ public class EventLoopTest: Drt.TestCase {
         loop.run();
         int64 diff = (GLib.get_monotonic_time() - now) / 1000;
 
-        expect_int64_equals(5, diff, @"$diff == 5");
+        expect_int64_equal(5, diff, @"$diff == 5");
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
         now = GLib.get_monotonic_time();
@@ -82,7 +82,7 @@ public class EventLoopTest: Drt.TestCase {
 
         expect_true(thread.join() == ctx, "Current context is thread-local");
         diff = (GLib.get_monotonic_time() - now) / 1000;
-        expect_int64_equals(5, diff, @"$diff == 5");
+        expect_int64_equal(5, diff, @"$diff == 5");
         expect_true(MainContext.@default() != ctx, "Current context is not global");
     }
 
@@ -98,7 +98,7 @@ public class EventLoopTest: Drt.TestCase {
         loop.run();
         int diff = (int) Math.round((GLib.get_monotonic_time() - now) / 1000000.0);
 
-        expect_int_equals(1, diff, @"$diff == 1");
+        expect_int_equal(1, diff, @"$diff == 1");
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
         now = GLib.get_monotonic_time();
@@ -118,7 +118,7 @@ public class EventLoopTest: Drt.TestCase {
 
         expect_true(thread.join() == ctx, "Current context is thread-local");
         diff = (int) Math.round((GLib.get_monotonic_time() - now) / 1000000.0);
-        expect_int_equals(1, diff, @"$diff == 1");
+        expect_int_equal(1, diff, @"$diff == 1");
         expect_true(MainContext.@default() != ctx, "Current context is not global");
     }
 
@@ -167,7 +167,7 @@ public class EventLoopTest: Drt.TestCase {
         int64 now = GLib.get_monotonic_time();
         yield Drt.EventLoop.sleep(5);
         int64 diff = (GLib.get_monotonic_time() - now) / 1000;
-        expect_int64_equals(5, diff, @"$diff == 5");
+        expect_int64_equal(5, diff, @"$diff == 5");
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2014-2019 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -236,7 +236,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_int_equals(int expected, int value, string format, ...) {
+    protected bool expect_int_equal(int expected, int value, string format, ...) {
         return process(expected == value, "%s: %d == %d".printf(format, expected, value), va_list());
     }
 
@@ -250,7 +250,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_uint_equals(uint expected, uint value, string format, ...) {
+    protected bool expect_uint_equal(uint expected, uint value, string format, ...) {
         return process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list());
     }
 
@@ -264,7 +264,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected void assert_uint_equals(uint expected, uint value, string format, ...) throws TestError {
+    protected void assert_uint_equal(uint expected, uint value, string format, ...) throws TestError {
         if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list())) {
             abort_test();
         }
@@ -280,7 +280,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_int64_equals(int64 expected, int64 value, string format, ...) {
+    protected bool expect_int64_equal(int64 expected, int64 value, string format, ...) {
         return process(expected == value, "%s: %s == %s".printf(
             format, expected.to_string(), value.to_string()), va_list());
     }
@@ -295,7 +295,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_double_equals(double expected, double value, string format, ...) {
+    protected bool expect_double_equal(double expected, double value, string format, ...) {
         return process(expected == value, "%s: %s == %s".printf(
             format, expected.to_string(), value.to_string()), va_list());
     }
@@ -310,7 +310,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_str_equals(string? expected, string? value, string format, ...) {
+    protected bool expect_str_equal(string? expected, string? value, string format, ...) {
         bool result = process(expected == value, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.printf("\t '%s' == '%s' failed.\n", expected, value);
@@ -343,7 +343,7 @@ public abstract class TestCase : GLib.Object {
      */
     [Diagnostics]
     [PrintfFormat]
-    protected bool expect_type_equals(Type expected, Type value, string format, ...) {
+    protected bool expect_type_equal(Type expected, Type value, string format, ...) {
         bool result = process(expected == value, format, va_list());
         if (!result && !Test.quiet()) {
             stdout.printf("\t %s == %s failed.\n", expected.name(), value.name());

@@ -27,18 +27,18 @@ public class RandomTest: Drt.TestCase {
         for (int n_bits = 0; n_bits < 9; n_bits++) {
             Random.blob(n_bits, out result);
             expect_not_null<void*>(result, @"$n_bits bits: result not null");
-            expect_int_equals(1, result.length, @"$n_bits bits: result 1 byte");
+            expect_int_equal(1, result.length, @"$n_bits bits: result 1 byte");
         }
 
         for (int n_bits = 9; n_bits < 17; n_bits++) {
             Random.blob(n_bits, out result);
             expect_not_null<void*>(result, @"$n_bits bits: result not null");
-            expect_int_equals(2, result.length, @"$n_bits bits: result 2 bytes");
+            expect_int_equal(2, result.length, @"$n_bits bits: result 2 bytes");
         }
 
         Random.blob(512, out result);
         expect_not_null<void*>(result, "$512 bits: result not null");
-        expect_int_equals(512 / 8, result.length, @"512: result $(512 / 8) bytes");
+        expect_int_equal(512 / 8, result.length, @"512: result $(512 / 8) bytes");
     }
 
     public void test_random_hexadecimal() {
@@ -46,18 +46,18 @@ public class RandomTest: Drt.TestCase {
         for (int n_bits = 0; n_bits < 9; n_bits++) {
             result = Random.hexadecimal(n_bits);
             expect_not_null<void*>(result, @"$n_bits bits: result not null");
-            expect_int_equals(2, result.length, @"$n_bits bits: result 2 bytes");
+            expect_int_equal(2, result.length, @"$n_bits bits: result 2 bytes");
         }
 
         for (int n_bits = 9; n_bits < 17; n_bits++) {
             result = Random.hexadecimal(n_bits);
             expect_not_null<void*>(result, @"$n_bits bits: result not null");
-            expect_int_equals(4, result.length, @"$n_bits bits: result 4 bytes");
+            expect_int_equal(4, result.length, @"$n_bits bits: result 4 bytes");
         }
 
         result = Random.hexadecimal(512);
         expect_not_null<void*>(result, "$512 bits: result not null");
-        expect_int_equals(512 / 8 * 2, result.length, @"512: result $(512 / 8 * 2) bytes");
+        expect_int_equal(512 / 8 * 2, result.length, @"512: result $(512 / 8 * 2) bytes");
     }
 }
 

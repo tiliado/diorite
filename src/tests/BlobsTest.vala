@@ -79,11 +79,11 @@ public class BlobsTest: Drt.TestCase {
         uint8[] blob_7_items_2 = {1, 2, 3, 4, 5, 6, 6};
         uint8[] blob_8_items = {1, 2, 3, 4, 5, 6, 7, 6};
 
-        expect_str_equals(null, Blobs.blob_to_string(null), "null");
-        expect_str_equals(null, Blobs.blob_to_string(blob_0_items), "0 items");
-        expect_str_equals("01020304050607", Blobs.blob_to_string(blob_7_items_1), "7 items 1");
-        expect_str_equals("01020304050606", Blobs.blob_to_string(blob_7_items_2), "7 items 2");
-        expect_str_equals("0102030405060706", Blobs.blob_to_string(blob_8_items), "8 items");
+        expect_str_equal(null, Blobs.blob_to_string(null), "null");
+        expect_str_equal(null, Blobs.blob_to_string(blob_0_items), "0 items");
+        expect_str_equal("01020304050607", Blobs.blob_to_string(blob_7_items_1), "7 items 1");
+        expect_str_equal("01020304050606", Blobs.blob_to_string(blob_7_items_2), "7 items 2");
+        expect_str_equal("0102030405060706", Blobs.blob_to_string(blob_8_items), "8 items");
     }
 
     public void test_bytes_to_string() {
@@ -92,11 +92,11 @@ public class BlobsTest: Drt.TestCase {
         var bytes_7_items_2 = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
         var bytes_8_items = new GLib.Bytes.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
-        expect_str_equals(null, Blobs.bytes_to_string(null), "null");
-        expect_str_equals(null, Blobs.bytes_to_string(bytes_0_items), "0 items");
-        expect_str_equals("01020304050607", Blobs.bytes_to_string(bytes_7_items_1), "7 items 1");
-        expect_str_equals("01020304050606", Blobs.bytes_to_string(bytes_7_items_2), "7 items 2");
-        expect_str_equals("0102030405060706", Blobs.bytes_to_string(bytes_8_items), "8 items");
+        expect_str_equal(null, Blobs.bytes_to_string(null), "null");
+        expect_str_equal(null, Blobs.bytes_to_string(bytes_0_items), "0 items");
+        expect_str_equal("01020304050607", Blobs.bytes_to_string(bytes_7_items_1), "7 items 1");
+        expect_str_equal("01020304050606", Blobs.bytes_to_string(bytes_7_items_2), "7 items 2");
+        expect_str_equal("0102030405060706", Blobs.bytes_to_string(bytes_8_items), "8 items");
     }
 
     public void test_byte_array_to_string() {
@@ -105,11 +105,11 @@ public class BlobsTest: Drt.TestCase {
         var byte_array_7_items_2 = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 6});
         var byte_array_8_items = new GLib.ByteArray.take(new uint8[] {1, 2, 3, 4, 5, 6, 7, 6});
 
-        expect_str_equals(null, Blobs.byte_array_to_string(null), "null");
-        expect_str_equals(null, Blobs.byte_array_to_string(byte_array_0_items), "0 items");
-        expect_str_equals("01020304050607", Blobs.byte_array_to_string(byte_array_7_items_1), "7 items 1");
-        expect_str_equals("01020304050606", Blobs.byte_array_to_string(byte_array_7_items_2), "7 items 2");
-        expect_str_equals("0102030405060706", Blobs.byte_array_to_string(byte_array_8_items), "8 items");
+        expect_str_equal(null, Blobs.byte_array_to_string(null), "null");
+        expect_str_equal(null, Blobs.byte_array_to_string(byte_array_0_items), "0 items");
+        expect_str_equal("01020304050607", Blobs.byte_array_to_string(byte_array_7_items_1), "7 items 1");
+        expect_str_equal("01020304050606", Blobs.byte_array_to_string(byte_array_7_items_2), "7 items 2");
+        expect_str_equal("0102030405060706", Blobs.byte_array_to_string(byte_array_8_items), "8 items");
     }
 
     public void test_int64_to_and_from_blob_samples() throws Drt.TestError {
@@ -263,13 +263,13 @@ public class BlobsTest: Drt.TestCase {
             val = values[j];
             data = null;
             Blobs.int64_to_hexadecimal(val, out data);
-            expect_str_equals(hexadecimal[j], data, @"item $j doesn't equal");
+            expect_str_equal(hexadecimal[j], data, @"item $j doesn't equal");
             assert(Blobs.int64_from_hexadecimal(data, out result), @"item $j not valid hexadecimal");
             assert(val == result, @"$val == $result");
 
             data = null;
             Blobs.int64_to_hexadecimal(val, out data, ':');
-            expect_str_equals(hexadecimal_separated[j], data, @"item $j doesn't equal");
+            expect_str_equal(hexadecimal_separated[j], data, @"item $j doesn't equal");
             assert(Blobs.int64_from_hexadecimal(data, out result, ':'), @"item $j not valid hexadecimal");
             assert(val == result, @"$val == $result");
         }

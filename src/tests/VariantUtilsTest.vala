@@ -141,7 +141,7 @@ public class VariantUtilsTest: Drt.TestCase {
             expect_variant_equal(new Variant.boolean(true), result["e"], "key e");
             expect_variant_equal(new Variant.double(3.14), result["f"], "key f");
             expect_variant_equal(null, result["g"], "key g");
-            expect_int_equals(6, (int) result.length, "dict size");
+            expect_int_equal(6, (int) result.length, "dict size");
         }
 
         // Dictionary of type "a{sv}" is also accepted
@@ -153,7 +153,7 @@ public class VariantUtilsTest: Drt.TestCase {
         if (expect_true(result != null, "result not null")) {
             expect_variant_equal(new Variant.string("abc"), result["a"], "key a");
             expect_variant_equal(new Variant.int32(1234), result["d"], "key d");
-            expect_int_equals(2, (int) result.length, "dict size");
+            expect_int_equal(2, (int) result.length, "dict size");
         }
 
         // Dictionary of type "a{ss}" is also accepted
@@ -165,7 +165,7 @@ public class VariantUtilsTest: Drt.TestCase {
         if (expect_true(result != null, "result not null")) {
             expect_variant_equal(new Variant.string("abc"), result["a"], "key a");
             expect_variant_equal(new Variant.string(""), result["d"], "key d");
-            expect_int_equals(2, (int) result.length, "dict size");
+            expect_int_equal(2, (int) result.length, "dict size");
         }
 
         // Empty dictionary
@@ -173,7 +173,7 @@ public class VariantUtilsTest: Drt.TestCase {
         dict = builder.end();
         result = VariantUtils.to_hash_table(dict);
         if (expect_true(result != null, "result not null")) {
-            expect_int_equals(0, (int) result.length, "dict size");
+            expect_int_equal(0, (int) result.length, "dict size");
         }
 
     }
@@ -183,7 +183,7 @@ public class VariantUtilsTest: Drt.TestCase {
         var table = new HashTable<string, Variant?>(str_hash, str_equal);
         Variant dict = VariantUtils.from_hash_table(table);
         if (expect_true(dict != null, "dict not null")) {
-            expect_int_equals(0, (int) dict.n_children(), "dict size");
+            expect_int_equal(0, (int) dict.n_children(), "dict size");
         }
 
         // Non-empty dictionary
@@ -206,7 +206,7 @@ public class VariantUtilsTest: Drt.TestCase {
         if (expect_true(dict != null, "dict not null")) {
             // Note: keys are sorted in VariantUtils.from_hash_table for the both variants to be compared easily.
             expect_variant_equal(expected, dict, "Dictionaries equal");
-            expect_int_equals(6, (int) dict.n_children(), "dict size");
+            expect_int_equal(6, (int) dict.n_children(), "dict size");
         }
     }
 
@@ -306,7 +306,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a string", i);
             }
-            expect_str_equals(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
         }
     }
 
@@ -376,7 +376,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a string", i);
             }
-            expect_str_equals(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
         }
     }
 
@@ -516,7 +516,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_double_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_double_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -586,7 +586,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_int64_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_int64_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -656,7 +656,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_int_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_int_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -726,7 +726,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_uint_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_uint_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -796,7 +796,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_double_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_double_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -911,7 +911,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a string", i);
             }
-            expect_str_equals(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
         }
     }
 
@@ -992,7 +992,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a string", i);
             }
-            expect_str_equals(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
         }
     }
 
@@ -1154,7 +1154,7 @@ public class VariantUtilsTest: Drt.TestCase {
             } else {
                 expect_false(result, "[%d] isn't a double", i);
             }
-            expect_double_equals(expected_values[i], actual_value, "[%d]", i);
+            expect_double_equal(expected_values[i], actual_value, "[%d]", i);
         }
     }
 
@@ -1240,7 +1240,7 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             string? actual_value = VariantUtils.to_string(input_values[i]);
-            expect_str_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 
@@ -1271,9 +1271,9 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             string? actual_value = VariantUtils.print(input_values[i], true);
-            expect_str_equals(expected_values_typed[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values_typed[i], actual_value, "[%d] value", i);
             actual_value = VariantUtils.print(input_values[i], false);
-            expect_str_equals(expected_values[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values[i], actual_value, "[%d] value", i);
         }
     }
 

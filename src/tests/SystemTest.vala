@@ -97,7 +97,7 @@ public class SystemTest: Drt.TestCase {
                 expect_true(file.query_file_type(0) == FileType.REGULAR, "file was created");
                 string actual_contents;
                 FileUtils.get_contents(file.get_path(), out actual_contents);
-                expect_str_equals(contents, actual_contents, "contents equal");
+                expect_str_equal(contents, actual_contents, "contents equal");
             } catch (GLib.Error e) {
                 unexpected_error(e, "Failed to create file.");
             }

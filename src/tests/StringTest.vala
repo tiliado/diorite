@@ -26,20 +26,20 @@ namespace Drt {
 public class StringTest: Drt.TestCase {
     public void test_semicolon_separated_set() {
         GenericSet<string> result = Drt.String.semicolon_separated_set(null, true);
-        expect_uint_equals(0, result.length, "null string");
+        expect_uint_equal(0, result.length, "null string");
         result = Drt.String.semicolon_separated_set("", true);
-        expect_uint_equals(0, result.length, "empty string");
+        expect_uint_equal(0, result.length, "empty string");
         result = Drt.String.semicolon_separated_set(";", true);
-        expect_uint_equals(0, result.length, "empty set");
+        expect_uint_equal(0, result.length, "empty set");
         var dataset = " hello ; Bye;;1234;byE;;;";
         result = Drt.String.semicolon_separated_set(dataset, false);
-        expect_uint_equals(4, result.length, "original set");
+        expect_uint_equal(4, result.length, "original set");
         foreach (unowned string s in new string[] {"hello", "Bye", "1234", "byE"}) {
             expect_true(result.contains(s), "item: %s", s);
         }
         expect_false(result.contains("bye"), "item: %s", "bye");
         result = Drt.String.semicolon_separated_set(dataset, true);
-        expect_uint_equals(3, result.length, "lowercase set");
+        expect_uint_equal(3, result.length, "lowercase set");
         foreach (unowned string s in new string[] {"hello", "bye", "1234"}) {
             expect_true(result.contains(s), "item: %s", s);
         }
@@ -47,17 +47,17 @@ public class StringTest: Drt.TestCase {
     }
 
     public void test_concat() {
-        expect_str_equals("bar", Drt.String.concat(null, "foo", "bar"), "");
-        expect_str_equals("bar", Drt.String.concat("", "foo", "bar"), "");
-        expect_str_equals("xfoobar", Drt.String.concat("x", "foo", "bar"), "");
+        expect_str_equal("bar", Drt.String.concat(null, "foo", "bar"), "");
+        expect_str_equal("bar", Drt.String.concat("", "foo", "bar"), "");
+        expect_str_equal("xfoobar", Drt.String.concat("x", "foo", "bar"), "");
 
-        expect_str_equals("bar", Drt.String.concat(null, null, "bar"), "");
-        expect_str_equals("bar", Drt.String.concat("", null, "bar"), "");
-        expect_str_equals("xbar", Drt.String.concat("x", null, "bar"), "");
+        expect_str_equal("bar", Drt.String.concat(null, null, "bar"), "");
+        expect_str_equal("bar", Drt.String.concat("", null, "bar"), "");
+        expect_str_equal("xbar", Drt.String.concat("x", null, "bar"), "");
 
-        expect_str_equals("bar", Drt.String.concat(null, "", "bar"), "");
-        expect_str_equals("bar", Drt.String.concat("", "", "bar"), "");
-        expect_str_equals("xbar", Drt.String.concat("x", "", "bar"), "");
+        expect_str_equal("bar", Drt.String.concat(null, "", "bar"), "");
+        expect_str_equal("bar", Drt.String.concat("", "", "bar"), "");
+        expect_str_equal("xbar", Drt.String.concat("x", "", "bar"), "");
     }
 
     public void test_append() {
@@ -65,39 +65,39 @@ public class StringTest: Drt.TestCase {
 
         buffer = null;
         Drt.String.append(ref buffer, "foo", "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
         buffer = null;
         Drt.String.append(ref buffer, null, "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
         buffer = null;
         Drt.String.append(ref buffer, "", "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
 
         buffer = "";
         Drt.String.append(ref buffer, "foo", "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
         buffer = "";
         Drt.String.append(ref buffer, null, "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
         buffer = "";
         Drt.String.append(ref buffer, "", "bar");
-        expect_str_equals("bar", buffer, "");
+        expect_str_equal("bar", buffer, "");
 
         buffer = "x";
         Drt.String.append(ref buffer, "foo", "bar");
-        expect_str_equals("xfoobar", buffer, "");
+        expect_str_equal("xfoobar", buffer, "");
         buffer = "x";
         Drt.String.append(ref buffer, null, "bar");
-        expect_str_equals("xbar", buffer, "");
+        expect_str_equal("xbar", buffer, "");
         buffer = "x";
         Drt.String.append(ref buffer, "", "bar");
-        expect_str_equals("xbar", buffer, "");
+        expect_str_equal("xbar", buffer, "");
     }
 
     public void test_unmask() {
         uint8[] data = {46, 143, 144, 145, 146, 147, 148};
         string? actual = Drt.String.unmask(data);
-        expect_str_equals("abcdef", actual, "valid");
+        expect_str_equal("abcdef", actual, "valid");
 
         data = {};
         actual = Drt.String.unmask(data);
@@ -109,7 +109,7 @@ public class StringTest: Drt.TestCase {
 
         data = {46, 143};
         actual = Drt.String.unmask(data);
-        expect_str_equals("a", actual, "2 items enough");
+        expect_str_equal("a", actual, "2 items enough");
 
         data = {146, 143};
         actual = Drt.String.unmask(data);
@@ -130,8 +130,8 @@ public class StringTest: Drt.TestCase {
         expect_null<void*>(str, "string ownership transferred");
         expect_true((void*) array == (void*) str0, "The address of the data has not changed");
         expect_not_null<void*>(array, "empty string produces non-null result");
-        expect_int_equals(0, array.length, "empty string produces 0-length array");
-        expect_uint_equals(0, array[0], "empty string produces 0-length array with [0] == '\\0'");
+        expect_int_equal(0, array.length, "empty string produces 0-length array");
+        expect_uint_equal(0, array[0], "empty string produces 0-length array with [0] == '\\0'");
 
         str = "abc";
         str0 = str;
@@ -139,8 +139,8 @@ public class StringTest: Drt.TestCase {
         expect_null<void*>(str, "string ownership transferred");
         expect_true((void*) array == (void*) str0, "The address of the data has not changed");
         expect_not_null<void*>(array, "empty string produces non-null result");
-        expect_int_equals(3, array.length, "abc string produces 3-length array");
-        expect_uint_equals(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
+        expect_int_equal(3, array.length, "abc string produces 3-length array");
+        expect_uint_equal(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
         expect_bytes_equal(new Bytes.take({'a', 'b', 'c'}), new Bytes.static(array), "strings equal");
     }
 
@@ -159,8 +159,8 @@ public class StringTest: Drt.TestCase {
         expect_not_null<void*>(bytes, "empty string produces non-null result");
         unowned uint8[] array = bytes.get_data();
         expect_true((void*) array == (void*) str0, "The address of the data has not changed");
-        expect_int_equals(0, array.length, "empty string produces 0-length array");
-        expect_uint_equals(0, array[0], "empty string produces 0-length array with [0] == '\\0'");
+        expect_int_equal(0, array.length, "empty string produces 0-length array");
+        expect_uint_equal(0, array[0], "empty string produces 0-length array with [0] == '\\0'");
 
         str = "abc";
         str0 = str;
@@ -169,8 +169,8 @@ public class StringTest: Drt.TestCase {
         expect_not_null<void*>(bytes, "empty string produces non-null result");
         array = bytes.get_data();
         expect_true((void*) array == (void*) str0, "The address of the data has not changed");
-        expect_int_equals(3, array.length, "abc string produces 3-length array");
-        expect_uint_equals(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
+        expect_int_equal(3, array.length, "abc string produces 3-length array");
+        expect_uint_equal(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
         expect_bytes_equal(new Bytes.take({'a', 'b', 'c'}), bytes, "strings equal");
     }
 }

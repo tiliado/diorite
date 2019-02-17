@@ -184,16 +184,16 @@ public class ConnectionTest: Drt.TestCase {
         try {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
             User user = conn.get_object(2);
-            expect_int64_equals(2, user.id, "id");
-            expect_str_equals("Jean", user.name, "name");
-            expect_int_equals(50, user.age, "age");
-            expect_double_equals(2.72, user.height, "height");
+            expect_int64_equal(2, user.id, "id");
+            expect_str_equal("Jean", user.name, "name");
+            expect_int_equal(50, user.age, "age");
+            expect_double_equal(2.72, user.height, "height");
             expect_false(user.alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 user.blob, "blob");
             expect(null == user.extra, "extra");
-            expect_int_equals(1024, user.not_in_db, "not_in_db");
+            expect_int_equal(1024, user.not_in_db, "not_in_db");
 
         } catch (GLib.Error e) {
             expectation_failed("Unexpected error: %s", e.message);

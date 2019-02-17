@@ -88,32 +88,32 @@ public class ObjectQueryTest: Drt.TestCase {
             uint counter = 0;
             foreach (var user in cursor) {
                 users += user;
-                expect_uint_equals(++counter, cursor.counter, "cursor counter");
+                expect_uint_equal(++counter, cursor.counter, "cursor counter");
             }
 
-            expect_int_equals(2, users.length, "users.length");
+            expect_int_equal(2, users.length, "users.length");
 
-            expect_int64_equals(1, users[0].id, "id");
-            expect_str_equals("George", users[0].name, "name");
-            expect_int_equals(30, users[0].age, "age");
-            expect_double_equals(1.72, users[0].height, "height");
+            expect_int64_equal(1, users[0].id, "id");
+            expect_str_equal("George", users[0].name, "name");
+            expect_int_equal(30, users[0].age, "age");
+            expect_double_equal(1.72, users[0].height, "height");
             expect_true(users[0].alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
-            expect_int_equals(1024, users[0].not_in_db, "not_in_db");
+            expect_int_equal(1024, users[0].not_in_db, "not_in_db");
 
-            expect_int64_equals(2, users[1].id, "id");
-            expect_str_equals("Jean", users[1].name, "name");
-            expect_int_equals(50, users[1].age, "age");
-            expect_double_equals(2.72, users[1].height, "height");
+            expect_int64_equal(2, users[1].id, "id");
+            expect_str_equal("Jean", users[1].name, "name");
+            expect_int_equal(50, users[1].age, "age");
+            expect_double_equal(2.72, users[1].height, "height");
             expect_false(users[1].alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[1].blob, "blob");
             expect(null == users[1].extra, "extra");
-            expect_int_equals(1024, users[1].not_in_db, "not_in_db");
+            expect_int_equal(1024, users[1].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
             expectation_failed("Unexpected error: %s", e.message);
         }
@@ -124,21 +124,21 @@ public class ObjectQueryTest: Drt.TestCase {
             uint counter = 0;
             foreach (var user in cursor) {
                 users += user;
-                expect_uint_equals(++counter, cursor.counter, "cursor counter");
+                expect_uint_equal(++counter, cursor.counter, "cursor counter");
             }
 
-            expect_int_equals(1, users.length, "users.length");
+            expect_int_equal(1, users.length, "users.length");
 
-            expect_int64_equals(2, users[0].id, "id");
-            expect_str_equals("Jean", users[0].name, "name");
-            expect_int_equals(50, users[0].age, "age");
-            expect_double_equals(2.72, users[0].height, "height");
+            expect_int64_equal(2, users[0].id, "id");
+            expect_str_equal("Jean", users[0].name, "name");
+            expect_int_equal(50, users[0].age, "age");
+            expect_double_equal(2.72, users[0].height, "height");
             expect_false(users[0].alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
-            expect_int_equals(1024, users[0].not_in_db, "not_in_db");
+            expect_int_equal(1024, users[0].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
             expectation_failed("Unexpected error: %s", e.message);
         }
@@ -158,29 +158,29 @@ public class ObjectQueryTest: Drt.TestCase {
                 users += user;
             }
 
-            expect_int_equals(2, users.length, "users.length");
+            expect_int_equal(2, users.length, "users.length");
 
-            expect_int64_equals(1, users[0].id, "id");
-            expect_str_equals("George", users[0].name, "name");
-            expect_int_equals(30, users[0].age, "age");
-            expect_double_equals(1.72, users[0].height, "height");
+            expect_int64_equal(1, users[0].id, "id");
+            expect_str_equal("George", users[0].name, "name");
+            expect_int_equal(30, users[0].age, "age");
+            expect_double_equal(1.72, users[0].height, "height");
             expect_true(users[0].alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 users[0].blob, "blob");
             expect(null == users[0].extra, "extra");
-            expect_int_equals(1024, users[0].not_in_db, "not_in_db");
+            expect_int_equal(1024, users[0].not_in_db, "not_in_db");
 
-            expect_int64_equals(2, users[1].id, "id");
-            expect_str_equals("Jean", users[1].name, "name");
-            expect_int_equals(50, users[1].age, "age");
-            expect_double_equals(2.72, users[1].height, "height");
+            expect_int64_equal(2, users[1].id, "id");
+            expect_str_equal("Jean", users[1].name, "name");
+            expect_int_equal(50, users[1].age, "age");
+            expect_double_equal(2.72, users[1].height, "height");
             expect_false(users[1].alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 users[1].blob, "blob");
             expect(null == users[1].extra, "extra");
-            expect_int_equals(1024, users[1].not_in_db, "not_in_db");
+            expect_int_equal(1024, users[1].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
             expectation_failed("Unexpected error: %s", e.message);
         }
@@ -211,16 +211,16 @@ public class ObjectQueryTest: Drt.TestCase {
         try {
 
             User user = conn.query_objects<User>(null, "WHERE id=?i", 2).get_one();
-            expect_int64_equals(2, user.id, "id");
-            expect_str_equals("Jean", user.name, "name");
-            expect_int_equals(50, user.age, "age");
-            expect_double_equals(2.72, user.height, "height");
+            expect_int64_equal(2, user.id, "id");
+            expect_str_equal("Jean", user.name, "name");
+            expect_int_equal(50, user.age, "age");
+            expect_double_equal(2.72, user.height, "height");
             expect_false(user.alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 6, 7}),
                 user.blob, "blob");
             expect(null == user.extra, "extra");
-            expect_int_equals(1024, user.not_in_db, "not_in_db");
+            expect_int_equal(1024, user.not_in_db, "not_in_db");
         } catch (GLib.Error e) {
             expectation_failed("Unexpected error: %s", e.message);
         }

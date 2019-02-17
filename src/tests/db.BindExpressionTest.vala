@@ -45,7 +45,7 @@ public class BindExpressionTest: Drt.TestCase {
             "John", 18, (double) 65.5, (int64) 123456, true, bytes, byte_array, gvalue),
         "binder.parse");
         string sql = binder.get_sql();
-        expect_str_equals(
+        expect_str_equal(
             "WHERE name = ? AND age = ? AND weight = ? AND money = ? AND married = ?"
             + " AND image = ? AND key = ? AND val = ?",
             sql, "sql");
@@ -53,54 +53,54 @@ public class BindExpressionTest: Drt.TestCase {
 
         SList<Value?> bound_values = binder.take_values();
         unowned SList<Value?> values = bound_values;
-        expect_uint_equals(8, values.length(), "n values");
+        expect_uint_equal(8, values.length(), "n values");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(string), val.type(), "str");
-        expect_str_equals("John", val.get_string(), "str");
+        expect_type_equal(typeof(string), val.type(), "str");
+        expect_str_equal("John", val.get_string(), "str");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(int), val.type(), "int");
-        expect_int_equals(18, val.get_int(), "int");
+        expect_type_equal(typeof(int), val.type(), "int");
+        expect_int_equal(18, val.get_int(), "int");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(double), val.type(), "double");
-        expect_double_equals(65.5, val.get_double(), "double");
+        expect_type_equal(typeof(double), val.type(), "double");
+        expect_double_equal(65.5, val.get_double(), "double");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(int64), val.type(), "int64");
-        expect_int64_equals(123456, val.get_int64(), "int64");
+        expect_type_equal(typeof(int64), val.type(), "int64");
+        expect_int64_equal(123456, val.get_int64(), "int64");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(bool), val.type(), "bool");
+        expect_type_equal(typeof(bool), val.type(), "bool");
         expect_true(val.get_boolean(), "bool");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(Bytes), val.type(), "Bytes");
-        expect_int_equals(0, bytes.compare((Bytes) val.get_boxed()), "Bytes");
+        expect_type_equal(typeof(Bytes), val.type(), "Bytes");
+        expect_int_equal(0, bytes.compare((Bytes) val.get_boxed()), "Bytes");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(ByteArray), val.type(), "ByteArray");
-        expect_int_equals(0, bytes.compare(ByteArray.free_to_bytes((ByteArray) val.get_boxed())), "ByteArray");
+        expect_type_equal(typeof(ByteArray), val.type(), "ByteArray");
+        expect_int_equal(0, bytes.compare(ByteArray.free_to_bytes((ByteArray) val.get_boxed())), "ByteArray");
 
         val = values.data; values = values.next;
-        expect_type_equals(typeof(int), val.type(), "gvalue");
-        expect_int_equals(1234, val.get_int(), "gvalue");
+        expect_type_equal(typeof(int), val.type(), "gvalue");
+        expect_int_equal(1234, val.get_int(), "gvalue");
     }
 
     public void test_reset_ok() {
         var binder = new BindExpression();
         expect_no_error(() => binder.parse("WHERE name = ?s", "John"), "binder.parse");
         string sql = binder.get_sql();
-        expect_str_equals("WHERE name = ?", sql, "sql");
+        expect_str_equal("WHERE name = ?", sql, "sql");
         SList<Value?> bound_values = binder.take_values();
-        expect_uint_equals(1, bound_values.length(), "n values");
+        expect_uint_equal(1, bound_values.length(), "n values");
 
         binder.reset();
         sql = binder.get_sql();
-        expect_str_equals("", sql, "sql");
+        expect_str_equal("", sql, "sql");
         bound_values = binder.take_values();
-        expect_uint_equals(0, bound_values.length(), "n values");
+        expect_uint_equal(0, bound_values.length(), "n values");
     }
 
 }

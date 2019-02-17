@@ -110,32 +110,32 @@ public class OrmManagerTest: Drt.TestCase {
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
                 User user = orm.create_object<User>(result);
-                expect_int64_equals(1, user.id, "id");
-                expect_str_equals("George", user.name, "name");
-                expect_int_equals(30, user.age, "age");
-                expect_double_equals(1.72, user.height, "height");
+                expect_int64_equal(1, user.id, "id");
+                expect_str_equal("George", user.name, "name");
+                expect_int_equal(30, user.age, "age");
+                expect_double_equal(1.72, user.height, "height");
                 expect_true(user.alive, "alive");
                 expect_bytes_equal(
                     new GLib.Bytes.take(new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                     user.blob, "blob");
                 expect(null == user.extra, "extra");
-                expect_int_equals(1024, user.not_in_db, "not_in_db");
+                expect_int_equal(1024, user.not_in_db, "not_in_db");
             } catch (GLib.Error e) {
                 expectation_failed("Unexpected error: %s", e.message);
             }
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
                 User user = orm.create_object<User>(result);
-                expect_int64_equals(1, user.id, "id");
-                expect_str_equals("George", user.name, "name");
-                expect_int_equals(30, user.age, "age");
-                expect_double_equals(1.72, user.height, "height");
+                expect_int64_equal(1, user.id, "id");
+                expect_str_equal("George", user.name, "name");
+                expect_int_equal(30, user.age, "age");
+                expect_double_equal(1.72, user.height, "height");
                 expect_true(user.alive, "alive");
                 expect_bytes_equal(
                     new GLib.Bytes.take(new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                     user.blob, "blob");
                 expect(null == user.extra, "extra");
-                expect_int_equals(1024, user.not_in_db, "not_in_db");
+                expect_int_equal(1024, user.not_in_db, "not_in_db");
             } catch (GLib.Error e) {
                 expectation_failed("Unexpected error: %s", e.message);
             }
@@ -172,22 +172,22 @@ public class OrmManagerTest: Drt.TestCase {
                 orm.fill_object(user, result);
                 expectation_failed("Expected error");
             } catch (GLib.Error e) {
-                expect_str_equals("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
+                expect_str_equal("Read-only value of property 'id' doesn't match database data.", e.message, "mismatch");
             }
 
             /* Matches */
             user = new User(1, "Lololo", 45, 2.25, false);
             orm.fill_object(user, result);
-            expect_int64_equals(1, user.id, "id");
-            expect_str_equals("George", user.name, "name");
-            expect_int_equals(30, user.age, "age");
-            expect_double_equals(1.72, user.height, "height");
+            expect_int64_equal(1, user.id, "id");
+            expect_str_equal("George", user.name, "name");
+            expect_int_equal(30, user.age, "age");
+            expect_double_equal(1.72, user.height, "height");
             expect_true(user.alive, "alive");
             expect_bytes_equal(
                 new GLib.Bytes.take(new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7}),
                 user.blob, "blob");
             expect(null == user.extra, "extra");
-            expect_int_equals(1024, user.not_in_db, "not_in_db");
+            expect_int_equal(1024, user.not_in_db, "not_in_db");
 
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "id"));
