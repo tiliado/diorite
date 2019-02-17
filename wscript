@@ -228,6 +228,7 @@ def configure(ctx):
         ctx.env.append_unique("VALAFLAGS", ["--fatal-warnings"])
         ctx.env.append_unique("VALADOCFLAGS", ["--fatal-warnings"])
         ctx.env.append_unique('CFLAGS', [
+            '-lm',
             '-Wall', '-Werror',
             '-Wno-unused-but-set-variable',
             '-Wno-incompatible-pointer-types',
@@ -416,7 +417,8 @@ def build(ctx):
         uselib = uselib_gtk,
         use = [DIORITE_GLIB, DIORITE_GTK, DIORITE_DB],
         vala_defines = vala_defines,
-        cflags = ['-DG_LOG_DOMAIN="DioriteTests"'],
+        defines = ['G_LOG_DOMAIN="DioriteTests"'],
+        lib = ['m'],
         vapi_dirs = vapi_dirs,
         vala_target_glib = TARGET_GLIB,
         install_path = None,
