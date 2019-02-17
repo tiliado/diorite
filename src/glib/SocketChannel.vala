@@ -79,8 +79,8 @@ public class SocketChannel : Drt.DuplexChannel {
     }
 
     private void set_condition(IOCondition condition) {
-        bool read = Flags.is_set(condition, IOCondition.IN);
-        bool write = Flags.is_set(condition, IOCondition.OUT);
+        bool read = (condition & IOCondition.IN) != 0;
+        bool write = (condition & IOCondition.OUT) != 0;
         if (can_read != read) {
             can_read = read;
         }
