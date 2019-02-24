@@ -98,7 +98,7 @@ public class EventLoopTest: Drt.TestCase {
         loop.run();
         int diff = (int) Math.round((GLib.get_monotonic_time() - now) / 1000000.0);
 
-        expect_int_equal(1, diff, @"$diff == 1");
+        expect_true(1 <= diff <= 2, @"$diff == 1");
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
         now = GLib.get_monotonic_time();
