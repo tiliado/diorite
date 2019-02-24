@@ -7,6 +7,25 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.16.0 - February 24th, 2019
+------------------------------------
+
+* Vala 0.44.x is recommended as it fixes some memory leaks.
+* Don't pass null to VariantUtils.to_strv. Issue: tiliado/nuvolaruntime#493
+* Valadoc is now run with `--fatal-warnings`. This requires Vala 0.44.x but can be disabled with
+  `./waf configure --no-strict`.
+* Asynchronous tests were fixed.
+* Various C warnings were fixed and marked as fatal to be caught in future.
+* Various optimizations of memory usage.
+* Refactoring continues, test cases and documentation are improved.
+* Removed: System.overwrite_file, ConditionalExpression, Bluetooth classes, RichTextBuffer, RichTextView,
+  EntryMultiCompletion, Flag.is_set.
+* Renamed: System.make_directory_with_parents_sync → System.make_dirs_async,
+  System.overwrite_file_async → System.write_to_file_async, TestCase.foo_equals → TestCase.foo_equal.
+* New API: String.as_array_of_bytes, TestCase.get_tmp_dir, TestCase.expect_error_match, TestCase.unexpected_error,
+  String.as_bytes.
+
+
 Release 4.15.0 - December 28th, 2018
 ------------------------------------
 
