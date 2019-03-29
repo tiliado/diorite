@@ -104,7 +104,10 @@ public abstract class KeyValueStorage: GLib.Object {
     public PropertyBinding? bind_object_property(string key, GLib.Object object, string property_name,
         PropertyBindingFlags flags=PropertyBindingFlags.BIDIRECTIONAL) {
         unowned ParamSpec? property = object.get_class().find_property(property_name);
-        return_val_if_fail(property != null, null);
+        if (property == null) {
+            critical("Object %s doesn't have property '%s'", object.get_type().name(), property_name);
+            return null;
+        }
         var binding = new PropertyBinding(this, make_full_key(key, property_name), object, property, flags);
         property_bindings.add(binding);
         return binding;
