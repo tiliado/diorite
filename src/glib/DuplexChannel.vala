@@ -62,7 +62,7 @@ public abstract class DuplexChannel : GLib.Object {
      * @param output     The output stream to write to,
      * @param timeout    The I/O timeout.
      */
-    public DuplexChannel(uint id, string name, InputStream input, OutputStream output, uint timeout) {
+    protected DuplexChannel(uint id, string name, InputStream input, OutputStream output, uint timeout) {
         this.id = id;
         this.name = name;
         this.output = output;

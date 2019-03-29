@@ -32,7 +32,7 @@ public abstract class RpcParam {
     public string type_string {get; protected set; default = null;}
     public string? description {get; protected set; default = null;}
 
-    public RpcParam(string name, bool required, bool nullable, Variant? default_value, string type_string,
+    protected RpcParam(string name, bool required, bool nullable, Variant? default_value, string type_string,
         string? description) {
         this.name = name;
         this.nullable = nullable;

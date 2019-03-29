@@ -55,7 +55,7 @@ public abstract class Application : Gtk.Application {
     private Menu? menubar_app_submenu = null;
     private Menu? default_menubar = null;
 
-    public Application(
+    protected Application(
         string uid, string name, string? dbus_name = null,
         GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE
     ) {
