@@ -11,7 +11,7 @@ jobs:
             dnf update -y > /dev/null
             dnf install -y git openssh-clients \
               gcc vala vala-devel valadoc gobject-introspection-devel 'pkgconfig(python3)' \
-              'pkgconfig(gtk+-3.0)' 'pkgconfig(gee-0.8)' sqlite-devel python3-pyparsing \
+              'pkgconfig(gtk+-3.0)' sqlite-devel python3-pyparsing \
               wget tar xz git autoconf-archive \
               make autoconf automake glib2-devel graphviz-devel flex bison libxslt
             dnf clean all > /dev/null
@@ -26,6 +26,17 @@ jobs:
             ./autogen.sh --prefix=/usr
             make all
             dnf remove -y vala valadoc
+            make install
+      - run:
+          name: Download Gee
+          command: |
+            git clone https://gitlab.gnome.org/GNOME/libgee.git
+      - run:
+          name: Build Gee
+          working_directory: ~/workdir/libgee
+          command: |
+            ./autogen.sh --prefix=/usr --enable-introspection=no --disable-static --enable-gtk-doc=no
+            make all
             make install
       - run:
           name: Install Valalint
