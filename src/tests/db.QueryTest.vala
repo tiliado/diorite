@@ -71,7 +71,7 @@ public class QueryTest : Drt.TestCase {
         try {
             query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)).exec();
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "query failed");
         }
     }
 
@@ -83,13 +83,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, 1);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_int(index, 1);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -97,16 +97,16 @@ public class QueryTest : Drt.TestCase {
                 try {
                     q.bind(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %d; %s", value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
                 try {
                     q.bind_int(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %d; %s", value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -119,13 +119,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_int64(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -133,16 +133,16 @@ public class QueryTest : Drt.TestCase {
                 try {
                     q.bind(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %s; %s", value.to_string(), e.message);
+                    unexpected_error(e, @"value $value");
                 }
                 try {
                     q.bind_int64(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %s; %s", value.to_string(), e.message);
+                    unexpected_error(e, @"value $value");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -155,13 +155,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_double(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -169,16 +169,16 @@ public class QueryTest : Drt.TestCase {
                 try {
                     q.bind(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %s; %s", value.to_string(), e.message);
+                    unexpected_error(e, @"value $value");
                 }
                 try {
                     q.bind_double(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %s; %s", value.to_string(), e.message);
+                    unexpected_error(e, @"value $value");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -191,13 +191,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_string(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -205,16 +205,16 @@ public class QueryTest : Drt.TestCase {
                 try {
                     q.bind(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value '%s'; %s", value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
                 try {
                     q.bind_string(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value '%s'; %s", value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -226,13 +226,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, true);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_bool(index, true);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -240,16 +240,16 @@ public class QueryTest : Drt.TestCase {
                 try {
                     q.bind(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %d; %s", (int) value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
                 try {
                     q.bind_bool(1, value);
                 } catch (GLib.Error e) {
-                    expectation_failed("value %d; %s", (int) value, e.message);
+                    unexpected_error(e, @"value $value");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -261,27 +261,27 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, null);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_null(index);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
             try {
                 q.bind(1, null);
             } catch (GLib.Error e) {
-                expectation_failed("value null; %s", e.message);
+                unexpected_error(e, "value null");
             }
             try {
                 q.bind_null(1);
             } catch (GLib.Error e) {
-                expectation_failed("value null; %s", e.message);
+                unexpected_error(e, "value null");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -297,19 +297,19 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, void_null);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d, null", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index, null");
                 }
                 try {
                     q.bind(index, void_non_null);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*Data type gpointer is supported only with a null pointer.*", e.message, "index %d, non_null", index);
+                    expect_str_match("*Data type gpointer is supported only with a null pointer.*", e.message, @"index $index, !null");
                 }
             }
             try {
                 q.bind(1, void_null);
             } catch (GLib.Error e) {
-                expectation_failed("value null; %s", e.message);
+                unexpected_error(e, "value null");
             }
             try {
                 q.bind(1, void_non_null);
@@ -318,7 +318,7 @@ public class QueryTest : Drt.TestCase {
                 expect_str_match("*Data type gpointer is supported only with a null pointer.*", e.message, "value non_null");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -345,7 +345,7 @@ public class QueryTest : Drt.TestCase {
                     q.bind_blob(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -356,11 +356,11 @@ public class QueryTest : Drt.TestCase {
                 } catch (GLib.Error e) {
                     string hex;
                     Drt.Blobs.hexadecimal_from_blob(value, out hex);
-                    expectation_failed("value %s; %s", hex, e.message);
+                    unexpected_error(e, @"hex value $hex");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -373,13 +373,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_bytes(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
 
@@ -390,18 +390,18 @@ public class QueryTest : Drt.TestCase {
                 } catch (GLib.Error e) {
                     string hex;
                     Drt.Blobs.hexadecimal_from_blob(value.get_data(), out hex);
-                    expectation_failed("value %s; %s", hex, e.message);
+                    unexpected_error(e, @"hex value $hex");
                 }
                 try {
                     q.bind_bytes(1, value);
                 } catch (GLib.Error e) {
                     string hex;
                     Drt.Blobs.hexadecimal_from_blob(value.get_data(), out hex);
-                    expectation_failed("value %s; %s", hex, e.message);
+                    unexpected_error(e, @"hex value $hex");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 
@@ -414,13 +414,13 @@ public class QueryTest : Drt.TestCase {
                     q.bind(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
                 try {
                     q.bind_byte_array(index, val);
                     expectation_failed("Expected error");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, "index %d", index);
+                    expect_str_match("*%d is not in range 1..2*".printf(index), e.message, @"index $index");
                 }
             }
             for (var j = 0; j < 100; j++) {
@@ -430,18 +430,18 @@ public class QueryTest : Drt.TestCase {
                 } catch (GLib.Error e) {
                     string hex;
                     Drt.Blobs.hexadecimal_from_blob(value.data, out hex);
-                    expectation_failed("value %s; %s", hex, e.message);
+                    unexpected_error(e, @"hex value $hex");
                 }
                 try {
                     q.bind_byte_array(1, value);
                 } catch (GLib.Error e) {
                     string hex;
                     Drt.Blobs.hexadecimal_from_blob(value.data, out hex);
-                    expectation_failed("value %s; %s", hex, e.message);
+                    unexpected_error(e, @"hex value $hex");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "bind failed");
         }
     }
 }

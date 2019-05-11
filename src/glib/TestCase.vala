@@ -167,9 +167,8 @@ public abstract class TestCase : GLib.Object {
      * @param expression    expression expected to be true
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert(bool expression, string format, ...) throws TestError {
-        if (!process(expression, format, va_list())) {
+    protected void assert(bool expression, string comment) throws TestError {
+        if (!process(expression, comment)) {
             abort_test();
         }
     }
@@ -181,9 +180,8 @@ public abstract class TestCase : GLib.Object {
      *
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_not_reached(string format, ...) throws TestError {
-        process(false, format, va_list());
+    protected void assert_not_reached(string comment) throws TestError {
+        process(false, comment);
         abort_test();
     }
 
@@ -195,9 +193,8 @@ public abstract class TestCase : GLib.Object {
      * @param expression    expression expected to be true
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect(bool expression, string format, ...) {
-        return process(expression, format, va_list());
+    protected bool expect(bool expression, string comment) {
+        return process(expression, comment);
     }
 
     /**
@@ -208,9 +205,8 @@ public abstract class TestCase : GLib.Object {
      * @param expression    expression expected to be true
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_true(bool expression, string format, ...) {
-        return process(expression, format, va_list());
+    protected bool expect_true(bool expression, string comment) {
+        return process(expression, comment);
     }
 
     /**
@@ -221,9 +217,8 @@ public abstract class TestCase : GLib.Object {
      * @param expression    expression expected to be false
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_false(bool expression, string format, ...) {
-        return process(!expression, format, va_list());
+    protected bool expect_false(bool expression, string comment) {
+        return process(!expression, comment);
     }
 
     /**
@@ -235,9 +230,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_int_equal(int expected, int value, string format, ...) {
-        return process(expected == value, "%s: %d == %d".printf(format, expected, value), va_list());
+    protected bool expect_int_equal(int expected, int value, string comment) {
+        return process(expected == value, "%s: %d == %d".printf(comment, expected, value));
     }
 
     /**
@@ -249,9 +243,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_uint_equal(uint expected, uint value, string format, ...) {
-        return process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list());
+    protected bool expect_uint_equal(uint expected, uint value, string comment) {
+        return process(expected == value, "%s: %u == %u".printf(comment, expected, value));
     }
 
     /**
@@ -263,9 +256,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_uint_equal(uint expected, uint value, string format, ...) throws TestError {
-        if (!process(expected == value, "%s: %u == %u".printf(format, expected, value), va_list())) {
+    protected void assert_uint_equal(uint expected, uint value, string comment) throws TestError {
+        if (!process(expected == value, "%s: %u == %u".printf(comment, expected, value))) {
             abort_test();
         }
     }
@@ -279,10 +271,9 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_int64_equal(int64 expected, int64 value, string format, ...) {
+    protected bool expect_int64_equal(int64 expected, int64 value, string comment) {
         return process(expected == value, "%s: %s == %s".printf(
-            format, expected.to_string(), value.to_string()), va_list());
+            comment, expected.to_string(), value.to_string()));
     }
 
     /**
@@ -294,10 +285,9 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_double_equal(double expected, double value, string format, ...) {
+    protected bool expect_double_equal(double expected, double value, string comment) {
         return process(expected == value, "%s: %s == %s".printf(
-            format, expected.to_string(), value.to_string()), va_list());
+            comment, expected.to_string(), value.to_string()));
     }
 
     /**
@@ -309,9 +299,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_str_equal(string? expected, string? value, string format, ...) {
-        bool result = process(expected == value, format, va_list());
+    protected bool expect_str_equal(string? expected, string? value, string comment) {
+        bool result = process(expected == value, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\t '%s' == '%s' failed.\n", expected, value);
         }
@@ -327,10 +316,9 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_variant_equal(Variant? expected, Variant? value, string format, ...) {
+    protected bool expect_variant_equal(Variant? expected, Variant? value, string comment) {
         return process(VariantUtils.equal(expected, value), "%s: %s == %s".printf(
-            format, VariantUtils.print(expected), VariantUtils.print(value)), va_list());
+            comment, VariantUtils.print(expected), VariantUtils.print(value)));
     }
 
     /**
@@ -342,9 +330,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_type_equal(Type expected, Type value, string format, ...) {
-        bool result = process(expected == value, format, va_list());
+    protected bool expect_type_equal(Type expected, Type value, string comment) {
+        bool result = process(expected == value, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\t %s == %s failed.\n", expected.name(), value.name());
         }
@@ -360,9 +347,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_str_not_equal(string? expected, string? value, string format, ...) {
-        bool result = process(expected != value, format, va_list());
+    protected bool expect_str_not_equal(string? expected, string? value, string comment) {
+        bool result = process(expected != value, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\t '%s' != '%s' failed.\n", expected, value);
         }
@@ -378,12 +364,11 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_blob_equal(uint8[]? expected, uint8[]? value, string format, ...) {
+    protected bool expect_blob_equal(uint8[]? expected, uint8[]? value, string comment) {
         return process_bytes_equal(
             expected != null ? new Bytes.static(expected): null,
             value != null ? new Bytes.static(value): null,
-            format, va_list());
+            comment);
     }
 
     /**
@@ -395,9 +380,8 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, ...) {
-        return process_bytes_equal(expected, value, format, va_list());
+    protected bool expect_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string comment) {
+        return process_bytes_equal(expected, value, comment);
     }
 
 
@@ -410,19 +394,18 @@ public abstract class TestCase : GLib.Object {
      * @param value       real value
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_byte_array_equal(GLib.ByteArray? expected, GLib.ByteArray? value, string format, ...) {
+    protected bool expect_byte_array_equal(GLib.ByteArray? expected, GLib.ByteArray? value, string comment) {
         return process_bytes_equal(
             expected != null ? new Bytes.static(expected.data): null,
             value != null ? new Bytes.static(value.data): null,
-            format, va_list());
+            comment);
     }
 
-    private bool process_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string format, va_list args) {
+    private bool process_bytes_equal(GLib.Bytes? expected, GLib.Bytes? value, string comment) {
         bool result = process(
             (expected == null && value == null)
         || (expected != null && value != null && expected.compare(value) == 0),
-            format, args);
+            comment);
         if (!result && !Test.quiet()) {
             string? expected_hex = null, value_hex = null;
             if (expected != null) {
@@ -443,12 +426,11 @@ public abstract class TestCase : GLib.Object {
      *
      * @param expected    expected value
      * @param actual      real value
-     * @param format      format string
+     * @param comment     comment related to this check
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) {
-        return process_value_equal(expected, actual, format, va_list());
+    protected bool expect_value_equal(GLib.Value? expected, GLib.Value? actual, string comment) {
+        return process_value_equal(expected, actual, comment);
     }
 
     /**
@@ -458,19 +440,18 @@ public abstract class TestCase : GLib.Object {
      *
      * @param expected    expected value
      * @param actual      real value
-     * @param format      format string
+     * @param comment     comment related to this check
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string format, ...) throws TestError {
-        if (!process_value_equal(expected, actual, format, va_list())) {
+    protected void assert_value_equal(GLib.Value? expected, GLib.Value? actual, string comment) throws TestError {
+        if (!process_value_equal(expected, actual, comment)) {
             abort_test();
         }
     }
 
-    private bool process_value_equal(GLib.Value? expected, GLib.Value? actual, string format, va_list args) {
+    private bool process_value_equal(GLib.Value? expected, GLib.Value? actual, string comment) {
         string description;
-        bool result = process(Value.equal_verbose(expected, actual, out description), format, args);
+        bool result = process(Value.equal_verbose(expected, actual, out description), comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\t %s\n", description);
         }
@@ -483,15 +464,13 @@ public abstract class TestCase : GLib.Object {
      * Test is not terminated.
      */
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expectation_failed(string format, ...) {
-        return process(false, format, va_list());
+    protected bool expectation_failed(string comment) {
+        return process(false, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected void fail(string format="", ...) throws TestError {
-        process(false, format, va_list());
+    protected void fail(string comment) throws TestError {
+        process(false, comment);
         abort_test();
     }
 
@@ -504,8 +483,8 @@ public abstract class TestCase : GLib.Object {
         }
     }
 
-    private bool process(bool expression, string format, va_list args) {
-        print_result(expression, format, args);
+    private bool process(bool expression, string comment) {
+        print_result(expression, comment);
         if (expression) {
             passed++;
         } else {
@@ -515,14 +494,14 @@ public abstract class TestCase : GLib.Object {
         return expression;
     }
 
-    private void print_result(bool result, string format, va_list args) {
+    private void print_result(bool result, string comment) {
         if (!Test.quiet()) {
-            if (format != "" && (Test.verbose() || !result)) {
+            if (comment != "" && (Test.verbose() || !result)) {
                 if (first_result) {
                     stdout.putc('\n');
                     first_result = false;
                 }
-                stdout.vprintf(format, args);
+                stdout.puts(comment);
             }
             if (!result) {
                 stdout.puts(" FAIL\n");
@@ -547,20 +526,19 @@ public abstract class TestCase : GLib.Object {
             }
             Test.fail();
         } else if (!(e is TestError.FAIL)) {
-            expectation_failed("Uncaught exception: %s %d %s", e.domain.to_string(), e.code, e.message);
+            expectation_failed(@"Uncaught exception: $(e.domain) $(e.code) $(e.message)");
         }
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_no_error(TestCallback func, string format, ...) {
+    protected bool expect_no_error(TestCallback func, string comment) {
         string? err = null;
         try {
             func();
         } catch (GLib.Error e) {
             err = "\tUnexpected error: %s %d %s\n".printf(e.domain.to_string(), e.code, e.message);
         }
-        bool result = process(err == null, format, va_list());
+        bool result = process(err == null, comment);
         if (!result && !Test.quiet()) {
             stdout.puts(err);
         }
@@ -568,8 +546,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_error(TestCallback func, string message_pattern, string format, ...) {
+    protected bool expect_error(TestCallback func, string message_pattern, string comment) {
         bool result = false;
         string? err = null;
         try {
@@ -578,7 +555,7 @@ public abstract class TestCase : GLib.Object {
             result = PatternSpec.match_simple(message_pattern, e.message);
             err = e.message;
         }
-        process(result, format, va_list());
+        process(result, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("An exception was expected: %s\n", message_pattern);
             if (err != null) {
@@ -589,10 +566,9 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_error_match(GLib.Error e, string message_pattern, string format, ...) {
+    protected bool expect_error_match(GLib.Error e, string message_pattern, string comment) {
         bool result = PatternSpec.match_simple(message_pattern, e.message);
-        process(result, format, va_list());
+        process(result, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("An exception was expected: %s\n", message_pattern);
             stdout.printf("Other exception has been thrown: %s\n", error_to_string(e));
@@ -601,27 +577,24 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected void unexpected_error(GLib.Error e, string format, ...) {
-        process(false, format, va_list());
+    protected void unexpected_error(GLib.Error e, string comment) {
+        process(false, comment);
         if (!Test.quiet()) {
             stdout.printf("Unexpected exception has been thrown: %s\n", error_to_string(e));
         }
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_type(Type expected_type, void* object, string format, ...) {
-        return expect_type_internal(expected_type, object, format, va_list());
+    protected bool expect_type(Type expected_type, void* object, string comment) {
+        return expect_type_internal(expected_type, object, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_type_of<T>(void* object, string format, ...) {
-        return expect_type_internal(typeof(T), object, format, va_list());
+    protected bool expect_type_of<T>(void* object, string comment) {
+        return expect_type_internal(typeof(T), object, comment);
     }
 
-    protected bool expect_type_internal(Type expected_type, void* object, string format, va_list args) {
+    protected bool expect_type_internal(Type expected_type, void* object, string comment) {
         string? type_found = null;
         bool result = false;
         if (object != null) {
@@ -629,7 +602,7 @@ public abstract class TestCase : GLib.Object {
             type_found = object_type.name();
             result = (object_type == expected_type || object_type.is_a(expected_type));
         }
-        process(result, format, args);
+        process(result, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("A type %s expected but %s found.\n", expected_type.name(), type_found);
         }
@@ -637,8 +610,7 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_enum<T>(T expected, T found, string format, ...) {
+    protected bool expect_enum<T>(T expected, T found, string comment) {
         Type expected_type = typeof(T);
         unowned string enum_name = expected_type.name();
         bool result = false;
@@ -666,7 +638,7 @@ public abstract class TestCase : GLib.Object {
                 }
             }
         }
-        process(result, format, va_list());
+        process(result, comment);
         if (!result && err != null && !Test.quiet()) {
             stdout.puts(err);
         }
@@ -674,15 +646,13 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_null<T>(T? val, string format, ...) {
-        return process(val == null, "assertion val is null failed; " + format, va_list());
+    protected bool expect_null<T>(T? val, string comment) {
+        return process(val == null, "assertion val is null failed; " + comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_not_null<T>(T? val, string format, ...) {
-        return process(val != null, "assertion val is not null failed; " + format, va_list());
+    protected bool expect_not_null<T>(T? val, string comment) {
+        return process(val != null, "assertion val is not null failed; " + comment);
     }
 
     public void summary() {
@@ -698,35 +668,31 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_str_match(string pattern, string data, string format, ...) {
-        return process_str_match(true, pattern, data, format, va_list());
+    protected bool expect_str_match(string pattern, string data, string comment) {
+        return process_str_match(true, pattern, data, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_str_not_match(string pattern, string data, string format, ...) {
-        return process_str_match(false, pattern, data, format, va_list());
+    protected bool expect_str_not_match(string pattern, string data, string comment) {
+        return process_str_match(false, pattern, data, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_str_match(string pattern, string data, string format, ...) throws TestError {
-        if (!process_str_match(true, pattern, data, format, va_list())) {
+    protected void assert_str_match(string pattern, string data, string comment) throws TestError {
+        if (!process_str_match(true, pattern, data, comment)) {
             abort_test();
         }
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_str_not_match(string pattern, string data, string format, ...) throws TestError {
-        if (!process_str_match(false, pattern, data, format, va_list())) {
+    protected void assert_str_not_match(string pattern, string data, string comment) throws TestError {
+        if (!process_str_match(false, pattern, data, comment)) {
             abort_test();
         }
     }
 
-    private bool process_str_match(bool expected, string pattern, string data, string format, va_list args) {
-        bool result = process(PatternSpec.match_simple(pattern, data) == expected, format, args);
+    private bool process_str_match(bool expected, string pattern, string data, string comment) {
+        bool result = process(PatternSpec.match_simple(pattern, data) == expected, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\tPattern %s should%s match string '%s'.\n", pattern, expected ? "" : " not", data);
         }
@@ -734,27 +700,25 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected void assert_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, ...)
+    protected void assert_array<T>(Array<T> expected, Array<T> found, EqualData eq, string comment)
     throws TestError {
-        if (!process_array(expected, found, eq, format, va_list())) {
+        if (!process_array(expected, found, eq, comment)) {
             abort_test();
         }
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, ...) {
-        return process_array<T>(expected, found, eq, format, va_list());
+    protected bool expect_array<T>(Array<T> expected, Array<T> found, EqualData eq, string comment) {
+        return process_array<T>(expected, found, eq, comment);
     }
 
-    protected bool process_array<T>(Array<T> expected, Array<T> found, EqualData eq, string format, va_list args) {
+    protected bool process_array<T>(Array<T> expected, Array<T> found, EqualData eq, string comment) {
         uint limit = uint.max(expected.length, found.length);
         bool result = true;
         string? reason = null;
         if (expected.length != found.length) {
             if (result) {
-                print_result(false, format, args);
+                print_result(false, comment);
             }
             result = false;
             if (!Test.quiet()) {
@@ -764,7 +728,7 @@ public abstract class TestCase : GLib.Object {
         for (var i = 0; i < limit; i++) {
             if (i >= expected.length) {
                 if (result) {
-                    print_result(false, format, args);
+                    print_result(false, comment);
                 }
                 result = false;
                 if (!Test.quiet()) {
@@ -772,7 +736,7 @@ public abstract class TestCase : GLib.Object {
                 }
             } else if (i >= found.length) {
                 if (result) {
-                    print_result(false, format, args);
+                    print_result(false, comment);
                 }
                 result = false;
                 if (!Test.quiet()) {
@@ -780,7 +744,7 @@ public abstract class TestCase : GLib.Object {
                 }
             } else if (!eq(expected.data[i], found.data[i], out reason)) {
                 if (result) {
-                    print_result(false, format, args);
+                    print_result(false, comment);
                 }
                 result = false;
                 if (!Test.quiet()) {
@@ -790,7 +754,7 @@ public abstract class TestCase : GLib.Object {
         }
 
         if (result) {
-            print_result(result, format, args);
+            print_result(result, comment);
             passed++;
         } else {
             failed++;
@@ -808,25 +772,22 @@ public abstract class TestCase : GLib.Object {
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_critical_message(string? domain, string text_pattern, string format, ...) {
-        return expect_log_message_va(domain, LogLevelFlags.LEVEL_CRITICAL, text_pattern, format, va_list());
+    protected bool expect_critical_message(string? domain, string text_pattern, string comment) {
+        return expect_log_message_internal(domain, LogLevelFlags.LEVEL_CRITICAL, text_pattern, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_warning_message(string? domain, string text_pattern, string format, ...) {
-        return expect_log_message_va(domain, LogLevelFlags.LEVEL_WARNING, text_pattern, format, va_list());
+    protected bool expect_warning_message(string? domain, string text_pattern, string comment) {
+        return expect_log_message_internal(domain, LogLevelFlags.LEVEL_WARNING, text_pattern, comment);
     }
 
     [Diagnostics]
-    [PrintfFormat]
-    protected bool expect_log_message(string? domain, LogLevelFlags level, string text_pattern, string format, ...) {
-        return expect_log_message_va(domain, level, text_pattern, format, va_list());
+    protected bool expect_log_message(string? domain, LogLevelFlags level, string text_pattern, string comment) {
+        return expect_log_message_internal(domain, level, text_pattern, comment);
     }
 
-    private bool expect_log_message_va(
-        string? domain, LogLevelFlags level, string text_pattern, string format, va_list args
+    private bool expect_log_message_internal(
+        string? domain, LogLevelFlags level, string text_pattern, string comment
     ) {
         bool result = false;
         if (log_messages != null) {
@@ -843,7 +804,7 @@ public abstract class TestCase : GLib.Object {
                 break;
             }
         }
-        process(result, format, args);
+        process(result, comment);
         if (!result && !Test.quiet()) {
             stdout.printf("\t Expected log message '%s' '%s' not found.\n", domain, text_pattern);
         }
@@ -853,11 +814,11 @@ public abstract class TestCase : GLib.Object {
     private void check_log_messages() {
         foreach (LogMessage msg in log_messages) {
             if ((msg.level & LogLevelFlags.LEVEL_ERROR) != 0) {
-                expectation_failed("Uncaught error log message: %s %s", msg.domain, msg.text);
+                expectation_failed(@"Uncaught error log message: $(msg.domain) $(msg.text)");
             } else if ((msg.level & LogLevelFlags.LEVEL_WARNING) != 0) {
-                expectation_failed("Uncaught warning log message: %s %s", msg.domain, msg.text);
+                expectation_failed(@"Uncaught warning log message: $(msg.domain) $(msg.text)");
             } else if ((msg.level & LogLevelFlags.LEVEL_CRITICAL) != 0) {
-                expectation_failed("Uncaught critical log message: %s %s", msg.domain, msg.text);
+                expectation_failed(@"Uncaught critical log message: $(msg.domain) $(msg.text)");
             }
         }
     }

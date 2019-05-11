@@ -28,7 +28,7 @@ public class SystemTest: Drt.TestCase {
         try {
             yield System.make_dirs_async(tmp);
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", error_to_string(e));
+            unexpected_error(e, "Failed to create dir.");
         }
         expect_true(tmp.query_file_type(0) == FileType.DIRECTORY, "tmp dir still exists");
 
@@ -73,7 +73,8 @@ public class SystemTest: Drt.TestCase {
             yield System.make_dirs_async(dir);
             expectation_failed("Should not overwrite a file");
         } catch (GLib.Error e) {
-            expect_error_match(e, "*Error creating directory */file1/dir3/dir4/dir5: Not a directory*", "Cannot overwrite file.");
+            expect_error_match(
+                e, "*Error creating directory */file1/dir3/dir4/dir5: Not a directory*", "Cannot overwrite file.");
         }
         expect_true(file.query_file_type(0) == FileType.REGULAR, "file is still file");
     }

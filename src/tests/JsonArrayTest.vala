@@ -188,45 +188,45 @@ public class JsonArrayTest: Drt.TestCase {
             node = array.get(i);
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_null(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_null(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_bool(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_bool(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_int(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_int(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_double(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_double(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_string(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_string(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "array[%u]", i)) {
-                    expect_true(node.is_array(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonArray>(node, @"array[$i]")) {
+                    expect_true(node.is_array(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "array[%u]", i)) {
-                    expect_true(node.is_object(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonObject>(node, @"array[$i]")) {
+                    expect_true(node.is_object(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "nothing":
-                expect_null(node, "array[%u]", i);
+                expect_null(node, @"array[$i]");
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -254,45 +254,45 @@ public class JsonArrayTest: Drt.TestCase {
             node = array.dotget(i.to_string());
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_null(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_null(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_bool(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_bool(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_int(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_int(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_double(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_double(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "array[%u]", i)) {
-                    expect_true(node.is_string(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$i]")) {
+                    expect_true(node.is_string(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "array[%u]", i)) {
-                    expect_true(node.is_array(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonArray>(node, @"array[$i]")) {
+                    expect_true(node.is_array(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "array[%u]", i)) {
-                    expect_true(node.is_object(), "array[%u] is %s", i, results[i]);
+                if (expect_type_of<JsonObject>(node, @"array[$i]")) {
+                    expect_true(node.is_object(), @"array[$i] is $(results[i])");
                 }
                 break;
             case "nothing":
-                expect_null(node, "array[%u]", i);
+                expect_null(node, @"array[$i]");
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -302,45 +302,45 @@ public class JsonArrayTest: Drt.TestCase {
             node = array.dotget(key);
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "array[%s]", key)) {
-                    expect_true(node.is_null(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$key]")) {
+                    expect_true(node.is_null(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "array[%s]", key)) {
-                    expect_true(node.is_bool(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$key]")) {
+                    expect_true(node.is_bool(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "array[%s]", key)) {
-                    expect_true(node.is_int(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$key]")) {
+                    expect_true(node.is_int(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "array[%s]", key)) {
-                    expect_true(node.is_double(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$key]")) {
+                    expect_true(node.is_double(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "array[%s]", key)) {
-                    expect_true(node.is_string(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, @"array[$key]")) {
+                    expect_true(node.is_string(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "array[%s]", key)) {
-                    expect_true(node.is_array(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonArray>(node, @"array[$key]")) {
+                    expect_true(node.is_array(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "array[%s]", key)) {
-                    expect_true(node.is_object(), "array[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonObject>(node, @"array[$key]")) {
+                    expect_true(node.is_object(), @"array[$key] is $(results[i])");
                 }
                 break;
             case "nothing":
-                expect_null(node, "array[%s]", key);
+                expect_null(node, @"array[$key]");
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -354,10 +354,10 @@ public class JsonArrayTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             unowned string ukey = results2[i, 0];
-            expect_null(array.dotget(ukey), "invalid key '%s'", ukey);
+            expect_null(array.dotget(ukey), @"invalid key '$ukey'");
             unowned string msg = results2[i, 1];
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
         }
     }
@@ -378,8 +378,8 @@ public class JsonArrayTest: Drt.TestCase {
             {false, false}, // nothing
         };
         for (uint i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.get_bool(i, out val), "get_bool(%u)", i);
-            expect(results[i, 1] == val, "[%u] == %s", i, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == array.get_bool(i, out val), @"get_bool($i)");
+            expect(results[i, 1] == val, @"[$i] == $(results[i, 1].get_boolean())");
         }
     }
 
@@ -402,13 +402,13 @@ public class JsonArrayTest: Drt.TestCase {
             {false, false}, // nothing
         };
         for (i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.dotget_bool(i.to_string(), out val), "get_bool('%u')", i);
-            expect(results[i, 1] == val, "['%u'] == %s", i, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == array.dotget_bool(i.to_string(), out val), @"get_bool('$i')");
+            expect(results[i, 1] == val, @"[$i] == $(results[i, 1].get_boolean())");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
-            expect(results[i, 0] == array.dotget_bool(key, out val), "get_bool('%s')", key);
-            expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == array.dotget_bool(key, out val), @"get_bool('$key')");
+            expect(results[i, 1] == val, @"[$key] == $(results[i, 1].get_boolean())");
         }
 
         GLib.Value[,] results2 = {
@@ -420,12 +420,12 @@ public class JsonArrayTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == array.dotget_bool(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == array.dotget_bool(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
-            expect(results2[i, 3] == val, "['%s'] == %s", ukey, results2[i, 3].get_boolean().to_string());
+            expect(results2[i, 3] == val, @"[$ukey] == $(results2[i, 3].get_boolean())");
         }
     }
 
@@ -445,9 +445,9 @@ public class JsonArrayTest: Drt.TestCase {
             {false, 0}, // nothing
         };
         for (uint i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.get_int(i, out val), "get_int(%u)", i);
+            expect(results[i, 0] == array.get_int(i, out val), @"get_int($i)");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, @"[$i] == $exp_val");
         }
     }
 
@@ -470,15 +470,15 @@ public class JsonArrayTest: Drt.TestCase {
             {false, 0}, // nothing
         };
         for (i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.dotget_int(i.to_string(), out val), "dotget_int(%u)", i);
+            expect(results[i, 0] == array.dotget_int(i.to_string(), out val), @"dotget_int($i)");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, @"[$i] == $exp_val");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
-            expect(results[i, 0] == array.dotget_int(key, out val), "dotget_int('%s')", key);
+            expect(results[i, 0] == array.dotget_int(key, out val), @"dotget_int('$key')");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%s] == %d", key, exp_val);
+            expect_int_equal(exp_val, val, @"[$key] == $exp_val");
         }
 
         GLib.Value[,] results2 = {
@@ -490,13 +490,13 @@ public class JsonArrayTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == array.dotget_int(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == array.dotget_int(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
             int exp_val = results2[i, 3].get_int();
-            expect_int_equal(exp_val, val, "['%s'] == %d", ukey, exp_val);
+            expect_int_equal(exp_val, val, @"[$ukey] == $exp_val");
         }
     }
 
@@ -516,9 +516,9 @@ public class JsonArrayTest: Drt.TestCase {
             {false, 0.0}, // nothing
         };
         for (uint i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.get_double(i, out val), "get_double(%u)", i);
+            expect(results[i, 0] == array.get_double(i, out val), @"get_double($i)");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "[%u] == %f", i, exp_val);
+            expect_double_equal(exp_val, val, @"[$i] == $exp_val");
         }
     }
 
@@ -541,15 +541,15 @@ public class JsonArrayTest: Drt.TestCase {
             {false, 0.0}, // nothing
         };
         for (i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0] == array.dotget_double(i.to_string(), out val), "dotget_double(%u)", i);
+            expect(results[i, 0] == array.dotget_double(i.to_string(), out val), @"dotget_double($i)");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "[%u] == %f", i, exp_val);
+            expect_double_equal(exp_val, val, @"[$i] == $exp_val");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
-            expect(results[i, 0] == array.dotget_double(key, out val), "dotget_double('%s')", key);
+            expect(results[i, 0] == array.dotget_double(key, out val), @"dotget_double('$key')");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "[%s] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, @"[$key] == $exp_val");
         }
 
         GLib.Value[,] results2 = {
@@ -561,13 +561,13 @@ public class JsonArrayTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == array.dotget_double(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == array.dotget_double(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
             double exp_val = results2[i, 3].get_double();
-            expect_double_equal(exp_val, val, "['%s'] == %f", ukey, exp_val);
+            expect_double_equal(exp_val, val, @"[$ukey] == $exp_val");
         }
     }
 
@@ -587,9 +587,9 @@ public class JsonArrayTest: Drt.TestCase {
             {false, null}, // nothing
         };
         for (uint i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0].get_boolean() == array.get_string(i, out val), "get_string(%u)", i);
+            expect(results[i, 0].get_boolean() == array.get_string(i, out val), @"get_string($i)");
             unowned string? exp_val = results[i, 1] == null ? null : results[i, 1].get_string();
-            expect_str_equal(exp_val, val, "[%u] == '%s'", i, exp_val);
+            expect_str_equal(exp_val, val, @"[$i] == $(Drt.String.repr(exp_val))");
         }
     }
 
@@ -612,15 +612,15 @@ public class JsonArrayTest: Drt.TestCase {
             {false, null}, // nothing
         };
         for (i = 0; i < results.length[0]; i++) {
-            expect(results[i, 0].get_boolean() == array.dotget_string(i.to_string(), out val), "dotget_string(%u)", i);
+            expect(results[i, 0].get_boolean() == array.dotget_string(i.to_string(), out val), @"dotget_string($i)");
             string exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equal(exp_val, val, "[%u] == '%s'", i, exp_val);
+            expect_str_equal(exp_val, val, @"[$i] == $(Drt.String.repr(exp_val))");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "7.%u".printf(i);
-            expect(results[i, 0].get_boolean() == array.dotget_string(key, out val), "dotget_string('%s')", key);
+            expect(results[i, 0].get_boolean() == array.dotget_string(key, out val), @"dotget_string('$key')");
             string exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equal(exp_val, val, "[%s] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, @"[$key] == $(Drt.String.repr(exp_val))");
         }
 
         GLib.Value[,] results2 = {
@@ -632,12 +632,12 @@ public class JsonArrayTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == array.dotget_string(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == array.dotget_string(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
-            expect_null(val, "['%s'] == null", ukey);
+            expect_null(val, @"['$ukey'] == null");
         }
     }
 
@@ -656,7 +656,7 @@ public class JsonArrayTest: Drt.TestCase {
             false, // nothing
         };
         for (uint i = 0; i < results.length; i++) {
-            expect(results[i] == array.get_null(i), "get_null(%u)", i);
+            expect(results[i] == array.get_null(i), @"get_null($i)");
         }
     }
 
@@ -664,9 +664,9 @@ public class JsonArrayTest: Drt.TestCase {
         JsonArray array = load_array();
         for (uint i = 0; i < 10; i++) {
             if (i != 7) {
-                expect_null(array.get_array(i), "get_array(%u)", i);
+                expect_null(array.get_array(i), @"get_array($i)");
             } else {
-                expect_not_null(array.get_array(i), "get_array(%u)", i);
+                expect_not_null(array.get_array(i), @"get_array($i)");
             }
         }
     }
@@ -675,9 +675,9 @@ public class JsonArrayTest: Drt.TestCase {
         JsonArray array = load_array();
         for (uint i = 0; i < 10; i++) {
             if (i != 8) {
-                expect_null(array.get_object(i), "get_object(%u)", i);
+                expect_null(array.get_object(i), @"get_object($i)");
             } else {
-                expect_not_null(array.get_object(i), "get_object(%u)", i);
+                expect_not_null(array.get_object(i), @"get_object($i)");
             }
         }
     }

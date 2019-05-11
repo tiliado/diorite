@@ -29,96 +29,96 @@ public class JsonParserTest: Drt.TestCase {
     public void test_pass() {
         int i;
         for (i = 1; i <= 3; i++) {
-            expect_no_error(() => JsonParser.load(load_data("pass", i)), "pass%d.json", i);
+            expect_no_error(() => JsonParser.load(load_data("pass", i)), @"pass$(i).json");
         }
         for (i = 1; i <= 2; i++) {
-            expect_no_error(() => JsonParser.load_array(load_data("pass", i)), "pass%d.json", i);
+            expect_no_error(() => JsonParser.load_array(load_data("pass", i)), @"pass$(i).json");
             expect_error(() => JsonParser.load_object(load_data("pass", i)),
-                "The data doesn't represent a JavaScript object.", "pass%d.json", i);
+                "The data doesn't represent a JavaScript object.", @"pass$(i).json");
         }
 
         i = 3;
-        expect_no_error(() => JsonParser.load_object(load_data("pass", i)), "pass%d.json", i);
+        expect_no_error(() => JsonParser.load_object(load_data("pass", i)), @"pass$(i).json");
         expect_error(() => JsonParser.load_array(load_data("pass", i)),
-            "The data doesn't represent a JavaScript array.", "pass%d.json", i);
+            "The data doesn't represent a JavaScript array.", @"pass$(i).json");
     }
 
     public void test_fail() {
         int i = 0;
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "The outermost value must be an object or array.", "fail%d.json", i);
+            "The outermost value must be an object or array.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:17 Unexpected end of data. Characters ',' or ']' expected.", "fail%d.json", i);
+            "1:17 Unexpected end of data. Characters ',' or ']' expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:2 Unexpected character 'u'. A string expected.", "fail%d.json", i);
+            "1:2 Unexpected character 'u'. A string expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:15 Unexpected character ']'. An object, an array, a string or a primitive value expected.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:22 Unexpected character ','. An object, an array, a string or a primitive value expected.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:4 Unexpected character ','. An object, an array, a string or a primitive value expected.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:26 Extra data has been found after a parsed JSON document. The first character is ','.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:16 Extra data has been found after a parsed JSON document. The first character is ']'.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:22 Unexpected character '}'. A string expected.", "fail%d.json", i);
+            "1:22 Unexpected character '}'. A string expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:35 Extra data has been found after a parsed JSON document. The first character is '\"'.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:26 Unexpected character '+'. Characters ',' or '}' expected.", "fail%d.json", i);
+            "1:26 Unexpected character '+'. Characters ',' or '}' expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:23 Unexpected character 'a'. An object, an array, a string or a primitive value expected.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:40 Invalid number: Numbers cannot have leading zeroes.", "fail%d.json", i);
+            "1:40 Invalid number: Numbers cannot have leading zeroes.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:28 Unexpected character 'x'. Characters ',' or '}' expected.", "fail%d.json", i);
+            "1:28 Unexpected character 'x'. Characters ',' or '}' expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:30 Invalid escape sequence.", "fail%d.json", i);
+            "1:30 Invalid escape sequence.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
             "1:1 Unexpected character '\\'. An object, an array, a string or a primitive value expected.",
-            "fail%d.json", i);
+            @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:30 Invalid escape sequence.", "fail%d.json", i);
+            "1:30 Invalid escape sequence.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:20 Maximal array recursion depth reached.", "fail%d.json", i);
+            "1:20 Maximal array recursion depth reached.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:18 Unexpected character 'n'. A ':' character expected.", "fail%d.json", i);
+            "1:18 Unexpected character 'n'. A ':' character expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:16 Unexpected character ':'. An object, an array, a string or a primitive value expected.", "fail%d.json", i);
+            "1:16 Unexpected character ':'. An object, an array, a string or a primitive value expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:26 Unexpected character ','. A ':' character expected.", "fail%d.json", i);
+            "1:26 Unexpected character ','. A ':' character expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:26 Unexpected character ':'. Characters ',' or ']' expected.", "fail%d.json", i);
+            "1:26 Unexpected character ':'. Characters ',' or ']' expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:18 Unexpected character 't'. The 'e' character of 'true' expected.", "fail%d.json", i);
+            "1:18 Unexpected character 't'. The 'e' character of 'true' expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:1 Unexpected character '''. An object, an array, a string or a primitive value expected.", "fail%d.json", i);
+            "1:1 Unexpected character '''. An object, an array, a string or a primitive value expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:3 Invalid control character (09) in a string.", "fail%d.json", i);
+            "1:3 Invalid control character (09) in a string.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:7 Invalid escape sequence.", "fail%d.json", i);
+            "1:7 Invalid escape sequence.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "2:0 Invalid control character (0A) in a string.", "fail%d.json", i);
+            "2:0 Invalid control character (0A) in a string.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "2:0 Invalid escape sequence.", "fail%d.json", i);
+            "2:0 Invalid escape sequence.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:3 Unexpected character ']'. A number character expected", "fail%d.json", i);
+            "1:3 Unexpected character ']'. A number character expected", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:4 Unexpected character ']'. A number character expected", "fail%d.json", i);
+            "1:4 Unexpected character ']'. A number character expected", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:4 Invalid number: A digit expected but '-' found.", "fail%d.json", i);
+            "1:4 Invalid number: A digit expected but '-' found.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:40 Unexpected end of data. A string expected.", "fail%d.json", i);
+            "1:40 Unexpected end of data. A string expected.", @"fail$(i).json");
         i++; expect_error(() => JsonParser.load(load_data("fail", i)),
-            "1:12 Unexpected character '}'. Characters ',' or ']' expected.", "fail%d.json", i);
+            "1:12 Unexpected character '}'. Characters ',' or ']' expected.", @"fail$(i).json");
     }
 }
 

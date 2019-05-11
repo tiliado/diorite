@@ -61,7 +61,7 @@ public class DatabaseTest: Drt.TestCase {
             db.open();
             db.close();
         } catch (GLib.Error e) {
-            assert_not_reached("%s", e.message);
+            unexpected_error(e, "Could not open or close database.");
         }
         assert(db_file.query_exists(), "");
     }
@@ -70,7 +70,7 @@ public class DatabaseTest: Drt.TestCase {
         try {
             db.open();
         } catch (GLib.Error e) {
-            assert_not_reached("%s", e.message);
+            unexpected_error(e, "Could not open database.");
         }
         try {
             db.exec("SELECT name FROM users WHERE id = 1");
@@ -80,12 +80,12 @@ public class DatabaseTest: Drt.TestCase {
         try {
             db.exec("CREATE TABLE users(id INTEGER PRIMARY KEY ASC, name TEXT)");
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "Could not create a table.");
         }
         try {
             db.exec("SELECT name FROM users WHERE id = 1");
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "Select query failed.");
         }
     }
 }

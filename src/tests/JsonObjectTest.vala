@@ -85,47 +85,49 @@ public class JsonObjectTest: Drt.TestCase {
             var key = " ";
             key.data[0] = (uint8)('a' + i);
             node = object.get(key);
+            string field = @"object['$key']";
+            string comment = @"object['$key'] is $(results[i])";
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_null(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_null(), comment);
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_bool(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_bool(), comment);
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_int(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_int(), comment);
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_double(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_double(), comment);
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_string(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_string(), comment);
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "object['%s']", key)) {
-                    expect_true(node.is_array(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonArray>(node, field)) {
+                    expect_true(node.is_array(), comment);
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "object['%s']", key)) {
-                    expect_true(node.is_object(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonObject>(node, field)) {
+                    expect_true(node.is_object(), comment);
                 }
                 break;
             case "nothing":
-                expect_null(node, "object['%s']", key);
+                expect_null(node, field);
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -152,47 +154,49 @@ public class JsonObjectTest: Drt.TestCase {
         for (i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
             node = object.dotget(key);
+            string field = @"object['$key']";
+            string comment = @"object['$key'] is $(results[i])";
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_null(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_null(), comment);
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_bool(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_bool(), comment);
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_int(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_int(), comment);
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_double(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_double(), comment);
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "object['%s']", key)) {
-                    expect_true(node.is_string(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_string(), comment);
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "object['%s']", key)) {
-                    expect_true(node.is_array(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonArray>(node, field)) {
+                    expect_true(node.is_array(), comment);
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "object['%s']", key)) {
-                    expect_true(node.is_object(), "object['%s'] is %s", key, results[i]);
+                if (expect_type_of<JsonObject>(node, field)) {
+                    expect_true(node.is_object(), comment);
                 }
                 break;
             case "nothing":
-                expect_null(node, "object['%s']", key);
+                expect_null(node, field);
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -200,47 +204,49 @@ public class JsonObjectTest: Drt.TestCase {
         for (i = 0; i < results.length; i++) {
             key = "i.%c".printf((char)('a' + i));
             node = object.dotget(key);
+            string field = @"object['$key']";
+            string comment = @"object['$key'] is $(results[i])";
             switch (results[i]) {
             case "null":
-                if (expect_type_of<JsonValue>(node, "object[%s]", key)) {
-                    expect_true(node.is_null(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_null(), comment);
                 }
                 break;
             case "bool":
-                if (expect_type_of<JsonValue>(node, "object[%s]", key)) {
-                    expect_true(node.is_bool(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_bool(), comment);
                 }
                 break;
             case "int":
-                if (expect_type_of<JsonValue>(node, "object[%s]", key)) {
-                    expect_true(node.is_int(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_int(), comment);
                 }
                 break;
             case "double":
-                if (expect_type_of<JsonValue>(node, "object[%s]", key)) {
-                    expect_true(node.is_double(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_double(), comment);
                 }
                 break;
             case "string":
-                if (expect_type_of<JsonValue>(node, "object[%s]", key)) {
-                    expect_true(node.is_string(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonValue>(node, field)) {
+                    expect_true(node.is_string(), comment);
                 }
                 break;
             case "array":
-                if (expect_type_of<JsonArray>(node, "object[%s]", key)) {
-                    expect_true(node.is_array(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonArray>(node, field)) {
+                    expect_true(node.is_array(), comment);
                 }
                 break;
             case "object":
-                if (expect_type_of<JsonObject>(node, "object[%s]", key)) {
-                    expect_true(node.is_object(), "object[%s] is %s", key, results[i]);
+                if (expect_type_of<JsonObject>(node, field)) {
+                    expect_true(node.is_object(), comment);
                 }
                 break;
             case "nothing":
-                expect_null(node, "object[%s]", key);
+                expect_null(node, field);
                 break;
             default:
-                expectation_failed("Unknown type '%s'", results[i]);
+                expectation_failed(@"Unknown type '$(results[i])'");
                 break;
             }
         }
@@ -254,10 +260,10 @@ public class JsonObjectTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             unowned string ukey = results2[i, 0];
-            expect_null(object.dotget(ukey), "invalid key '%s'", ukey);
+            expect_null(object.dotget(ukey), @"invalid key '$ukey'");
             unowned string msg = results2[i, 1];
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
         }
     }
@@ -280,8 +286,8 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.get_bool(key, out val), "get_bool('%s')", key);
-            expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == object.get_bool(key, out val), @"get_bool('$key')");
+            expect(results[i, 1] == val, @"['$key'] == $(results[i, 1].get_boolean())");
         }
     }
 
@@ -306,13 +312,13 @@ public class JsonObjectTest: Drt.TestCase {
         key = " ";
         for (i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.dotget_bool(key, out val), "get_bool('%s')", key);
-            expect(results[i, 1] == val, "['%u'] == %s", i, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == object.dotget_bool(key, out val), @"get_bool('$key')");
+            expect(results[i, 1] == val, @"['$key'] == $(results[i, 1].get_boolean())");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
-            expect(results[i, 0] == object.dotget_bool(key, out val), "get_bool('%s')", key);
-            expect(results[i, 1] == val, "['%s'] == %s", key, results[i, 1].get_boolean().to_string());
+            expect(results[i, 0] == object.dotget_bool(key, out val), @"get_bool('$key')");
+            expect(results[i, 1] == val, @"['$key'] == $(results[i, 1].get_boolean())");
         }
 
         GLib.Value[,] results2 = {
@@ -324,12 +330,12 @@ public class JsonObjectTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == object.dotget_bool(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == object.dotget_bool(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
-            expect(results2[i, 3] == val, "['%s'] == %s", ukey, results2[i, 3].get_boolean().to_string());
+            expect(results2[i, 3] == val, @"['$ukey'] == $(results2[i, 3].get_boolean())");
         }
     }
 
@@ -350,7 +356,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i] == object.get_bool_or(key, false), "get_bool_or('%s')", key);
+            expect(results[i] == object.get_bool_or(key, false), @"get_bool_or('$key')");
         }
     }
 
@@ -372,9 +378,9 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.get_int(key, out val), "get_int('%s')", key);
+            expect(results[i, 0] == object.get_int(key, out val), @"get_int('$key')");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, @"[$i] == $exp_val");
         }
     }
 
@@ -399,15 +405,15 @@ public class JsonObjectTest: Drt.TestCase {
         for (i = 0; i < results.length[0]; i++) {
             key = " ";
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
+            expect(results[i, 0] == object.dotget_int(key, out val), @"dotget_int('$key')");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%u] == %d", i, exp_val);
+            expect_int_equal(exp_val, val, @"[$i] == $exp_val");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
-            expect(results[i, 0] == object.dotget_int(key, out val), "dotget_int('%s')", key);
+            expect(results[i, 0] == object.dotget_int(key, out val), @"dotget_int('$key')");
             int exp_val = results[i, 1].get_int();
-            expect_int_equal(exp_val, val, "[%s] == %d", key, exp_val);
+            expect_int_equal(exp_val, val, @"[$key] == $exp_val");
         }
 
         GLib.Value[,] results2 = {
@@ -419,13 +425,13 @@ public class JsonObjectTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == object.dotget_int(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == object.dotget_int(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
             int exp_val = results2[i, 3].get_int();
-            expect_int_equal(exp_val, val, "['%s'] == %d", ukey, exp_val);
+            expect_int_equal(exp_val, val, @"[$ukey] == $exp_val");
         }
     }
 
@@ -446,7 +452,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect_int_equal(results[i], object.get_int_or(key, -7), "get_int_or('%s')", key);
+            expect_int_equal(results[i], object.get_int_or(key, -7), @"get_int_or('$key')");
         }
     }
 
@@ -468,9 +474,9 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < results.length[0]; i++) {
             var key = " ";
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.get_double(key, out val), "get_double('%s')", key);
+            expect(results[i, 0] == object.get_double(key, out val), @"get_double('$key')");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, @"[$key] == $exp_val");
         }
     }
 
@@ -495,15 +501,15 @@ public class JsonObjectTest: Drt.TestCase {
         key = " ";
         for (i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
+            expect(results[i, 0] == object.dotget_double(key, out val), @"dotget_double('$key')");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, @"[$key] == $exp_val");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
-            expect(results[i, 0] == object.dotget_double(key, out val), "dotget_double('%s')", key);
+            expect(results[i, 0] == object.dotget_double(key, out val), @"dotget_double('$key')");
             double exp_val = results[i, 1].get_double();
-            expect_double_equal(exp_val, val, "['%s'] == %f", key, exp_val);
+            expect_double_equal(exp_val, val, @"[$key] == $exp_val");
         }
 
         GLib.Value[,] results2 = {
@@ -515,13 +521,13 @@ public class JsonObjectTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == object.dotget_double(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == object.dotget_double(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
             double exp_val = results2[i, 3].get_double();
-            expect_double_equal(exp_val, val, "['%s'] == %f", ukey, exp_val);
+            expect_double_equal(exp_val, val, @"[$key] == $exp_val");
         }
     }
 
@@ -542,7 +548,7 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < results.length; i++) {
             var key = " ";
             key.data[0] = (uint8)('a' + i);
-            expect_double_equal(results[i], object.get_double_or(key, -5.6), "get_double_or('%s')", key);
+            expect_double_equal(results[i], object.get_double_or(key, -5.6), @"get_double_or('$key')");
         }
     }
 
@@ -564,9 +570,9 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0].get_boolean() == object.get_string(key, out val), "get_string('%s')", key);
+            expect(results[i, 0].get_boolean() == object.get_string(key, out val), @"get_string('$key')");
             unowned string? exp_val = results[i, 1] == null ? null : results[i, 1].get_string();
-            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, @"[$key] == $(Drt.String.repr(exp_val))");
         }
     }
 
@@ -591,15 +597,15 @@ public class JsonObjectTest: Drt.TestCase {
         key = " ";
         for (i = 0; i < results.length[0]; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
+            expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), @"dotget_string('$key')");
             string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, @"[$key] == $(Drt.String.repr(exp_val))");
         }
         for (i = 0; i < results.length[0]; i++) {
             key = "i.%c".printf((char)('a' + i));
-            expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), "dotget_string('%s')", key);
+            expect(results[i, 0].get_boolean() == object.dotget_string(key, out val), @"dotget_string('$key')");
             string? exp_val = results[i, 1] != null ? results[i, 1].get_string() : null;
-            expect_str_equal(exp_val, val, "['%s'] == '%s'", key, exp_val);
+            expect_str_equal(exp_val, val, @"[$key] == $(Drt.String.repr(exp_val))");
         }
 
         GLib.Value[,] results2 = {
@@ -611,12 +617,12 @@ public class JsonObjectTest: Drt.TestCase {
         };
         for (i = 0; i < results2.length[0]; i++) {
             ukey = results2[i, 0].get_string();
-            expect(results2[i, 1] == object.dotget_string(ukey, out val), "invalid key '%s'", ukey);
+            expect(results2[i, 1] == object.dotget_string(ukey, out val), @"invalid key '$ukey'");
             unowned string msg = results2[i, 2].get_string();
             if (msg[0] != '\0') {
-                expect_critical_message("DioriteGlib", msg, "critical msg for '%s'", ukey);
+                expect_critical_message("DioriteGlib", msg, @"critical msg for '$ukey'");
             }
-            expect_null(val, "['%s'] == null", ukey);
+            expect_null(val, @"['$ukey'] == null");
         }
     }
 
@@ -637,7 +643,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect_str_equal(results[i], object.get_string_or(key, "abc"), "get_string_or('%s')", key);
+            expect_str_equal(results[i], object.get_string_or(key, "abc"), @"get_string_or('$key')");
         }
     }
 
@@ -658,7 +664,7 @@ public class JsonObjectTest: Drt.TestCase {
         var key = " ";
         for (uint i = 0; i < results.length; i++) {
             key.data[0] = (uint8)('a' + i);
-            expect(results[i] == object.get_null(key), "get_null('%s')", key);
+            expect(results[i] == object.get_null(key), @"get_null('$key')");
         }
     }
 
@@ -668,9 +674,9 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < 10; i++) {
             key.data[0] = (uint8)('a' + i);
             if (i != 7) {
-                expect_null(object.get_array(key), "get_array('%s')", key);
+                expect_null(object.get_array(key), @"get_array('$key')");
             } else {
-                expect_not_null(object.get_array(key), "get_array('%s')", key);
+                expect_not_null(object.get_array(key), @"get_array('$key')");
             }
         }
     }
@@ -681,9 +687,9 @@ public class JsonObjectTest: Drt.TestCase {
         for (uint i = 0; i < 10; i++) {
             key.data[0] = (uint8)('a' + i);
             if (i != 8) {
-                expect_null(object.get_object(key), "get_object('%s')", key);
+                expect_null(object.get_object(key), @"get_object('$key')");
             } else {
-                expect_not_null(object.get_object(key), "get_object('%s')", key);
+                expect_not_null(object.get_object(key), @"get_object('key')");
             }
         }
     }

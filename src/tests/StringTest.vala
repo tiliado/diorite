@@ -35,15 +35,15 @@ public class StringTest: Drt.TestCase {
         result = Drt.String.semicolon_separated_set(dataset, false);
         expect_uint_equal(4, result.length, "original set");
         foreach (unowned string s in new string[] {"hello", "Bye", "1234", "byE"}) {
-            expect_true(result.contains(s), "item: %s", s);
+            expect_true(result.contains(s), @"item: $s");
         }
-        expect_false(result.contains("bye"), "item: %s", "bye");
+        expect_false(result.contains("bye"), "item: bye");
         result = Drt.String.semicolon_separated_set(dataset, true);
         expect_uint_equal(3, result.length, "lowercase set");
         foreach (unowned string s in new string[] {"hello", "bye", "1234"}) {
-            expect_true(result.contains(s), "item: %s", s);
+            expect_true(result.contains(s), @"item: $s");
         }
-        expect_false(result.contains("Bye"), "item: %s", "Bye");
+        expect_false(result.contains("Bye"), "item: Byte");
     }
 
     public void test_concat() {
@@ -121,7 +121,8 @@ public class StringTest: Drt.TestCase {
         uint8[] array = Drt.String.as_array_of_bytes((owned) str);
         expect_null<void*>(array, "null string leads to null array");
         expect_log_message(
-            "DioriteGlib", LogLevelFlags.LEVEL_CRITICAL, "drt_string_as_array_of_bytes: assertion 'str != NULL' failed",
+            "DioriteGlib", LogLevelFlags.LEVEL_CRITICAL,
+            "drt_string_as_array_of_bytes: assertion 'str != NULL' failed",
             "null string produces critical warning");
 
         str = "";
@@ -172,6 +173,21 @@ public class StringTest: Drt.TestCase {
         expect_int_equal(3, array.length, "abc string produces 3-length array");
         expect_uint_equal(0, array[3], "abc string produces 3-length array with [3] == '\\0'");
         expect_bytes_equal(new Bytes.take({'a', 'b', 'c'}), bytes, "strings equal");
+    }
+
+    public void test_repr() {
+        (unowned string?)[,] results = {
+            {null, "null"},
+            {"", "\"\""},
+            {" ", "\" \""},
+            {"\"", "\"\"\""},
+            {"Jiří", "\"Jiří\""},
+        };
+        for (uint i = 0; i < results.length[0]; i++) {
+            unowned string exp_val = results[i, 1];
+            string val = Drt.String.repr(results[i, 0]);
+            expect_str_equal(exp_val, val, @"index $i");
+        }
     }
 }
 

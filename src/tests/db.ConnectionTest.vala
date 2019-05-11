@@ -83,7 +83,7 @@ public class ConnectionTest: Drt.TestCase {
         try {
             conn.query("SELECT name FROM %s WHERE id = 1".printf(TABLE_USERS_NAME)); // No exec();
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "Select query failed.");
         }
     }
 
@@ -115,7 +115,7 @@ public class ConnectionTest: Drt.TestCase {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
             conn.get_objects<User>(null);
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get object.");
         }
     }
 
@@ -196,7 +196,7 @@ public class ConnectionTest: Drt.TestCase {
             expect_int_equal(1024, user.not_in_db, "not_in_db");
 
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get object.");
         }
     }
 }

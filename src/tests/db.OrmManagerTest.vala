@@ -121,7 +121,7 @@ public class OrmManagerTest: Drt.TestCase {
                 expect(null == user.extra, "extra");
                 expect_int_equal(1024, user.not_in_db, "not_in_db");
             } catch (GLib.Error e) {
-                expectation_failed("Unexpected error: %s", e.message);
+                unexpected_error(e, "ORM");
             }
             try {
                 orm.add_object_spec(new ObjectSpec(typeof(User), "not-in-db", User.all_props()));
@@ -137,7 +137,7 @@ public class OrmManagerTest: Drt.TestCase {
                 expect(null == user.extra, "extra");
                 expect_int_equal(1024, user.not_in_db, "not_in_db");
             } catch (GLib.Error e) {
-                expectation_failed("Unexpected error: %s", e.message);
+                unexpected_error(e, "ORM");
             }
 
             /* Not GObject */
@@ -148,7 +148,7 @@ public class OrmManagerTest: Drt.TestCase {
                 expect_str_match("*Data type DrtdbSimpleUser is not supported*", e.message, "invalid type");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "ORM");
         }
     }
 
@@ -207,7 +207,7 @@ public class OrmManagerTest: Drt.TestCase {
                 expect_str_match("*no column named 'not-in-db'*", e.message, "invalid column");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            unexpected_error(e, "ORM");
         }
     }
 }

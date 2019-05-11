@@ -86,13 +86,13 @@ public class ObjectSpecTest: Drt.TestCase {
         try {
             new ObjectSpec(typeof(User), "id", User.all_props());
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not create object spec.");
         }
 
         try {
             new ObjectSpec(typeof(User), "id");
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not create object spec.");
         }
     }
 }

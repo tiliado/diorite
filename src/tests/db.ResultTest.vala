@@ -33,7 +33,8 @@ public class ResultTest: Drt.TestCase {
         db = new Database(db_file);
         try {
             query(TABLE_USERS_SQL).exec();
-            query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(TABLE_USERS_NAME))
+            query("INSERT INTO %s(id, name, age, height, blob, alive, extra) VALUES(?, ?, ?, ?, ?, ?, ?)".printf(
+                TABLE_USERS_NAME))
             .bind(1, 1).bind(2, "Jiří").bind(3, 30).bind(4, 1.72)
             .bind_blob(5, new uint8[] {7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7})
             .bind(6, true).bind_null(7).exec();
@@ -82,13 +83,13 @@ public class ResultTest: Drt.TestCase {
         try {
             Result result = select_data();
             foreach (var index in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
-                expect_str_equal(null, result.get_column_name(index), "index %d", index);
+                expect_str_equal(null, result.get_column_name(index), @"index $index");
             }
             for (var index = 0; index < column_names.length; index++) {
-                expect_str_equal(column_names[index], result.get_column_name(index), "index %d", index);
+                expect_str_equal(column_names[index], result.get_column_name(index), @"index $index");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -96,13 +97,14 @@ public class ResultTest: Drt.TestCase {
         try {
             Result result = select_data();
             foreach (var name in new string[] {"hello", "", "baby"}) {
-                expect_int_equal(-1, result.get_column_index(name), "column '%s'", name);
+                expect_int_equal(-1, result.get_column_index(name), @"column '$name'");
             }
             for (var index = 0; index < column_names.length; index++) {
-                expect_int_equal(index, result.get_column_index(column_names[index]), "column '%s'", column_names[index]);
+                expect_int_equal(index, result.get_column_index(column_names[index]),
+                    @"column '$(column_names[index])'");
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -123,13 +125,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_is_null(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $(i)");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -150,13 +152,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_int(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -177,13 +179,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_int64(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -204,14 +206,14 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_bool(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
 
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -232,14 +234,14 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_double(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
 
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -263,13 +265,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_string(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -292,13 +294,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_blob(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -321,13 +323,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_bytes(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -350,13 +352,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_byte_array(i);
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 
@@ -368,9 +370,9 @@ public class ResultTest: Drt.TestCase {
             foreach (var i in new int[] {-int.MAX, -1, 7, 8, int.MAX}) {
                 try {
                     result.fetch_value_of_type(i, typeof(int));
-                    expectation_failed("Expected error: index %d", i);
+                    expectation_failed(@"Expected error: index $i");
                 } catch (GLib.Error e) {
-                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, "index %d", i);
+                    expect_str_match("*%d is not in range 0..6*".printf(i), e.message, @"index $i");
                 }
             }
 
@@ -399,13 +401,13 @@ public class ResultTest: Drt.TestCase {
             foreach (var t in new Type[] {typeof(uint), typeof(uint8), typeof(uint8[]), this.get_type(), typeof(void*)}) {
                 try {
                     result.fetch_value_of_type(1, t);
-                    expectation_failed("Expected error: type %s", t.name());
+                    expectation_failed(@"Expected error: $(Drt.Types.to_string(t))");
                 } catch (GLib.Error e) {
-                    expect_str_match("*type %s is not supported*".printf(t.name()), e.message, "type %s", t.name());
+                    expect_str_match("*type %s is not supported*".printf(t.name()), e.message, @"type $(Drt.Types.to_string(t))");
                 }
             }
         } catch (GLib.Error e) {
-            expectation_failed("%s", e.message);
+            expectation_failed(e.message);
         }
     }
 }

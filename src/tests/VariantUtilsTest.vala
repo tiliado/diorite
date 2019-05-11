@@ -302,11 +302,11 @@ public class VariantUtilsTest: Drt.TestCase {
             string? actual_value = null;
             bool result = VariantUtils.get_string(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a string", i);
+                expect_true(result, @"[$i] is a string");
             } else {
-                expect_false(result, "[%d] isn't a string", i);
+                expect_false(result, @"[$i] isn't a string");
             }
-            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i]");
         }
     }
 
@@ -372,11 +372,11 @@ public class VariantUtilsTest: Drt.TestCase {
             string? actual_value = null;
             bool result = VariantUtils.get_maybe_string(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a string", i);
+                expect_true(result, @"[$i] is a string");
             } else {
-                expect_false(result, "[%d] isn't a string", i);
+                expect_false(result, @"[$i] isn't a string");
             }
-            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i]");
         }
     }
 
@@ -442,11 +442,11 @@ public class VariantUtilsTest: Drt.TestCase {
             bool actual_value = false;
             bool result = VariantUtils.get_bool(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a bool", i);
+                expect_true(result, @"[$i] is a bool");
             } else {
-                expect_false(result, "[%d] isn't a bool", i);
+                expect_false(result, @"[$i] isn't a bool");
             }
-            expect_true(expected_values[i] == actual_value, "[%d] value", i);
+            expect_true(expected_values[i] == actual_value, @"[$i] value");
         }
     }
 
@@ -512,11 +512,11 @@ public class VariantUtilsTest: Drt.TestCase {
             double actual_value = -1.0;
             bool result = VariantUtils.get_double(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_double_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_double_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -582,11 +582,11 @@ public class VariantUtilsTest: Drt.TestCase {
             int64 actual_value = -1;
             bool result = VariantUtils.get_int64(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_int64_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_int64_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -652,11 +652,11 @@ public class VariantUtilsTest: Drt.TestCase {
             int actual_value = -1;
             bool result = VariantUtils.get_int(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_int_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_int_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -722,11 +722,11 @@ public class VariantUtilsTest: Drt.TestCase {
             uint actual_value = 1;
             bool result = VariantUtils.get_uint(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_uint_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_uint_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -792,11 +792,11 @@ public class VariantUtilsTest: Drt.TestCase {
             double actual_value = -1.0;
             bool result = VariantUtils.get_number(variants[i], out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_double_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_double_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -907,11 +907,11 @@ public class VariantUtilsTest: Drt.TestCase {
             actual_value = null;
             bool result = VariantUtils.get_string_item(dict, i.to_string(), out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a string", i);
+                expect_true(result, @"[$i] is a string");
             } else {
-                expect_false(result, "[%d] isn't a string", i);
+                expect_false(result, @"[$i] isn't a string");
             }
-            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i]");
         }
     }
 
@@ -988,11 +988,11 @@ public class VariantUtilsTest: Drt.TestCase {
             actual_value = null;
             bool result = VariantUtils.get_maybe_string_item(dict, i.to_string(), out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a string", i);
+                expect_true(result, @"[$i] is a string");
             } else {
-                expect_false(result, "[%d] isn't a string", i);
+                expect_false(result, @"[$i] isn't a string");
             }
-            expect_str_equal(expected_values[i], actual_value, "[%d]", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -1069,11 +1069,11 @@ public class VariantUtilsTest: Drt.TestCase {
             actual_value = true;
             bool result = VariantUtils.get_bool_item(dict, i.to_string(), out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a bool", i);
+                expect_true(result, @"[$i] is a bool");
             } else {
-                expect_false(result, "[%d] isn't a bool", i);
+                expect_false(result, @"[$i] isn't a bool");
             }
-            expect_true(expected_values[i] == actual_value, "[%d]", i);
+            expect_true(expected_values[i] == actual_value, @"[$i] value");
         }
     }
 
@@ -1150,11 +1150,11 @@ public class VariantUtilsTest: Drt.TestCase {
             actual_value = -1.0;
             bool result = VariantUtils.get_double_item(dict, i.to_string(), out actual_value);
             if (results[i]) {
-                expect_true(result, "[%d] is a double", i);
+                expect_true(result, @"[$i] is a double");
             } else {
-                expect_false(result, "[%d] isn't a double", i);
+                expect_false(result, @"[$i] isn't a double");
             }
-            expect_double_equal(expected_values[i], actual_value, "[%d]", i);
+            expect_double_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -1195,7 +1195,7 @@ public class VariantUtilsTest: Drt.TestCase {
 
         for (var i = 0; i < variants.length; i++) {
             Variant? unboxed = VariantUtils.unbox(variants[i]);
-            expect_variant_equal(unboxed_variants[i], unboxed, "[%d] value", i);
+            expect_variant_equal(unboxed_variants[i], unboxed, @"[$i] value");
         }
     }
 
@@ -1217,7 +1217,7 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             Variant? actual_value = VariantUtils.parse_typed_value(input_values[i]);
-            expect_variant_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_variant_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -1240,7 +1240,7 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             string? actual_value = VariantUtils.to_string(input_values[i]);
-            expect_str_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -1271,9 +1271,9 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             string? actual_value = VariantUtils.print(input_values[i], true);
-            expect_str_equal(expected_values_typed[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values_typed[i], actual_value, @"[$i] value");
             actual_value = VariantUtils.print(input_values[i], false);
-            expect_str_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_str_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 
@@ -1286,7 +1286,7 @@ public class VariantUtilsTest: Drt.TestCase {
         };
         for (var i = 0; i < input_values.length; i++) {
             Variant? actual_value = VariantUtils.from_string_if_not_null(input_values[i]);
-            expect_variant_equal(expected_values[i], actual_value, "[%d] value", i);
+            expect_variant_equal(expected_values[i], actual_value, @"[$i] value");
         }
     }
 }

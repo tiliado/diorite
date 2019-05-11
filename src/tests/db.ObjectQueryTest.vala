@@ -79,7 +79,7 @@ public class ObjectQueryTest: Drt.TestCase {
         try {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not add object spec.");
         }
 
         try {
@@ -115,7 +115,7 @@ public class ObjectQueryTest: Drt.TestCase {
             expect(null == users[1].extra, "extra");
             expect_int_equal(1024, users[1].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get objects.");
         }
 
         try {
@@ -140,7 +140,7 @@ public class ObjectQueryTest: Drt.TestCase {
             expect(null == users[0].extra, "extra");
             expect_int_equal(1024, users[0].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get objects.");
         }
     }
 
@@ -148,7 +148,7 @@ public class ObjectQueryTest: Drt.TestCase {
         try {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not add object spec.");
         }
 
         try {
@@ -182,7 +182,7 @@ public class ObjectQueryTest: Drt.TestCase {
             expect(null == users[1].extra, "extra");
             expect_int_equal(1024, users[1].not_in_db, "not_in_db");
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get objects.");
         }
 
     }
@@ -191,7 +191,7 @@ public class ObjectQueryTest: Drt.TestCase {
         try {
             db.orm.add_object_spec(new ObjectSpec(typeof(User), "id", User.all_props()));
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not add object spec.");
         }
 
         try {
@@ -209,7 +209,6 @@ public class ObjectQueryTest: Drt.TestCase {
         }
 
         try {
-
             User user = conn.query_objects<User>(null, "WHERE id=?i", 2).get_one();
             expect_int64_equal(2, user.id, "id");
             expect_str_equal("Jean", user.name, "name");
@@ -222,7 +221,7 @@ public class ObjectQueryTest: Drt.TestCase {
             expect(null == user.extra, "extra");
             expect_int_equal(1024, user.not_in_db, "not_in_db");
         } catch (GLib.Error e) {
-            expectation_failed("Unexpected error: %s", e.message);
+            unexpected_error(e, "Could not get objects.");
         }
     }
 }
