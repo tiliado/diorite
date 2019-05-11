@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2019 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,18 @@ public uint type_hash(Type type) {
 
 public bool type_equal(Type type1, Type type2) {
     return ((uint) type1) == ((uint) type2);
+}
+
+/**
+ * Convert a type to a string.
+ *
+ * If type is unknown, "*unknown*" is returned.
+ *
+ * @param type    The type to convert.
+ * @return A type name or "*unknown*" if the type is unknown/invalid.
+ */
+public unowned string to_string(Type type) {
+    return type == 0 ? "*unknown*" : type.name();
 }
 
 } // namespace Drt.Types
