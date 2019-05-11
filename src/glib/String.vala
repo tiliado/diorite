@@ -237,4 +237,16 @@ public Bytes as_bytes(owned string str) {
     return new Bytes.take(as_array_of_bytes((owned) str));
 }
 
+/**
+ * Return a representation of a string.
+ *
+ * If the string isn't null, a quoted string is returned, `null` otherwise.
+ *
+ * @param str    A string to create a representation of.
+ * @return A quoted string if the string isn't null, `null` otherwise.
+ */
+public string repr(string? str) {
+    return str == null ? "null" : "\"%s\"".printf(str);
+}
+
 } // namespace Drt.String
