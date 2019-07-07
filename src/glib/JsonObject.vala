@@ -471,11 +471,20 @@ public class JsonObject: JsonNode {
         if (nl) {
             buffer.append_c('\n');
         }
-        HashTableIter<string, JsonNode?> iter = HashTableIter<string, JsonNode?>(nodes);
-        unowned string? key = null;
-        unowned JsonNode? node = null;
-        bool next = (iter.next(out key, out node) && key != null && node != null);
-        while (next) {
+        List<unowned string?> keys = nodes.get_keys();
+        keys.sort(strcmp);
+        bool first = true;
+        foreach (unowned string? key in keys) {
+            if (first) {
+                first = false;
+            } else {
+                buffer.append(item_sep);
+                if (nl) {
+                    buffer.append_c('\n');
+                }
+            }
+            unowned JsonNode? node = nodes[key];
+            assert(key != null && node != null);
             if (nl) {
                 for (var i = 0; i <= level; i++) {
                     buffer.append(indent);
@@ -489,15 +498,9 @@ public class JsonObject: JsonNode {
             } else {
                 buffer.append(node.to_string());
             }
-            next = iter.next(out key, out node) && key != null && node != null;
-            if (next) {
-                buffer.append(item_sep);
-            }
-            if (nl) {
-                buffer.append_c('\n');
-            }
         }
         if (nl) {
+            buffer.append_c('\n');
             for (var i = 0; i < level; i++) {
                 buffer.append(indent);
             }
