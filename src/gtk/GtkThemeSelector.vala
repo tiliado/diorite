@@ -54,11 +54,7 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
      * @param name    Theme name.
      * @return Human label.
      */
-    public virtual string create_theme_label(string? name) {
-        if (name == null || name == "") {
-            return "Default";
-        }
-
+    public virtual string create_theme_label(string name) {
         var pretty = new StringBuilder("");
         int begin = 0;
         int cursor = 0;
@@ -102,28 +98,24 @@ public class GtkThemeSelector : Gtk.ComboBoxText {
         HashTable<string, File> themes = yield DesktopShell.list_gtk_themes();
         List<unowned string> names = themes.get_keys();
         names.sort(strcmp);
-        append("", create_theme_label(null));
-        foreach (unowned string name in names) {
-            append(name, create_theme_label(name));
+        foreach (unowned string? name in names) {
+            if (!Drt.String.is_empty(name)) {
+                append(name, create_theme_label(name));
+            }
         }
         if (select_theme != null) {
             active_id = select_theme;
         }
-        if (active_id == null) {
-            active_id = select_current ? DesktopShell.get_gtk_theme() : "";
+        if (active_id == null && select_current) {
+            active_id = DesktopShell.get_gtk_theme();
         }
         if (active_id == null) {
-            active_id = "";
+            active_id = THEME_ADWAITA;
         }
     }
 
     private void on_changed() {
-        unowned string theme_name = active_id;
-        if (theme_name == "") {
-            DesktopShell.reset_gtk_theme();
-        } else if (theme_name != null) {
-            DesktopShell.set_gtk_theme(theme_name);
-        }
+        DesktopShell.set_gtk_theme(active_id);
     }
 
 }
