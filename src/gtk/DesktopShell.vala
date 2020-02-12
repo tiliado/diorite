@@ -26,6 +26,7 @@ using Drt;
 
 namespace Drtgtk {
 
+const string THEME_ADWAITA = "Adwaita";
 public abstract class DesktopShell: GLib.Object {
     private static DesktopShell? default_shell = null;
     private static GenericSet<string> shells = null;
@@ -132,17 +133,20 @@ public abstract class DesktopShell: GLib.Object {
      * @return true if the theme exists, false otherwise.
      */
     public static bool gtk_theme_exists(string theme) {
-        return lookup_gtk_theme_dir(theme) != null;
+        return theme == THEME_ADWAITA || lookup_gtk_theme_dir(theme) != null;
     }
 
     /**
      * List available GTK+ themes.
      *
-     * @return A HashTable of GTK+ theme names and corresponding `gtk+3.0` theme directories.
+     * @return A HashTable of GTK+ theme names and corresponding `gtk+3.0` theme directories
+     * (null for built-in themes).
      */
-    public static async HashTable<string, File> list_gtk_themes() {
+    public static async HashTable<string, File?> list_gtk_themes() {
         var storage = new Drt.XdgStorage();
-        var theme_dirs = new HashTable<string, File>(str_hash, str_equal);
+        var theme_dirs = new HashTable<string, File?>(str_hash, str_equal);
+        theme_dirs[THEME_ADWAITA] = null; // Built-in theme
+
         foreach (unowned File data_dir in storage.data_dirs()) {
             File themes_dir = data_dir.get_child("themes");
             try {
