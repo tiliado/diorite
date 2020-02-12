@@ -27,6 +27,8 @@ using Drt;
 namespace Drtgtk {
 
 const string THEME_ADWAITA = "Adwaita";
+const string THEME_ADWAITA_DARK = "Adwaita-dark";
+
 public abstract class DesktopShell: GLib.Object {
     private static DesktopShell? default_shell = null;
     private static GenericSet<string> shells = null;
@@ -83,7 +85,12 @@ public abstract class DesktopShell: GLib.Object {
      */
     public static string get_gtk_theme() {
         string? theme = Gtk.Settings.get_default().gtk_theme_name;
-        return theme != "" ? theme : "Adwaita";
+        if (theme == "" || theme == THEME_ADWAITA_DARK) {
+            // Normalize the default theme or dark theme preference won't work.
+            theme = THEME_ADWAITA;
+            set_gtk_theme(theme);
+        }
+        return theme;
     }
 
     /**
