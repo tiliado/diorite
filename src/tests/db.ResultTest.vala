@@ -398,7 +398,7 @@ public class ResultTest: Drt.TestCase {
             expect_value_equal(null, result.fetch_value_of_type(6, typeof(GLib.ByteArray)), "byte array - null");
 
             /* Unsupported types */
-            foreach (var t in new Type[] {typeof(uint), typeof(uint8), typeof(uint8[]), this.get_type(), typeof(void*)}) {
+            foreach (var t in new Type[] {typeof(uint), typeof(uint8), this.get_type(), typeof(void*)}) {
                 try {
                     result.fetch_value_of_type(1, t);
                     expectation_failed(@"Expected error: $(Drt.Types.to_string(t))");
