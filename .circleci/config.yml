@@ -1,12 +1,96 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  fedora:
     docker:
-      - image: fedora:latest
-    working_directory: ~/workdir
+     - image: fedora:32
+
+commands:
+
+  install-common-deps:
     steps:
       - run:
-          name: Install deps
+          name: Install common dependencies
+          command: |
+            dnf update -y > /dev/null
+            dnf install -y \
+              git \
+              gcc \
+              glib2-devel \
+              gobject-introspection-devel \
+              libgee \
+              libgee-devel \
+              make \
+              'pkgconfig(gtk+-3.0)' \
+              'pkgconfig(python3)' \
+              python3-pyparsing \
+              sqlite-devel \
+              vala \
+              vala-devel \
+              valadoc
+
+  build-vala:
+    parameters:
+      branch:
+        type: string
+        default: "master"
+    steps:
+      - run:
+          name: Install Vala dependencies
+          command: |
+            dnf install -y \
+              autoconf \
+              autoconf-archive \
+              automake \
+              bison \
+              flex \
+              gcc \
+              graphviz-devel \
+              make
+            gcc --version
+            valac --version
+      - run:
+          name: Build Vala from git
+          working_directory: ~/workdir
+          command: |
+            git clone https://gitlab.gnome.org/GNOME/vala.git -b << parameters.branch >> --depth 500
+            cd vala
+            ./autogen.sh --prefix=/usr
+            make all
+            dnf remove -y --noautoremove vala vala-devel valadoc
+            make install
+  build-gee:
+    steps:
+      - run:
+          name: Build Gee from git
+          working_directory: ~/workdir
+          command: |
+            git clone https://gitlab.gnome.org/GNOME/libgee.git --depth=500
+            cd libgee
+            ./autogen.sh --prefix=/usr --enable-introspection=no --disable-static --enable-gtk-doc=no
+            make all
+            dnf remove -y --noautoremove libgee libgee-devel
+            make install
+
+  build-valalint:
+    parameters:
+      branch:
+        type: string
+        default: "master"
+    steps:
+      - run:
+          name: Build Valalint from git
+          working_directory: ~/workdir
+          command: |
+            git clone https://github.com/tiliado/valalint.git -b << parameters.branch >>
+            cd valalint
+            make all
+            make install
+
+  install-foo-deps:
+    steps:
+      - run:
+          name: Install common dependencies
           command: |
             dnf update -y > /dev/null
             dnf install -y git openssh-clients \
@@ -14,45 +98,59 @@ jobs:
               'pkgconfig(gtk+-3.0)' sqlite-devel python3-pyparsing \
               wget tar xz git autoconf-archive \
               make autoconf automake glib2-devel graphviz-devel flex bison libxslt
-            dnf clean all > /dev/null
-      - run:
-          name: Download Vala
-          command: |
-            git clone https://gitlab.gnome.org/GNOME/vala.git
-      - run:
-          name: Build Vala
-          working_directory: ~/workdir/vala
-          command: |
-            ./autogen.sh --prefix=/usr
-            make all
-            dnf remove -y vala valadoc
-            make install
-      - run:
-          name: Download Gee
-          command: |
-            git clone https://gitlab.gnome.org/GNOME/libgee.git
-      - run:
-          name: Build Gee
-          working_directory: ~/workdir/libgee
-          command: |
-            ./autogen.sh --prefix=/usr --enable-introspection=no --disable-static --enable-gtk-doc=no
-            make all
-            make install
-      - run:
-          name: Install Valalint
-          command: |
-            git clone https://github.com/tiliado/valalint.git
-            cd valalint
-            make all
-            make install
-            cd ..
-            rm -rf valalint
+
+  checkout-and-build:
+    steps:
       - checkout:
           path: ~/workdir/diorite
       - run:
           name: Build and run tests
           working_directory: ~/workdir/diorite
           command: |
+            valac --version
             ./waf configure build install
             /sbin/ldconfig
             LD_LIBRARY_PATH=./build ./build/run-dioritetests
+
+jobs:
+
+  build-vala-fedora:
+    executor: fedora
+    working_directory: ~/workdir
+    steps:
+      - install-common-deps
+      - build-valalint:
+          branch: "0.48.x"
+      - checkout-and-build
+
+  build-vala-git-stable:
+    executor: fedora
+    working_directory: ~/workdir
+    steps:
+      - install-common-deps
+      - build-vala:
+          branch: "0.48"
+      - build-valalint:
+          branch: "0.48.x"
+      - checkout-and-build
+
+  build-vala-git-master:
+    executor: fedora
+    working_directory: ~/workdir
+    steps:
+      - install-common-deps
+      - build-vala
+      - build-gee
+      - build-valalint
+      - checkout-and-build
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      # Build with Vala as included in Fedora.
+      - build-vala-fedora
+      # Build with latest stable Vala from git.
+      - build-vala-git-stable
+      # Build with development Vala from git master.
+      - build-vala-git-master
