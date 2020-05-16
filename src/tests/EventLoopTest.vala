@@ -54,7 +54,7 @@ public class EventLoopTest: Drt.TestCase {
         var loop = new MainLoop();
         MainContext? ctx = null;
         int64 now = GLib.get_monotonic_time();
-        Drt.EventLoop.add_timeout(5, () => {
+        Drt.EventLoop.add_timeout(2, () => {
             ctx = MainContext.ref_thread_default();
             loop.quit();
             return false;
@@ -62,7 +62,7 @@ public class EventLoopTest: Drt.TestCase {
         loop.run();
         int64 diff = (GLib.get_monotonic_time() - now) / 1000;
 
-        expect_int64_equal(5, diff, @"$diff == 5");
+        expect_true(diff >= 2, @"$diff >= 2");
         expect_true(MainContext.@default() == ctx, "Current context is global");
 
         now = GLib.get_monotonic_time();
@@ -82,7 +82,7 @@ public class EventLoopTest: Drt.TestCase {
 
         expect_true(thread.join() == ctx, "Current context is thread-local");
         diff = (GLib.get_monotonic_time() - now) / 1000;
-        expect_int64_equal(5, diff, @"$diff == 5");
+        expect_true(diff >= 2, @"$diff >= 2");
         expect_true(MainContext.@default() != ctx, "Current context is not global");
     }
 
