@@ -444,7 +444,7 @@ public abstract class DuplexChannel : GLib.Object {
         out bool direction, out uint32 id, out ByteArray data, uint timeout=0, owned Cancellable? cancellable=null
     ) throws GLib.Error {
         data = new ByteArray();
-        uint8[MESSAGE_BUFSIZE] real_buffer = new uint8[MESSAGE_BUFSIZE];
+        uint8[] real_buffer = new uint8[MESSAGE_BUFSIZE];
         unowned uint8[] buffer;
         var bytes_to_read = (int) (2 * sizeof(uint32));
         size_t bytes_read_total = 0;
