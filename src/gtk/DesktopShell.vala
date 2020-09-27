@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2015-2020 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,8 +26,9 @@ using Drt;
 
 namespace Drtgtk {
 
-const string THEME_ADWAITA = "Adwaita";
-const string THEME_ADWAITA_DARK = "Adwaita-dark";
+public const string THEME_ADWAITA = "Adwaita";
+public const string THEME_ADWAITA_DARK = "Adwaita-dark";
+public const string DEFAULT_GTK_THEME = THEME_ADWAITA;
 
 public abstract class DesktopShell: GLib.Object {
     private static DesktopShell? default_shell = null;
