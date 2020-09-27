@@ -85,13 +85,8 @@ public abstract class DesktopShell: GLib.Object {
      * @return The name of the current GTK+ theme.
      */
     public static string get_gtk_theme() {
-        string? theme = Gtk.Settings.get_default().gtk_theme_name;
-        if (theme == "" || theme == THEME_ADWAITA_DARK) {
-            // Normalize the default theme or dark theme preference won't work.
-            theme = THEME_ADWAITA;
-            set_gtk_theme(theme);
-        }
-        return theme;
+        adjust_and_remember_initial_gtk_theme();
+        return Gtk.Settings.get_default().gtk_theme_name;
     }
 
     /**
@@ -100,19 +95,27 @@ public abstract class DesktopShell: GLib.Object {
      * @return The name of the initial GTK+ theme. May be an empty string but not null.
      */
     public static unowned string get_initial_gtk_theme() {
-        if (initial_gtk_theme == null) {
-            initial_gtk_theme = Gtk.Settings.get_default().gtk_theme_name ?? "";
-        }
+        adjust_and_remember_initial_gtk_theme();
         return initial_gtk_theme;
     }
 
+    private static void adjust_and_remember_initial_gtk_theme() {
+        if (initial_gtk_theme == null) {
+            initial_gtk_theme = Gtk.Settings.get_default().gtk_theme_name;
+            if (Drt.String.is_empty(initial_gtk_theme) || initial_gtk_theme == THEME_ADWAITA_DARK) {
+                // Normalize the default theme or dark theme preference won't work.
+                initial_gtk_theme = THEME_ADWAITA;
+                set_gtk_theme(initial_gtk_theme);
+            }
+        }
+    }
     /**
      * Set the current GTK+ theme name.
      *
      * @param theme    The name of the GTK+ theme to set.
      */
     public static void set_gtk_theme(string theme) {
-        get_initial_gtk_theme();  // remember initial GTK+ theme
+        adjust_and_remember_initial_gtk_theme();
         Gtk.Settings.get_default().gtk_theme_name = theme;
     }
 
