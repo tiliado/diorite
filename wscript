@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright 2014-2018 Jiří Janoušek <janousek.jiri@gmail.com>
+# Copyright 2014-2020 Jiří Janoušek <janousek.jiri@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-VERSION = "4.16.0"
+VERSION = "4.17.0"
 
 MIN_VALA = "0.42.0"
 MIN_GLIB = "2.56.1"

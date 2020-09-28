@@ -7,6 +7,25 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.17.0 - September 28, 2020
+-----------------------------------
+
+* KeyValueStorage: Tell which property cannot be bound.
+* Fix Creation method of abstract class cannot be public (Vala 0.44.1.38-c900b4).
+* Add String.repr(): Return a representation of a string.
+* Add Types.to_string: Convert a type to a string.
+* Drop printf style of TestCase expect/assert methods.
+* Sort keys in JsonObject dump. Issue: tiliado/nuvolaruntime#541
+* Make built-in theme Adwaita always available. Issue: tiliado/nuvolaruntime#586
+* Remove Default from GTK theme selector. Issue: tiliado/nuvolaruntime#586
+* Normalize the default GTK theme. Issue: tiliado/nuvolaruntime#586
+* Fix warning from Valac 0.48.
+* Make EventLoop test less strict.
+* Fix syntax error with Vala master.
+* Add Drtgtk.DEFAULT_GTK_THEME (Adwaita). Issue: tiliado/nuvolaruntime#636
+* Always adjust Adwaita theme name.
+
+
 Release 4.16.0 - February 24th, 2019
 ------------------------------------
 
