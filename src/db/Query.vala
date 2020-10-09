@@ -337,9 +337,7 @@ public class Query : GLib.Object {
      * Throw error if statement fails.
      */
     protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
-        if (Drtdb.is_sql_error(result)) {
-            throw convert_sqlite_error(result, connection.get_last_error_message(), sql);
-        }
+        throw_sqlite_error(result, connection.get_last_error_message(), sql);
         return result;
     }
 }

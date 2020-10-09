@@ -282,9 +282,7 @@ public class Result : GLib.Object {
      * Throw an error on SQLite failure.
      */
     protected int throw_on_error(int result, string? sql=null) throws DatabaseError {
-        if (Drtdb.is_sql_error(result)) {
-            throw convert_sqlite_error(result, connection.get_last_error_message(), sql, statement);
-        }
+        throw_sqlite_error(result, connection.get_last_error_message(), sql, statement);
         return result;
     }
 

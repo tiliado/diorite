@@ -91,19 +91,21 @@ throws DatabaseError {
  * Parameters `message`, `sql` and `stm` are optional but add more information
  * to the resulting error message.
  *
- * @param errno      sqlite error code
+ * @param code      sqlite error code
  * @param message    error message
  * @param sql        executed sql query
  * @param stm        sqlite statement
- * @return corresponding {@link DatabaseError}
+ * @throws DatabaseError corresponding {@link DatabaseError}
  */
-private DatabaseError convert_sqlite_error(int errno, string? message, string? sql=null,
-    Sqlite.Statement? stm = null) {
-    string msg = "SQLite Error %d: %s. |%s|".printf(
-        errno,
-        message ?? "(unknown message)",
-        sql ?? (stm != null ? stm.sql() : null));
-    return new DatabaseError.GENERAL(msg);
+private void throw_sqlite_error(int code, string? message, string? sql=null,
+    Sqlite.Statement? stm = null) throws DatabaseError {
+    if (is_sql_error(code)) {
+        string msg = "SQLite Error %d: %s. |%s|".printf(
+            code,
+            message ?? "(unknown message)",
+            sql ?? (stm != null ? stm.sql() : null));
+        throw new DatabaseError.GENERAL(msg);
+    }
 }
 
 

@@ -258,9 +258,7 @@ public class Database: GLib.Object, Queryable {
         Sqlite.Database db;
         int result = Sqlite.Database.open_v2(
             db_file.get_path(), out db, Sqlite.OPEN_READWRITE|Sqlite.OPEN_CREATE, null);
-        if (Drtdb.is_sql_error(result)) {
-            throw convert_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
-        }
+        throw_sqlite_error(result, db != null ? db.errmsg() : sqlite3_errstr(result));
         return new Connection((owned) db, orm);
     }
 
