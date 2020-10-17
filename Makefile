@@ -1,17 +1,26 @@
-devel:
-	git checkout devel
+#!/usr/bin/make -f
 
-master:
-	git checkout master
+DEVELOP_BRANCH := master
+STABLE_BRANCH := release-4.x
 
-sync:
-	git checkout devel
+switch-develop:
+	git checkout $(DEVELOP_BRANCH)
+
+switch-stable:
+	git checkout $(STABLE_BRANCH)
+
+push:
+	git checkout $(STABLE_BRANCH)
 	git push && git push --tags
-	git checkout master
+	git checkout $(DEVELOP_BRANCH)
 	git push && git push --tags
-	git checkout devel
 
-merge:
-	git checkout master
-	git merge --ff-only devel
-	git checkout devel
+merge-devel:
+	set -eu \
+	&& b="`git branch --show-current`" \
+	&& test -n "$$b" -a "$$b" != $(DEVELOP_BRANCH) -a "$$b" != $(STABLE_BRANCH) \
+	&& set -x \
+	&& git checkout $(DEVELOP_BRANCH) \
+	&& git merge --ff-only "$$b" \
+	&& git branch -d "$$b" \
+	&& git status -v
