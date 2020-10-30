@@ -7,6 +7,15 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.18.0 - October 30, 2020
+---------------------------------
+
+* Refactor convert_sqlite_error into throw_sqlite_error
+* The names of git branches has changed:
+  * release-4.x - stable version for immediate release
+  * master - development branch, merged into stable when ready
+* Pre-release git tag (e.g. 4.19.0-dev) are supported.
+
 Release 4.17.0 - September 28, 2020
 -----------------------------------
 
