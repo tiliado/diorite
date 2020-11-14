@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Jiří Janoušek <janousek.jiri@gmail.com>
+ * Copyright 2011-2020 Jiří Janoušek <janousek.jiri@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,7 +45,6 @@ private const string XFCE_SESSION_SERVICE_OBJECT = "/org/xfce/SessionManager";
 public abstract class Application : Gtk.Application {
     private static Application? instance;
     public string desktop_name {get; protected set;}
-    public string app_id {get; protected set;}
     public string app_name {get; protected set;}
     public string icon {get; protected set; default = "";}
     public string version {get; protected set; default = "";}
@@ -56,16 +55,17 @@ public abstract class Application : Gtk.Application {
     private Menu? default_menubar = null;
 
     protected Application(
-        string uid, string name, string? dbus_name = null,
-        GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE
+        string application_id, string name, GLib.ApplicationFlags flags=GLib.ApplicationFlags.FLAGS_NONE
     ) {
-        Object(application_id: dbus_name ?? uid, flags: flags);
+        Object(application_id: application_id, flags: flags);
         this.app_name = name;
-        this.desktop_name = uid + ".desktop";
-        this.app_id = uid;
+        this.desktop_name = application_id + ".desktop";
         actions = new Actions(this);
-        prctl(15, uid, 0, 0, 0);
-        GLib.Environment.set_prgname(uid);
+        prctl(15, application_id, 0, 0, 0);
+        /* g_application_id == D-Bus service name == $(basename desktop_file_path .desktop) == xdg app_id
+         *  http://honk.sigxcpu.org/con/GTK__and_the_application_id.html
+         */
+        GLib.Environment.set_prgname(application_id);
         GLib.Environment.set_application_name(name);
     }
 
@@ -135,7 +135,7 @@ public abstract class Application : Gtk.Application {
 
     public override void startup() {
         /* Set program name */
-        Gdk.set_program_class(app_id); // must be set after Gtk.init()!
+        Gdk.set_program_class(application_id); // must be set after Gtk.init()!
         instance = this;
         Posix.sigaction_t sig_action = {};
         sig_action.sa_sigaction = terminate_handler;
