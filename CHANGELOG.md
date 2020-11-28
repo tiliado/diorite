@@ -7,6 +7,12 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.19.0 - November 29, 2020
+----------------------------------
+
+* Use relative paths in pkg-config files. Issue: tiliado/nuvolaruntime#482
+* Make application id and dbus id always equal. Issue: tiliado/diorite#32
+
 Release 4.18.0 - October 30, 2020
 ---------------------------------
 
