@@ -28,7 +28,7 @@
 top = '.'
 out = 'build'
 APPNAME = "diorite"
-VERSION = "4.18.0"
+VERSION = "4.19.0"
 
 MIN_VALA = "0.42.0"
 MIN_GLIB = "2.56.1"
@@ -448,17 +448,23 @@ def build(ctx):
         install_path = None
     )
 
+    # https://www.bassi.io/articles/2018/03/15/pkg-config-and-paths/
+    PREFIX = ctx.env.PREFIX
+    PC_PATHS = {}
+    for name in "LIBDIR", "INCLUDEDIR", "DATADIR":
+        path = getattr(ctx.env, name)
+        PC_PATHS[name] = "${prefix}" + path[len(PREFIX):] if path.startswith(PREFIX + "/") else path
+
     ctx(features = 'subst',
         source='src/dioriteglib.pc.in',
         target='{}glib{}.pc'.format(APPNAME, ctx.env.SERIES),
         install_path='${LIBDIR}/pkgconfig',
         VERSION=ctx.env.VERSION,
-        PREFIX=ctx.env.PREFIX,
-        INCLUDEDIR = ctx.env.INCLUDEDIR,
-        LIBDIR = ctx.env.LIBDIR,
+        PREFIX=PREFIX,
         APPNAME=APPNAME,
         PC_CFLAGS=PC_CFLAGS,
         LIBNAME=DIORITE_GLIB,
+        **PC_PATHS,
     )
 
     ctx(features = 'subst',
@@ -466,13 +472,12 @@ def build(ctx):
         target='{}gtk{}.pc'.format(APPNAME, ctx.env.SERIES),
         install_path='${LIBDIR}/pkgconfig',
         VERSION=ctx.env.VERSION,
-        PREFIX=ctx.env.PREFIX,
-        INCLUDEDIR = ctx.env.INCLUDEDIR,
-        LIBDIR = ctx.env.LIBDIR,
+        PREFIX=PREFIX,
         APPNAME=APPNAME,
         PC_CFLAGS=PC_CFLAGS,
         LIBNAME=DIORITE_GTK,
         DIORITE_GLIB=DIORITE_GLIB,
+        **PC_PATHS,
     )
 
     ctx(features = 'subst',
@@ -480,13 +485,12 @@ def build(ctx):
         target='{}db{}.pc'.format(APPNAME, ctx.env.SERIES),
         install_path='${LIBDIR}/pkgconfig',
         VERSION=ctx.env.VERSION,
-        PREFIX=ctx.env.PREFIX,
-        INCLUDEDIR = ctx.env.INCLUDEDIR,
-        LIBDIR = ctx.env.LIBDIR,
+        PREFIX=PREFIX,
         APPNAME=APPNAME,
         PC_CFLAGS=PC_CFLAGS,
         LIBNAME=DIORITE_DB,
         DIORITE_GLIB=DIORITE_GLIB,
+        **PC_PATHS,
     )
 
     ctx.install_as('${BINDIR}/diorite-testgen' + ctx.env.SERIES, 'testgen.py', chmod=Utils.O755)
