@@ -7,6 +7,11 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+Release 4.20.0 - December 28, 2020
+----------------------------------
+
+* Add Drt.System.get_hostname.
+
 Release 4.19.0 - November 29, 2020
 ----------------------------------
 
