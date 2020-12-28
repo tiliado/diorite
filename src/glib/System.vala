@@ -344,4 +344,15 @@ public async string? get_machine_id_hash(uint8[] app_key, GLib.ChecksumType chec
     return GLib.Hmac.compute_for_data(checksum, app_key, cached_machine_id);
 }
 
+[CCode(cname="HOST_NAME_MAX", cheader_filename="limits.h")]
+private extern const int HOST_NAME_MAX;
+
+public string? get_hostname() {
+    char[] hostname = new char[HOST_NAME_MAX + 1];
+    if (Posix.gethostname(hostname) != 0) {
+        return null;
+    }
+    return (string) hostname;
+}
+
 } // namespace Drt.System
