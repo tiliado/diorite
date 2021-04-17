@@ -129,9 +129,9 @@ jobs:
     steps:
       - install-common-deps
       - build-vala:
-          branch: "0.48"
+          branch: "0.52"
       - build-valalint:
-          branch: "0.48.x"
+          branch: "0.52.x"
       - checkout-and-build
 
   build-vala-git-master:
