@@ -7,6 +7,11 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+4.22.0 - May 9th, 2021
+----------------------
+
+* Synchronize version with Nuvola Player.
+
 Release 4.21.0 - April 11th, 2021
 ---------------------------------
 
