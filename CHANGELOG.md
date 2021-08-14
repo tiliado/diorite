@@ -7,6 +7,8 @@ Diorite Changelog
    [Nuvola Devel mailing list](https://groups.google.com/d/forum/nuvola-player-devel)
    to receive more technical announcements and important information about future development.
 
+* Make text of dialogs selectable. Issue: tiliado/nuvolaplayer#762
+
 4.23.0 - August 1st, 2021
 -------------------------
 

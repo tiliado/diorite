@@ -25,10 +25,24 @@
 using Drt;
 
 namespace Drtgtk {
+
+public interface SelectableDialog : Gtk.MessageDialog {
+    public void set_selectable(bool selectable) {
+        var container = (Gtk.Container) get_message_area();
+        List<unowned Gtk.Widget> children = container.get_children();
+        foreach (unowned Gtk.Widget child in children) {
+            var label = child as Gtk.Label;
+            if (label != null) {
+                label.set_selectable(selectable);
+            }
+        }
+    }
+}
+
 /**
  * Simple Error dialog with OK button.
  */
-public class ErrorDialog : Gtk.MessageDialog {
+public class ErrorDialog : Gtk.MessageDialog, SelectableDialog {
 
     /**
      * Constructs new error dialog.
@@ -47,6 +61,7 @@ public class ErrorDialog : Gtk.MessageDialog {
         );
         this.text = title;
         this.secondary_text = message;
+        set_selectable(true);
     }
 
     public override void response(int id) {
@@ -57,7 +72,7 @@ public class ErrorDialog : Gtk.MessageDialog {
 /**
  * Simple confirmation dialog with YES and NO buttons.
  */
-public class ConfirmDialog : Gtk.MessageDialog {
+public class ConfirmDialog : Gtk.MessageDialog, SelectableDialog {
 
     /**
      * Constructs new error dialog.
@@ -76,6 +91,7 @@ public class ConfirmDialog : Gtk.MessageDialog {
         );
         this.text = title;
         this.secondary_text = message;
+        set_selectable(true);
     }
 
     public override void response(int id) {
@@ -86,7 +102,7 @@ public class ConfirmDialog : Gtk.MessageDialog {
 /**
  * Simple Information dialog with OK button.
  */
-public class InfoDialog : Gtk.MessageDialog {
+public class InfoDialog : Gtk.MessageDialog, SelectableDialog {
 
     /**
      * Constructs new error dialog.
@@ -105,6 +121,7 @@ public class InfoDialog : Gtk.MessageDialog {
         );
         this.text = title;
         this.secondary_text = message;
+        set_selectable(true);
     }
 
     public override void response(int id) {
