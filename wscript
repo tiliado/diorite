@@ -212,7 +212,7 @@ def options(ctx):
     ctx.add_option('--gir', action='store_true', default=False, dest='build_gir', help="Build GIR.")
     ctx.add_option('--no-strict', action='store_false', default=True, dest='strict', help="Disable strict checks (e.g. fatal warnings).")
     ctx.add_option(
-        '--no-vala-lint', action='store_false', default=True, dest='lint_vala', help="Don't use Vala linter.")
+        '--no-vala-lint', action='store_false', default=False, dest='lint_vala', help="Noop.")
     ctx.add_option(
         '--lint-vala-auto-fix', action='store_true', default=False,
         dest='lint_vala_auto_fix', help="Use Vala linter and automatically fix errors (dangerous).")
